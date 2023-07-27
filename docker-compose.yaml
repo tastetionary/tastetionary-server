@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  server:
+    container_name: 'server'
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /usr/src/app/node_modules
+      - .:/usr/src/app
+    ports:
+      - 8080:3000
+    expose:
+      - 8080
+    depends_on:
+      - db
+    networks:
+      - my_network
+  db:
+    image: postgres:9.6
+    restart: always
+    container_name: 'db'
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=db
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - my_network
+volumes:
+  db:
+    driver: local
+
+networks:
+  my_network:
