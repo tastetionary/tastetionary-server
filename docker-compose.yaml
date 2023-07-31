@@ -15,8 +15,9 @@ services:
       - 8080
     depends_on:
       - db
+      - cache
     networks:
-      - my_network
+      - dev_network
   db:
     image: postgres:9.6
     restart: always
@@ -30,10 +31,22 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
     networks:
-      - my_network
+      - dev_network
+  cache:
+    image: redis:7.0-alpine
+    container_name: 'cache'
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server
+    volumes: 
+      - ./cache:/data
+    networks:
+      - dev_network
 volumes:
   db:
     driver: local
-
+  cache:
+    driver: local
 networks:
-  my_network:
+  dev_network:
