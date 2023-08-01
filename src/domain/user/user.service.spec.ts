@@ -1,4 +1,4 @@
-//TODO: remove test once user repository is implemented
+//TODO: remove test once user service is implemented
 describe('dummy test ', () => {
   it('dummy test', () => {
     const expected = 2;
