@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { AppService } from '@src/app.service';
 import { PlaygroundModule } from '@src/domain/playground/playground.module';
-
+import config from '@src/config';
 @Module({
-  imports: [PlaygroundModule],
-  controllers: [AppController],
+  imports: [
+    PlaygroundModule,
+    ConfigModule.forRoot({
+      cache: true,
+      isGlobal: true,
+      load: [config],
+    }),
+  ],
   providers: [AppService],
 })
 export class AppModule {}
