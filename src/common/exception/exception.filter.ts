@@ -13,7 +13,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
-    // TODO modify detail property on env, when dev, full response but prod, no
+    // TODO modify detail property on env, when dev, return full response, but prod no
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),

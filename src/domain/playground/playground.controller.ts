@@ -5,7 +5,7 @@ import {
   HttpStatus,
   UseFilters,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from '@src/common/exception';
+import { HttpExceptionFilter } from '@src/common/exception/exception.filter';
 
 @Controller('v1/playground')
 @UseFilters(new HttpExceptionFilter())
