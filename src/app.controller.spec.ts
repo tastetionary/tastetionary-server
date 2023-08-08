@@ -1,22 +1,33 @@
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from '@src/app.controller';
-import { AppService } from '@src/app.service';
+import * as request from 'supertest';
+import { AppModule } from './app.module';
 
 describe('AppController', () => {
-  let appController: AppController;
+  let app: INestApplication;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    app = moduleFixture.createNestApplication();
+    await app.init();
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  it('should be defined', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Hello World!');
+  });
+
+  describe('/healthcheck', () => {
+    it('Successfully return server healthcheck', async () => {
+      const res = await request(app.getHttpServer()).get('/healthcheck').send();
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('timestamp');
+      expect(res.body).toHaveProperty('version');
     });
   });
 });
