@@ -7,4 +7,5 @@ export default () => ({
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT, 10) || 5432,
   },
+  name: process.env.NAME,
 });

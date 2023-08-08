@@ -8,7 +8,13 @@ describe('app service', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [AppService],
-      imports: [ConfigModule],
+      imports: [
+        ConfigModule.forRoot({
+          cache: true,
+          isGlobal: true,
+          envFilePath: `.env.${process.env.NODE_ENV}`,
+        }),
+      ],
     }).compile();
 
     appService = module.get<AppService>(AppService);
