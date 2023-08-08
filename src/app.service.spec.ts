@@ -1,24 +1,7 @@
-import { ConfigModule } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppService } from '@src/app.service';
+import { appService } from '@root/jest.setup';
 
 describe('app service', () => {
-  let appService: AppService;
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AppService],
-      imports: [
-        ConfigModule.forRoot({
-          cache: true,
-          isGlobal: true,
-          envFilePath: `.env.${process.env.NODE_ENV}`,
-        }),
-      ],
-    }).compile();
-
-    appService = module.get<AppService>(AppService);
-  });
+  beforeEach(async () => {});
 
   describe('configuration', () => {
     it('should temp', () => {
