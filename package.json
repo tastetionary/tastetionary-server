@@ -13,11 +13,11 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "jest NODE_ENV=test src/**/**/*.repository.spec.ts src/**/**/*.service.spec.ts",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json --passWithNoTests",
+    "test:e2e": "jest NODE_ENV=test src/**/**/*.controller.spec.ts src/app.controller.spec.ts",
     "prepare": "husky install",
     "husky": "npx husky install && npx husky add .husky/pre-commit"
   },
