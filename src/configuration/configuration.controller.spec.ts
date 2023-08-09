@@ -1,20 +1,39 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigurationController } from './configuration.controller';
-import { ConfigurationService } from './configuration.service';
+import { ConfigurationController } from '@src/configuration/configuration.controller';
+import { ConfigurationService } from '@src/configuration/configuration.service';
+import { INestApplication } from '@nestjs/common';
+import { TestingModule } from '@nestjs/testing';
+import { appModuleFixture } from '@root/jest.setup';
+import * as request from 'supertest';
 
-describe('ConfigurationController', () => {
-  let controller: ConfigurationController;
+describe('configuration controller', () => {
+  let app: INestApplication;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [ConfigurationController],
-      providers: [ConfigurationService],
-    }).compile();
-
-    controller = module.get<ConfigurationController>(ConfigurationController);
+    const module = (await appModuleFixture(
+      [ConfigurationController],
+      [ConfigurationService],
+    )) as TestingModule;
+    app = module.createNestApplication();
+    await app.init();
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('/', () => {
+    it('should return env', async () => {
+      const res = await request(app.getHttpServer()).get('/');
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toEqual({ env: 'TEST', port: '3000' });
+    });
+  });
+
+  describe('/health-check', () => {
+    it('Successfully return server health check', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/health-check')
+        .send();
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('timestamp');
+      expect(res.body).toHaveProperty('version');
+    });
   });
 });

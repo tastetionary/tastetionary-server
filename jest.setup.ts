@@ -22,8 +22,10 @@ beforeAll(async () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  appModuleFixture = async(importers:any[], env='test'):Promise<TestingModule>=>{
+  appModuleFixture = async(controllers:any[], providers:Provider<any>[],importers:any[]=[], env='test'):Promise<TestingModule>=>{
     return await Test.createTestingModule({
+      controllers,
+      providers,
       imports: [
         ...importers,
         ConfigModule.forRoot({
