@@ -1,4 +1,4 @@
-import { ConfigurationController } from '@src/configuration/configuration.controller';
+import { V1ConfigurationController } from '@src/configuration/configuration.controller';
 import { ConfigurationService } from '@src/configuration/configuration.service';
 import { INestApplication } from '@nestjs/common';
 import { TestingModule } from '@nestjs/testing';
@@ -10,16 +10,16 @@ describe('configuration controller', () => {
 
   beforeEach(async () => {
     const module = (await appModuleFixture(
-      [ConfigurationController],
+      [V1ConfigurationController],
       [ConfigurationService],
     )) as TestingModule;
     app = module.createNestApplication();
     await app.init();
   });
 
-  describe('/', () => {
+  describe('/v1/configuration', () => {
     it('should return env', async () => {
-      const res = await request(app.getHttpServer()).get('/');
+      const res = await request(app.getHttpServer()).get('/v1/configuration');
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual({ env: 'TEST', port: '3000' });
     });
@@ -28,7 +28,7 @@ describe('configuration controller', () => {
   describe('/health-check', () => {
     it('Successfully return server health check', async () => {
       const res = await request(app.getHttpServer())
-        .get('/health-check')
+        .get('/v1/configuration/health-check')
         .send();
 
       expect(res.statusCode).toEqual(200);
