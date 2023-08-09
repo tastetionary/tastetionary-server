@@ -1,21 +1,39 @@
+import { Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppService } from '@src/app.service';
 
-let appService:AppService;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let appServiceFixture:CallableFunction;
+let appModuleFixture:CallableFunction;
 beforeAll(async () => {
-  const module: TestingModule = await Test.createTestingModule({
-    providers: [AppService],
-    imports: [
-      ConfigModule.forRoot({
-        cache: true,
-        isGlobal: true,
-        envFilePath: `.env.${process.env.NODE_ENV}`,
-      }),
-    ],
-  }).compile();
 
-  appService = module.get<AppService>(AppService);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  appServiceFixture = async(providers:Provider<any>[], env='test'):Promise<TestingModule>=>{
+    return await Test.createTestingModule({
+      providers: providers,
+      imports: [
+        ConfigModule.forRoot({
+          cache: true,
+          isGlobal: true,
+          envFilePath: `.env.${env}`,
+        }),
+      ],
+    }).compile();
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  appModuleFixture = async(importers:any[], env='test'):Promise<TestingModule>=>{
+    return await Test.createTestingModule({
+      imports: [
+        ...importers,
+        ConfigModule.forRoot({
+          cache: true,
+          isGlobal: true,
+          envFilePath: `.env.${env}`,
+        }),
+      ],
+    }).compile();
+  };
 });
 
-export {appService};
+export {appServiceFixture, appModuleFixture};

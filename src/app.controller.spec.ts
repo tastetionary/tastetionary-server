@@ -1,25 +1,22 @@
 import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { TestingModule } from '@nestjs/testing';
+import { appModuleFixture } from '@root/jest.setup';
 import * as request from 'supertest';
-import { AppModule } from './app.module';
+import { AppModule } from '@src/app.module';
 
 describe('AppController', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
+    const module = (await appModuleFixture([AppModule])) as TestingModule;
+    app = module.createNestApplication();
     await app.init();
   });
 
-  it('should be defined', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('should return env', async () => {
+    const res = await request(app.getHttpServer()).get('/');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual({ env: 'TEST', port: '3000' });
   });
 
   describe('/health-check', () => {
