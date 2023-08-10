@@ -6,7 +6,7 @@ export class V1ConfigurationController {
   constructor(private readonly cfgService: ConfigurationService) {}
 
   @Get('/')
-  get() {
+  getServerConfig() {
     return this.cfgService.getServerConfig();
   }
 
