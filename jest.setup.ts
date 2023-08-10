@@ -1,12 +1,11 @@
 import { Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { validate } from '@src/env.validation';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let appServiceFixture:CallableFunction;
 let appModuleFixture:CallableFunction;
 beforeAll(async () => {
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   appServiceFixture = async(providers:Provider<any>[], env='test'):Promise<TestingModule>=>{
     return await Test.createTestingModule({
@@ -16,6 +15,7 @@ beforeAll(async () => {
           cache: true,
           isGlobal: true,
           envFilePath: `.env.${env}`,
+          validate
         }),
       ],
     }).compile();
@@ -32,6 +32,7 @@ beforeAll(async () => {
           cache: true,
           isGlobal: true,
           envFilePath: `.env.${env}`,
+          validate
         }),
       ],
     }).compile();

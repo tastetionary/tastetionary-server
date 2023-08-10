@@ -20,7 +20,7 @@ describe('configuration service', () => {
 
   it('fixture with test env should return expected', async () => {
     const res = service.getServerConfig();
-    expect(res.ENV).toEqual('TEST');
+    expect(res.ENV).toEqual('test');
   });
 
   it.skip('reason: env is not cleared so this test affect other test, fixture with dev env should return expected', async () => {
@@ -30,6 +30,6 @@ describe('configuration service', () => {
     )) as TestingModule;
     const devService = module.get<cfgService>(cfgService);
     const res = devService.getServerConfig();
-    expect(res.ENV).toEqual('DEV');
+    expect(res.ENV).toEqual('development');
   });
 });

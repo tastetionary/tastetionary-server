@@ -21,7 +21,7 @@ describe('configuration controller', () => {
     it('should return env', async () => {
       const res = await request(app.getHttpServer()).get('/v1/configuration');
       expect(res.statusCode).toEqual(200);
-      expect(res.body).toEqual({ ENV: 'TEST' });
+      expect(res.body).toEqual({ ENV: 'test' });
     });
   });
 
