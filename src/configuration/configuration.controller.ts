@@ -3,15 +3,15 @@ import { ConfigurationService } from '@src/configuration/configuration.service';
 
 @Controller('v1/configuration')
 export class V1ConfigurationController {
-  constructor(private readonly configurationService: ConfigurationService) {}
+  constructor(private readonly cfgService: ConfigurationService) {}
 
   @Get('/')
   get() {
-    return '';
+    return this.cfgService.getServerConfig();
   }
 
   @Get('/health-check')
   getServerStatus() {
-    return '';
+    return this.cfgService.getServerMetaData();
   }
 }

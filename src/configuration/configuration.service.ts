@@ -1,16 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+  ServerConfig,
+  ServerMetaData,
+} from '@src/configuration/dto/configuration.dto';
 
 @Injectable()
 export class ConfigurationService {
   constructor(private configService: ConfigService) {}
 
-  getServerConfig() {
-    const env = this.configService.get<string>('ENV');
-    const port = this.configService.get<number>('APP_PORT');
+  getServerConfig(): ServerConfig {
+    const ENV = this.configService.get<string>('ENV');
     return {
-      env,
-      port,
+      ENV,
     };
+  }
+
+  getServerMetaData(): ServerMetaData {
+    return { serverTime: new Date().toISOString(), version: '0.0.1' };
   }
 }
