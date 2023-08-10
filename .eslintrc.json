@@ -1,25 +1,26 @@
 {
-    "env": {
-        "browser": true,
-        "commonjs": true,
-        "es2021": true
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": "latest"
-    },
-    "plugins": [
-        "@typescript-eslint"
-    ],
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es2021": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier"
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": "latest"
+	},
+	"plugins": [
+		"@typescript-eslint"
+	],
 
-    "rules": {
-        "quotes": ["error", "single"], // we want to force semicolons
-        "semi": ["error", "always"], // we use 2 spaces to indent our code
-        "indent": ["error", 2], // we want to avoid extraneous spaces
-        "no-multi-spaces": ["error"]
-    }
+	"rules": {
+		"quotes": ["error", "single"], // we want to force semicolons
+		"semi": ["error", "always"], // we use 2 spaces to indent our code
+		"no-multi-spaces": ["error"],
+		"indent": "off"
+	}
 }
