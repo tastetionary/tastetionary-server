@@ -18,6 +18,7 @@
     "noFallthroughCasesInSwitch": false,
     "baseUrl": ".",
     "paths": {
+      "@root/*": ["./*"],
       "@src/*": ["src/*"],
       "@domain/*": ["src/domain/*"]
     }

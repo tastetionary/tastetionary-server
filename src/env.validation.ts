@@ -1,0 +1,32 @@
+import { plainToInstance } from 'class-transformer';
+import { IsEnum, validateSync, IsNumber } from 'class-validator';
+
+enum Environment {
+  DEVELOPMENT = 'development',
+  TEST = 'test',
+  PRODUCTION = 'production',
+}
+
+class EnvironmentVariables {
+  @IsEnum(Environment)
+  ENV: Environment;
+
+  @IsNumber()
+  API_SERVER_PORT: number;
+}
+
+export function validate(config: Record<string, unknown>) {
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
+
+  if (errors.length > 0) {
+    throw new Error(
+      `fail setting config, check env and EnvironmentVariables, ${errors.toString()}`,
+    );
+  }
+  return validatedConfig;
+}
