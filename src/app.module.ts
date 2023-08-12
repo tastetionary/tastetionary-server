@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PlaygroundModule } from '@src/domain/playground/playground.module';
+import { LoggingModule } from '@src/common/logging/logging.module';
 import { ConfigurationModule } from '@src/configuration/configuration.module';
+import { PlaygroundModule } from '@src/domain/playground/playground.module';
 import { validate } from '@src/env.validation';
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { validate } from '@src/env.validation';
       envFilePath: `.env.${process.env.NODE_ENV}`,
       validate,
     }),
+    LoggingModule,
   ],
 })
 export class AppModule {}
