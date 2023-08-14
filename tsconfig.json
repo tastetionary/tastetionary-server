@@ -20,7 +20,9 @@
     "paths": {
       "@root/*": ["./*"],
       "@src/*": ["src/*"],
-      "@domain/*": ["src/domain/*"]
+      "@domain/*": ["src/domain/*"],
+      "@common/*": ["src/common/*"],
+      "@utils/*": ["src/utils/*"]
     }
-  },
+  }
 }
