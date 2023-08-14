@@ -20,7 +20,7 @@ const dailyOptions = (level: string) => {
 export const winstonLogger = WinstonModule.createLogger({
   transports: [
     new winston.transports.Console({
-      level: env === 'production' ? 'http' : 'silly',
+      level: env === 'production' ? 'info' : 'silly',
       format:
         env === 'production'
           ? winston.format.simple()
