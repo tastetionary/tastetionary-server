@@ -21,7 +21,8 @@
       "@root/*": ["./*"],
       "@src/*": ["src/*"],
       "@domain/*": ["src/domain/*"],
-      "@common/*": ["src/common/*"]
+      "@common/*": ["src/common/*"],
+      "@utils/*": ["src/utils/*"]
     }
   }
 }
