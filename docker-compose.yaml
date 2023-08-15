@@ -1,23 +1,6 @@
 version: '3.8'
 
 services:
-  server:
-    container_name: 'server'
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - /usr/src/app/node_modules
-      - .:/usr/src/app
-    ports:
-      - 8080:3000
-    expose:
-      - 8080
-    depends_on:
-      - db
-      - cache
-    networks:
-      - dev_network
   db:
     image: postgres:9.6
     restart: always
@@ -27,7 +10,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=db
+      - POSTGRES_DB=taste
     volumes:
       - ./data:/var/lib/postgresql/data
     networks:
@@ -37,7 +20,7 @@ services:
     container_name: 'cache'
     restart: always
     ports:
-      - 6379:6379
+      - 6399:6379
     command: redis-server
     volumes: 
       - ./cache:/data
