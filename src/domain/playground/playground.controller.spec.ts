@@ -18,6 +18,13 @@ describe('PlaygroundController', () => {
 
   it('should be defined', () => {
     return request(app.getHttpServer())
+      .post('/v1/playground/nestia')
+      .send({ email: 'wkdgndldi@gmail.com' })
+      .expect(201);
+  });
+
+  it('should be defined', () => {
+    return request(app.getHttpServer())
       .get('/v1/playground')
       .expect(200)
       .expect('Hello World!');
