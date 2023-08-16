@@ -10,7 +10,7 @@ export class ConfigurationService {
   constructor(private configService: ConfigService) {}
 
   getServerConfig(): ServerConfig {
-    const ENV = this.configService.get<string>('ENV');
+    const ENV = this.configService.get<string>('ENV', 'undefined');
     return {
       ENV,
     };
