@@ -6,12 +6,22 @@ import {
   UseFilters,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@src/common/exception/exception.filter';
-import { TypedBody, TypedRoute } from '@nestia/core';
-interface TestDto {
+import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
+export interface TestDto {
   /**
-   * @format email
+   * Title of the article.
    */
-  email: string;
+  title: string;
+
+  /**
+   * Content body.
+   */
+  body: string;
+
+  /**
+   * Password of the article.
+   */
+  password: string;
 }
 
 @Controller('v1/playground')
@@ -33,6 +43,12 @@ export class PlaygroundController {
   @TypedRoute.Post('/nestia')
   getSampleNestia(@TypedBody() dto: TestDto): string {
     console.log(`work..., ${dto}`);
+    return 'success';
+  }
+
+  @TypedRoute.Get('/nestia/:value')
+  getSampleNestiaTwo(@TypedParam('value') value: string): string {
+    console.log(`work..., ${value}`);
     return 'success';
   }
 }
