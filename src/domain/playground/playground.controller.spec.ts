@@ -4,7 +4,7 @@ import { AppModule } from '@src/app.module';
 import { INestApplication } from '@nestjs/common';
 import { ConfigurationModule } from '@root/src/configuration/configuration.module';
 
-describe('PlaygroundController', () => {
+describe('playground controller', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -19,15 +19,15 @@ describe('PlaygroundController', () => {
   it('should be defined', () => {
     return request(app.getHttpServer())
       .post('/v1/playground/nestia')
-      .send({ email: 'wkdgndldi@gmail.com' })
+      .send({ title: 'title', body: 'body', password: 'pwd' })
       .expect(201);
   });
 
   it('should be defined', () => {
     return request(app.getHttpServer())
-      .get('/v1/playground')
+      .get('/v1/playground/nestia/sample')
       .expect(200)
-      .expect('Hello World!');
+      .expect({ data: 'sample' });
   });
 
   it('should return error format', async () => {

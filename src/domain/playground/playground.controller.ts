@@ -7,31 +7,11 @@ import {
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@src/common/exception/exception.filter';
 import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
-export interface TestDto {
-  /**
-   * Title of the article.
-   */
-  title: string;
-
-  /**
-   * Content body.
-   */
-  body: string;
-
-  /**
-   * Password of the article.
-   */
-  password: string;
-}
+import { PlaygroundSampleDto } from '@src/domain/playground/dto/playground.dto';
 
 @Controller('v1/playground')
 @UseFilters(new HttpExceptionFilter())
 export class PlaygroundController {
-  @Get()
-  findAll() {
-    return 'Hello World!';
-  }
-
   @Get('/error')
   createError() {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN, {
@@ -41,14 +21,14 @@ export class PlaygroundController {
   }
 
   @TypedRoute.Post('/nestia')
-  getSampleNestia(@TypedBody() dto: TestDto): string {
-    console.log(`work..., ${dto}`);
-    return 'success';
+  postSample(@TypedBody() dto: PlaygroundSampleDto): {
+    data: PlaygroundSampleDto;
+  } {
+    return { data: dto };
   }
 
   @TypedRoute.Get('/nestia/:value')
-  getSampleNestiaTwo(@TypedParam('value') value: string): string {
-    console.log(`work..., ${value}`);
-    return 'success';
+  getSample(@TypedParam('value') value: string): { data: string } {
+    return { data: value };
   }
 }
