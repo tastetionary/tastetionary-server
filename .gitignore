@@ -34,3 +34,4 @@ cache/
 
 # nestia
 src/api/
+packages/api/lib/
