@@ -6,6 +6,13 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "prebuild": "rimraf dist",
+    "postbuild": "npx nestia swagger",
+    "swagger": "npx nestia swagger",
+    "sdk": "rimraf ./src/api/functional && NODE_ENV=development nestia sdk",
+    "nestia": "npm run swagger ; npm run sdk",
+    "build:api": "rimraf packages/api/lib && npm run nestia && tsc -p ./tsconfig.api.json",
+    "package:publish": "npm run build:api && cd ./packages/api && npm publish --access=public",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -41,6 +48,7 @@
     "nest-winston": "^1.9.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "typescript-transform-paths": "^3.4.6",
     "typia": "^4.2.3",
     "winston": "^3.10.0",
     "winston-daily-rotate-file": "^4.7.1"
