@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   ServerConfig,
   ServerMetaData,
-} from '@src/configuration/dto/configuration.dto';
+} from '@root/src/domain/configuration/dto/configuration.dto';
 
 @Injectable()
 export class ConfigurationService {

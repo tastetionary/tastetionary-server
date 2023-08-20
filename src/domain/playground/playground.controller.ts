@@ -7,11 +7,12 @@ import {
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@src/common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
-import { PlaygroundSampleDto } from '@src/domain/playground/dto/playground.dto';
+import { PlaygroundSampleDto } from '@domain/playground/dto/playground.dto';
 
 @Controller('v1/playground')
 @UseFilters(new HttpExceptionFilter())
 export class PlaygroundController {
+  // TODO delete after fixing custom error rule
   @Get('/error')
   createError() {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN, {

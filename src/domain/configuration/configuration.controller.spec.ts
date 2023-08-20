@@ -1,5 +1,5 @@
-import { V1ConfigurationController } from '@src/configuration/configuration.controller';
-import { ConfigurationService } from '@src/configuration/configuration.service';
+import { V1ConfigurationController } from '@domain/configuration/configuration.controller';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { INestApplication } from '@nestjs/common';
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture } from '@root/jest.setup';
@@ -25,10 +25,10 @@ describe('configuration controller', () => {
     });
   });
 
-  describe('/v1/health-check', () => {
+  describe('/v1/server-status', () => {
     it('Successfully return server health check', async () => {
       const res = await request(app.getHttpServer())
-        .get('/v1/configuration/health-check')
+        .get('/v1/configuration/server-status')
         .send();
 
       expect(res.statusCode).toEqual(200);
