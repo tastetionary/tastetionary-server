@@ -6,7 +6,7 @@ import {
   UseFilters,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@src/common/exception/exception.filter';
-import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
+import { TypedBody, TypedRoute } from '@nestia/core';
 import { PlaygroundSampleDto } from '@src/domain/playground/dto/playground.dto';
 
 @Controller('v1/playground')
@@ -21,14 +21,7 @@ export class PlaygroundController {
   }
 
   @TypedRoute.Post('/nestia')
-  postSample(@TypedBody() dto: PlaygroundSampleDto): {
-    data: PlaygroundSampleDto;
-  } {
-    return { data: dto };
-  }
-
-  @TypedRoute.Get('/nestia/:value')
-  getSample(@TypedParam('value') value: string): { data: string } {
-    return { data: value };
+  postSample(@TypedBody() dto: PlaygroundSampleDto): PlaygroundSampleDto {
+    return dto;
   }
 }
