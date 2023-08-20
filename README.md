@@ -8,17 +8,7 @@ TBD
 $ npm install
 ```
 
-## publish on npm
-
-1. change version on package/api/package.json
-2. run cli
-
-```
-npm run package:publish
-```
-
 ## DB migration
-
 .env is for database only
 
 ### run migrate
