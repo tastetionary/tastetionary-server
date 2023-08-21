@@ -18,7 +18,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      detail: exception['options'],
+      detail: {
+        reason: exception['options'],
+        additionalData: exception['additionalData'],
+      },
     });
   }
 }

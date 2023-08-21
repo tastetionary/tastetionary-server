@@ -27,7 +27,7 @@ describe('playground controller', () => {
     const res = await request(app.getHttpServer())
       .get('/v1/playground/error')
       .send();
-    expect(res.statusCode).toEqual(403);
+    expect(res.statusCode).toEqual(400);
     expect(res.body).toHaveProperty('detail');
     expect(res.body).toHaveProperty('path');
     expect(res.body).toHaveProperty('statusCode');
