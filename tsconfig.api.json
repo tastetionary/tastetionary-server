@@ -1,0 +1,13 @@
+{
+  // sdk build 시 사용되는 tsconfig 파일
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "removeComments": false,
+    "sourceMap": false,
+    "target": "ES6",
+    "declaration": true,
+    "outDir": "./packages/api/lib",
+    "lib": ["DOM", "ES2015"]
+  },
+  "include": ["./src/api"]
+}
