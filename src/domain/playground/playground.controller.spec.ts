@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '@src/app.module';
 import { INestApplication } from '@nestjs/common';
-import { ConfigurationModule } from '@root/src/configuration/configuration.module';
+import { ConfigurationModule } from '@root/src/domain/configuration/configuration.module';
 
-describe('PlaygroundController', () => {
+describe('playground controller', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -18,16 +18,16 @@ describe('PlaygroundController', () => {
 
   it('should be defined', () => {
     return request(app.getHttpServer())
-      .get('/v1/playground')
-      .expect(200)
-      .expect('Hello World!');
+      .post('/v1/playground/nestia')
+      .send({ title: 'title', body: 'body', password: 'pwd' })
+      .expect(201);
   });
 
   it('should return error format', async () => {
     const res = await request(app.getHttpServer())
       .get('/v1/playground/error')
       .send();
-    expect(res.statusCode).toEqual(403);
+    expect(res.statusCode).toEqual(400);
     expect(res.body).toHaveProperty('detail');
     expect(res.body).toHaveProperty('path');
     expect(res.body).toHaveProperty('statusCode');

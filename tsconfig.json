@@ -11,18 +11,41 @@
     "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "baseUrl": ".",
     "paths": {
-      "@root/*": ["./*"],
-      "@src/*": ["src/*"],
-      "@domain/*": ["src/domain/*"],
-      "@common/*": ["src/common/*"],
-      "@utils/*": ["src/utils/*"]
-    }
+      "@root/*": [
+        "./*"
+      ],
+      "@src/*": [
+        "src/*"
+      ],
+      "@domain/*": [
+        "src/domain/*"
+      ],
+      "@common/*": [
+        "src/common/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ]
+    },
+    "plugins": [{
+        "transform": "@nestia/core/lib/transform",
+        "validate": "assert",
+        "stringify": "assert"
+      },
+      {
+        "transform": "typia/lib/transform"
+      },
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ]
   }
 }
