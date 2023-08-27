@@ -10,18 +10,131 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model Users {
+  id        Int      @id @default(autoincrement())
+  nickname  String   @map("nickanme") @db.VarChar(32)
+  state     String   @map("state") @db.VarChar(16) // user 의 상태, 가입 완료, 탈퇴, 블락 등
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([nickname])
+  @@index([state])
+  @@index([nickname, state])
+  @@map("users")
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model UserTokens {
+  id                    Int      @id @default(autoincrement())
+  userId                Int      @map("user_id")
+  accessToken           String   @map("access_token") @db.Varchar(512)
+  refreshToken          String   @map("refresh_token") @db.Varchar(512)
+  accessTokenExpiredAt  DateTime @map("access_token_expired_at")
+  refreshTokenExpiredAt DateTime @map("refresh_token_expired_at")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("user_tokens")
+}
+
+model UserAreas {
+  id        Int                      @id @default(autoincrement())
+  userId    Int                      @map("user_id")
+  category  String                   @map("category") @db.VarChar(32) // 활동지역, 식사지역 
+  order     Int                      @map("order") @db.SmallInt // user 의 상태, 가입 완료, 탈퇴, 블락 등
+  location  Unsupported("geography") // 위경도
+  createdAt DateTime                 @default(now()) @map("created_at")
+  updatedAt DateTime                 @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([location], type: Gist)
+  @@map("user_areas")
+}
+
+model UserPreferences {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  bookmark_ids Int[]    @map("bookmark_ids") @db.Integer
+  excluded_ids Int[]    @map("excluded_ids") @db.Integer
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([bookmark_ids], type: Gin)
+  @@index([excluded_ids], type: Gin)
+  @@map("user_preferences")
+}
+
+model RestaurantReviews {
+  id            Int      @id @default(autoincrement())
+  external_uuid BigInt   @map("external_uuid") // 외부 API 를 통해 가져온 식당 uuid
+  userId        Int      @map("user_id")
+  summary       String   @map("summary") @db.VarChar(128) // 한줄 요약
+  opinion       String   @map("opinion") @db.VarChar(16) // 최종 의견, 
+  keywords      Json     @map("keywords") @db.Json // tags
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([external_uuid])
+  @@index([external_uuid, userId])
+  @@map("restaurant_reviews")
+}
+
+model Accounts {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  category       String   @map("category") @db.VarChar(32)
+  identification String   @map("identification") @db.VarChar(256)
+  password       String   @map("password") @db.VarChar(256)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([identification, password])
+  @@map("accounts")
+}
+
+model Agreements {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  category  String   @map("category") @db.VarChar(32)
+  state     String   @map("state") @db.VarChar(16)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("agreements")
+}
+
+model Authentications {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  identification String   @map("identification") @db.VarChar(256)
+  category       String   @map("category") @db.VarChar(32)
+  type           String   @map("type") @db.VarChar(16)
+  state          String   @map("state") @db.VarChar(16)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, category])
+  @@index([userId, category, state])
+  @@index([userId, identification, category])
+  @@map("authentications")
+}
+
+model AuthenticationHistories {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  identification String   @map("identification") @db.VarChar(256)
+  type           String   @map("type") @db.VarChar(16)
+  code           String   @map("code") @db.VarChar(16)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  expiredAt      DateTime @map("expired_at")
+
+  @@index([userId])
+  @@index([identification, type])
+  @@index([identification, type, code])
+  @@map("authentication_histories")
 }
