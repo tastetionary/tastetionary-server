@@ -53,13 +53,27 @@ CREATE TABLE "restaurant_reviews" (
     "id" SERIAL NOT NULL,
     "external_uuid" BIGINT NOT NULL,
     "user_id" INTEGER NOT NULL,
+    "category" VARCHAR(32) NOT NULL,
     "summary" VARCHAR(128) NOT NULL,
     "opinion" VARCHAR(16) NOT NULL,
-    "keywords" JSON NOT NULL,
+    "keywords" TEXT[],
+    "price" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "restaurant_reviews_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "external_restaurant_informations" (
+    "id" BIGSERIAL NOT NULL,
+    "external_uuid" BIGINT NOT NULL,
+    "location" geography NOT NULL,
+    "reference_link" VARCHAR(1024) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "external_restaurant_informations_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -153,6 +167,18 @@ CREATE INDEX "restaurant_reviews_external_uuid_idx" ON "restaurant_reviews"("ext
 
 -- CreateIndex
 CREATE INDEX "restaurant_reviews_external_uuid_user_id_idx" ON "restaurant_reviews"("external_uuid", "user_id");
+
+-- CreateIndex
+CREATE INDEX "restaurant_reviews_keywords_idx" ON "restaurant_reviews" USING GIN ("keywords");
+
+-- CreateIndex
+CREATE INDEX "restaurant_reviews_price_idx" ON "restaurant_reviews"("price");
+
+-- CreateIndex
+CREATE INDEX "external_restaurant_informations_external_uuid_idx" ON "external_restaurant_informations"("external_uuid");
+
+-- CreateIndex
+CREATE INDEX "external_restaurant_informations_location_idx" ON "external_restaurant_informations" USING GIST ("location");
 
 -- CreateIndex
 CREATE INDEX "accounts_user_id_idx" ON "accounts"("user_id");
