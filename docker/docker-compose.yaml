@@ -20,8 +20,8 @@ services:
     ports:
       - 6399:6379
     command: redis-server
-    volumes: 
-      - ./cache:/data
+    volumes:
+      - ../cache:/data
     networks:
       - taste_dict_network
 volumes:
