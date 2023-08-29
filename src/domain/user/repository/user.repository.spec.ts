@@ -1,14 +1,15 @@
-import { UserRepository } from '@src/domain/user/repository/user.repository';
+import { UserRepository } from '@domain/user/repository/user.repository';
 import { TestingModule } from '@nestjs/testing';
 import { PrismaService } from '@common/database/prisma.service';
 import { appModuleFixture } from '@root/jest.setup';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
 
 describe('user repository', () => {
   let repo: UserRepository;
   beforeAll(async () => {
     const module = (await appModuleFixture(
       [],
-      [PrismaService, UserRepository],
+      [ConfigurationService, PrismaService, UserRepository],
     )) as TestingModule;
     repo = module.get(UserRepository);
   });
