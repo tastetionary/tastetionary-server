@@ -10,18 +10,154 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model Users {
+  id        Int      @id @default(autoincrement())
+  nickname  String   @map("nickname") @db.VarChar(32)
+  state     String   @map("state") @db.VarChar(16) // user 의 상태, 가입 완료, 탈퇴, 블락 등
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([nickname])
+  @@index([state])
+  @@index([nickname, state])
+  @@map("users")
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model UserTokens {
+  id                    Int      @id @default(autoincrement())
+  userId                Int      @map("user_id")
+  accessToken           String   @map("access_token") @db.VarChar(512)
+  refreshToken          String   @map("refresh_token") @db.VarChar(512)
+  accessTokenExpiredAt  DateTime @map("access_token_expired_at")
+  refreshTokenExpiredAt DateTime @map("refresh_token_expired_at")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, accessToken])
+  @@index([userId, refreshToken])
+  @@map("user_tokens")
+}
+
+model UserAreas {
+  id        Int                      @id @default(autoincrement())
+  userId    Int                      @map("user_id")
+  category  String                   @map("category") @db.VarChar(32) // 활동지역, 식사지역 
+  order     Int                      @map("order") @db.SmallInt // user 의 상태, 가입 완료, 탈퇴, 블락 등
+  location  Unsupported("geography") // 위경도
+  createdAt DateTime                 @default(now()) @map("created_at")
+  updatedAt DateTime                 @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([location], type: Gist)
+  @@map("user_areas")
+}
+
+model UserPreferences {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  bookmark_ids Int[]    @map("bookmark_ids") @db.Integer
+  excluded_ids Int[]    @map("excluded_ids") @db.Integer
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([bookmark_ids], type: Gin)
+  @@index([excluded_ids], type: Gin)
+  @@map("user_preferences")
+}
+
+model RestaurantReviews {
+  id            Int      @id @default(autoincrement())
+  external_uuid BigInt   @map("external_uuid") /// 외부 API 를 통해 가져온 식당 uuid
+  userId        Int      @map("user_id")
+  category      String   @map("category") @db.VarChar(32) /// 리뷰시 등록되는 음식 종류, 한식 중식 양식 등
+  summary       String   @map("summary") @db.VarChar(128) /// 한줄 요약
+  opinion       String   @map("opinion") @db.VarChar(16) // 최종 의견, 
+  keywords      String[] @map("keywords") @db.Text // tags
+  price         Int      @map("price") @db.Integer // 가격
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([external_uuid])
+  @@index([external_uuid, userId])
+  @@index([keywords], type: Gin)
+  @@index([price])
+  @@map("restaurant_reviews")
+}
+
+model ExternalRestaurantInformations {
+  id             BigInt                   @id @default(autoincrement())
+  external_uuid  BigInt                   @map("external_uuid") /// 외부 API 를 통해 가져온 식당 uuid
+  location       Unsupported("geography") // 위경도
+  reference_link String                   @map("reference_link") @db.VarChar(1024)
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @updatedAt @map("updated_at")
+
+  @@index([external_uuid])
+  @@index([location], type: Gist)
+  @@map("external_restaurant_informations")
+}
+
+model Accounts {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  category       String   @map("category") @db.VarChar(32) // 로그인 수단(종류), 구글 로그인, 이메일 로그인 등
+  identification String   @map("identification") @db.VarChar(256) // 로그인 수단에 사용된 고유 값
+  password       String   @map("password") @db.VarChar(256) // 
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([category, identification])
+  @@index([identification, password])
+  @@map("accounts")
+}
+
+model Agreements {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  category  String   @map("category") @db.VarChar(32) // 서비스에서 제공하는 규약 종류
+  is_agree  Boolean  @map("state") @db.Boolean // 규약에 대한 동의 비동의 여부
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, category])
+  @@map("agreements")
+}
+
+// 개인 인증 내용을 저장, 회사인증 조직인증 등 
+model Authentications {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  identification String   @map("identification") @db.VarChar(256) // 인증시 사용한 수단의 고유값, email, phone_number 등
+  category       String   @map("category") @db.VarChar(32) // 인증의 종류, 회사 인증, 동아리 인증 등
+  type           String   @map("type") @db.VarChar(16) // 인증시 사용된 수단, Email, SMS 등
+  state          String   @map("state") @db.VarChar(16) // 인증 상태, 진행중, 완료
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([identification])
+  @@index([userId, category])
+  @@index([userId, category, state])
+  @@index([userId, identification, category])
+  @@map("authentications")
+}
+
+model AuthenticationHistories {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  identification String   @map("identification") @db.VarChar(256) // 인증에서 사용된 고유값, email, phone-number 등
+  type           String   @map("type") @db.VarChar(16) // 인증에서 사용되는 수단, email, sms 등
+  code           String   @map("code") @db.VarChar(16) // 인증을 위해 사용되는 code 값
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  expiredAt      DateTime @map("expired_at") // 인증 만료 시간
+
+  @@index([userId])
+  @@index([identification, type])
+  @@index([identification, type, code])
+  @@map("authentication_histories")
 }

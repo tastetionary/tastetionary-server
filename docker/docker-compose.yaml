@@ -1,23 +1,21 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:9.6
+  postgis-db:
+    image: postgis/postgis
     restart: always
-    container_name: 'db'
+    container_name: 'taste-dict-rds'
     ports:
       - 5433:5432
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=taste
-    volumes:
-      - ../data:/var/lib/postgresql/data
     networks:
-      - dev_network
+      - taste_dict_network
   cache:
     image: redis:7.0-alpine
-    container_name: 'cache'
+    container_name: 'tast-dict-cache'
     restart: always
     ports:
       - 6399:6379
@@ -25,11 +23,11 @@ services:
     volumes:
       - ../cache:/data
     networks:
-      - dev_network
+      - taste_dict_network
 volumes:
-  db:
+  taste-dict-rds:
     driver: local
-  cache:
+  taste-dict-cache:
     driver: local
 networks:
-  dev_network:
+  taste_dict_network:
