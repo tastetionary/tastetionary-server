@@ -20,10 +20,17 @@ describe('user repository', () => {
     await truncateTables(prisma, ['users']);
   });
 
-  it('should create users', async () => {
-    const data = [{ nickname: 'test', state: 'test' }];
+  it('should save user', async () => {
+    const data = { nickname: 'test', state: 'test', property: {} };
+    await repo.saveUser(data);
+    const res = await repo.getUser({});
+    expect(res.length).toEqual(1);
+  });
+
+  it('should save users', async () => {
+    const data = [{ nickname: 'test', state: 'test', property: {} }];
     await repo.saveUsers(data);
-    const res = await repo.getUsers();
+    const res = await repo.getUsers({});
     expect(res.length).toEqual(data.length);
   });
 });
