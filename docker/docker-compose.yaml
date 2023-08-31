@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  postgis-db:
+  taste-dict-rds:
     image: postgis/postgis
     restart: always
     container_name: 'taste-dict-rds'
@@ -13,9 +13,9 @@ services:
       - POSTGRES_DB=taste
     networks:
       - taste_dict_network
-  cache:
+  taste-dict-cache:
     image: redis:7.0-alpine
-    container_name: 'tast-dict-cache'
+    container_name: 'taste-dict-cache'
     restart: always
     ports:
       - 6399:6379

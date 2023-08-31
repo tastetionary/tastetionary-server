@@ -1,8 +1,11 @@
+CREATE EXTENSION IF NOT EXISTS postgis; 
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "nickname" VARCHAR(32) NOT NULL,
     "state" VARCHAR(16) NOT NULL,
+    "property" JSONB NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
