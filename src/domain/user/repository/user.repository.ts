@@ -5,42 +5,58 @@ import { PrismaService } from '@common/database/prisma.service';
 export class UserRepository {
   constructor(private prisma: PrismaService) {}
 
-  async saveUser(data: {
+  async saveUser(param: {
     nickname: string;
     state: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     property: Record<string, any>;
   }) {
-    await this.saveUsers([data]);
+    await this.saveUsers([param]);
   }
 
   async saveUsers(
-    data: {
+    params: {
       nickname: string;
       state: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       property: Record<string, any>;
     }[],
   ) {
-    return this.prisma.users.createMany({ data });
+    return this.prisma.users.createMany({ data: params });
   }
 
-  async getUser(data: { id?: number; nickname?: string; state?: string }) {
-    return this.getUsers(data, 1);
+  async getUserById(id: number) {
+    return this.getUsers({ ids: [id] }, 1);
   }
 
-  // TODO modify type state to enum
+  // TODO modify state to enum after fixed state
   async getUsers(
-    data: { id?: number; nickname?: string; state?: string },
+    param: { ids?: number[]; nicknames?: string[]; states?: string[] },
     take = 100,
   ) {
     return this.prisma.users.findMany({
       where: {
-        id: data.id,
-        nickname: data.nickname,
-        state: data.state,
+        id: {
+          in: param.ids,
+        },
+        nickname: {
+          in: param.nicknames,
+        },
+        state: {
+          in: param.states,
+        },
       },
       take,
+    });
+  }
+
+  async updateUserById(
+    id: number,
+    param: { nickname?: string; state?: string },
+  ) {
+    return this.prisma.users.update({
+      where: { id },
+      data: param,
     });
   }
 }

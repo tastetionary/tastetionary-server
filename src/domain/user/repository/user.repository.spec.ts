@@ -20,10 +20,23 @@ describe('user repository', () => {
     await truncateTables(prisma, ['users']);
   });
 
+  it('should update user', async () => {
+    const data = { nickname: 'test', state: 'test', property: {} };
+    await repo.saveUser(data);
+
+    let user = (await repo.getUsers({}))[0];
+    const updateData = { nickname: 'test2', state: 'test2' };
+    await repo.updateUserById(user.id, updateData);
+
+    user = (await repo.getUsers({}))[0];
+    expect(user.nickname).toEqual(updateData.nickname);
+    expect(user.state).toEqual(updateData.state);
+  });
+
   it('should save user', async () => {
     const data = { nickname: 'test', state: 'test', property: {} };
     await repo.saveUser(data);
-    const res = await repo.getUser({});
+    const res = await repo.getUsers({});
     expect(res.length).toEqual(1);
   });
 
