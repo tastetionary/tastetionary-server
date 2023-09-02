@@ -1,13 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { validate } from '@src/env.validation';
+import { PrismaService } from './src/common/database/prisma.service';
 
-let appServiceFixture:CallableFunction;
-let appModuleFixture:CallableFunction;
+let appServiceFixture: CallableFunction;
+let appModuleFixture: CallableFunction;
 beforeAll(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  appServiceFixture = async(providers:Provider<any>[], env='test'):Promise<TestingModule>=>{
+  appServiceFixture = async (
+    providers: Provider<any>[],
+    env = 'test',
+  ): Promise<TestingModule> => {
     return await Test.createTestingModule({
       providers: providers,
       imports: [
@@ -15,14 +19,18 @@ beforeAll(async () => {
           cache: true,
           isGlobal: true,
           envFilePath: `.env.${env}`,
-          validate
+          validate,
         }),
       ],
     }).compile();
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  appModuleFixture = async(controllers:any[], providers:Provider<any>[],importers:any[]=[], env='test'):Promise<TestingModule>=>{
+  appModuleFixture = async (
+    controllers: any[],
+    providers: Provider<any>[],
+    importers: any[] = [],
+    env = 'test',
+  ): Promise<TestingModule> => {
     return await Test.createTestingModule({
       controllers,
       providers,
@@ -32,11 +40,19 @@ beforeAll(async () => {
           cache: true,
           isGlobal: true,
           envFilePath: `.env.${env}`,
-          validate
+          validate,
         }),
       ],
     }).compile();
   };
 });
 
-export {appServiceFixture, appModuleFixture};
+async function truncateTables(prisma: PrismaService, tableNames: string[]) {
+  for (const name of tableNames) {
+    await prisma.$queryRawUnsafe(
+      `TRUNCATE "${name}" RESTART IDENTITY CASCADE;`,
+    );
+  }
+}
+
+export { appServiceFixture, appModuleFixture, truncateTables };
