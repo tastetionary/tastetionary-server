@@ -1,4 +1,4 @@
-export class UserCore {
+export class AccountRegister {
   helloWorld() {
     return 'hello';
   }
