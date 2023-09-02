@@ -3,6 +3,7 @@ import { TestingModule } from '@nestjs/testing';
 import { PrismaService } from '@common/database/prisma.service';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { UserState } from '@domain/user/user.enum';
 
 describe('user repository', () => {
   let repo: UserRepository;
@@ -21,7 +22,7 @@ describe('user repository', () => {
   });
 
   it('should update user', async () => {
-    const data = { nickname: 'test', state: 'test', property: {} };
+    const data = { nickname: 'test', state: UserState.ACTIVE, property: {} };
     await repo.saveUser(data);
 
     let user = (await repo.getUsers({}))[0];
@@ -34,14 +35,14 @@ describe('user repository', () => {
   });
 
   it('should save user', async () => {
-    const data = { nickname: 'test', state: 'test', property: {} };
+    const data = { nickname: 'test', state: UserState.ACTIVE, property: {} };
     await repo.saveUser(data);
     const res = await repo.getUsers({});
     expect(res.length).toEqual(1);
   });
 
   it('should save users', async () => {
-    const data = [{ nickname: 'test', state: 'test', property: {} }];
+    const data = [{ nickname: 'test', state: UserState.ACTIVE, property: {} }];
     await repo.saveUsers(data);
     const res = await repo.getUsers({});
     expect(res.length).toEqual(data.length);

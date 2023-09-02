@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
-import { AccountCategory } from '@domain/user.enum';
+import { AccountCategory } from '@domain/user/user.enum';
 
 @Injectable()
 export class AccountRepository {

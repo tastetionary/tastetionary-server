@@ -3,7 +3,7 @@ import { TestingModule } from '@nestjs/testing';
 import { PrismaService } from '@common/database/prisma.service';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { AgreementCategory } from '@domain/user.enum';
+import { AgreementCategory } from '@domain/user/user.enum';
 
 describe('agreement repository', () => {
   let repo: AgreementRepository;

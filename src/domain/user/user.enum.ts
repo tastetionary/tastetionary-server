@@ -1,3 +1,6 @@
+export enum UserState {
+  ACTIVE = 'active',
+}
 export enum AccountCategory {
   EMAIL = 'email',
 }
