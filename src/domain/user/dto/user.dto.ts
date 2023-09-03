@@ -13,4 +13,30 @@ export interface RegisterAccountDto {
    * @type string
    */
   password: string;
+
+  /**
+   * category for accounts, now only support 'EMAIL'
+   * @type string
+   */
+  category: string;
+
+  /**
+   * agreements data
+   * @type Array
+   */
+  agreement: RegisterAgreementDto[];
+}
+
+export interface RegisterAgreementDto {
+  /**
+   * category for agreements, now only support 'PERSONAL_INFORMATION''
+   * @type string
+   */
+  category: string;
+
+  /**
+   * whether user agree the agreement-category
+   * @type boolean
+   */
+  is_agree: boolean;
 }
