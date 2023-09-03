@@ -59,4 +59,9 @@ export class UserRepository {
       data: param,
     });
   }
+
+  // TODO for testing mock, it will be removed after merge service/core PR
+  async tempMethod() {
+    return ['origin'];
+  }
 }

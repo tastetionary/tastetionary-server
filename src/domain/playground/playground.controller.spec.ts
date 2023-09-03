@@ -7,7 +7,7 @@ import { ConfigurationModule } from '@root/src/domain/configuration/configuratio
 describe('playground controller', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, ConfigurationModule],
     }).compile();
