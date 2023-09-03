@@ -19,13 +19,27 @@ describe('user controller', () => {
     app = module.createNestApplication();
     await app.init();
   });
-  it('temp should return state', async () => {
+
+  it('temp - mock test', async () => {
     const result = ['test'];
     jest.spyOn(repo, 'tempMethod').mockImplementation(async () => result);
 
-    return request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/v1/users/')
-      .send({ id: 1 })
-      .expect(201);
+      .send({ identification: 'test', password: 'pwd' });
+
+    expect(res.statusCode).toEqual(201);
+  });
+
+  it('wrong input should return bad request', async () => {
+    const result = ['test'];
+    jest.spyOn(repo, 'tempMethod').mockImplementation(async () => result);
+
+    const res = await request(app.getHttpServer())
+      .post('/v1/users/')
+      .send({ id: 1 });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.detail.reason).toContain('not following');
   });
 });
