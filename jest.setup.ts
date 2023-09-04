@@ -47,7 +47,8 @@ beforeAll(async () => {
   };
 });
 
-async function truncateTables(prisma: PrismaService, tableNames: string[]) {
+type tableNames = 'users' | 'accounts' | 'agreements';
+async function truncateTables(prisma: PrismaService, tableNames: tableNames[]) {
   for (const name of tableNames) {
     await prisma.$queryRawUnsafe(
       `TRUNCATE "${name}" RESTART IDENTITY CASCADE;`,

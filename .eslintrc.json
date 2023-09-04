@@ -21,6 +21,7 @@
 		"quotes": ["error", "single"], // we want to force semicolons
 		"semi": ["error", "always"], // we use 2 spaces to indent our code
 		"no-multi-spaces": ["error"],
-		"indent": "off"
+		"indent": "off",
+		"@typescript-eslint/no-explicit-any": "off"
 	}
 }
