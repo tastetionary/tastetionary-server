@@ -14,7 +14,7 @@ export class UserController {
   @TypedRoute.Post('/')
   async registerAccount(
     @TypedBody() dto: RegisterAccountDto,
-  ): Promise<BaseResponseDto<{ state: string }>> {
+  ): Promise<BaseResponseDto<object>> {
     const data = await this.repo.tempMethod();
     console.log(data, dto);
     return new BaseResponseDto({ state: 'success' });
