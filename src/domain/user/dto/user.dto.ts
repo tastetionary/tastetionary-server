@@ -1,4 +1,5 @@
 import typia from 'typia';
+import { AccountCategory } from '../user.enum';
 export const checkRegisterAccountDto = typia.createIs<RegisterAccountDto>();
 
 export interface RegisterAccountDto {
@@ -18,7 +19,7 @@ export interface RegisterAccountDto {
    * category for accounts, now only support 'EMAIL'
    * @type string
    */
-  category: string;
+  category: AccountCategory;
 
   /**
    * agreements data
