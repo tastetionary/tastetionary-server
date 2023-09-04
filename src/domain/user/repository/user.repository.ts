@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
+import { UserState } from '@domain/user/user.enum';
 
 @Injectable()
 export class UserRepository {
@@ -7,7 +8,7 @@ export class UserRepository {
 
   async saveUser(param: {
     nickname: string;
-    state: string;
+    state: UserState;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     property: Record<string, any>;
   }) {
@@ -17,7 +18,7 @@ export class UserRepository {
   async saveUsers(
     params: {
       nickname: string;
-      state: string;
+      state: UserState;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       property: Record<string, any>;
     }[],
@@ -29,9 +30,8 @@ export class UserRepository {
     return this.getUsers({ ids: [id] }, 1);
   }
 
-  // TODO modify state to enum after fixed state
   async getUsers(
-    param: { ids?: number[]; nicknames?: string[]; states?: string[] },
+    param: { ids?: number[]; nicknames?: string[]; states?: UserState[] },
     take = 100,
   ) {
     return this.prisma.users.findMany({
