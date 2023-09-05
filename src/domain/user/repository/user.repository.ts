@@ -12,7 +12,7 @@ export class UserRepository {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     property: Record<string, any>;
   }) {
-    await this.saveUsers([param]);
+    return this.prisma.users.create({ data: param });
   }
 
   async saveUsers(
