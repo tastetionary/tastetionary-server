@@ -6,7 +6,8 @@ import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserService } from '@domain/user/service/user.service';
 import { AccountRepository } from '@domain/user/repository/account.repository';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
-import { AccountCategory } from '@domain/user/user.enum';
+import { AccountCategory, AgreementCategory } from '@domain/user/user.enum';
+import { AgreementRepository } from '@domain/user/repository/agreements.repository';
 
 describe('user service', () => {
   let service: UserService;
@@ -20,6 +21,7 @@ describe('user service', () => {
         PrismaService,
         UserRepository,
         AccountRepository,
+        AgreementRepository,
       ],
     )) as TestingModule;
     service = module.get(UserService);
@@ -30,14 +32,14 @@ describe('user service', () => {
     await truncateTables(prisma, ['users', 'accounts']);
   });
 
-  it('should create user and account', async () => {
+  it('should create user and account and agreement', async () => {
     const dto: RegisterUserDTO = {
       identification: 'test',
       password: 'pwd',
       category: AccountCategory.EMAIL,
       agreement: [
         {
-          category: 'PERSONAL',
+          category: AgreementCategory.PERSONAL_INFORMATION,
           is_agree: true,
         },
       ],

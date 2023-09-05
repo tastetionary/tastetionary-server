@@ -1,5 +1,5 @@
 import typia from 'typia';
-import { AccountCategory } from '@domain/user/user.enum';
+import { AccountCategory, AgreementCategory } from '@domain/user/user.enum';
 
 export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
 
@@ -36,7 +36,7 @@ export interface AgreementDTO {
    * category for agreements, now only support 'PERSONAL_INFORMATION''
    * @type string
    */
-  category: string;
+  category: AgreementCategory;
 
   /**
    * whether user agree the agreement-category
