@@ -3,7 +3,7 @@ import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { PrismaService } from '@common/database/prisma.service';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { Account } from '@domain/user/core/account';
-import { RegisterAccountDto } from '@domain/user/dto/user.dto';
+import { AccountDTO } from '@domain/user/dto/user.dto';
 import { AccountRepository } from '@domain/user/repository/account.repository';
 import { AccountCategory } from '@domain/user/user.enum';
 
@@ -24,16 +24,10 @@ describe('account', () => {
   });
 
   it('duplicated email should raise error', async () => {
-    const dto: RegisterAccountDto = {
+    const dto: AccountDTO = {
       identification: 'test',
       password: 'pwd',
       category: AccountCategory.EMAIL,
-      agreement: [
-        {
-          category: 'PERSONAL',
-          is_agree: true,
-        },
-      ],
     };
     const account = new Account(accountRepo, dto);
     await account.register(1);
@@ -41,16 +35,10 @@ describe('account', () => {
   });
 
   it('should save account', async () => {
-    const dto: RegisterAccountDto = {
+    const dto: AccountDTO = {
       identification: 'test',
       password: 'pwd',
       category: AccountCategory.EMAIL,
-      agreement: [
-        {
-          category: 'PERSONAL',
-          is_agree: true,
-        },
-      ],
     };
     const account = new Account(accountRepo, dto);
     await account.register(1);

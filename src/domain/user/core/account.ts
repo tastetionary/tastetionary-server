@@ -1,11 +1,11 @@
-import { RegisterAccountDto } from '@domain/user/dto/user.dto';
+import { AccountDTO } from '@domain/user/dto/user.dto';
 import { AccountRepository } from '@domain/user/repository/account.repository';
 import { CoreException } from '@common/exception/custom.exception';
 
 export class Account {
   constructor(
     private readonly repo: AccountRepository,
-    private readonly dto: RegisterAccountDto,
+    private readonly dto: AccountDTO,
   ) {}
   async register(userId: number) {
     await this.validateEmail();

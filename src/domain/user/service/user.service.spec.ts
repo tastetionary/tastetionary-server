@@ -5,7 +5,7 @@ import { ConfigurationService } from '@domain/configuration/configuration.servic
 import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserService } from '@domain/user/service/user.service';
 import { AccountRepository } from '@domain/user/repository/account.repository';
-import { RegisterAccountDto } from '@domain/user/dto/user.dto';
+import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AccountCategory } from '@domain/user/user.enum';
 
 describe('user service', () => {
@@ -31,7 +31,7 @@ describe('user service', () => {
   });
 
   it('should create user and account', async () => {
-    const dto: RegisterAccountDto = {
+    const dto: RegisterUserDTO = {
       identification: 'test',
       password: 'pwd',
       category: AccountCategory.EMAIL,
