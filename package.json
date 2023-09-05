@@ -112,7 +112,7 @@
     "testEnvironment": "node"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,json,ts,tsx}": [
+    "src/**/*.{js,jsx,ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ]
