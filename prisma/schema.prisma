@@ -12,7 +12,7 @@ datasource db {
 
 model Users {
   id        Int      @id @default(autoincrement())
-  nickname  String   @map("nickname") @db.VarChar(32)
+  nickname  String   @map("nickname") @db.VarChar(128)
   state     String   @map("state") @db.VarChar(16) // user 의 상태, 가입 완료, 탈퇴, 블락 등
   property  Json     @map("property")
   createdAt DateTime @default(now()) @map("created_at")
