@@ -1,7 +1,17 @@
 import typia from 'typia';
-export const checkRegisterAccountDto = typia.createIs<RegisterAccountDto>();
+import { AccountCategory, AgreementCategory } from '@domain/user/user.enum';
 
-export interface RegisterAccountDto {
+export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
+
+export interface RegisterUserDTO extends AccountDTO {
+  /**
+   * agreements data
+   * @type Array
+   */
+  agreement: AgreementDTO[];
+}
+
+export interface AccountDTO {
   /**
    * unique identification for accounts, such as email
    * @type string
@@ -18,21 +28,15 @@ export interface RegisterAccountDto {
    * category for accounts, now only support 'EMAIL'
    * @type string
    */
-  category: string;
-
-  /**
-   * agreements data
-   * @type Array
-   */
-  agreement: RegisterAgreementDto[];
+  category: AccountCategory;
 }
 
-export interface RegisterAgreementDto {
+export interface AgreementDTO {
   /**
    * category for agreements, now only support 'PERSONAL_INFORMATION''
    * @type string
    */
-  category: string;
+  category: AgreementCategory;
 
   /**
    * whether user agree the agreement-category

@@ -26,6 +26,15 @@ export class AccountRepository {
     return this.prisma.accounts.createMany({ data: params });
   }
 
+  async getAccountByIdentification(
+    identification: string,
+    category: AccountCategory,
+  ) {
+    return this.prisma.accounts.findFirst({
+      where: { identification, category },
+    });
+  }
+
   async getAccountById(id: number) {
     return this.prisma.accounts.findUnique({ where: { id } });
   }

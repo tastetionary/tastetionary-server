@@ -1,7 +1,7 @@
 import { Controller, Injectable, UseFilters } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
-import { RegisterAccountDto } from '@domain/user/dto/user.dto';
+import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { UserRepository } from '@domain/user/repository/user.repository';
 
@@ -13,7 +13,7 @@ export class UserController {
 
   @TypedRoute.Post('/')
   async registerAccount(
-    @TypedBody() dto: RegisterAccountDto,
+    @TypedBody() dto: RegisterUserDTO,
   ): Promise<BaseResponseDto<object>> {
     const data = await this.repo.tempMethod();
     console.log(data, dto);
