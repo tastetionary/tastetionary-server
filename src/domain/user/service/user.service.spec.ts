@@ -6,14 +6,20 @@ import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserService } from '@domain/user/service/user.service';
 import { AccountRepository } from '@domain/user/repository/account.repository';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
-import { AccountCategory, AgreementCategory } from '@domain/user/user.enum';
+import {
+  AccountCategory,
+  AgreementCategory,
+  AreaCategory,
+} from '@domain/user/user.enum';
 import { AgreementRepository } from '@domain/user/repository/agreements.repository';
+import { AreaRepository } from '@domain/user/repository/area.repository';
 
 describe('user service', () => {
   let service: UserService;
   let prisma: PrismaService;
+  let module: TestingModule;
   beforeAll(async () => {
-    const module = (await appModuleFixture(
+    module = (await appModuleFixture(
       [],
       [
         UserService,
@@ -22,6 +28,7 @@ describe('user service', () => {
         UserRepository,
         AccountRepository,
         AgreementRepository,
+        AreaRepository,
       ],
     )) as TestingModule;
     service = module.get(UserService);
@@ -32,11 +39,26 @@ describe('user service', () => {
     await truncateTables(prisma, ['users', 'accounts']);
   });
 
-  it('should create user and account and agreement', async () => {
+  it('should create user and account and agreement and location', async () => {
     const dto: RegisterUserDTO = {
-      identification: 'test',
-      password: 'pwd',
-      category: AccountCategory.EMAIL,
+      userProperty: { companyName: 'test' },
+      area: [
+        {
+          latitude: 1,
+          longitude: 1,
+          category: AreaCategory.ACTIVITY_AREA,
+        },
+        {
+          latitude: 1,
+          longitude: 1,
+          category: AreaCategory.DINING_AREA,
+        },
+      ],
+      account: {
+        identification: 'test',
+        password: 'pwd',
+        category: AccountCategory.EMAIL,
+      },
       agreement: [
         {
           category: AgreementCategory.PERSONAL_INFORMATION,
@@ -44,7 +66,7 @@ describe('user service', () => {
         },
       ],
     };
-    const user = await service.registerEndUser(dto);
+    const user = await service.register(dto);
     expect(user).not.toBeNull();
   });
 });

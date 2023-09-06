@@ -63,6 +63,7 @@ describe('end user', () => {
           category: AreaCategory.ACTIVITY_AREA,
         },
       ],
+      { companyName: 'company' },
     );
     expect(user.id).not.toBeNull();
 

@@ -1,7 +1,11 @@
 import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserState } from '@domain/user/user.enum';
 import { AgreementRepository } from '@domain/user/repository/agreements.repository';
-import { AgreementDTO, AreaDto } from '@domain/user/dto/user.dto';
+import {
+  AgreementDTO,
+  AreaDto,
+  UserPropertyDto,
+} from '@domain/user/dto/user.dto';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { getRandomItem } from '@common/util';
 import { AreaRepository } from '@domain/user/repository/area.repository';
@@ -13,13 +17,17 @@ export class EndUser {
     private readonly areaRepo: AreaRepository,
   ) {}
 
-  async register(agreeDtoList: AgreementDTO[], areaDtoList: AreaDto[]) {
+  async register(
+    agreeDtoList: AgreementDTO[],
+    areaDtoList: AreaDto[],
+    userProperty: UserPropertyDto,
+  ) {
     const nickname = this.getNickname();
 
     const user = await this.userRepo.saveUser({
       state: UserState.ACTIVE,
       nickname,
-      property: {},
+      property: userProperty,
     });
 
     const params = agreeDtoList.map((dto) => {

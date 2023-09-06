@@ -9,6 +9,12 @@ export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
 
 export interface RegisterUserDTO {
   /**
+   * user data, not essential
+   * @type Object
+   */
+  userProperty: UserPropertyDto;
+
+  /**
    * user location data, now only support 'ACTIVITY_AREA' and 'DINING_AREA'
    * @type Object
    */
@@ -65,4 +71,8 @@ export interface AreaDto {
   category: AreaCategory;
   latitude: number;
   longitude: number;
+}
+
+export interface UserPropertyDto {
+  companyName: string;
 }
