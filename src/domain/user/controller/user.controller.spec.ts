@@ -1,5 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { UserController } from '@domain/user/controller/user.controller';
 import { appModuleFixture } from '@root/jest.setup';
