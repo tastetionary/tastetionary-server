@@ -1,9 +1,31 @@
 import typia from 'typia';
-import { AccountCategory, AgreementCategory } from '@domain/user/user.enum';
+import {
+  AccountCategory,
+  AgreementCategory,
+  AreaCategory,
+} from '@domain/user/user.enum';
 
 export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
 
-export interface RegisterUserDTO extends AccountDTO {
+export interface RegisterUserDTO {
+  /**
+   * user data, not essential
+   * @type Object
+   */
+  userProperty: UserPropertyDto;
+
+  /**
+   * user location data, now only support 'ACTIVITY_AREA' and 'DINING_AREA'
+   * @type Object
+   */
+  area: AreaDto[];
+
+  /**
+   * account data
+   * @type Object
+   */
+  account: AccountDTO;
+
   /**
    * agreements data
    * @type Array
@@ -43,4 +65,14 @@ export interface AgreementDTO {
    * @type boolean
    */
   is_agree: boolean;
+}
+
+export interface AreaDto {
+  category: AreaCategory;
+  latitude: number;
+  longitude: number;
+}
+
+export interface UserPropertyDto {
+  companyName: string;
 }

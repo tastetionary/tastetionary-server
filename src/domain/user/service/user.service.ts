@@ -5,6 +5,7 @@ import { EndUser } from '@domain/user/core/end-user';
 import { Account } from '@domain/user/core/account';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AgreementRepository } from '@domain/user/repository/agreements.repository';
+import { AreaRepository } from '@domain/user/repository/area.repository';
 
 @Injectable()
 export class UserService {
@@ -12,16 +13,25 @@ export class UserService {
     private userRepo: UserRepository,
     private accountRepo: AccountRepository,
     private agreementRepo: AgreementRepository,
+    private areaRepo: AreaRepository,
   ) {}
 
-  async registerEndUser(dto: RegisterUserDTO) {
-    const endUser = new EndUser(this.userRepo, this.agreementRepo);
-    const user = await endUser.register(dto.agreement);
+  async register(dto: RegisterUserDTO) {
+    const endUser = new EndUser(
+      this.userRepo,
+      this.agreementRepo,
+      this.areaRepo,
+    );
+    const user = await endUser.register(
+      dto.agreement,
+      dto.area,
+      dto.userProperty,
+    );
 
     const account = new Account(this.accountRepo, {
-      identification: dto.identification,
-      password: dto.password,
-      category: dto.category,
+      identification: dto.account.identification,
+      password: dto.account.password,
+      category: dto.account.category,
     });
     await account.register(user.id);
     return user;

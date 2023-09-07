@@ -47,7 +47,7 @@ beforeAll(async () => {
   };
 });
 
-type tableNames = 'users' | 'accounts' | 'agreements';
+type tableNames = 'users' | 'accounts' | 'agreements' | 'user_areas';
 async function truncateTables(prisma: PrismaService, tableNames: tableNames[]) {
   for (const name of tableNames) {
     await prisma.$queryRawUnsafe(
