@@ -1,6 +1,7 @@
 import { AccountDTO } from '@domain/user/dto/user.dto';
 import { AccountRepository } from '@domain/user/repository/account.repository';
 import { CoreException } from '@common/exception/custom.exception';
+import bcrypt from 'bcrypt';
 
 export class Account {
   constructor(
@@ -8,17 +9,18 @@ export class Account {
     private readonly dto: AccountDTO,
   ) {}
   async register(userId: number) {
-    await this.validateEmail();
+    await this.validateAccountCategory();
 
+    const password = await bcrypt.hash(this.dto.password, 10);
     await this.repo.saveAccount({
       userId,
       category: this.dto.category,
       identification: this.dto.identification,
-      password: this.dto.password,
+      password,
     });
   }
 
-  private async validateEmail() {
+  private async validateAccountCategory() {
     const accountRes = await this.repo.getAccountByIdentification(
       this.dto.identification,
       this.dto.category,
