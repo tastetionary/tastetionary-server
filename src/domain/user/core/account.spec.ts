@@ -6,21 +6,43 @@ import { Account } from '@domain/user/core/account';
 import { AccountDTO } from '@domain/user/dto/user.dto';
 import { AccountRepository } from '@domain/user/repository/account.repository';
 import { AccountCategory } from '@domain/user/user.enum';
+import { UserTokenRepository } from '@domain/user/repository/user-token.repository';
 
 describe('account', () => {
   let prisma;
   let accountRepo: AccountRepository;
+  let tokenRepo: UserTokenRepository;
   beforeAll(async () => {
     const module = (await appModuleFixture(
       [],
-      [ConfigurationService, PrismaService, AccountRepository],
+      [
+        ConfigurationService,
+        PrismaService,
+        AccountRepository,
+        UserTokenRepository,
+      ],
     )) as TestingModule;
     accountRepo = module.get<AccountRepository>(AccountRepository);
+    tokenRepo = module.get<UserTokenRepository>(UserTokenRepository);
     prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
     await truncateTables(prisma, ['accounts']);
+  });
+
+  it('should create token', async () => {
+    const dto: AccountDTO = {
+      identification: 'test',
+      password: 'pwd',
+      category: AccountCategory.EMAIL,
+    };
+    const userId = 1;
+    const account = new Account(dto, accountRepo, tokenRepo);
+    await account.register(userId);
+
+    const token = await account.createToken(userId);
+    expect(token).not.toBeNull();
   });
 
   it('duplicated email should raise error', async () => {
@@ -29,7 +51,7 @@ describe('account', () => {
       password: 'pwd',
       category: AccountCategory.EMAIL,
     };
-    const account = new Account(accountRepo, dto);
+    const account = new Account(dto, accountRepo, tokenRepo);
     await account.register(1);
     await expect(account.register(1)).rejects.toThrowError();
   });
@@ -40,7 +62,7 @@ describe('account', () => {
       password: 'pwd',
       category: AccountCategory.EMAIL,
     };
-    const account = new Account(accountRepo, dto);
+    const account = new Account(dto, accountRepo, tokenRepo);
     await account.register(1);
 
     const res = await accountRepo.getAccountByIdentification(
