@@ -3,7 +3,7 @@ import { ConfigurationService } from '@domain/configuration/configuration.servic
 import { INestApplication } from '@nestjs/common';
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture } from '@root/jest.setup';
-import * as request from 'supertest';
+import request from 'supertest';
 
 describe('configuration controller', () => {
   let app: INestApplication;
