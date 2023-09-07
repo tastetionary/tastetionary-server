@@ -30,6 +30,19 @@ describe('end user', () => {
     await truncateTables(prisma, ['users']);
   });
 
+  class FakeUser extends EndUser {
+    public getNickname() {
+      return super.getNickname();
+    }
+  }
+
+  it('should return random nickname', () => {
+    const endUser = new FakeUser(userRep, agreementRepo);
+    const first = endUser.getNickname();
+    const second = endUser.getNickname();
+    expect(first).not.toEqual(second);
+  });
+
   it('should save user and agreement', async () => {
     const endUser = new EndUser(userRep, agreementRepo);
     const user = await endUser.register([

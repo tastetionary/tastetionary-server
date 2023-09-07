@@ -2,6 +2,8 @@ import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserState } from '@domain/user/user.enum';
 import { AgreementRepository } from '@domain/user/repository/agreements.repository';
 import { AgreementDTO } from '@domain/user/dto/user.dto';
+import * as nicknameSource from '@domain/user/resource/nickname.json';
+import { getRandomItem } from '@common/util';
 
 export class EndUser {
   constructor(
@@ -26,6 +28,22 @@ export class EndUser {
   }
 
   protected getNickname() {
-    return 'random nickname';
+    const nicknameList = this.getNicknameFromSource();
+    const randomAdj = getRandomItem(nicknameList.adj);
+    const randomNameKey = getRandomItem(Object.keys(nicknameList.name));
+    const randomName = getRandomItem(nicknameList.name[randomNameKey]);
+
+    return `${randomAdj} ${randomName}`;
+  }
+
+  private getNicknameFromSource(): {
+    adj: string[];
+    name: {
+      animal: string[];
+      food: string[];
+      cooking: string[];
+    };
+  } {
+    return nicknameSource;
   }
 }
