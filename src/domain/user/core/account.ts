@@ -3,12 +3,15 @@ import { AccountRepository } from '@domain/user/repository/account.repository';
 import { CoreException } from '@common/exception/custom.exception';
 import bcrypt from 'bcrypt';
 import { UserTokenRepository } from '@domain/user/repository/user-token.repository';
+import { JwtService } from '@nestjs/jwt';
+import { add } from 'date-fns';
 
 export class Account {
   constructor(
     private readonly dto: AccountDTO,
     private readonly repo: AccountRepository,
     private readonly tokenRepo: UserTokenRepository,
+    private readonly jwtService: JwtService,
   ) {}
   async createToken(userId: number) {
     const account = await this.repo.getAccountByIdentification(
@@ -23,13 +26,21 @@ export class Account {
         'identification or password is wrong',
       );
     }
-
+    const payload = { userId, category: this.dto.category };
+    const accessToken = this.jwtService.sign(payload, {
+      secret: 'my-secret-access',
+      expiresIn: 24 * 3600,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: 'my-secret-access',
+      expiresIn: 24 * 3600,
+    });
     this.tokenRepo.saveToken({
       userId,
-      accessToken: password,
-      refreshToken: password,
-      accessTokenExpiredAt: new Date(),
-      refreshTokenExpiredAt: new Date(),
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      accessTokenExpiredAt: add(new Date(), { seconds: 24 * 3600 }),
+      refreshTokenExpiredAt: add(new Date(), { seconds: 24 * 3600 }),
     });
 
     return account;
