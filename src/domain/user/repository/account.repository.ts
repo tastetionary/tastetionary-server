@@ -26,10 +26,7 @@ export class AccountRepository {
     return this.prisma.accounts.createMany({ data: params });
   }
 
-  async getAccountByIdentification(
-    identification: string,
-    category: AccountCategory,
-  ) {
+  async getIdentification(identification: string, category: AccountCategory) {
     return this.prisma.accounts.findFirst({
       where: { identification, category },
     });
