@@ -2,9 +2,15 @@ name: server-unit-tests
 
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+      - 'bridge/*' # Use single quotes around 'bridge/*' to treat it as a string
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+      - 'bridge/*' #
 
 jobs:
   build:
@@ -18,6 +24,25 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Set up database resource
+        env:
+          POSTGRES_PASSWORD: postgres
+          HOST: localhost
+          POSTGRES_USER: postgres
+        run: |
+          cd docker
+          docker-compose up -d
+          until PGPASSWORD=$POSTGRES_PASSWORD psql -h $HOST -U $POSTGRES_USER -c '\q'; do
+            >&2 echo "Postgres is unavailable - sleeping"
+            sleep 1
+          done
+          cd ..
+      
+      - name: Change Env variables
+        run: |
+          echo DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/taste\" > .env
+
       - name: Install dependencies
         run: |
           npm install
