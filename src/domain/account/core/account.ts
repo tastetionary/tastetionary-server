@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { AccountCategory } from '@domain/user/user.enum';
+import { AccountCategory } from '@domain/account/account.enum';
 import { CoreException } from '@common/exception/custom.exception';
 type AccountEntity = {
   id: number;

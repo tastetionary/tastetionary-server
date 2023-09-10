@@ -1,9 +1,9 @@
-import { AccountDTO } from '@domain/user/dto/user.dto';
-import { AccountRepository } from '@domain/user/repository/account.repository';
-import { UserTokenRepository } from '@domain/user/repository/user-token.repository';
+import { AccountDTO } from '@domain/account/dto/account.dto';
+import { AccountRepository } from '@domain/account/repository/account.repository';
+import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { add } from 'date-fns';
-import { Account } from '@domain/user/core/account';
+import { Account } from '@domain/account/core/account';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

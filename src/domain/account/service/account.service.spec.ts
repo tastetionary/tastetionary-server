@@ -1,12 +1,12 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { PrismaService } from '@common/database/prisma.service';
-import { AccountService } from '@domain/user/service/account.service';
-import { AccountDTO } from '@domain/user/dto/user.dto';
-import { AccountCategory } from '@domain/user/user.enum';
+import { AccountService } from '@domain/account/service/account.service';
+import { AccountDTO } from '@domain/account/dto/account.dto';
+import { AccountCategory } from '@domain/account/account.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { AccountRepository } from '@domain/user/repository/account.repository';
-import { UserTokenRepository } from '@domain/user/repository/user-token.repository';
+import { AccountRepository } from '@domain/account/repository/account.repository';
+import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { JwtService } from '@nestjs/jwt';
 
 describe('account service', () => {

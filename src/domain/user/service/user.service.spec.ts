@@ -13,6 +13,7 @@ import {
 } from '@domain/user/user.enum';
 import { AgreementRepository } from '@domain/user/repository/agreements.repository';
 import { AreaRepository } from '@domain/user/repository/area.repository';
+import { AccountService } from '@domain/user/service/account.service';
 
 describe('user service', () => {
   let service: UserService;
@@ -23,6 +24,7 @@ describe('user service', () => {
       [],
       [
         UserService,
+        AccountService,
         ConfigurationService,
         PrismaService,
         UserRepository,

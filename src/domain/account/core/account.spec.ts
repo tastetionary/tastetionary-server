@@ -1,5 +1,5 @@
-import { AccountCategory } from '@domain/user/user.enum';
-import { Account } from '@domain/user/core/account';
+import { AccountCategory } from '@domain/account/account.enum';
+import { Account } from '@domain/account/core/account';
 describe('account core', () => {
   it('duplicated email should raise error', async () => {
     const entity = {
