@@ -13,6 +13,7 @@ describe('account service', () => {
   let prisma;
   let accountService: AccountService;
   let accountRepo: AccountRepository;
+  let tokenRepo: UserTokenRepository;
   beforeAll(async () => {
     const module = (await appModuleFixture(
       [],
@@ -27,11 +28,28 @@ describe('account service', () => {
     )) as TestingModule;
     accountService = module.get<AccountService>(AccountService);
     accountRepo = module.get<AccountRepository>(AccountRepository);
+    tokenRepo = module.get<UserTokenRepository>(UserTokenRepository);
     prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['accounts']);
+    await truncateTables(prisma, ['accounts', 'user_tokens']);
+  });
+
+  it('should delete token', async () => {
+    const dto: AccountDTO = {
+      identification: 'test',
+      password: 'pwd',
+      category: AccountCategory.EMAIL,
+    };
+    const userId = 1;
+    await accountService.register(userId, dto);
+
+    await accountService.createToken(userId, dto);
+    await accountService.deleteTokens(userId);
+
+    const tokens = await tokenRepo.getTokenByUserId(userId);
+    expect(tokens).toBeNull();
   });
 
   it('should create token', async () => {

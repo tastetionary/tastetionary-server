@@ -13,6 +13,23 @@ export class AccountService {
     private readonly jwtService: JwtService,
     private readonly tokenRepo: UserTokenRepository,
   ) {}
+  async register(userId: number, dto: AccountDTO) {
+    const accountRecord = await this.accountRepo.getIdentification(
+      dto.identification,
+      dto.category,
+    );
+
+    const account = new Account(accountRecord);
+    account.checkDuplicatedIdentification(dto.category, dto.identification);
+    const password = await account.encryptValue(dto.password);
+
+    await this.accountRepo.saveAccount({
+      userId,
+      category: dto.category,
+      identification: dto.identification,
+      password,
+    });
+  }
 
   async createToken(userId: number, dto: AccountDTO) {
     const accountRecord = await this.accountRepo.getIdentification(
@@ -54,21 +71,10 @@ export class AccountService {
     return data;
   }
 
-  async register(userId: number, dto: AccountDTO) {
-    const accountRecord = await this.accountRepo.getIdentification(
-      dto.identification,
-      dto.category,
-    );
+  async deleteTokens(userId: number) {
+    const token = await this.tokenRepo.getTokenByUserId(userId);
+    if (!token) return;
 
-    const account = new Account(accountRecord);
-    account.checkDuplicatedIdentification(dto.category, dto.identification);
-    const password = await account.encryptValue(dto.password);
-
-    await this.accountRepo.saveAccount({
-      userId,
-      category: dto.category,
-      identification: dto.identification,
-      password,
-    });
+    await this.tokenRepo.deleteToken(token.id);
   }
 }
