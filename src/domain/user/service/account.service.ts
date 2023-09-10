@@ -33,19 +33,23 @@ export class AccountService {
   }
 
   private makeTokens(payload: { userId: number }) {
+    const accessTokenExpiredAt = 60 * 60 * 24;
+    const refreshTokenExpiredAt = 60 * 60 * 24;
     const accessToken = this.jwtService.sign(payload, {
       secret: 'my-secret-access',
-      expiresIn: 24 * 3600,
+      expiresIn: accessTokenExpiredAt,
     });
     const refreshToken = this.jwtService.sign(payload, {
       secret: 'my-secret-access',
-      expiresIn: 24 * 3600,
+      expiresIn: refreshTokenExpiredAt,
     });
     const data = {
       accessToken: accessToken,
       refreshToken: refreshToken,
-      accessTokenExpiredAt: add(new Date(), { seconds: 24 * 3600 }),
-      refreshTokenExpiredAt: add(new Date(), { seconds: 24 * 3600 }),
+      accessTokenExpiredAt: add(new Date(), { seconds: accessTokenExpiredAt }),
+      refreshTokenExpiredAt: add(new Date(), {
+        seconds: refreshTokenExpiredAt,
+      }),
     };
     return data;
   }
