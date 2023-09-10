@@ -14,7 +14,6 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-
     if (!token) {
       throw new UnauthorizedException(
         'no token in request, check Bearer header',
@@ -26,7 +25,7 @@ export class AuthGuard implements CanActivate {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      request['user'] = payload;
+      request['userId'] = payload;
     } catch {
       throw new UnauthorizedException(
         'not verified token, maybe expired or invalid or not proper created',
