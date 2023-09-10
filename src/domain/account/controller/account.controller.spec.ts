@@ -1,11 +1,10 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture } from '@root/jest.setup';
+import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { AccountModule } from '@domain/account/account.module';
 import { AccountService } from '@domain/account/service/account.service';
 import { AccountCategory } from '@domain/account/account.enum';
-import * as jwtOrigin from 'jsonwebtoken';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -23,13 +22,10 @@ describe('user controller', () => {
   });
 
   it('should delete success', async () => {
-    const payload = {
-      userId: 123,
-    };
-    const options: jwtOrigin.SignOptions = {
-      expiresIn: '10h', // Include expiresIn in JwtSignOptions
-    };
-    const token = jwtOrigin.sign(payload, 'my-secret-access', options);
+    const token = createUserToken(123, 'my-secret-access', {
+      expiresIn: '10h',
+    });
+
     jest
       .spyOn(accountService, 'deleteTokens')
       .mockImplementation(async () => {});

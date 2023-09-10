@@ -1,10 +1,9 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture } from '@root/jest.setup';
+import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserModule } from '@domain/user/user.module';
-import * as jwtOrigin from 'jsonwebtoken';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -33,15 +32,9 @@ describe('user controller', () => {
   });
 
   it('temp - with expires token should return 401', async () => {
-    const payload = {
-      userId: 123,
-    };
-    const options: jwtOrigin.SignOptions = {
-      expiresIn: '1ms', // Include expiresIn in JwtSignOptions
-    };
-
-    const token = jwtOrigin.sign(payload, 'my-secret-access', options);
-
+    const token = createUserToken(123, 'my-secret-access', {
+      expiresIn: '1ms',
+    });
     const res = await request(app.getHttpServer())
       .get('/v1/users/test')
       .set('Authorization', `Bearer ${token}`);
