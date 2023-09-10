@@ -5,7 +5,6 @@ import { appModuleFixture } from '@root/jest.setup';
 import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserModule } from '@domain/user/user.module';
 import * as jwtOrigin from 'jsonwebtoken';
-import { SignOptions } from 'jsonwebtoken';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -37,7 +36,7 @@ describe('user controller', () => {
     const payload = {
       userId: 123,
     };
-    const options: SignOptions = {
+    const options: jwtOrigin.SignOptions = {
       expiresIn: '1ms', // Include expiresIn in JwtSignOptions
     };
 
