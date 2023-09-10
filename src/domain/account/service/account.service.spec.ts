@@ -38,7 +38,7 @@ describe('account service', () => {
     const userId = 1;
     await accountService.register(userId, dto);
 
-    await accountService.createToken(userId, dto);
+    await accountService.createToken(dto);
     await accountService.deleteTokens(userId);
 
     const tokens = await tokenRepo.getTokenByUserId(userId);
@@ -54,7 +54,7 @@ describe('account service', () => {
     const userId = 1;
     await accountService.register(userId, dto);
 
-    const token = await accountService.createToken(userId, dto);
+    const token = await accountService.createToken(dto);
     expect(token).not.toBeNull();
     expect(token).toHaveProperty('accessToken');
     expect(token).toHaveProperty('refreshToken');

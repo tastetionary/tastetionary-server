@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { add } from 'date-fns';
 import { Account } from '@domain/account/core/account';
 import { Injectable } from '@nestjs/common';
+import { ServiceException } from '@root/src/common/exception/custom.exception';
 
 @Injectable()
 export class AccountService {
@@ -31,18 +32,22 @@ export class AccountService {
     });
   }
 
-  async createToken(userId: number, dto: AccountDTO) {
+  async createToken(dto: AccountDTO) {
     const accountRecord = await this.accountRepo.getIdentification(
       dto.identification,
       dto.category,
     );
 
+    if (!accountRecord) {
+      throw new ServiceException('no account');
+    }
+
     const account = new Account(accountRecord);
     account.checkPassword(dto.password);
 
-    const tokens = this.makeTokens({ userId });
+    const tokens = this.makeTokens({ userId: accountRecord.userId });
     this.tokenRepo.saveToken({
-      userId,
+      userId: accountRecord.userId,
       ...tokens,
     });
 
