@@ -4,12 +4,12 @@ import { INestApplication } from '@nestjs/common';
 import { appModuleFixture } from '@root/jest.setup';
 import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserModule } from '@domain/user/user.module';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import * as jwtOrigin from 'jsonwebtoken';
+import { SignOptions } from 'jsonwebtoken';
 
 describe('user controller', () => {
   let app: INestApplication;
   let repo: UserRepository;
-  let jwt: JwtService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -19,7 +19,6 @@ describe('user controller', () => {
     )) as TestingModule;
     repo = module.get<UserRepository>(UserRepository);
     app = module.createNestApplication();
-    jwt = module.get<JwtService>(JwtService);
     await app.init();
   });
 
@@ -38,12 +37,11 @@ describe('user controller', () => {
     const payload = {
       userId: 123,
     };
-    const options: JwtSignOptions = {
+    const options: SignOptions = {
       expiresIn: '1ms', // Include expiresIn in JwtSignOptions
-      secret: 'my-secret-access',
     };
 
-    const token = jwt.sign(payload, options);
+    const token = jwtOrigin.sign(payload, 'my-secret-access', options);
 
     const res = await request(app.getHttpServer())
       .get('/v1/users/test')
