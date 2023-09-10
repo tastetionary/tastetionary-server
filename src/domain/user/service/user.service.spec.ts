@@ -1,19 +1,12 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { PrismaService } from '@common/database/prisma.service';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserService } from '@domain/user/service/user.service';
-import { AccountRepository } from '@domain/user/repository/account.repository';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
-import {
-  AccountCategory,
-  AgreementCategory,
-  AreaCategory,
-} from '@domain/user/user.enum';
-import { AgreementRepository } from '@domain/user/repository/agreements.repository';
-import { AreaRepository } from '@domain/user/repository/area.repository';
-import { AccountService } from '@domain/user/service/account.service';
+import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
+import { UserModule } from '@domain/user/user.module';
+import { AccountModule } from '@domain/account/account.module';
+import { AccountCategory } from '@domain/account/account.enum';
 
 describe('user service', () => {
   let service: UserService;
@@ -22,16 +15,8 @@ describe('user service', () => {
   beforeAll(async () => {
     module = (await appModuleFixture(
       [],
-      [
-        UserService,
-        AccountService,
-        ConfigurationService,
-        PrismaService,
-        UserRepository,
-        AccountRepository,
-        AgreementRepository,
-        AreaRepository,
-      ],
+      [],
+      [UserModule, AccountModule],
     )) as TestingModule;
     service = module.get(UserService);
     prisma = module.get(PrismaService);

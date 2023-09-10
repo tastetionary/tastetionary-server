@@ -15,5 +15,6 @@ import { UserTokenRepository } from '@domain/account/repository/user-token.repos
     ConfigurationService,
     PrismaService,
   ],
+  exports: [AccountService],
 })
 export class AccountModule {}
