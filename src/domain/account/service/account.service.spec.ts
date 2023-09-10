@@ -4,10 +4,9 @@ import { PrismaService } from '@common/database/prisma.service';
 import { AccountService } from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { AccountRepository } from '@domain/account/repository/account.repository';
 import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
-import { JwtService } from '@nestjs/jwt';
+import { AccountModule } from '@domain/account/account.module';
 
 describe('account service', () => {
   let prisma;
@@ -17,14 +16,8 @@ describe('account service', () => {
   beforeAll(async () => {
     const module = (await appModuleFixture(
       [],
-      [
-        AccountService,
-        AccountRepository,
-        JwtService,
-        UserTokenRepository,
-        ConfigurationService,
-        PrismaService,
-      ],
+      [],
+      [AccountModule],
     )) as TestingModule;
     accountService = module.get<AccountService>(AccountService);
     accountRepo = module.get<AccountRepository>(AccountRepository);
