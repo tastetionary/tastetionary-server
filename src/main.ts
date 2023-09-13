@@ -9,6 +9,7 @@ async function bootstrap() {
   });
   const config = app.get(ConfigService);
   const port = config.get<number>('API_SERVER_PORT') as number;
+
   await app.listen(port);
 }
 bootstrap();
