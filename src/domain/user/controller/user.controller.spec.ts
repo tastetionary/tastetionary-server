@@ -1,19 +1,20 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { UserController } from '@domain/user/controller/user.controller';
 import { appModuleFixture } from '@root/jest.setup';
 import { UserRepository } from '@domain/user/repository/user.repository';
-import { PrismaService } from '@common/database/prisma.service';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { UserModule } from '@domain/user/user.module';
+import * as jwtOrigin from 'jsonwebtoken';
+
 describe('user controller', () => {
   let app: INestApplication;
   let repo: UserRepository;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
-      [UserController],
-      [ConfigurationService, PrismaService, UserRepository],
+      [],
+      [],
+      [UserModule],
     )) as TestingModule;
     repo = module.get<UserRepository>(UserRepository);
     app = module.createNestApplication();
@@ -29,6 +30,27 @@ describe('user controller', () => {
       .send({ identification: 'test', password: 'pwd' });
 
     expect(res.statusCode).toEqual(201);
+  });
+
+  it('temp - with expires token should return 401', async () => {
+    const payload = {
+      userId: 123,
+    };
+    const options: jwtOrigin.SignOptions = {
+      expiresIn: '1ms', // Include expiresIn in JwtSignOptions
+    };
+
+    const token = jwtOrigin.sign(payload, 'my-secret-access', options);
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/users/test')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toEqual(401);
+  });
+
+  it('temp - with none token should return 401', async () => {
+    const res = await request(app.getHttpServer()).get('/v1/users/test');
+    expect(res.statusCode).toEqual(401);
   });
 
   it('wrong input should return bad request', async () => {
