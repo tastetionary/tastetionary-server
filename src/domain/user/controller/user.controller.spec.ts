@@ -4,10 +4,12 @@ import { INestApplication } from '@nestjs/common';
 import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserModule } from '@domain/user/user.module';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
 
 describe('user controller', () => {
   let app: INestApplication;
   let repo: UserRepository;
+  let configService: ConfigurationService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -16,6 +18,7 @@ describe('user controller', () => {
       [UserModule],
     )) as TestingModule;
     repo = module.get<UserRepository>(UserRepository);
+    configService = module.get<ConfigurationService>(ConfigurationService);
     app = module.createNestApplication();
     await app.init();
   });
@@ -32,7 +35,8 @@ describe('user controller', () => {
   });
 
   it('temp - with expires token should return 401', async () => {
-    const token = createUserToken(123, 'my-secret-access', {
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(123, key, {
       expiresIn: '1ms',
     });
     const res = await request(app.getHttpServer())
