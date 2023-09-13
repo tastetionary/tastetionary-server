@@ -1,4 +1,10 @@
-import { Controller, Injectable, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  Injectable,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
@@ -12,6 +18,7 @@ import { AuthGuard } from '@common/auth/auth.guard';
 export class UserController {
   constructor(private repo: UserRepository) {}
 
+  @HttpCode(200)
   @TypedRoute.Post('/')
   async registerAccount(
     @TypedBody() dto: RegisterUserDTO,

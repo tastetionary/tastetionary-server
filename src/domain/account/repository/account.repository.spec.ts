@@ -1,9 +1,9 @@
-import { AccountRepository } from '@domain/user/repository/account.repository';
+import { AccountRepository } from '@domain/account/repository/account.repository';
 import { TestingModule } from '@nestjs/testing';
 import { PrismaService } from '@common/database/prisma.service';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { AccountCategory } from '@domain/user/user.enum';
+import { AccountCategory } from '@domain/account/account.enum';
 
 describe('account repository', () => {
   let repo: AccountRepository;

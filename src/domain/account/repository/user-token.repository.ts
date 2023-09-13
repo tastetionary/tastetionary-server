@@ -20,4 +20,8 @@ export class UserTokenRepository {
       where: { userId },
     });
   }
+
+  async deleteToken(id: number) {
+    return this.prisma.userTokens.delete({ where: { id } });
+  }
 }

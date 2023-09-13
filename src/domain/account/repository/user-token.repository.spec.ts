@@ -1,4 +1,4 @@
-import { UserTokenRepository } from '@domain/user/repository/user-token.repository';
+import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { TestingModule } from '@nestjs/testing';
 import { PrismaService } from '@common/database/prisma.service';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
