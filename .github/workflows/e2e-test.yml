@@ -18,8 +18,31 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Set up database resource
+        env:
+          POSTGRES_PASSWORD: postgres
+          HOST: localhost
+          POSTGRES_USER: postgres
+          PORT: 5433
+        run: |
+          cd docker
+          docker-compose up -d
+          until PGPASSWORD=$POSTGRES_PASSWORD psql -h $HOST -p $PORT -U $POSTGRES_USER -c '\q'; do
+            >&2 echo "Postgres is unavailable - sleeping"
+            sleep 1
+          done
+          cd ..
+      
+      - name: Change Env variables
+        run: |
+          echo DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/taste\" > .env
+
       - name: Install dependencies
         run: |
           npm install
       - name: Run tests
-        run: npm run test:e2e
+        run: |
+          npx prisma migrate deploy
+          npx prisma generate
+          npm run test:e2e
