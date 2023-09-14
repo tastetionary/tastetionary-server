@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   ServerConfig,
   ServerMetaData,
-} from '@root/src/domain/configuration/dto/configuration.dto';
+} from '@domain/configuration/dto/configuration.dto';
 
 @Injectable()
 export class ConfigurationService {
@@ -18,5 +18,9 @@ export class ConfigurationService {
 
   getServerMetaData(): ServerMetaData {
     return { serverTime: new Date().toISOString(), version: '0.0.1' };
+  }
+
+  getDataBaseHost() {
+    return this.configService.get<string>('DATABASE_HOST');
   }
 }
