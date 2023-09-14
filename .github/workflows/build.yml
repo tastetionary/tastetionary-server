@@ -7,28 +7,9 @@ on:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Set .npmrc
-        run: |
-          echo "//npm.pkg.github.com//:_authToken=${{ secrets.NPM_AUTH_TOKEN }}\n@homekeeper89:registry=https://npm.pkg.github.com" > ~/.npmrc
-          
-      - name: Bump to new version
-        run: |
-          git config user.name "taste-bot"
-          git config user.email "noreply@github.com"
-          git switch -c bump-${{ github.REF_NAME }}
-          npm version ${{ github.REF_NAME }} -m "bump to ${{ github.REF_NAME }}"
-          npm run package:publish
-          git push --set-upstream origin bump-${{ github.REF_NAME }}
-          gh pr create --title "bump to ${{ github.REF_NAME }}" --body "bump to ${{ github.REF_NAME }}" --base main --head bump-${{ github.REF_NAME }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
