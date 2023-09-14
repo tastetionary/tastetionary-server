@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
-import { AccountCategory } from '@domain/user/user.enum';
+import { AccountCategory } from '@domain/account/account.enum';
 
 @Injectable()
 export class AccountRepository {
@@ -26,10 +26,7 @@ export class AccountRepository {
     return this.prisma.accounts.createMany({ data: params });
   }
 
-  async getAccountByIdentification(
-    identification: string,
-    category: AccountCategory,
-  ) {
+  async getIdentification(identification: string, category: AccountCategory) {
     return this.prisma.accounts.findFirst({
       where: { identification, category },
     });
