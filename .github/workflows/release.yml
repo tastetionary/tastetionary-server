@@ -1,0 +1,40 @@
+ccname: publish_package
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Bump to new version
+        run: |
+          TAG=$(git tag --sort=version:refname | tail -n 1)
+          git config user.name "taste-bot"
+          git config user.email "noreply@github.com"
+          git switch -c bump-$TAG
+          npm version $TAG -m "bump to $TAG"
+          git push --set-upstream origin bump-$TAG
+          gh pr create --title "bump to $TAG" --body "bump to $TAG" --base main --head bump-$TAG
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '18.x'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@homekeeper89'
+      - run: npm ci
+      - run: npm i -g rimraf
+      - run: npm run package:publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
