@@ -1,4 +1,5 @@
-ccname: publish_package
+name: publish_package
+
 
 on:
   push:
