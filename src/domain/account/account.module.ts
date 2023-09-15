@@ -6,8 +6,6 @@ import { AccountService } from '@domain/account/service/account.service';
 import { AccountRepository } from '@domain/account/repository/account.repository';
 import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { AccountController } from './controller/account.controller';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from '@common/auth/auth.guard';
 
 @Module({
   controllers: [AccountController],
@@ -18,10 +16,6 @@ import { AuthGuard } from '@common/auth/auth.guard';
     UserTokenRepository,
     ConfigurationService,
     PrismaService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
   ],
   exports: [AccountService],
 })
