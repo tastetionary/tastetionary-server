@@ -25,9 +25,8 @@ describe('user controller', () => {
     jest.spyOn(repo, 'tempMethod').mockImplementation(async () => result);
 
     const res = await request(app.getHttpServer())
-      .post('/v1/users/')
+      .post('/v1/users')
       .send({ id: 1 });
-
     expect(res.statusCode).toEqual(400);
     expect(res.body.detail.reason).toContain('not following');
   });

@@ -5,13 +5,15 @@ import { JwtService } from '@nestjs/jwt';
 import { add } from 'date-fns';
 import { Account } from '@domain/account/core/account';
 import { Injectable } from '@nestjs/common';
-import { ServiceException } from '@root/src/common/exception/custom.exception';
+import { ServiceException } from '@common/exception/custom.exception';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
 
 @Injectable()
 export class AccountService {
   constructor(
-    private readonly accountRepo: AccountRepository,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigurationService,
+    private readonly accountRepo: AccountRepository,
     private readonly tokenRepo: UserTokenRepository,
   ) {}
   async register(userId: number, dto: AccountDTO) {
@@ -55,14 +57,17 @@ export class AccountService {
   }
 
   private makeTokens(payload: { userId: number }) {
-    const accessTokenExpiredAt = 60 * 60 * 24;
-    const refreshTokenExpiredAt = 60 * 60 * 24;
+    const accessTokenExpiredAt =
+      this.configService.getTokenData().accessTokenExpiredAt;
+    const refreshTokenExpiredAt =
+      this.configService.getTokenData().refreshTokenExpiredAt;
+
     const accessToken = this.jwtService.sign(payload, {
-      secret: 'my-secret-access',
+      secret: this.configService.getTokenData().accessTokenSecret,
       expiresIn: accessTokenExpiredAt,
     });
     const refreshToken = this.jwtService.sign(payload, {
-      secret: 'my-secret-access',
+      secret: this.configService.getTokenData().refreshTokenSecret,
       expiresIn: refreshTokenExpiredAt,
     });
     const data = {
