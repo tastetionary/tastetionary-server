@@ -23,6 +23,8 @@ jobs:
           git config user.email "noreply@github.com"
           git switch -c bump-$TAG
           npm version $TAG -m "bump to $TAG"
+          cd packages/api
+          npm version $TAG -m "bump to $TAG"
           git push --set-upstream origin bump-$TAG
           gh pr create --title "bump to $TAG" --body "bump to $TAG" --base main --head bump-$TAG
         env:
