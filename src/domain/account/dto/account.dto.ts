@@ -19,3 +19,10 @@ export interface AccountDTO {
    */
   category: AccountCategory;
 }
+
+export interface TokenDTO {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiredAt: Date;
+  refreshTokenExpiredAt: Date;
+}
