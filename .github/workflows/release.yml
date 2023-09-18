@@ -24,7 +24,7 @@ jobs:
           git switch -c bump-$TAG
           npm version $TAG -m "bump to $TAG"
           git push --set-upstream origin bump-$TAG
-          gh pr create --title "bump to $TAG" --body "bump to $TAG" --base main --head bump-$TAG
+          gh pr create --title "bump to $TAG" --body "bump to $TAG" --base develop --head bump-$TAG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
