@@ -2,6 +2,14 @@
 
 TBD
 
+## Getting Started
+
+Create .env file
+
+```bash
+cp .env.sample .env
+```
+
 ## publish on npm
 
 1. change version on package/api/package.json
