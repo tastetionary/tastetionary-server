@@ -34,11 +34,13 @@ describe('user service', () => {
           latitude: 1,
           longitude: 1,
           category: AreaCategory.ACTIVITY_AREA,
+          address: 'test',
         },
         {
           latitude: 1,
           longitude: 1,
           category: AreaCategory.DINING_AREA,
+          address: 'test',
         },
       ],
       account: {
