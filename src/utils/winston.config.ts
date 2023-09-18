@@ -20,9 +20,9 @@ const dailyOptions = (level: string) => {
 export const winstonLogger = WinstonModule.createLogger({
   transports: [
     new winston.transports.Console({
-      level: env === 'production' ? 'info' : 'silly',
+      level: env === 'prod' ? 'info' : 'silly',
       format:
-        env === 'production'
+        env === 'prod'
           ? winston.format.simple()
           : winston.format.combine(
               winston.format.timestamp({
