@@ -1,0 +1,4 @@
+
+### server stats
+GET {{base_url}}/v1/configuration/server-status
+

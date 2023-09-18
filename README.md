@@ -11,6 +11,34 @@ TBD
 npm run package:publish
 ```
 
+## integration test(only for vscode)
+
+1. install vscode extension > REST Client
+
+- https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+2. add this to .vscode/settings.json
+
+```json
+{ ...
+	"rest-client.environmentVariables": {
+		"$shared": {
+			"version": "v1",
+			"content_type_json": "application/json",
+		},
+		"local": {
+			"base_url": "http://localhost:3000",
+			"content_type_json": "{{$shared content_type_json}}"
+		},
+
+	}
+}
+```
+
+3. shift + cmd + P and find `Rest Client: Switch Environment` and select local(or other env)
+4. move to any other \*.http in integration_test and click
+   (before click, server should be running)
+
 ## DB migration
 
 ## Installation
@@ -20,6 +48,7 @@ $ npm install
 ```
 
 ## DB migration
+
 .env is for database only
 
 ### run migrate

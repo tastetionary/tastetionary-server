@@ -3,7 +3,8 @@ import { Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { validate } from '@src/env.validation';
-import { PrismaService } from './src/common/database/prisma.service';
+import { PrismaService } from '@common/database/prisma.service';
+import * as jwt from 'jsonwebtoken';
 
 let appServiceFixture: CallableFunction;
 let appModuleFixture: CallableFunction;
@@ -47,7 +48,12 @@ beforeAll(async () => {
   };
 });
 
-type tableNames = 'users' | 'accounts' | 'agreements' | 'user_areas';
+type tableNames =
+  | 'users'
+  | 'accounts'
+  | 'agreements'
+  | 'user_areas'
+  | 'user_tokens';
 async function truncateTables(prisma: PrismaService, tableNames: tableNames[]) {
   for (const name of tableNames) {
     await prisma.$queryRawUnsafe(
@@ -56,4 +62,12 @@ async function truncateTables(prisma: PrismaService, tableNames: tableNames[]) {
   }
 }
 
-export { appServiceFixture, appModuleFixture, truncateTables };
+function createUserToken(
+  userId: number,
+  secretKey: string,
+  options: jwt.SignOptions,
+) {
+  return jwt.sign({ userId }, secretKey, options);
+}
+
+export { appServiceFixture, appModuleFixture, truncateTables, createUserToken };
