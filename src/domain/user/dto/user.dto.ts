@@ -46,6 +46,7 @@ export interface AgreementDTO {
 
 export interface AreaDto {
   category: AreaCategory;
+  address: string;
   latitude: number;
   longitude: number;
 }

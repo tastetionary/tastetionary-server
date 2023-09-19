@@ -10,7 +10,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
       pull-requests: write
     steps:
@@ -23,8 +23,10 @@ jobs:
           git config user.email "noreply@github.com"
           git switch -c bump-$TAG
           npm version $TAG -m "bump to $TAG"
+          cd packages/api
+          npm version $TAG -m "bump to $TAG"
           git push --set-upstream origin bump-$TAG
-          gh pr create --title "bump to $TAG" --body "bump to $TAG" --base main --head bump-$TAG
+          gh pr create --title "bump to $TAG" --body "bump to $TAG" --base develop --head bump-$TAG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

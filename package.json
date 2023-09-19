@@ -1,6 +1,6 @@
 {
   "name": "bside-4",
-  "version": "0.0.1",
+  "version": "0.1.8",
   "description": "",
   "author": "",
   "private": true,
@@ -19,7 +19,7 @@
     "start:dev": "cross-env NODE_ENV=dev nest start --watch",
     "start:test": "cross-env NODE_ENV=test nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest NODE_ENV=test src/**/**/*.repository.spec.ts src/**/**/*.service.spec.ts",
     "test:watch": "jest --watch",
