@@ -20,8 +20,8 @@ export class ConfigurationService {
     return { serverTime: new Date().toISOString(), version: '0.0.1' };
   }
 
-  getDataBaseHost() {
-    return this.configService.get<string>('DATABASE_HOST');
+  getDataBaseUrl() {
+    return this.configService.get<string>('DATABASE_URL');
   }
 
   getTokenData() {

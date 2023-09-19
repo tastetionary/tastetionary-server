@@ -42,8 +42,9 @@ model UserTokens {
 model UserAreas {
   id        Int                      @id @default(autoincrement())
   userId    Int                      @map("user_id")
-  category  String                   @map("category") @db.VarChar(32) // 활동지역, 식사지역 
+  category  String                   @map("category") @db.VarChar(32) // 활동지역, 식사지역 등 종류
   order     Int                      @map("order") @db.SmallInt // user 의 상태, 가입 완료, 탈퇴, 블락 등
+  address   String                   @map("address") @db.VarChar(128) // 주소, 2-3 depth
   location  Unsupported("geography") // 위경도
   createdAt DateTime                 @default(now()) @map("created_at")
   updatedAt DateTime                 @updatedAt @map("updated_at")
@@ -54,34 +55,34 @@ model UserAreas {
 }
 
 model UserPreferences {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
-  bookmark_ids Int[]    @map("bookmark_ids") @db.Integer
-  excluded_ids Int[]    @map("excluded_ids") @db.Integer
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id                      Int      @id @default(autoincrement())
+  userId                  Int      @map("user_id")
+  bookmark_restaurant_ids Int[]    @map("bookmark_restaurant_ids") @db.Integer
+  exclude_restaurant_ids  Int[]    @map("exclude_restaurant_ids") @db.Integer
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
-  @@index([bookmark_ids], type: Gin)
-  @@index([excluded_ids], type: Gin)
+  @@index([bookmark_restaurant_ids], type: Gin)
+  @@index([exclude_restaurant_ids], type: Gin)
   @@map("user_preferences")
 }
 
 model RestaurantReviews {
-  id            Int      @id @default(autoincrement())
-  external_uuid BigInt   @map("external_uuid") /// 외부 API 를 통해 가져온 식당 uuid
-  userId        Int      @map("user_id")
-  category      String   @map("category") @db.VarChar(32) /// 리뷰시 등록되는 음식 종류, 한식 중식 양식 등
-  summary       String   @map("summary") @db.VarChar(128) /// 한줄 요약
-  opinion       String   @map("opinion") @db.VarChar(16) // 최종 의견, 
-  keywords      String[] @map("keywords") @db.Text // tags
-  price         Int      @map("price") @db.Integer // 가격
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id                                 Int      @id @default(autoincrement())
+  external_restaurant_information_id BigInt   @map("external_restaurant_information_id") /// 외부 API 를 통해 가져온 식당 uuid
+  userId                             Int      @map("user_id")
+  category                           String   @map("category") @db.VarChar(32) /// 리뷰시 등록되는 음식 종류, 한식 중식 양식 등
+  summary                            String   @map("summary") @db.VarChar(128) /// 한줄 요약
+  opinion                            String   @map("opinion") @db.VarChar(16) // 최종 의견, 
+  keywords                           String[] @map("keywords") @db.Text // tags
+  price                              Int      @map("price") @db.Integer // 가격
+  createdAt                          DateTime @default(now()) @map("created_at")
+  updatedAt                          DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
-  @@index([external_uuid])
-  @@index([external_uuid, userId])
+  @@index([external_restaurant_information_id])
+  @@index([external_restaurant_information_id, userId])
   @@index([keywords], type: Gin)
   @@index([price])
   @@map("restaurant_reviews")
@@ -89,7 +90,8 @@ model RestaurantReviews {
 
 model ExternalRestaurantInformations {
   id             BigInt                   @id @default(autoincrement())
-  external_uuid  BigInt                   @map("external_uuid") /// 외부 API 를 통해 가져온 식당 uuid
+  external_uuid  BigInt                   @map("external_uuid") // 외부 API 를 통해 가져온 식당 uuid
+  name           String                   @map("name") @db.VarChar(128) // 상호명
   location       Unsupported("geography") // 위경도
   reference_link String                   @map("reference_link") @db.VarChar(1024)
   createdAt      DateTime                 @default(now()) @map("created_at")

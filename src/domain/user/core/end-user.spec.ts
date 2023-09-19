@@ -60,6 +60,7 @@ describe('end user', () => {
         {
           latitude: 1,
           longitude: 1,
+          address: 'one two three',
           category: AreaCategory.ACTIVITY_AREA,
         },
       ],
