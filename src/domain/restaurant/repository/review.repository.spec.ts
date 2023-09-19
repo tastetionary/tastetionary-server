@@ -17,7 +17,10 @@ describe('review repository', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['reviews']);
+    await truncateTables(prisma, [
+      'restaurant_reviews',
+      'external_restaurant_informations',
+    ]);
   });
 
   it('should save external info', async () => {
@@ -28,7 +31,7 @@ describe('review repository', () => {
         latitude: 1,
         longitude: 1,
       },
-      link: 'https://www.naver.com',
+      reference_link: 'https://www.naver.com',
     };
 
     await repo.saveExternalRestaurantInformation(data);

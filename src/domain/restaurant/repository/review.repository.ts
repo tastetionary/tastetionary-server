@@ -12,10 +12,10 @@ export class ReviewRepository {
     category: string;
     price: number;
     summary: string;
-    opinion: string;
+    opinion?: string;
     external_restaurant_information_id: number;
   }) {
-    this.saveReviews([param]);
+    await this.saveReviews([param]);
   }
 
   async saveReviews(
@@ -25,11 +25,11 @@ export class ReviewRepository {
       category: string;
       price: number;
       summary: string;
-      opinion: string;
+      opinion?: string;
       external_restaurant_information_id: number;
     }[],
   ) {
-    this.prisma.restaurantReviews.createMany({ data: params });
+    await this.prisma.restaurantReviews.createMany({ data: params });
   }
 
   async getReviewsByUserId(userId: number) {
@@ -43,10 +43,12 @@ export class ReviewRepository {
       latitude: number;
       longitude: number;
     };
-    link: string;
+    reference_link: string;
   }) {
-    const query = Prisma.sql`INSERT INTO external_restaurant_informations (external_uuid, name, location, link) 
-        VALUES (${param.external_uuid}, ${param.name}, st_point(${param.location.latitude}, ${param.location.longitude}), ${param.link})`;
+    const query = Prisma.sql`INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
+        VALUES (${param.external_uuid}, ${param.name}, st_point(${
+      param.location.latitude
+    }, ${param.location.longitude}), ${param.reference_link}, ${new Date()})`;
     await this.prisma.$queryRaw`${query}`;
   }
 
