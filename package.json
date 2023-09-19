@@ -1,5 +1,5 @@
 {
-  "name": "bside-4",
+  "name": "taste-dictionary-api",
   "version": "0.1.8",
   "description": "",
   "author": "",
@@ -63,6 +63,7 @@
     "@nestia/sdk": "^1.6.3",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
+    "@nestjs/swagger": "^7.1.11",
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
