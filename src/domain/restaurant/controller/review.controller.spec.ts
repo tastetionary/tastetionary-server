@@ -2,7 +2,7 @@ import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { appModuleFixture, createUserToken } from '@root/jest.setup';
-import { ReviewModule } from '@domain/review/review.module';
+import { ReviewModule } from '@root/src/domain/restaurant/review.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 
 describe('review controller', () => {

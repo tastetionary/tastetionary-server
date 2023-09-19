@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ReviewController } from '@domain/review/controller/review.controller';
+import { ReviewController } from '@root/src/domain/restaurant/controller/review.controller';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { JwtService } from '@nestjs/jwt';
