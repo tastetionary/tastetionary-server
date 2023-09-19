@@ -40,6 +40,7 @@ export class EndUser {
         userId: user.id,
         order: 0,
         category: dto.category,
+        address: dto.address,
         location: { latitude: dto.latitude, longitude: dto.longitude },
       };
     });
