@@ -9,7 +9,7 @@ import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
-import { ReviewDTO } from '@root/src/domain/restaurant/dto/review.dto';
+import { ReviewDTO } from '@domain/restaurant/dto/restaurant.dto';
 
 @Controller('v1/review')
 @UseFilters(new HttpExceptionFilter())
