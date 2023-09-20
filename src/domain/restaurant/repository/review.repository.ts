@@ -3,7 +3,7 @@ import { PrismaService } from '@common/database/prisma.service';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class ReviewRepository {
+export class RestaurantRepository {
   constructor(private prisma: PrismaService) {}
 
   async saveReview(param: {
@@ -13,7 +13,7 @@ export class ReviewRepository {
     price: number;
     summary: string;
     opinion?: string;
-    external_restaurant_information_id: number;
+    externalRestaurantInformationId: number;
   }) {
     await this.saveReviews([param]);
   }
@@ -26,10 +26,16 @@ export class ReviewRepository {
       price: number;
       summary: string;
       opinion?: string;
-      external_restaurant_information_id: number;
+      externalRestaurantInformationId: number;
     }[],
   ) {
-    await this.prisma.restaurantReviews.createMany({ data: params });
+    const data: any[] = params.map((param) => {
+      const { externalRestaurantInformationId, ...rest } = param;
+      rest['external_restaurant_information_id'] =
+        externalRestaurantInformationId;
+      return rest;
+    });
+    await this.prisma.restaurantReviews.createMany({ data });
   }
 
   async getReviewsByUserId(userId: number) {
@@ -37,18 +43,18 @@ export class ReviewRepository {
   }
 
   async saveExternalRestaurantInformation(param: {
-    external_uuid: number;
+    externalUUID: number;
     name: string;
     location: {
       latitude: number;
       longitude: number;
     };
-    reference_link: string;
+    referenceLink: string;
   }) {
     const query = Prisma.sql`INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
-        VALUES (${param.external_uuid}, ${param.name}, st_point(${
+        VALUES (${param.externalUUID}, ${param.name}, st_point(${
       param.location.latitude
-    }, ${param.location.longitude}), ${param.reference_link}, ${new Date()})`;
+    }, ${param.location.longitude}), ${param.referenceLink}, ${new Date()})`;
     await this.prisma.$queryRaw`${query}`;
   }
 
