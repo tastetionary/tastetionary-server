@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { RestaurantReviewDTO } from '@domain/restaurant/dto/restaurant.dto';
+import {
+  ExternalRestaurantInformationDTO,
+  RestaurantReviewDTO,
+} from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
 
 @Injectable()
@@ -20,5 +23,26 @@ export class RestaurantService {
 
   async getReviews(userId: number) {
     return this.repo.getReviewsByUserId(userId);
+  }
+
+  async registerExternalRestaurantInformationWhenNoData(
+    param: ExternalRestaurantInformationDTO,
+  ) {
+    const info = await this.repo.getExternalRestaurantInformation(
+      param.externalUUID,
+    );
+    if (info) {
+      return;
+    }
+
+    await this.repo.saveExternalRestaurantInformation({
+      externalUUID: param.externalUUID,
+      name: param.name,
+      location: {
+        latitude: param.latitude,
+        longitude: param.longitude,
+      },
+      referenceLink: param.referenceLink,
+    });
   }
 }
