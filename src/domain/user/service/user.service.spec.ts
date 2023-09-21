@@ -29,7 +29,7 @@ describe('user service', () => {
   it('should create user and account and agreement and location', async () => {
     const dto: RegisterUserDTO = {
       userProperty: { companyName: 'test' },
-      area: [
+      areas: [
         {
           latitude: 1,
           longitude: 1,
@@ -48,7 +48,7 @@ describe('user service', () => {
         password: 'pwd',
         category: AccountCategory.EMAIL,
       },
-      agreement: [
+      agreements: [
         {
           category: AgreementCategory.PERSONAL_INFORMATION,
           is_agree: true,
