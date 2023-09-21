@@ -26,7 +26,7 @@ describe('Restaurant repository', () => {
 
   it('should save external info', async () => {
     const data = {
-      externalUUID: 1,
+      externalUUID: 1n,
       name: 'test',
       location: {
         latitude: 1,

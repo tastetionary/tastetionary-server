@@ -44,13 +44,13 @@ export class RestaurantRepository {
   }
 
   async saveExternalRestaurantInformation(param: {
-    externalUUID: number;
+    externalUUID: bigint;
     name: string;
     location: {
       latitude: number;
       longitude: number;
     };
-    referenceLink: string;
+    referenceLink?: string;
   }) {
     const query = Prisma.sql`INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
         VALUES (${param.externalUUID}, ${param.name}, st_point(${
@@ -59,7 +59,7 @@ export class RestaurantRepository {
     await this.prisma.$queryRaw`${query}`;
   }
 
-  async getExternalRestaurantInformation(externalUUid: number) {
+  async getExternalRestaurantInformation(externalUUid: bigint) {
     return this.prisma.externalRestaurantInformations.findFirst({
       where: { external_uuid: externalUUid },
     });
