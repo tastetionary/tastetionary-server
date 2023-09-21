@@ -2,7 +2,7 @@ import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { appModuleFixture, createUserToken } from '@root/jest.setup';
-import { ReviewModule } from '@root/src/domain/restaurant/restaurant.module';
+import { RestaurantModule } from '@root/src/domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 
 describe('review controller', () => {
@@ -13,7 +13,7 @@ describe('review controller', () => {
     const module = (await appModuleFixture(
       [],
       [],
-      [ReviewModule],
+      [RestaurantModule],
     )) as TestingModule;
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
