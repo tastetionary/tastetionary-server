@@ -14,7 +14,7 @@ export class RestaurantRepository {
     price: number;
     summary: string;
     opinion?: string;
-    externalRestaurantInformationId: number;
+    externalRestaurantInformationId: bigint;
   }) {
     await this.saveReviews([param]);
   }
@@ -27,7 +27,7 @@ export class RestaurantRepository {
       price: number;
       summary: string;
       opinion?: string;
-      externalRestaurantInformationId: number;
+      externalRestaurantInformationId: bigint;
     }[],
   ) {
     const data: any[] = params.map((param) => {

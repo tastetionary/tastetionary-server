@@ -4,6 +4,7 @@ import {
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import { ServiceException } from '@common/exception/custom.exception';
 
 @Injectable()
 export class RestaurantService {
@@ -11,12 +12,24 @@ export class RestaurantService {
 
   async registerReview(param: {
     userId: number;
-    externalRestaurantInformationId: number;
+    externalDto: ExternalRestaurantInformationDTO;
     dto: RestaurantReviewDTO;
   }) {
+    const externalInfo =
+      await this.registerExternalRestaurantInformationWhenNoData(
+        param.externalDto,
+      );
+
+    if (!externalInfo) {
+      throw new ServiceException(
+        'external restaurant information is not found',
+        `${param.externalDto.externalUUID}}`,
+      );
+    }
+
     await this.repo.saveReview({
       userId: param.userId,
-      externalRestaurantInformationId: param.externalRestaurantInformationId,
+      externalRestaurantInformationId: externalInfo.id,
       ...param.dto,
     });
   }
@@ -28,11 +41,9 @@ export class RestaurantService {
   async registerExternalRestaurantInformationWhenNoData(
     param: ExternalRestaurantInformationDTO,
   ) {
-    const info = await this.repo.getExternalRestaurantInformation(
-      param.externalUUID,
-    );
+    const info = await this.getExternalRestaurant(param.externalUUID);
     if (info) {
-      return;
+      return info;
     }
 
     await this.repo.saveExternalRestaurantInformation({
@@ -44,5 +55,11 @@ export class RestaurantService {
       },
       referenceLink: param.referenceLink,
     });
+
+    return await this.getExternalRestaurant(param.externalUUID);
+  }
+
+  async getExternalRestaurant(externalUUID: bigint) {
+    return await this.repo.getExternalRestaurantInformation(externalUUID);
   }
 }
