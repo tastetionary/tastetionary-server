@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
 import { Prisma } from '@prisma/client';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
 @Injectable()
 export class RestaurantRepository {
@@ -9,7 +10,7 @@ export class RestaurantRepository {
   async saveReview(param: {
     userId: number;
     keywords: string[];
-    category: string;
+    category: RestaurantCategory;
     price: number;
     summary: string;
     opinion?: string;
@@ -22,7 +23,7 @@ export class RestaurantRepository {
     params: {
       userId: number;
       keywords: string[];
-      category: string;
+      category: RestaurantCategory;
       price: number;
       summary: string;
       opinion?: string;

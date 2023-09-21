@@ -1,17 +1,19 @@
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+
 export interface RestaurantReviewDTO {
   /**
    * restaurant category,
    * example: "한식"
-   * @type string
+   * @type RestaurantCategory
    */
-  category: string;
+  category: RestaurantCategory;
 
   /**
    * restaurant keywords
    * example: "깨끗해요"
-   * @type string
+   * @type string[]
    */
-  keywords: string;
+  keywords: string[];
 
   /**
    * example: 10000

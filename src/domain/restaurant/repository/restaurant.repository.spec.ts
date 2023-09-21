@@ -3,6 +3,7 @@ import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import { RestaurantCategory } from '../restaurant.enum';
 
 describe('Restaurant repository', () => {
   let repo: RestaurantRepository;
@@ -44,7 +45,7 @@ describe('Restaurant repository', () => {
       {
         userId: 1,
         keywords: ['clean'],
-        category: 'korean_food',
+        category: RestaurantCategory.ASIAN,
         price: 10_000,
         summary: 'never come again',
         opinion: 'no',
