@@ -5,7 +5,7 @@ import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { RestaurantModule } from '@root/src/domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 
-describe('review controller', () => {
+describe('restaurant controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
 
@@ -26,7 +26,7 @@ describe('review controller', () => {
       expiresIn: '10h',
     });
     const res = await request(app.getHttpServer())
-      .post('/v1/review')
+      .post('/v1/restaurant/review')
       .set('Authorization', `Bearer ${token}`)
       .send({
         category: 'category',

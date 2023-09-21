@@ -11,7 +11,7 @@ import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { RestaurantReviewDTO } from '@domain/restaurant/dto/restaurant.dto';
 
-@Controller('v1/review')
+@Controller('v1/restaurant/review')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class RestaurantController {
