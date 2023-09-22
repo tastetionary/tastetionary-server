@@ -12,6 +12,7 @@ import { UserState } from '@domain/user/user.enum';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { getRandomItem } from '@common/util';
 import { AgreementDTO } from '@domain/user/dto/user.dto';
+import { EndUser } from '@domain/user/core/end-user';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,11 @@ export class UserService {
   ) {}
   @Inject(AccountService)
   private readonly accountService: AccountService;
+
+  async getEndUser(userId: number) {
+    const areas = await this.areaRepo.getAreasByUserId(userId);
+    return new EndUser(userId, areas);
+  }
 
   async register(dto: RegisterUserDTO) {
     const user = await this.registerUser(dto.userProperty);

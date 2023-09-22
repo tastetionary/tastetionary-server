@@ -40,6 +40,17 @@ export class AreaRepository {
   }
 
   async getAreasByUserId(userId: number) {
-    return this.prisma.userAreas.findMany({ where: { userId } });
+    const areas = await this.prisma.userAreas.findMany({ where: { userId } });
+
+    return areas.map((area) => {
+      const { category, ...res } = area;
+
+      const enumCategory = {
+        [AreaCategory.ACTIVITY_AREA]: AreaCategory.ACTIVITY_AREA,
+        [AreaCategory.DINING_AREA]: AreaCategory.DINING_AREA,
+      };
+      const targetCategory: AreaCategory = enumCategory[category];
+      return { ...res, category: targetCategory };
+    });
   }
 }
