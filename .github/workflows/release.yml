@@ -14,7 +14,20 @@ jobs:
       packages: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '18.x'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@homekeeper89'
+      - run: npm ci
+      - run: npm i -g rimraf
+      - run: npm run package:publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Bump to new version
         run: |
@@ -31,15 +44,4 @@ jobs:
           gh pr create --title "bump to $TAG" --body "bump to $TAG" --base develop --head bump-$TAG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '18.x'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@homekeeper89'
-      - run: npm ci
-      - run: npm i -g rimraf
-      - run: npm run package:publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
