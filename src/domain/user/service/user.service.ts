@@ -1,12 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from '@domain/user/repository/user.repository';
-import { RegisterUserDTO } from '@domain/user/dto/user.dto';
+import {
+  AreaDto,
+  RegisterUserDTO,
+  UserPropertyDto,
+} from '@domain/user/dto/user.dto';
 import { AgreementRepository } from '@domain/user/repository/agreements.repository';
 import { AreaRepository } from '@domain/user/repository/area.repository';
 import { AccountService } from '@domain/account/service/account.service';
 import { UserState } from '@domain/user/user.enum';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { getRandomItem } from '@common/util';
+import { AgreementDTO } from '@domain/user/dto/user.dto';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -18,22 +24,20 @@ export class UserService {
   private readonly accountService: AccountService;
 
   async register(dto: RegisterUserDTO) {
-    const nickname = this.getNickname();
+    const user = await this.registerUser(dto.userProperty);
 
-    const user = await this.userRepo.saveUser({
-      state: UserState.ACTIVE,
-      nickname,
-      property: dto.userProperty,
-    });
+    await this.registerAgreements(user.id, dto.agreements);
 
-    const params = dto.agreements.map((dto) => {
-      return { userId: user.id, ...dto };
-    });
-    await this.agreementRepo.saveAgreements(params);
+    await this.registerArea(user.id, dto.areas);
 
-    const areaParams = dto.areas.map((dto) => {
+    await this.accountService.register(user.id, dto.account);
+    return user;
+  }
+
+  private async registerArea(userId: number, dtoList: AreaDto[]) {
+    const areaParams = dtoList.map((dto) => {
       return {
-        userId: user.id,
+        userId,
         order: 0,
         category: dto.category,
         address: dto.address,
@@ -41,8 +45,22 @@ export class UserService {
       };
     });
     await this.areaRepo.saveAreas(areaParams);
+  }
 
-    await this.accountService.register(user.id, dto.account);
+  private async registerAgreements(userId: number, dtoList: AgreementDTO[]) {
+    const params = dtoList.map((dto) => {
+      return { userId, ...dto };
+    });
+    await this.agreementRepo.saveAgreements(params);
+  }
+
+  private async registerUser(dto: UserPropertyDto) {
+    const nickname = this.getNickname();
+    const user = await this.userRepo.saveUser({
+      state: UserState.ACTIVE,
+      nickname,
+      property: dto,
+    });
     return user;
   }
 
