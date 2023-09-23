@@ -1,4 +1,4 @@
-export interface ReviewDTO {
+export interface RestaurantReviewDTO {
   /**
    * restaurant category,
    * example: "한식"
