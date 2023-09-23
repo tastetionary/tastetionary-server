@@ -347,14 +347,14 @@
           "userProperty": {
             "$ref": "#/components/schemas/UserPropertyDto"
           },
-          "area": {
+          "areas": {
             "description": "user location data, now only support 'ACTIVITY_AREA' and 'DINING_AREA'",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
                 "text": [
                   {
-                    "text": "Object",
+                    "text": "AreaDto[]",
                     "kind": "text"
                   }
                 ]
@@ -370,14 +370,14 @@
           "account": {
             "$ref": "#/components/schemas/AccountDTO"
           },
-          "agreement": {
+          "agreements": {
             "description": "agreements data",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
                 "text": [
                   {
-                    "text": "Array",
+                    "text": "AgreementDTO[]",
                     "kind": "text"
                   }
                 ]
@@ -394,9 +394,9 @@
         "nullable": false,
         "required": [
           "userProperty",
-          "area",
+          "areas",
           "account",
-          "agreement"
+          "agreements"
         ],
         "x-typia-jsDocTags": []
       },
