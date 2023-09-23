@@ -6,9 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@common/database/prisma.service';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import { UserModule } from '@domain/user/user.module';
 
 @Module({
-  imports: [],
+  imports: [UserModule],
   controllers: [RestaurantController],
   providers: [
     AuthGuard,

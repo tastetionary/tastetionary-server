@@ -1,20 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
 import { ServiceException } from '@common/exception/custom.exception';
+import { UserService } from '@domain/user/service/user.service';
 
 @Injectable()
 export class RestaurantService {
   constructor(private repo: RestaurantRepository) {}
+
+  @Inject(UserService)
+  private readonly userService: UserService;
 
   async registerReview(param: {
     userId: number;
     externalDto: ExternalRestaurantInformationDTO;
     dto: RestaurantReviewDTO;
   }) {
+    const endUser = await this.userService.getEndUser(param.userId);
+
+    if (!endUser.activityArea) {
+      throw new ServiceException(
+        'domain rule error',
+        `user: ${param.userId} has no area, should register area first`,
+      );
+    }
+
     const externalInfo =
       await this.registerExternalRestaurantInformationWhenNoData(
         param.externalDto,
@@ -22,8 +35,8 @@ export class RestaurantService {
 
     if (!externalInfo) {
       throw new ServiceException(
-        `external restaurant information is not found, uuid: ${param.externalDto.externalUUID}`,
-        'external restaurant information is necessary for registering review',
+        'internal exception occur',
+        `no data or can not register about uuid: ${param.externalDto.externalUUID}`,
       );
     }
 
