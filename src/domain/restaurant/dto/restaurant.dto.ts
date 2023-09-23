@@ -35,7 +35,7 @@ export interface ExternalRestaurantInformationDTO {
    * example: 9391929
    * @type number
    */
-  externalUUID: bigint;
+  externalUUID: number;
 
   /**
    * restaurant name,

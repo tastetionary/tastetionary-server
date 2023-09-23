@@ -4,26 +4,41 @@ import {
   Injectable,
   UseFilters,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
-import { RestaurantReviewDTO } from '@domain/restaurant/dto/restaurant.dto';
+import {
+  ExternalRestaurantInformationDTO,
+  RestaurantReviewDTO,
+} from '@domain/restaurant/dto/restaurant.dto';
+import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 
 @Controller('v1/restaurant/review')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class RestaurantController {
-  constructor() {}
+  constructor(private service: RestaurantService) {}
 
   @UseGuards(AuthGuard)
   @HttpCode(200)
   @TypedRoute.Post('/')
   async registerRestaurantReview(
-    @TypedBody() dto: RestaurantReviewDTO,
+    @Request() req,
+    @TypedBody()
+    dto: {
+      review: RestaurantReviewDTO;
+      external: ExternalRestaurantInformationDTO;
+    },
   ): Promise<BaseResponseDto<object>> {
-    console.log(dto);
+    const userId = req.user.userId;
+    await this.service.registerReview({
+      userId,
+      externalDto: dto.external,
+      dto: dto.review,
+    });
     return new BaseResponseDto({ state: 'success' });
   }
 }
