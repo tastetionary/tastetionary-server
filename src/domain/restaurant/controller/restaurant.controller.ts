@@ -22,6 +22,11 @@ import { RestaurantService } from '@domain/restaurant/service/restaurant.service
 export class RestaurantController {
   constructor(private service: RestaurantService) {}
 
+  /**
+   * @tag restaurant
+   * @summary register restaurant review only for end-user who register activity area
+   * @security bearer
+   */
   @UseGuards(AuthGuard)
   @HttpCode(200)
   @TypedRoute.Post('/')
