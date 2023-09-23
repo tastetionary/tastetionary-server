@@ -7,6 +7,8 @@ import { RestaurantService } from '@domain/restaurant/service/restaurant.service
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserModule } from '@domain/user/user.module';
+import { EndUser } from '@domain/user/core/end-user';
+import { AreaCategory } from '@domain/user/user.enum';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
@@ -62,13 +64,25 @@ describe('restaurant service', () => {
   });
 
   it('should create review data and external data', async () => {
-    const userId = 1;
-    await service.registerReview({
+    const userId = 999;
+    const area = {
+      id: 1,
       userId,
-      externalDto: EXTERNAL_DTO,
-      dto: DTO,
-    });
-    const res = await service.getReviews(1);
+      category: AreaCategory.ACTIVITY_AREA,
+      order: 1,
+      address: 'address',
+    };
+
+    const user = new EndUser(userId, [area]);
+    await service.registerReview(
+      {
+        userId,
+        externalDto: EXTERNAL_DTO,
+        dto: DTO,
+      },
+      user,
+    );
+    const res = await service.getReviews(userId);
 
     expect(res).toHaveLength(1);
   });

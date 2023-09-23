@@ -6,6 +6,7 @@ import {
 import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserService } from '@domain/user/service/user.service';
+import { EndUser } from '@domain/user/core/end-user';
 
 @Injectable()
 export class RestaurantService {
@@ -14,12 +15,15 @@ export class RestaurantService {
   @Inject(UserService)
   private readonly userService: UserService;
 
-  async registerReview(param: {
-    userId: number;
-    externalDto: ExternalRestaurantInformationDTO;
-    dto: RestaurantReviewDTO;
-  }) {
-    const endUser = await this.userService.getEndUser(param.userId);
+  async registerReview(
+    param: {
+      userId: number;
+      externalDto: ExternalRestaurantInformationDTO;
+      dto: RestaurantReviewDTO;
+    },
+    user?: EndUser,
+  ) {
+    const endUser = user ?? (await this.userService.getEndUser(param.userId));
 
     if (!endUser.activityArea) {
       throw new ServiceException(
