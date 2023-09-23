@@ -22,14 +22,26 @@ export class RestaurantService {
 
     if (!externalInfo) {
       throw new ServiceException(
-        'external restaurant information is not found',
-        `${param.externalDto.externalUUID}}`,
+        `external restaurant information is not found, uuid: ${param.externalDto.externalUUID}`,
+        'external restaurant information is necessary for registering review',
       );
     }
 
+    await this.registerRestaurantReview({
+      userId: param.userId,
+      externalInfoId: externalInfo.id,
+      dto: param.dto,
+    });
+  }
+
+  private async registerRestaurantReview(param: {
+    userId: number;
+    externalInfoId: bigint;
+    dto: RestaurantReviewDTO;
+  }) {
     await this.repo.saveReview({
       userId: param.userId,
-      externalRestaurantInformationId: externalInfo.id,
+      externalRestaurantInformationId: param.externalInfoId,
       ...param.dto,
     });
   }
