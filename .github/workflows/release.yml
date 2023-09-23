@@ -22,6 +22,8 @@ jobs:
           git config user.name "taste-bot"
           git config user.email "noreply@github.com"
           git switch -c bump-$TAG
+          npx nestia swagger
+          git diff-index --quiet HEAD || git commit -am "bump to $TAG"
           npm version $TAG -m "bump to $TAG"
           cd packages/api
           npm version $TAG -m "bump to $TAG"
