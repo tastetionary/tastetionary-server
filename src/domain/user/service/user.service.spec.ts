@@ -26,36 +26,44 @@ describe('user service', () => {
     await truncateTables(prisma, ['users', 'accounts']);
   });
 
-  it('should create user and account and agreement and location', async () => {
-    const dto: RegisterUserDTO = {
-      userProperty: { companyName: 'test' },
-      area: [
-        {
-          latitude: 1,
-          longitude: 1,
-          category: AreaCategory.ACTIVITY_AREA,
-          address: 'test',
-        },
-        {
-          latitude: 1,
-          longitude: 1,
-          category: AreaCategory.DINING_AREA,
-          address: 'test',
-        },
-      ],
-      account: {
-        identification: 'test',
-        password: 'pwd',
-        category: AccountCategory.EMAIL,
+  const DTO: RegisterUserDTO = {
+    userProperty: { companyName: 'test' },
+    areas: [
+      {
+        latitude: 1,
+        longitude: 1,
+        category: AreaCategory.ACTIVITY_AREA,
+        address: 'test',
       },
-      agreement: [
-        {
-          category: AgreementCategory.PERSONAL_INFORMATION,
-          is_agree: true,
-        },
-      ],
-    };
-    const user = await service.register(dto);
+      {
+        latitude: 1,
+        longitude: 1,
+        category: AreaCategory.DINING_AREA,
+        address: 'test',
+      },
+    ],
+    account: {
+      identification: 'test',
+      password: 'pwd',
+      category: AccountCategory.EMAIL,
+    },
+    agreements: [
+      {
+        category: AgreementCategory.PERSONAL_INFORMATION,
+        is_agree: true,
+      },
+    ],
+  };
+
+  it('should return end-user', async () => {
+    const user = await service.register(DTO);
+    const endUser = await service.getEndUser(user.id);
+    expect(endUser).not.toBeNull();
+    expect(endUser.activityArea).not.toBeNull();
+  });
+
+  it('should create user and account and agreement and location', async () => {
+    const user = await service.register(DTO);
     expect(user).not.toBeNull();
   });
 });
