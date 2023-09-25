@@ -12,7 +12,7 @@ import { BaseResponseDto } from '@common/dto/base.dto';
 import { UserRepository } from '@domain/user/repository/user.repository';
 import { AuthGuard } from '@common/auth/auth.guard';
 
-@Controller('v1/users')
+@Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class UserController {

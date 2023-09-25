@@ -45,12 +45,40 @@ export interface AgreementDTO {
 }
 
 export interface AreaDto {
+  /**
+   * area category
+   * example: 'dining_area'
+   * @type AreaCategory
+   */
   category: AreaCategory;
+
+  /**
+   * human-readable address,
+   * example: '서울특별시 강남구 00동'
+   * @type string
+   */
   address: string;
+
+  /**
+   * latitude,
+   * example: 37.1234
+   * @type number
+   */
   latitude: number;
+
+  /**
+   * longitude,
+   * example: 127.1123
+   * @type number
+   */
   longitude: number;
 }
 
 export interface UserPropertyDto {
+  /**
+   * company name,
+   * example: google
+   * @type string
+   */
   companyName: string;
 }

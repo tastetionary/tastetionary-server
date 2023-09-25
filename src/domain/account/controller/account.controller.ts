@@ -19,6 +19,11 @@ import { AuthGuard } from '@common/auth/auth.guard';
 export class AccountController {
   constructor(private service: AccountService) {}
 
+  /**
+   * @tag account
+   * @summary create token for user
+   * @security bearer
+   */
   @TypedRoute.Post('/tokens')
   @HttpCode(200)
   async createToken(
@@ -28,6 +33,11 @@ export class AccountController {
     return new BaseResponseDto({ ...token });
   }
 
+  /**
+   * @tag account
+   * @summary delete token,
+   * @security bearer
+   */
   @UseGuards(AuthGuard)
   @TypedRoute.Delete('/tokens')
   @HttpCode(200)
