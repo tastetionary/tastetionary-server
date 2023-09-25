@@ -4,6 +4,7 @@ import { INestApplication } from '@nestjs/common';
 import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { RestaurantModule } from '@root/src/domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
 describe('restaurant controller', () => {
   let app: INestApplication;
@@ -29,8 +30,8 @@ describe('restaurant controller', () => {
       .post('/v1/restaurant/review')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        category: 'category',
-        keywords: 'key',
+        category: RestaurantCategory.ASIAN,
+        keywords: ['key'],
         price: 10_000,
         summary: 'one-line summary',
       });

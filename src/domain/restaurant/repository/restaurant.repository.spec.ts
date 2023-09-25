@@ -3,6 +3,7 @@ import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
 describe('Restaurant repository', () => {
   let repo: RestaurantRepository;
@@ -25,7 +26,7 @@ describe('Restaurant repository', () => {
 
   it('should save external info', async () => {
     const data = {
-      externalUUID: 1,
+      externalUUID: 1n,
       name: 'test',
       location: {
         latitude: 1,
@@ -44,11 +45,11 @@ describe('Restaurant repository', () => {
       {
         userId: 1,
         keywords: ['clean'],
-        category: 'korean_food',
+        category: RestaurantCategory.ASIAN,
         price: 10_000,
         summary: 'never come again',
         opinion: 'no',
-        externalRestaurantInformationId: 1,
+        externalRestaurantInformationId: 1n,
       },
     ];
 

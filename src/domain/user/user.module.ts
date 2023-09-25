@@ -21,5 +21,6 @@ import { AccountModule } from '@domain/account/account.module';
     AgreementRepository,
     AreaRepository,
   ],
+  exports: [UserService],
 })
 export class UserModule {}

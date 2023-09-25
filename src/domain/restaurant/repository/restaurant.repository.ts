@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
 import { Prisma } from '@prisma/client';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
 @Injectable()
 export class RestaurantRepository {
@@ -9,11 +10,11 @@ export class RestaurantRepository {
   async saveReview(param: {
     userId: number;
     keywords: string[];
-    category: string;
+    category: RestaurantCategory;
     price: number;
     summary: string;
     opinion?: string;
-    externalRestaurantInformationId: number;
+    externalRestaurantInformationId: bigint;
   }) {
     await this.saveReviews([param]);
   }
@@ -22,11 +23,11 @@ export class RestaurantRepository {
     params: {
       userId: number;
       keywords: string[];
-      category: string;
+      category: RestaurantCategory;
       price: number;
       summary: string;
       opinion?: string;
-      externalRestaurantInformationId: number;
+      externalRestaurantInformationId: bigint;
     }[],
   ) {
     const data: any[] = params.map((param) => {
@@ -43,13 +44,13 @@ export class RestaurantRepository {
   }
 
   async saveExternalRestaurantInformation(param: {
-    externalUUID: number;
+    externalUUID: bigint;
     name: string;
     location: {
       latitude: number;
       longitude: number;
     };
-    referenceLink: string;
+    referenceLink?: string;
   }) {
     const query = Prisma.sql`INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
         VALUES (${param.externalUUID}, ${param.name}, st_point(${
@@ -58,7 +59,7 @@ export class RestaurantRepository {
     await this.prisma.$queryRaw`${query}`;
   }
 
-  async getExternalRestaurantInformation(externalUUid: number) {
+  async getExternalRestaurantInformation(externalUUid: bigint) {
     return this.prisma.externalRestaurantInformations.findFirst({
       where: { external_uuid: externalUUid },
     });
