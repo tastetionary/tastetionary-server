@@ -9,22 +9,21 @@ import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
-import { UserRepository } from '@domain/user/repository/user.repository';
 import { AuthGuard } from '@common/auth/auth.guard';
+import { UserService } from '@domain/user/service/user.service';
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class UserController {
-  constructor(private repo: UserRepository) {}
+  constructor(private service: UserService) {}
 
   @HttpCode(200)
   @TypedRoute.Post('/')
   async registerAccount(
     @TypedBody() dto: RegisterUserDTO,
   ): Promise<BaseResponseDto<object>> {
-    const data = await this.repo.tempMethod();
-    console.log(data, dto);
+    await this.service.register(dto);
     return new BaseResponseDto({ state: 'success' });
   }
 
