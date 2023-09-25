@@ -76,7 +76,7 @@ export class RestaurantService {
     }
 
     await this.repo.saveExternalRestaurantInformation({
-      externalUUID: param.externalUUID,
+      externalUUID: BigInt(param.externalUUID),
       name: param.name,
       location: {
         latitude: param.latitude,
@@ -88,7 +88,9 @@ export class RestaurantService {
     return await this.getExternalRestaurant(param.externalUUID);
   }
 
-  async getExternalRestaurant(externalUUID: bigint) {
-    return await this.repo.getExternalRestaurantInformation(externalUUID);
+  async getExternalRestaurant(externalUUID: number) {
+    return await this.repo.getExternalRestaurantInformation(
+      BigInt(externalUUID),
+    );
   }
 }
