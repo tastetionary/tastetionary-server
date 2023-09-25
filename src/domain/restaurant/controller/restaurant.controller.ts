@@ -16,6 +16,11 @@ import {
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 
+export interface registerRestaurantReviewInput {
+  review: RestaurantReviewDTO;
+  external: ExternalRestaurantInformationDTO;
+}
+
 @Controller('v1/restaurant/review')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
@@ -33,16 +38,13 @@ export class RestaurantController {
   async registerRestaurantReview(
     @Request() req,
     @TypedBody()
-    dto: {
-      review: RestaurantReviewDTO;
-      external: ExternalRestaurantInformationDTO;
-    },
+    input: registerRestaurantReviewInput,
   ): Promise<BaseResponseDto<object>> {
     const userId = req.user.userId;
     await this.service.registerReview({
       userId,
-      externalDto: dto.external,
-      dto: dto.review,
+      externalDto: input.external,
+      dto: input.review,
     });
     return new BaseResponseDto({ state: 'success' });
   }
