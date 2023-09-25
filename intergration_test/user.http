@@ -1,22 +1,24 @@
 
 ### Register User 
-POST {{base_url}}/v1/users
+POST {{base_url}}/v1/user
 Content-Type: {{content_type_json}}
 
 {
   "userProperty": {
     "companyName": "test"
   },
-  "area": [
+  "areas": [
     {
       "latitude": 1,
       "longitude": 1,
-      "category": "activity_area"
+      "category": "activity_area",
+      "address":"activity"
     },
     {
       "latitude": 1,
       "longitude": 1,
-      "category": "dining_area"
+      "category": "dining_area",
+      "address":"dining"
     }
   ],
   "account": {
@@ -25,7 +27,7 @@ Content-Type: {{content_type_json}}
     "category": "email"
     
   },
-  "agreement": [
+  "agreements": [
     {
       "category": "personal_information",
       "is_agree": true
