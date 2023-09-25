@@ -39,7 +39,7 @@ describe('restaurant service', () => {
     summary: 'never come again',
   };
   const EXTERNAL_DTO: ExternalRestaurantInformationDTO = {
-    externalUUID: 123123n,
+    externalUUID: 123123,
     name: 'some',
     latitude: 1,
     longitude: 1,
