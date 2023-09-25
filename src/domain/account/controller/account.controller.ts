@@ -10,7 +10,7 @@ import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AccountService } from '@domain/account/service/account.service';
-import { AccountDTO } from '@domain/account/dto/account.dto';
+import { AccountDTO, TokenDTO } from '@domain/account/dto/account.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 
 @Controller('v1/account')
@@ -21,14 +21,9 @@ export class AccountController {
 
   @TypedRoute.Post('/tokens')
   @HttpCode(200)
-  async createToken(@TypedBody() dto: AccountDTO): Promise<
-    BaseResponseDto<{
-      accessToken: string;
-      refreshToken: string;
-      accessTokenExpiredAt: Date;
-      refreshTokenExpiredAt: Date;
-    }>
-  > {
+  async createToken(
+    @TypedBody() dto: AccountDTO,
+  ): Promise<BaseResponseDto<TokenDTO>> {
     const token = await this.service.createToken(dto);
     return new BaseResponseDto({ ...token });
   }

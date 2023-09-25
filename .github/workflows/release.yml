@@ -16,18 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Bump to new version
-        run: |
-          TAG=$(git tag --sort=version:refname | tail -n 1)
-          git config user.name "taste-bot"
-          git config user.email "noreply@github.com"
-          git switch -c bump-$TAG
-          npm version $TAG -m "bump to $TAG"
-          git push --set-upstream origin bump-$TAG
-          gh pr create --title "bump to $TAG" --body "bump to $TAG" --base main --head bump-$TAG
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: actions/setup-node@v2
         with:
           node-version: '18.x'
@@ -38,4 +26,20 @@ jobs:
       - run: npm run package:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Bump to new version
+        run: |
+          TAG=$(git tag --sort=version:refname | tail -n 1)
+          git config user.name "taste-bot"
+          git config user.email "noreply@github.com"
+          git switch -c bump-$TAG
+          npx nestia swagger
+          git diff-index --quiet HEAD || git commit -am "bump to $TAG"
+          npm version $TAG -m "bump to $TAG"
+          cd packages/api
+          npm version $TAG -m "bump to $TAG"
+          git push --set-upstream origin bump-$TAG
+          gh pr create --title "bump to $TAG" --body "bump to $TAG" --base develop --head bump-$TAG
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

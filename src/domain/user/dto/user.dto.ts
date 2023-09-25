@@ -13,9 +13,9 @@ export interface RegisterUserDTO {
 
   /**
    * user location data, now only support 'ACTIVITY_AREA' and 'DINING_AREA'
-   * @type Object
+   * @type AreaDto[]
    */
-  area: AreaDto[];
+  areas: AreaDto[];
 
   /**
    * account data
@@ -25,9 +25,9 @@ export interface RegisterUserDTO {
 
   /**
    * agreements data
-   * @type Array
+   * @type AgreementDTO[]
    */
-  agreement: AgreementDTO[];
+  agreements: AgreementDTO[];
 }
 
 export interface AgreementDTO {
@@ -46,6 +46,7 @@ export interface AgreementDTO {
 
 export interface AreaDto {
   category: AreaCategory;
+  address: string;
   latitude: number;
   longitude: number;
 }

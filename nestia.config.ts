@@ -6,7 +6,7 @@ const config: INestiaConfig = {
   distribute: 'packages/api',
   e2e: 'test',
   swagger: {
-    output: 'dist/swagger.json',
+    output: 'packages/api/swagger.json',
     security: {
       bearer: {
         type: 'apiKey',
