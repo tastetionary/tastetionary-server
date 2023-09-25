@@ -74,7 +74,7 @@ model RestaurantReviews {
   userId                             Int      @map("user_id")
   category                           String   @map("category") @db.VarChar(32) /// 리뷰시 등록되는 음식 종류, 한식 중식 양식 등
   summary                            String   @map("summary") @db.VarChar(128) /// 한줄 요약
-  opinion                            String?   @map("opinion") @db.VarChar(16) // 최종 의견, 
+  opinion                            String?  @map("opinion") @db.VarChar(16) // 최종 의견, 
   keywords                           String[] @map("keywords") @db.Text // tags
   price                              Int      @map("price") @db.Integer // 가격
   createdAt                          DateTime @default(now()) @map("created_at")
@@ -97,6 +97,7 @@ model ExternalRestaurantInformations {
   createdAt      DateTime                 @default(now()) @map("created_at")
   updatedAt      DateTime                 @updatedAt @map("updated_at")
 
+  @@unique([external_uuid])
   @@index([external_uuid])
   @@index([location], type: Gist)
   @@map("external_restaurant_informations")
@@ -111,6 +112,7 @@ model Accounts {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
+  @@unique([category, identification])
   @@index([userId])
   @@index([category, identification])
   @@index([identification, password])
@@ -141,6 +143,7 @@ model Authentications {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
+  @@unique([identification, category])
   @@index([userId])
   @@index([identification])
   @@index([userId, category])
