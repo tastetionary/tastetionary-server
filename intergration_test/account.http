@@ -1,0 +1,10 @@
+
+### Register User 
+POST {{base_url}}/v1/account/tokens
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "test",
+  "password": "pwd",
+  "category": "email"
+}
