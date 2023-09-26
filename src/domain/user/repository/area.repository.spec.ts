@@ -27,6 +27,7 @@ describe('area repository', () => {
         userId: 1,
         category: AreaCategory.ACTIVITY_AREA,
         order: 0,
+        address: 'address',
         location: {
           latitude: 1,
           longitude: 1,

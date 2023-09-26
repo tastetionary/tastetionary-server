@@ -19,7 +19,7 @@ class BaseException extends HttpException {
 
 export class ServiceException extends BaseException {
   constructor(
-    cause: string,
+    cause: string | 'domain rule error',
     description?: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     additionalData?: Record<string, any>,
