@@ -8,4 +8,5 @@ export enum RestaurantCategory {
   CAFE_AND_DESERT = '카페',
   ASIAN = '아시안',
   BUFFET = '뷔페',
+  ALL = '모두',
 }

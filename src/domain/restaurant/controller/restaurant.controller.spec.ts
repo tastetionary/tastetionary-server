@@ -44,7 +44,34 @@ describe('restaurant controller', () => {
     },
   };
 
-  it('not activity user, should return 400', async () => {
+  it('/recommendation, should return 200', async () => {
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(123, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .post('/v1/restaurant/recommendation')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        category: RestaurantCategory.ASIAN,
+        keywords: ['key'],
+        price: 10_000,
+      });
+
+    expect(res.statusCode).toEqual(200);
+    const data = res.body.data[0];
+
+    expect(data).toHaveProperty('name');
+    expect(data).toHaveProperty('externalUUID');
+    expect(data).toHaveProperty('latitude');
+    expect(data).toHaveProperty('longitude');
+    expect(data).toHaveProperty('referenceLink');
+    expect(data).toHaveProperty('pricePerPerson');
+    expect(data).toHaveProperty('ratioOfRejoin');
+  });
+
+  it('/review, not activity user, should return 400', async () => {
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
       expiresIn: '10h',
@@ -57,7 +84,7 @@ describe('restaurant controller', () => {
     expect(res.statusCode).toEqual(400);
   });
 
-  it('should return 200', async () => {
+  it('/review, should return 200', async () => {
     jest.spyOn(service, 'registerReview').mockImplementation(async () => {});
 
     const key = configService.getTokenData().accessTokenSecret;
