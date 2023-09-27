@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "version": "0.1.8",
+    "version": "0.1.11",
     "title": "taste-dictionary-api",
     "description": "",
     "license": {
@@ -17,7 +17,9 @@
   "paths": {
     "/v1/account/tokens": {
       "post": {
-        "tags": [],
+        "tags": [
+          "account"
+        ],
         "parameters": [],
         "requestBody": {
           "description": "",
@@ -44,12 +46,47 @@
             "x-nestia-encrypted": false
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "x-nestia-namespace": "v1.account.tokens.createToken",
-        "x-nestia-jsDocTags": [],
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "account",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "create token for user",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
         "x-nestia-method": "POST"
       },
       "delete": {
-        "tags": [],
+        "tags": [
+          "account"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -64,8 +101,41 @@
             "x-nestia-encrypted": false
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "x-nestia-namespace": "v1.account.tokens.deleteToken",
-        "x-nestia-jsDocTags": [],
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "account",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "delete token,",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
         "x-nestia-method": "DELETE"
       }
     },
@@ -113,7 +183,76 @@
         "x-nestia-method": "GET"
       }
     },
-    "/v1/users": {
+    "/v1/restaurant/review": {
+      "post": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/registerRestaurantReviewInput"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-nestia-namespace": "v1.restaurant.review.registerRestaurantReview",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "register restaurant review only for end-user who register activity area",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/user": {
       "post": {
         "tags": [],
         "parameters": [],
@@ -142,12 +281,12 @@
             "x-nestia-encrypted": false
           }
         },
-        "x-nestia-namespace": "v1.users.registerAccount",
+        "x-nestia-namespace": "v1.user.registerAccount",
         "x-nestia-jsDocTags": [],
         "x-nestia-method": "POST"
       }
     },
-    "/v1/users/test": {
+    "/v1/user/test": {
       "get": {
         "tags": [],
         "parameters": [],
@@ -164,7 +303,7 @@
             "x-nestia-encrypted": false
           }
         },
-        "x-nestia-namespace": "v1.users.test.test",
+        "x-nestia-namespace": "v1.user.test.test",
         "x-nestia-jsDocTags": [],
         "x-nestia-method": "GET"
       }
@@ -341,6 +480,219 @@
         ],
         "x-typia-jsDocTags": []
       },
+      "registerRestaurantReviewInput": {
+        "type": "object",
+        "properties": {
+          "review": {
+            "$ref": "#/components/schemas/RestaurantReviewDTO"
+          },
+          "external": {
+            "$ref": "#/components/schemas/ExternalRestaurantInformationDTO"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "review",
+          "external"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "RestaurantReviewDTO": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/RestaurantCategory"
+          },
+          "keywords": {
+            "description": "restaurant keywords\nexample: \"깨끗해요\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string[]",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "description": "restaurant keywords\nexample: \"깨끗해요\"",
+              "x-typia-jsDocTags": [
+                {
+                  "name": "type",
+                  "text": [
+                    {
+                      "text": "string[]",
+                      "kind": "text"
+                    }
+                  ]
+                }
+              ],
+              "x-typia-required": true,
+              "x-typia-optional": false,
+              "type": "string"
+            }
+          },
+          "price": {
+            "description": "example: 10000",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "summary": {
+            "description": "one-line summary\nexample: \"never go again\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "category",
+          "keywords",
+          "price",
+          "summary"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "RestaurantCategory": {
+        "type": "string",
+        "enum": [
+          "한식",
+          "중식",
+          "일식",
+          "양식",
+          "분식",
+          "패스트푸드",
+          "카페",
+          "아시안",
+          "뷔페"
+        ]
+      },
+      "ExternalRestaurantInformationDTO": {
+        "type": "object",
+        "properties": {
+          "externalUUID": {
+            "description": "uuid get from external api,\nexample: 9391929",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "name": {
+            "description": "restaurant name,\nexample: \"some\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "latitude": {
+            "description": "latitude,\nexample: 37.1234",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "longitude": {
+            "description": "longitude,\nexample: 127.1123",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "referenceLink": {
+            "description": "link to check,\nexample: \"https://www.naver.com/some-restaurant\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "externalUUID",
+          "name",
+          "latitude",
+          "longitude"
+        ],
+        "x-typia-jsDocTags": []
+      },
       "RegisterUserDTO": {
         "type": "object",
         "properties": {
@@ -404,6 +756,18 @@
         "type": "object",
         "properties": {
           "companyName": {
+            "description": "company name,\nexample: google",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
@@ -422,16 +786,52 @@
             "$ref": "#/components/schemas/AreaCategory"
           },
           "address": {
+            "description": "human-readable address,\nexample: '서울특별시 강남구 00동'",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
           },
           "latitude": {
+            "description": "latitude,\nexample: 37.1234",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
           },
           "longitude": {
+            "description": "longitude,\nexample: 127.1123",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
