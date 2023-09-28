@@ -52,16 +52,53 @@ export class RestaurantRepository {
     };
     referenceLink?: string;
   }) {
-    const query = Prisma.sql`INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
-        VALUES (${param.externalUUID}, ${param.name}, st_point(${
-      param.location.latitude
-    }, ${param.location.longitude}), ${param.referenceLink}, ${new Date()})`;
-    await this.prisma.$queryRaw`${query}`;
+    await this.saveExternalRestaurantInformations([param]);
+  }
+
+  async saveExternalRestaurantInformations(
+    param: {
+      externalUUID: bigint;
+      name: string;
+      location: {
+        latitude: number;
+        longitude: number;
+      };
+      referenceLink?: string;
+    }[],
+  ) {
+    const values = param.map(
+      (param) =>
+        Prisma.sql`(${param.externalUUID}, ${param.name}, 
+        st_point(${param.location.latitude},${param.location.longitude}), 
+        ${param.referenceLink},
+        ${new Date()})`,
+    );
+    await this.prisma.$queryRaw`
+      INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
+      VALUES ${Prisma.join(values)}`;
   }
 
   async getExternalRestaurantInformation(externalUUid: bigint) {
     return this.prisma.externalRestaurantInformations.findFirst({
       where: { external_uuid: externalUUid },
     });
+  }
+
+  async getExternalRestaurantIdsByDistance(param: {
+    latitude: number;
+    longitude: number;
+    maxDistanceOnMeter?: number;
+  }): Promise<
+    {
+      id: bigint;
+      name: string;
+      external_uuid: bigint;
+    }[]
+  > {
+    const queryRaw = Prisma.sql`
+    SELECT id, name, external_uuid FROM external_restaurant_informations 
+      WHERE st_dwithin(location, ST_MakePoint(${param.latitude}, ${param.longitude}), ${param.maxDistanceOnMeter})`;
+
+    return await this.prisma.$queryRaw(queryRaw);
   }
 }

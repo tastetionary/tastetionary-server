@@ -24,6 +24,40 @@ describe('Restaurant repository', () => {
     ]);
   });
 
+  it('should return restaurants by condition', async () => {
+    const latitude = 37.517331925853;
+    const longitude = 127.047377408384;
+
+    const data = [
+      {
+        externalUUID: 1000n,
+        name: 'test',
+        location: {
+          latitude,
+          longitude,
+        },
+        referenceLink: 'https://www.naver.com',
+      },
+      {
+        externalUUID: 1001n,
+        name: 'test',
+        location: {
+          latitude,
+          longitude,
+        },
+        referenceLink: 'https://www.naver.com',
+      },
+    ];
+    await repo.saveExternalRestaurantInformations(data);
+    const res = await repo.getExternalRestaurantIdsByDistance({
+      latitude,
+      longitude,
+      maxDistanceOnMeter: 1000,
+    });
+    const ids = res.map((r) => r.external_uuid);
+    expect(ids).toEqual([1000n, 1001n]);
+  });
+
   it('should save external info', async () => {
     const data = {
       externalUUID: 1n,
