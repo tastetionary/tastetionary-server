@@ -28,7 +28,7 @@ describe('restaurant controller', () => {
     await jest.clearAllMocks();
   });
 
-  const DATA = {
+  const REVIEW_INPUT = {
     review: {
       category: RestaurantCategory.ASIAN,
       keywords: ['key'],
@@ -54,6 +54,7 @@ describe('restaurant controller', () => {
       .post('/v1/restaurant/recommendation')
       .set('Authorization', `Bearer ${token}`)
       .send({
+        excludeIds: [],
         category: RestaurantCategory.ASIAN,
         keywords: ['key'],
         price: 10_000,
@@ -79,7 +80,7 @@ describe('restaurant controller', () => {
     const res = await request(app.getHttpServer())
       .post('/v1/restaurant/review')
       .set('Authorization', `Bearer ${token}`)
-      .send(DATA);
+      .send(REVIEW_INPUT);
 
     expect(res.statusCode).toEqual(400);
   });
@@ -94,7 +95,7 @@ describe('restaurant controller', () => {
     const res = await request(app.getHttpServer())
       .post('/v1/restaurant/review')
       .set('Authorization', `Bearer ${token}`)
-      .send(DATA);
+      .send(REVIEW_INPUT);
 
     expect(res.statusCode).toEqual(200);
   });

@@ -22,11 +22,36 @@ export interface RegisterRestaurantReviewInput {
 }
 
 export interface GetRestaurantInput
-  extends Omit<RestaurantReviewDTO, 'summary'> {}
+  extends Omit<RestaurantReviewDTO, 'summary'> {
+  /**
+   * already recommended restaurant ids, it will be ignored
+   * example: 10000
+   * @type number
+   */
+  excludeIds: number[];
+}
 
 export interface GetRestaurantsOutput extends ExternalRestaurantInformationDTO {
+  /**
+   * price per person,
+   * example: 10000
+   * @type number
+   */
   pricePerPerson: number;
+
+  /**
+   * rejoin count / total review count, 0 ~ 100
+   * example: 80,
+   * @type string
+   */
   ratioOfRejoin: number;
+
+  /**
+   * total count by condition
+   * example: 998
+   * @type number
+   */
+  resultCount: number;
 }
 
 @Controller('v1/restaurant')
@@ -59,6 +84,7 @@ export class RestaurantController {
         referenceLink: 'https://naver.com',
         pricePerPerson: 12_000,
         ratioOfRejoin: 20,
+        resultCount: 1,
       },
     ]);
   }
