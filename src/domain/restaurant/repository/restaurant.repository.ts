@@ -84,6 +84,17 @@ export class RestaurantRepository {
     });
   }
 
+  async getRestaurantsByConditions(param: { keywords: string[] }) {
+    const condition = {};
+    if (param.keywords.length >= 1) {
+      condition['keywords'] = { hasSome: param.keywords };
+    }
+
+    return this.prisma.restaurantReviews.findMany({
+      where: condition,
+    });
+  }
+
   async getExternalRestaurantIdsByDistance(param: {
     latitude: number;
     longitude: number;

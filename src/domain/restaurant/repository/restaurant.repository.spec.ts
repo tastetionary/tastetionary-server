@@ -24,6 +24,42 @@ describe('Restaurant repository', () => {
     ]);
   });
 
+  it('should return restaurants by keywords', async () => {
+    const data = [
+      {
+        userId: 1,
+        keywords: ['clean', 'good', 'test', 'abc'],
+        category: RestaurantCategory.ASIAN,
+        price: 10_000,
+        summary: 'never come again',
+        opinion: 'no',
+        externalRestaurantInformationId: 1n,
+      },
+    ];
+
+    await repo.saveReview(data[0]);
+
+    const cleanRes = await repo.getRestaurantsByConditions({
+      keywords: ['clean'],
+    });
+    expect(cleanRes).toHaveLength(1);
+
+    const onlyOneRes = await repo.getRestaurantsByConditions({
+      keywords: ['clean', 'never'],
+    });
+    expect(onlyOneRes).toHaveLength(1);
+
+    const nothingRes = await repo.getRestaurantsByConditions({
+      keywords: ['nothing'],
+    });
+    expect(nothingRes).toHaveLength(0);
+
+    const allRes = await repo.getRestaurantsByConditions({
+      keywords: [],
+    });
+    expect(allRes).toHaveLength(1);
+  });
+
   it('should return restaurants by condition', async () => {
     const latitude = 37.517331925853;
     const longitude = 127.047377408384;
