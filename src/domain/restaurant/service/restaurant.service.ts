@@ -119,6 +119,7 @@ export class RestaurantService {
     if (restaurants.length == 0) {
       return [];
     }
+
     const ids = restaurants.map((r) => r.id);
     const properRestaurants = await this.repo.getRestaurantsByConditions({
       restaurantIds: ids,
@@ -126,6 +127,10 @@ export class RestaurantService {
       ltePrice: param.ltePrice,
       categories: param.categories,
     });
+
+    if (properRestaurants.length == 0) {
+      return [];
+    }
 
     return properRestaurants;
   }
