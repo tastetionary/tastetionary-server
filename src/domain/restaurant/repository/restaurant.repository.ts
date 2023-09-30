@@ -85,11 +85,18 @@ export class RestaurantRepository {
   }
 
   async getRestaurantsByConditions(param: {
+    restaurantIds?: bigint[];
     keywords?: string[];
     ltePrice?: number;
     categories?: RestaurantCategory[];
   }) {
     const condition = {};
+
+    if (param.restaurantIds && param.restaurantIds.length >= 1) {
+      condition['external_restaurant_information_id'] = {
+        in: param.restaurantIds,
+      };
+    }
 
     if (param.keywords && param.keywords.length >= 1) {
       condition['keywords'] = { hasSome: param.keywords };
@@ -119,11 +126,16 @@ export class RestaurantRepository {
       id: bigint;
       name: string;
       external_uuid: bigint;
+      distance: number;
     }[]
   > {
     const queryRaw = Prisma.sql`
-    SELECT id, name, external_uuid FROM external_restaurant_informations 
-      WHERE st_dwithin(location, ST_MakePoint(${param.latitude}, ${param.longitude}), ${param.maxDistanceOnMeter})`;
+      SELECT id, 
+          name, 
+          external_uuid, 
+          ST_Distance(location, ST_MakePoint(${param.latitude}, ${param.longitude})) as distance
+      FROM external_restaurant_informations 
+        WHERE st_dwithin(location, ST_MakePoint(${param.latitude}, ${param.longitude}), ${param.maxDistanceOnMeter})`;
 
     return await this.prisma.$queryRaw(queryRaw);
   }

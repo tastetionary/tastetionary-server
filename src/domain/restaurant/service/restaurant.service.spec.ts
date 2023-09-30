@@ -32,6 +32,8 @@ describe('restaurant service', () => {
     ]);
   });
 
+  const LATITUDE = 37.517331925853;
+  const LONGITUDE = 127.047377408384;
   const DTO = {
     category: RestaurantCategory.ASIAN,
     keywords: ['clean'],
@@ -42,12 +44,114 @@ describe('restaurant service', () => {
   const EXTERNAL_DTO: ExternalRestaurantInformationDTO = {
     externalUUID: 123123,
     name: 'some',
-    latitude: 1,
-    longitude: 1,
+    latitude: LATITUDE,
+    longitude: LONGITUDE,
     referenceLink: 'https://www.naver.com',
   };
 
-  describe('getRecommendedRestaurant', () => {});
+  describe('getRecommendedRestaurant', () => {
+    it('should return proper restaurant', async () => {
+      const userId = 1;
+      const diningArea = {
+        id: 1,
+        userId,
+        category: AreaCategory.DINING_AREA,
+        order: 1,
+        address: 'address',
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+      };
+
+      const activityArea = {
+        id: 1,
+        userId,
+        category: AreaCategory.ACTIVITY_AREA,
+        order: 1,
+        address: 'address',
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+      };
+
+      const user = new EndUser(userId, [diningArea, activityArea]);
+      await service.registerReview(
+        {
+          userId,
+          externalDto: EXTERNAL_DTO,
+          dto: DTO,
+        },
+        user,
+      );
+      const maxDistance = 1000;
+      const res = await service.getRecommendedRestaurant(
+        {
+          userId,
+          maxDistance,
+          keywords: ['clean'],
+          ltePrice: 10_000,
+          categories: [RestaurantCategory.ASIAN],
+        },
+        user,
+      );
+      expect(res.length).toEqual(1);
+    });
+
+    it('with not restaurant within distance, should return empty array', async () => {
+      const userId = 1;
+      const diningArea = {
+        id: 1,
+        userId,
+        category: AreaCategory.DINING_AREA,
+        order: 1,
+        address: 'address',
+        latitude: 1,
+        longitude: 1,
+      };
+
+      const activityArea = {
+        id: 1,
+        userId,
+        category: AreaCategory.ACTIVITY_AREA,
+        order: 1,
+        address: 'address',
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+      };
+
+      const user = new EndUser(userId, [diningArea, activityArea]);
+      await service.registerReview(
+        {
+          userId,
+          externalDto: EXTERNAL_DTO,
+          dto: DTO,
+        },
+        user,
+      );
+      const maxDistance = 1000;
+      const res = await service.getRecommendedRestaurant(
+        {
+          userId,
+          maxDistance,
+          keywords: [],
+          ltePrice: 10_000,
+          categories: [RestaurantCategory.ASIAN],
+        },
+        user,
+      );
+      expect(res).toEqual([]);
+    });
+
+    it('with un dinning area user, should throw error', async () => {
+      await expect(
+        service.getRecommendedRestaurant({
+          userId: 1,
+          maxDistance: 1000,
+          keywords: [],
+          ltePrice: 10_000,
+          categories: [RestaurantCategory.ASIAN],
+        }),
+      ).rejects.toThrowError(ServiceException);
+    });
+  });
 
   describe('registerReview', () => {
     it('with not register activity_area, should not register review', async () => {
@@ -79,6 +183,8 @@ describe('restaurant service', () => {
         category: AreaCategory.ACTIVITY_AREA,
         order: 1,
         address: 'address',
+        latitude: 1,
+        longitude: 1,
       };
 
       const user = new EndUser(userId, [area]);
