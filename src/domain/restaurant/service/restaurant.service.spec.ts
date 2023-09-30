@@ -50,16 +50,21 @@ describe('restaurant service', () => {
   };
 
   describe('getRecommendedRestaurant', () => {
-    it('should return proper restaurant', async () => {
-      const userId = 1;
+    const createRestaurant = async (
+      userId: number,
+      diningLocation: {
+        latitude: number;
+        longitude: number;
+      },
+    ) => {
       const diningArea = {
         id: 1,
         userId,
         category: AreaCategory.DINING_AREA,
         order: 1,
         address: 'address',
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
+        latitude: diningLocation.latitude,
+        longitude: diningLocation.longitude,
       };
 
       const activityArea = {
@@ -81,6 +86,14 @@ describe('restaurant service', () => {
         },
         user,
       );
+      return user;
+    };
+    it('should return proper restaurant', async () => {
+      const userId = 1;
+      const user = await createRestaurant(1, {
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+      });
       const maxDistance = 1000;
       const res = await service.getRecommendedRestaurant(
         {
@@ -97,35 +110,10 @@ describe('restaurant service', () => {
 
     it('with not restaurant within distance, should return empty array', async () => {
       const userId = 1;
-      const diningArea = {
-        id: 1,
-        userId,
-        category: AreaCategory.DINING_AREA,
-        order: 1,
-        address: 'address',
+      const user = await createRestaurant(1, {
         latitude: 1,
         longitude: 1,
-      };
-
-      const activityArea = {
-        id: 1,
-        userId,
-        category: AreaCategory.ACTIVITY_AREA,
-        order: 1,
-        address: 'address',
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-      };
-
-      const user = new EndUser(userId, [diningArea, activityArea]);
-      await service.registerReview(
-        {
-          userId,
-          externalDto: EXTERNAL_DTO,
-          dto: DTO,
-        },
-        user,
-      );
+      });
       const maxDistance = 1000;
       const res = await service.getRecommendedRestaurant(
         {
