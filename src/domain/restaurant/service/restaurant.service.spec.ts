@@ -48,6 +48,35 @@ describe('restaurant service', () => {
     longitude: LONGITUDE,
     referenceLink: 'https://www.naver.com',
   };
+  describe('aggregateRestaurant', () => {
+    it('should calc average price', () => {
+      const reviews = [
+        {
+          id: 1,
+          external_restaurant_information_id: 1n,
+          userId: 1,
+          category: RestaurantCategory.ASIAN,
+          summary: 'asian',
+          opinion: null,
+          keywords: ['clean'],
+          price: 10_000,
+        },
+        {
+          id: 2,
+          external_restaurant_information_id: 1n,
+          userId: 1,
+          category: RestaurantCategory.BUFFET,
+          summary: 'buffet',
+          opinion: null,
+          keywords: ['kind'],
+          price: 15_000,
+        },
+      ];
+
+      const res = service.aggregateRestaurant(reviews);
+      expect(res.avgPrice).toBe(12_500);
+    });
+  });
 
   describe('getRecommendedRestaurant', () => {
     const createRestaurant = async (

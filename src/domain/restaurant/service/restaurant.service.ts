@@ -3,7 +3,10 @@ import {
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import {
+  RestaurantRepository,
+  RestaurantReviewEntity,
+} from '@domain/restaurant/repository/restaurant.repository';
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
@@ -133,5 +136,12 @@ export class RestaurantService {
     }
 
     return properRestaurants;
+  }
+
+  aggregateRestaurant(reviews: RestaurantReviewEntity[]) {
+    return {
+      reviews,
+      avgPrice: 0,
+    };
   }
 }

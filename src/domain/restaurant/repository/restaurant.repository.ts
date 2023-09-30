@@ -3,6 +3,19 @@ import { PrismaService } from '@common/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
+export interface RestaurantReviewEntity {
+  id: number;
+  external_restaurant_information_id: bigint;
+  userId: number;
+  category: RestaurantCategory;
+  summary: string;
+  opinion: string | null;
+  keywords: string[];
+  price: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 @Injectable()
 export class RestaurantRepository {
   constructor(private prisma: PrismaService) {}
