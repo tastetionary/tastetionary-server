@@ -24,6 +24,55 @@ describe('Restaurant repository', () => {
     ]);
   });
 
+  it('should return restaurants by category', async () => {
+    const data = [
+      {
+        userId: 1,
+        keywords: ['clean', 'good', 'test', 'abc'],
+        category: RestaurantCategory.ASIAN,
+        price: 10_000,
+        summary: 'never come again',
+        opinion: 'no',
+        externalRestaurantInformationId: 1n,
+      },
+    ];
+
+    await repo.saveReview(data[0]);
+
+    const res = await repo.getRestaurantsByConditions({
+      categories: [RestaurantCategory.ASIAN],
+    });
+    expect(res).toHaveLength(1);
+  });
+
+  it('should return restaurants by keywords', async () => {
+    const data = [
+      {
+        userId: 1,
+        keywords: ['clean', 'good', 'test', 'abc'],
+        category: RestaurantCategory.ASIAN,
+        price: 10_000,
+        summary: 'never come again',
+        opinion: 'no',
+        externalRestaurantInformationId: 1n,
+      },
+    ];
+
+    await repo.saveReview(data[0]);
+
+    const res = await repo.getRestaurantsByConditions({
+      keywords: [],
+      ltePrice: 12_000,
+    });
+    expect(res).toHaveLength(1);
+
+    const wrongRes = await repo.getRestaurantsByConditions({
+      keywords: [],
+      ltePrice: 9_000,
+    });
+    expect(wrongRes).toHaveLength(0);
+  });
+
   it('should return restaurants by keywords', async () => {
     const data = [
       {
@@ -54,9 +103,7 @@ describe('Restaurant repository', () => {
     });
     expect(nothingRes).toHaveLength(0);
 
-    const allRes = await repo.getRestaurantsByConditions({
-      keywords: [],
-    });
+    const allRes = await repo.getRestaurantsByConditions({});
     expect(allRes).toHaveLength(1);
   });
 

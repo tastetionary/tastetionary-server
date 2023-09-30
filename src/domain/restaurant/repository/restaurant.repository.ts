@@ -84,10 +84,25 @@ export class RestaurantRepository {
     });
   }
 
-  async getRestaurantsByConditions(param: { keywords: string[] }) {
+  async getRestaurantsByConditions(param: {
+    keywords?: string[];
+    ltePrice?: number;
+    categories?: RestaurantCategory[];
+  }) {
     const condition = {};
-    if (param.keywords.length >= 1) {
+
+    if (param.keywords && param.keywords.length >= 1) {
       condition['keywords'] = { hasSome: param.keywords };
+    }
+
+    if (param.ltePrice) {
+      condition['price'] = { lte: param.ltePrice };
+    }
+
+    if (param.categories) {
+      condition['category'] = {
+        in: param.categories,
+      };
     }
 
     return this.prisma.restaurantReviews.findMany({
