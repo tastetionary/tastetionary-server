@@ -93,4 +93,8 @@ export class RestaurantService {
       BigInt(externalUUID),
     );
   }
+
+  async getRecommendedRestaurant(userId: number) {
+    console.log(userId);
+  }
 }

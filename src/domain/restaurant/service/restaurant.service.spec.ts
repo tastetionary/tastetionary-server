@@ -38,6 +38,7 @@ describe('restaurant service', () => {
     price: 10_000,
     summary: 'never come again',
   };
+
   const EXTERNAL_DTO: ExternalRestaurantInformationDTO = {
     externalUUID: 123123,
     name: 'some',
@@ -46,44 +47,52 @@ describe('restaurant service', () => {
     referenceLink: 'https://www.naver.com',
   };
 
-  it('with not register activity_area, should not register review', async () => {
-    const userId = 1;
-    await expect(
-      service.registerReview({
+  describe('getRecommendedRestaurant', () => {});
+
+  describe('registerReview', () => {
+    it('with not register activity_area, should not register review', async () => {
+      const userId = 1;
+      await expect(
+        service.registerReview({
+          userId,
+          externalDto: EXTERNAL_DTO,
+          dto: DTO,
+        }),
+      ).rejects.toThrowError(new ServiceException('domaine rule error'));
+    });
+
+    it('with new restaurant, should save or update', async () => {
+      await service.registerExternalRestaurantInformationWhenNoData(
+        EXTERNAL_DTO,
+      );
+      const res = await service.getExternalRestaurant(
+        EXTERNAL_DTO.externalUUID,
+      );
+      expect(res).not.toBeNull();
+    });
+
+    it('should create review data and external data', async () => {
+      const userId = 999;
+      const area = {
+        id: 1,
         userId,
-        externalDto: EXTERNAL_DTO,
-        dto: DTO,
-      }),
-    ).rejects.toThrowError(new ServiceException('domaine rule error'));
-  });
+        category: AreaCategory.ACTIVITY_AREA,
+        order: 1,
+        address: 'address',
+      };
 
-  it('with new restaurant, should save or update', async () => {
-    await service.registerExternalRestaurantInformationWhenNoData(EXTERNAL_DTO);
-    const res = await service.getExternalRestaurant(EXTERNAL_DTO.externalUUID);
-    expect(res).not.toBeNull();
-  });
+      const user = new EndUser(userId, [area]);
+      await service.registerReview(
+        {
+          userId,
+          externalDto: EXTERNAL_DTO,
+          dto: DTO,
+        },
+        user,
+      );
+      const res = await service.getReviews(userId);
 
-  it('should create review data and external data', async () => {
-    const userId = 999;
-    const area = {
-      id: 1,
-      userId,
-      category: AreaCategory.ACTIVITY_AREA,
-      order: 1,
-      address: 'address',
-    };
-
-    const user = new EndUser(userId, [area]);
-    await service.registerReview(
-      {
-        userId,
-        externalDto: EXTERNAL_DTO,
-        dto: DTO,
-      },
-      user,
-    );
-    const res = await service.getReviews(userId);
-
-    expect(res).toHaveLength(1);
+      expect(res).toHaveLength(1);
+    });
   });
 });
