@@ -7,6 +7,7 @@ import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.r
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
 @Injectable()
 export class RestaurantService {
@@ -92,5 +93,45 @@ export class RestaurantService {
     return await this.repo.getExternalRestaurantInformation(
       BigInt(externalUUID),
     );
+  }
+
+  async getRecommendedRestaurant(
+    param: {
+      userId: number;
+      maxDistance: number;
+      keywords: string[];
+      ltePrice: number;
+      categories: RestaurantCategory[];
+    },
+    user?: EndUser,
+  ) {
+    const endUser = user ?? (await this.userService.getEndUser(param.userId));
+    if (!endUser.dinningArea) {
+      throw new ServiceException('no dinning area, should register first');
+    }
+
+    const restaurants = await this.repo.getExternalRestaurantIdsByDistance({
+      latitude: endUser.dinningArea.latitude,
+      longitude: endUser.dinningArea.longitude,
+      maxDistanceOnMeter: param.maxDistance,
+    });
+
+    if (restaurants.length == 0) {
+      return [];
+    }
+
+    const ids = restaurants.map((r) => r.id);
+    const properRestaurants = await this.repo.getRestaurantsByConditions({
+      restaurantIds: ids,
+      keywords: param.keywords,
+      ltePrice: param.ltePrice,
+      categories: param.categories,
+    });
+
+    if (properRestaurants.length == 0) {
+      return [];
+    }
+
+    return properRestaurants;
   }
 }

@@ -1,21 +1,17 @@
 import { AreaCategory } from '@domain/user/user.enum';
-
-interface AreaEntity {
-  id: number;
-  userId: number;
-  category: AreaCategory;
-  order: number;
-  address: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { AreaEntity } from '@domain/user/repository/area.repository';
 
 export class EndUser {
   readonly id: number;
   readonly areas?: AreaEntity[];
+
   constructor(id: number, areas?: AreaEntity[]) {
     this.id = id;
     this.areas = areas;
+  }
+
+  get dinningArea() {
+    return this.getArea(AreaCategory.DINING_AREA);
   }
 
   get activityArea() {

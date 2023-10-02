@@ -3,6 +3,18 @@ import { PrismaService } from '@common/database/prisma.service';
 import { AreaCategory } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
 
+export interface AreaEntity {
+  id: number;
+  userId: number;
+  category: AreaCategory;
+  order: number;
+  address: string;
+  latitude: number;
+  longitude: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 @Injectable()
 export class AreaRepository {
   constructor(private prisma: PrismaService) {}
@@ -40,17 +52,16 @@ export class AreaRepository {
   }
 
   async getAreasByUserId(userId: number) {
-    const areas = await this.prisma.userAreas.findMany({ where: { userId } });
-
-    return areas.map((area) => {
-      const { category, ...res } = area;
-
-      const enumCategory = {
-        [AreaCategory.ACTIVITY_AREA]: AreaCategory.ACTIVITY_AREA,
-        [AreaCategory.DINING_AREA]: AreaCategory.DINING_AREA,
-      };
-      const targetCategory: AreaCategory = enumCategory[category];
-      return { ...res, category: targetCategory };
-    });
+    const areas: AreaEntity[] = await this.prisma.$queryRaw`
+      SELECT
+          id,
+          user_id,
+          category,
+          "order",
+          address,
+          ST_X(location::geometry) as longitude,
+          ST_Y(location::geometry) as latitude
+      FROM user_areas WHERE user_id = ${userId}`;
+    return areas;
   }
 }
