@@ -16,6 +16,18 @@ export interface RestaurantReviewEntity {
   updatedAt?: Date;
 }
 
+export interface ExternalRestaurantInformationEntity {
+  id: bigint;
+  name: string;
+  externalUUID: bigint;
+  referenceLink: string | null;
+  latitude: number;
+  longitude: number;
+  distance: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 @Injectable()
 export class RestaurantRepository {
   constructor(private prisma: PrismaService) {}
@@ -142,18 +154,9 @@ export class RestaurantRepository {
   async getExternalRestaurantIdsByDistance(param: {
     latitude: number;
     longitude: number;
-    maxDistanceOnMeter?: number;
-  }): Promise<
-    {
-      id: bigint;
-      name: string;
-      externalUUID: bigint;
-      referenceLink: string | null;
-      latitude: number;
-      longitude: number;
-      distance: number;
-    }[]
-  > {
+    maxDistanceMeter?: number;
+    excludedIds?: bigint[];
+  }): Promise<ExternalRestaurantInformationEntity[]> {
     const queryRaw = Prisma.sql`
       SELECT id, 
           name, 
@@ -161,9 +164,14 @@ export class RestaurantRepository {
           reference_link as "referenceLink",
           ST_Y(location::geometry) as latitude,
           ST_X(location::geometry) as longitude, 
-          ST_Distance(location, ST_MakePoint(${param.longitude}, ${param.latitude})) as distance
+          ST_Distance(location, ST_MakePoint(${param.longitude}, ${
+      param.latitude
+    })) as distance
       FROM external_restaurant_informations 
-        WHERE st_dwithin(location, ST_MakePoint(${param.longitude}, ${param.latitude}), ${param.maxDistanceOnMeter})`;
+        WHERE id NOT IN (${Prisma.join(param.excludedIds ?? [])}) AND
+          st_dwithin(location, ST_MakePoint(${param.longitude}, ${
+      param.latitude
+    }), ${param.maxDistanceMeter})`;
 
     return await this.prisma.$queryRaw(queryRaw);
   }

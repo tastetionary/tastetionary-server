@@ -135,7 +135,7 @@ describe('Restaurant repository', () => {
     const res = await repo.getExternalRestaurantIdsByDistance({
       latitude,
       longitude,
-      maxDistanceOnMeter: 1000,
+      maxDistanceMeter: 1000,
     });
     console.log(res);
     const ids = res.map((r) => r.externalUUID);
