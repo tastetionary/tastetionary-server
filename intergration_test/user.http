@@ -1,0 +1,36 @@
+
+### Register User 
+POST {{base_url}}/v1/user
+Content-Type: {{content_type_json}}
+
+{
+  "userProperty": {
+    "companyName": "test"
+  },
+  "areas": [
+    {
+      "latitude": 1,
+      "longitude": 1,
+      "category": "activity_area",
+      "address":"activity"
+    },
+    {
+      "latitude": 1,
+      "longitude": 1,
+      "category": "dining_area",
+      "address":"dining"
+    }
+  ],
+  "account": {
+    "identification": "test",
+    "password": "pwd",
+    "category": "email"
+    
+  },
+  "agreements": [
+    {
+      "category": "personal_information",
+      "is_agree": true
+    }
+  ]
+}
