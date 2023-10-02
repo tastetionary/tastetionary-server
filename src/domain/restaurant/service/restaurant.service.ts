@@ -11,6 +11,8 @@ import { ServiceException } from '@common/exception/custom.exception';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import * as fx from '@fxts/core';
+import { getRandomItem } from '@root/src/common/util';
 
 @Injectable()
 export class RestaurantService {
@@ -139,9 +141,59 @@ export class RestaurantService {
   }
 
   aggregateRestaurant(reviews: RestaurantReviewEntity[]) {
-    return {
+    const groupedReview = fx.groupBy(
+      (r) => r.external_restaurant_information_id.toString(),
       reviews,
-      avgPrice: 0,
+    );
+    const randomId = getRandomItem(Object.keys(groupedReview));
+    const randomReviews = groupedReview[randomId];
+
+    const data: {
+      category: RestaurantCategory[];
+      summary: string[];
+      opinion: string[];
+      keywords: string[];
+      price: number[];
+      aggregatePrice: { [index: string]: number };
+    } = {
+      category: [],
+      summary: [],
+      opinion: [],
+      keywords: [],
+      price: [],
+      aggregatePrice: {},
     };
+    fx.pipe(
+      randomReviews,
+      fx.map((review) => {
+        data.category.push(review.category);
+        data.summary.push(review.summary);
+        data.opinion.push(review.opinion ?? '');
+        data.keywords.push(...review.keywords);
+        data.price.push(review.price);
+        return data;
+      }),
+      fx.map((data) => {
+        data['aggregatePrice'] = this.aggregatePrice(data.price);
+        return data;
+      }),
+      fx.toArray,
+    );
+    return data;
+  }
+
+  aggregatePrice(prices: number[]) {
+    const data: { [index: string]: number } = {};
+
+    prices.forEach((price) => {
+      if (data[price.toString()]) {
+        data[price.toString()] += 1;
+      } else {
+        data[price.toString()] = 1;
+      }
+    });
+    const uniquePrices = [...new Set(prices)];
+    data['avg'] = fx.average(uniquePrices);
+    return data;
   }
 }

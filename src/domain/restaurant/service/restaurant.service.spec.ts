@@ -74,7 +74,15 @@ describe('restaurant service', () => {
       ];
 
       const res = service.aggregateRestaurant(reviews);
-      expect(res.avgPrice).toBe(12_500);
+      expect(res.aggregatePrice.avg).toBe(12_500);
+    });
+
+    it('aggregatePrice, should return expected', () => {
+      const res = service.aggregatePrice([10000, 15000]);
+      expect(res).toEqual({ 10000: 1, 15000: 1, avg: 12500 });
+
+      const resTwo = service.aggregatePrice([10000, 10000, 15000]);
+      expect(resTwo).toEqual({ 10000: 2, 15000: 1, avg: 12500 });
     });
   });
 
