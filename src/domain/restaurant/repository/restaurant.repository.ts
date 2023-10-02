@@ -82,7 +82,7 @@ export class RestaurantRepository {
     const values = param.map(
       (param) =>
         Prisma.sql`(${param.externalUUID}, ${param.name}, 
-        st_point(${param.location.latitude},${param.location.longitude}), 
+        st_point(${param.location.longitude},${param.location.latitude}), 
         ${param.referenceLink},
         ${new Date()})`,
     );
@@ -148,6 +148,8 @@ export class RestaurantRepository {
       id: bigint;
       name: string;
       external_uuid: bigint;
+      latitude: number;
+      longitude: number;
       distance: number;
     }[]
   > {
@@ -155,9 +157,11 @@ export class RestaurantRepository {
       SELECT id, 
           name, 
           external_uuid, 
-          ST_Distance(location, ST_MakePoint(${param.latitude}, ${param.longitude})) as distance
+          ST_Y(location::geometry) as latitude,
+          ST_X(location::geometry) as longitude, 
+          ST_Distance(location, ST_MakePoint(${param.longitude}, ${param.latitude})) as distance
       FROM external_restaurant_informations 
-        WHERE st_dwithin(location, ST_MakePoint(${param.latitude}, ${param.longitude}), ${param.maxDistanceOnMeter})`;
+        WHERE st_dwithin(location, ST_MakePoint(${param.longitude}, ${param.latitude}), ${param.maxDistanceOnMeter})`;
 
     return await this.prisma.$queryRaw(queryRaw);
   }
