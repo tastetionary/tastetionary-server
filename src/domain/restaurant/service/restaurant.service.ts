@@ -12,7 +12,7 @@ import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
-import { getRandomItem } from '@root/src/common/util';
+import { getRandomItem } from '@common/util';
 
 @Injectable()
 export class RestaurantService {
@@ -137,7 +137,7 @@ export class RestaurantService {
       return [];
     }
 
-    return properRestaurants;
+    return this.aggregateRestaurant(properRestaurants);
   }
 
   aggregateRestaurant(reviews: RestaurantReviewEntity[]) {
@@ -149,32 +149,32 @@ export class RestaurantService {
     const randomReviews = groupedReview[randomId];
 
     const data: {
-      category: RestaurantCategory[];
-      summary: string[];
-      opinion: string[];
+      categories: RestaurantCategory[];
+      summaries: string[];
+      opinions: string[];
       keywords: string[];
-      price: number[];
+      prices: number[];
       aggregatePrice: { [index: string]: number };
     } = {
-      category: [],
-      summary: [],
-      opinion: [],
+      categories: [],
+      summaries: [],
+      opinions: [],
       keywords: [],
-      price: [],
+      prices: [],
       aggregatePrice: {},
     };
     fx.pipe(
       randomReviews,
       fx.map((review) => {
-        data.category.push(review.category);
-        data.summary.push(review.summary);
-        data.opinion.push(review.opinion ?? '');
+        data.categories.push(review.category);
+        data.summaries.push(review.summary);
+        data.opinions.push(review.opinion ?? '');
         data.keywords.push(...review.keywords);
-        data.price.push(review.price);
+        data.prices.push(review.price);
         return data;
       }),
       fx.map((data) => {
-        data['aggregatePrice'] = this.aggregatePrice(data.price);
+        data['aggregatePrice'] = this.aggregatePrice(data.prices);
         return data;
       }),
       fx.toArray,

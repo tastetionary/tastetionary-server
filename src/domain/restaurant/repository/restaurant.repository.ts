@@ -102,7 +102,7 @@ export class RestaurantRepository {
     keywords?: string[];
     ltePrice?: number;
     categories?: RestaurantCategory[];
-  }) {
+  }): Promise<RestaurantReviewEntity[]> {
     const condition = {};
 
     if (param.restaurantIds && param.restaurantIds.length >= 1) {
@@ -125,8 +125,17 @@ export class RestaurantRepository {
       };
     }
 
-    return this.prisma.restaurantReviews.findMany({
+    const res = await this.prisma.restaurantReviews.findMany({
       where: condition,
+    });
+
+    return res.map((r) => {
+      const { category, ...rest } = r;
+      const enumCategory = Object.values(RestaurantCategory).find(
+        (key) => key == category,
+      ) as RestaurantCategory;
+
+      return { ...rest, category: enumCategory };
     });
   }
 
