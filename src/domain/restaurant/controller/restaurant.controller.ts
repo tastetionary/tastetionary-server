@@ -11,10 +11,12 @@ import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
+  AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
+import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
 
 export interface RegisterRestaurantReviewInput {
   review: RestaurantReviewDTO;
@@ -31,27 +33,18 @@ export interface GetRestaurantInput
   excludeIds: number[];
 }
 
-export interface GetRestaurantsOutput extends ExternalRestaurantInformationDTO {
+export interface GetRestaurantsOutput {
   /**
-   * price per person,
-   * example: 10000
-   * @type number
+   * recommended restaurant
+   * @type ExternalRestaurantInformationEntity
    */
-  pricePerPerson: number;
+  restaurant: ExternalRestaurantInformationEntity;
 
   /**
-   * rejoin count / total review count, 0 ~ 100
-   * example: 80,
-   * @type string
+   * aggregate data from review
+   * @type AggregateReviewDTO
    */
-  ratioOfRejoin: number;
-
-  /**
-   * total count by condition
-   * example: 998
-   * @type number
-   */
-  resultCount: number;
+  aggregateReview: AggregateReviewDTO;
 }
 
 @Controller('v1/restaurant')
@@ -72,21 +65,26 @@ export class RestaurantController {
     @Request() req,
     @TypedBody()
     input: GetRestaurantInput,
-  ): Promise<BaseResponseDto<GetRestaurantsOutput[]>> {
+  ): Promise<BaseResponseDto<GetRestaurantsOutput>> {
     const userId = req.user.userId;
-    console.log(input, userId);
-    return new BaseResponseDto([
-      {
-        name: '놀부 부대찌개',
-        externalUUID: 1112233,
-        latitude: 37.1231232,
-        longitude: 127.1231223,
-        referenceLink: 'https://naver.com',
-        pricePerPerson: 12_000,
-        ratioOfRejoin: 20,
-        resultCount: 1,
-      },
-    ]);
+    const maxDistanceMeter = 1_000;
+
+    const data = (await this.service.getRecommendedRestaurant({
+      userId,
+      masDistanceMeter: maxDistanceMeter,
+      ltePrice: input.price,
+      keywords: input.keywords,
+      categories: [input.category],
+      excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
+    })) as {
+      restaurant: ExternalRestaurantInformationEntity;
+      aggregateData: AggregateReviewDTO;
+    };
+
+    return new BaseResponseDto({
+      restaurant: data.restaurant,
+      aggregateReview: data.aggregateData,
+    });
   }
 
   /**
