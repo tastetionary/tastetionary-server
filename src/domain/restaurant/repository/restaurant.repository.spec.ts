@@ -39,7 +39,7 @@ describe('Restaurant repository', () => {
 
     await repo.saveReview(data[0]);
 
-    const res = await repo.getRestaurantsByConditions({
+    const res = await repo.getReviewsByConditions({
       categories: [RestaurantCategory.ASIAN],
     });
     expect(res).toHaveLength(1);
@@ -60,13 +60,13 @@ describe('Restaurant repository', () => {
 
     await repo.saveReview(data[0]);
 
-    const res = await repo.getRestaurantsByConditions({
+    const res = await repo.getReviewsByConditions({
       keywords: [],
       ltePrice: 12_000,
     });
     expect(res).toHaveLength(1);
 
-    const wrongRes = await repo.getRestaurantsByConditions({
+    const wrongRes = await repo.getReviewsByConditions({
       keywords: [],
       ltePrice: 9_000,
     });
@@ -88,22 +88,22 @@ describe('Restaurant repository', () => {
 
     await repo.saveReview(data[0]);
 
-    const cleanRes = await repo.getRestaurantsByConditions({
+    const cleanRes = await repo.getReviewsByConditions({
       keywords: ['clean'],
     });
     expect(cleanRes).toHaveLength(1);
 
-    const onlyOneRes = await repo.getRestaurantsByConditions({
+    const onlyOneRes = await repo.getReviewsByConditions({
       keywords: ['clean', 'never'],
     });
     expect(onlyOneRes).toHaveLength(1);
 
-    const nothingRes = await repo.getRestaurantsByConditions({
+    const nothingRes = await repo.getReviewsByConditions({
       keywords: ['nothing'],
     });
     expect(nothingRes).toHaveLength(0);
 
-    const allRes = await repo.getRestaurantsByConditions({});
+    const allRes = await repo.getReviewsByConditions({});
     expect(allRes).toHaveLength(1);
   });
 
@@ -137,7 +137,8 @@ describe('Restaurant repository', () => {
       longitude,
       maxDistanceOnMeter: 1000,
     });
-    const ids = res.map((r) => r.external_uuid);
+    console.log(res);
+    const ids = res.map((r) => r.externalUUID);
     expect(ids).toEqual([1000n, 1001n]);
   });
 

@@ -97,7 +97,7 @@ export class RestaurantRepository {
     });
   }
 
-  async getRestaurantsByConditions(param: {
+  async getReviewsByConditions(param: {
     restaurantIds?: bigint[];
     keywords?: string[];
     ltePrice?: number;
@@ -147,7 +147,8 @@ export class RestaurantRepository {
     {
       id: bigint;
       name: string;
-      external_uuid: bigint;
+      externalUUID: bigint;
+      referenceLink: string | null;
       latitude: number;
       longitude: number;
       distance: number;
@@ -156,7 +157,8 @@ export class RestaurantRepository {
     const queryRaw = Prisma.sql`
       SELECT id, 
           name, 
-          external_uuid, 
+          external_uuid as "externalUUID", 
+          reference_link as "referenceLink",
           ST_Y(location::geometry) as latitude,
           ST_X(location::geometry) as longitude, 
           ST_Distance(location, ST_MakePoint(${param.longitude}, ${param.latitude})) as distance
