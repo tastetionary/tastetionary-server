@@ -73,8 +73,8 @@ describe('restaurant service', () => {
         },
       ];
 
-      const res = service.aggregateRestaurant(reviews);
-      expect(res.aggregatePrice.avg).toBe(12_500);
+      const res = service.aggregateRestaurantReview(reviews);
+      expect(res.data.aggregatePrice.avg).toBe(12_500);
     });
 
     it('aggregatePrice, should return expected', () => {

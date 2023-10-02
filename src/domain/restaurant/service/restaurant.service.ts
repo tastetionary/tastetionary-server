@@ -126,21 +126,29 @@ export class RestaurantService {
     }
 
     const ids = restaurants.map((r) => r.id);
-    const properRestaurants = await this.repo.getRestaurantsByConditions({
+    const targetReviews = await this.repo.getReviewsByConditions({
       restaurantIds: ids,
       keywords: param.keywords,
       ltePrice: param.ltePrice,
       categories: param.categories,
     });
 
-    if (properRestaurants.length == 0) {
+    if (targetReviews.length == 0) {
       return [];
     }
 
-    return this.aggregateRestaurant(properRestaurants);
+    const aggregateData = this.aggregateRestaurantReview(targetReviews);
+    const targetRestaurant = restaurants.find(
+      (r) => r.id.toString() == aggregateData.id,
+    );
+
+    return {
+      targetRestaurant,
+      aggregateData,
+    };
   }
 
-  aggregateRestaurant(reviews: RestaurantReviewEntity[]) {
+  aggregateRestaurantReview(reviews: RestaurantReviewEntity[]) {
     const groupedReview = fx.groupBy(
       (r) => r.external_restaurant_information_id.toString(),
       reviews,
@@ -179,7 +187,7 @@ export class RestaurantService {
       }),
       fx.toArray,
     );
-    return data;
+    return { id: randomId, data };
   }
 
   aggregatePrice(prices: number[]) {
