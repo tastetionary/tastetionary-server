@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
+  AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
@@ -103,10 +104,11 @@ export class RestaurantService {
   async getRecommendedRestaurant(
     param: {
       userId: number;
-      maxDistance: number;
+      masDistanceMeter: number;
       keywords: string[];
       ltePrice: number;
       categories: RestaurantCategory[];
+      excludeRestaurantIds: bigint[];
     },
     user?: EndUser,
   ) {
@@ -118,7 +120,8 @@ export class RestaurantService {
     const restaurants = await this.repo.getExternalRestaurantIdsByDistance({
       latitude: endUser.dinningArea.latitude,
       longitude: endUser.dinningArea.longitude,
-      maxDistanceOnMeter: param.maxDistance,
+      maxDistanceMeter: param.masDistanceMeter,
+      excludedIds: param.excludeRestaurantIds,
     });
 
     if (restaurants.length == 0) {
@@ -137,14 +140,12 @@ export class RestaurantService {
       return [];
     }
 
-    const aggregateData = this.aggregateRestaurantReview(targetReviews);
-    const targetRestaurant = restaurants.find(
-      (r) => r.id.toString() == aggregateData.id,
-    );
+    const { id, data } = this.aggregateRestaurantReview(targetReviews);
+    const targetRestaurant = restaurants.find((r) => r.id.toString() == id);
 
     return {
-      targetRestaurant,
-      aggregateData,
+      restaurant: targetRestaurant,
+      aggregateData: data,
     };
   }
 
@@ -156,20 +157,14 @@ export class RestaurantService {
     const randomId = getRandomItem(Object.keys(groupedReview));
     const randomReviews = groupedReview[randomId];
 
-    const data: {
-      categories: RestaurantCategory[];
-      summaries: string[];
-      opinions: string[];
-      keywords: string[];
-      prices: number[];
-      aggregatePrice: { [index: string]: number };
-    } = {
+    const data: AggregateReviewDTO = {
       categories: [],
       summaries: [],
       opinions: [],
       keywords: [],
       prices: [],
       aggregatePrice: {},
+      totalCount: randomReviews.length,
     };
     fx.pipe(
       randomReviews,

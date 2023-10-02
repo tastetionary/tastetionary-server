@@ -135,7 +135,7 @@ describe('restaurant service', () => {
       const res = (await service.getRecommendedRestaurant(
         {
           userId,
-          maxDistance,
+          masDistanceMeter: maxDistance,
           keywords: ['clean'],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
@@ -155,7 +155,7 @@ describe('restaurant service', () => {
       const res = await service.getRecommendedRestaurant(
         {
           userId,
-          maxDistance,
+          masDistanceMeter: maxDistance,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
@@ -169,7 +169,7 @@ describe('restaurant service', () => {
       await expect(
         service.getRecommendedRestaurant({
           userId: 1,
-          maxDistance: 1000,
+          masDistanceMeter: 1000,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
