@@ -12,7 +12,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     function isValidationFailure(
       exception: any,
     ): exception is { message: string } {
-      return exception && typeof exception.message === 'string';
+      return (
+        exception &&
+        !['Service', 'Core', 'Repository'].includes(exception.message)
+      );
     }
 
     const ctx = host.switchToHttp();
@@ -24,7 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      reason: exception['option'],
+      reason: exception['options'],
       additionalData: exception['additionalData'],
     };
 
