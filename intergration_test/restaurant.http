@@ -1,0 +1,46 @@
+### get token(use after register user)
+# @name token
+POST {{base_url}}/v1/account/tokens
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "matthew",
+  "password": "pwd",
+  "category": "email"
+}
+
+###
+@access_token = {{token.response.body.data.accessToken}}
+
+### Register review
+POST {{base_url}}/v1/restaurant/review
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+    "review":{
+        "category":"아시안",
+        "keywords":["test"],
+        "price":10000,
+        "summary":"one-line summary"
+    },
+    "external":{
+        "externalUUID":1,
+        "name":"http-test",
+        "latitude":37.123456,
+        "longitude":127.123456,
+        "referenceLink":"https://www.naver.com"
+    }
+}
+
+### get recommendation
+POST {{base_url}}/v1/restaurant/recommendation
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+    "excludeIds": [],
+    "category": "아시안",
+    "keywords": ["test"],
+    "price": 10000
+}
