@@ -47,10 +47,10 @@ export interface GetRestaurantsOutput
   id: string;
   externalUUID: string;
   /**
-   * aggregate data from review
+   * aggregate data from review, if not reviewed, it will be null
    * @type AggregateReviewDTO
    */
-  aggregateReview: AggregateReviewDTO;
+  aggregateReviews: AggregateReviewDTO | null;
 }
 
 @Controller('v1/restaurant')
@@ -84,7 +84,7 @@ export class RestaurantController {
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
     })) as {
       restaurant: ExternalRestaurantInformationEntity;
-      aggregateData: AggregateReviewDTO;
+      aggregateReviews: AggregateReviewDTO;
     };
 
     // TODO use 204 code or create response that success but no data
@@ -95,7 +95,7 @@ export class RestaurantController {
       id: id.toString(),
       externalUUID: externalUUID.toString(),
       ...rest,
-      aggregateReview: data.aggregateData,
+      aggregateReviews: data.aggregateReviews,
     });
   }
 

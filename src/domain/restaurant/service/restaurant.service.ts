@@ -125,7 +125,7 @@ export class RestaurantService {
     });
 
     if (restaurants.length == 0) {
-      return { restaurant: null, aggregateData: null };
+      return { restaurant: null, aggregateReviews: null };
     }
 
     const ids = restaurants.map((r) => r.id);
@@ -137,7 +137,8 @@ export class RestaurantService {
     });
 
     if (targetReviews.length == 0) {
-      return { restaurant: null, aggregateData: null };
+      const randomRestaurant = getRandomItem(restaurants);
+      return { restaurant: randomRestaurant, aggregateReviews: null };
     }
 
     const { id, data } = this.aggregateRestaurantReview(targetReviews);
@@ -145,7 +146,7 @@ export class RestaurantService {
 
     return {
       restaurant: targetRestaurant,
-      aggregateData: data,
+      aggregateReviews: data,
     };
   }
 

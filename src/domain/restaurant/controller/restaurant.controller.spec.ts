@@ -74,7 +74,6 @@ describe('restaurant controller', () => {
         keywords: ['key'],
         price: 10_000,
       });
-
     expect(res.statusCode).toEqual(200);
   });
 
