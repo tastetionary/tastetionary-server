@@ -7,7 +7,7 @@ import { AccountService } from '@domain/account/service/account.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 
-describe('user controller', () => {
+describe('account controller', () => {
   let app: INestApplication;
   let accountService: AccountService;
   let configService: ConfigurationService;
