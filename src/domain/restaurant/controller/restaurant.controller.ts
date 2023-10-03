@@ -19,7 +19,16 @@ import { RestaurantService } from '@domain/restaurant/service/restaurant.service
 import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
 
 export interface RegisterRestaurantReviewInput {
+  /**
+   * review data
+   * @type RestaurantReviewDTO
+   */
   review: RestaurantReviewDTO;
+
+  /**
+   * external restaurant information for register
+   * @type ExternalRestaurantInformationDTO
+   */
   external: ExternalRestaurantInformationDTO;
 }
 
