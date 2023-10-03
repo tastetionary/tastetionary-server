@@ -16,7 +16,7 @@ export interface FoodOption {
   keywords: FoodKeyword[];
 }
 
-export interface FoodRecommend {
+export interface GetFoodOutput {
   /**
    * recommended food
    * example: "김치찌개"
