@@ -34,7 +34,16 @@ describe('food controller', () => {
   };
 
   it('should return 200', async () => {
-    jest.spyOn(service, 'getRecommendedFood').mockImplementation();
+    jest.spyOn(service, 'getRecommendedFood').mockImplementation(async () => {
+      const mock = {
+        id: 1,
+        name: 'Mock Food',
+        category: ['Mock Category'],
+        keyword: ['Mock Keyword'],
+      };
+      return mock;
+    });
+
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
       expiresIn: '10h',

@@ -16,7 +16,7 @@ describe('Food repository', () => {
   it('should get food options', async () => {
     const res = await repo.getFoodOptions();
     const expected = {
-      category: [
+      categories: [
         '한식',
         '양식',
         '중식',
