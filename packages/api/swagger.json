@@ -741,8 +741,8 @@
             "x-typia-optional": false,
             "type": "string"
           },
-          "aggregateReview": {
-            "$ref": "#/components/schemas/AggregateReviewDTO"
+          "aggregateReviews": {
+            "$ref": "#/components/schemas/AggregateReviewDTO.Nullable"
           },
           "name": {
             "x-typia-required": true,
@@ -787,7 +787,7 @@
         "required": [
           "id",
           "externalUUID",
-          "aggregateReview",
+          "aggregateReviews",
           "name",
           "referenceLink",
           "latitude",
@@ -796,7 +796,7 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "AggregateReviewDTO": {
+      "AggregateReviewDTO.Nullable": {
         "type": "object",
         "properties": {
           "categories": {
@@ -856,7 +856,7 @@
             "type": "number"
           }
         },
-        "nullable": false,
+        "nullable": true,
         "required": [
           "categories",
           "summaries",

@@ -25,10 +25,10 @@ Content-Type: {{content_type_json}}
         "summary":"one-line summary"
     },
     "external":{
-        "externalUUID":1,
+        "externalUUID":2,
         "name":"http-test",
-        "latitude":37.123456,
-        "longitude":127.123456,
+        "latitude":1,
+        "longitude":1,
         "referenceLink":"https://www.naver.com"
     }
 }
