@@ -33,13 +33,10 @@ export interface GetRestaurantInput
   excludeIds: number[];
 }
 
-export interface GetRestaurantsOutput {
-  /**
-   * recommended restaurant
-   * @type ExternalRestaurantInformationEntity
-   */
-  restaurant: ExternalRestaurantInformationEntity;
-
+export interface GetRestaurantsOutput
+  extends Omit<ExternalRestaurantInformationEntity, 'id' | 'externalUUID'> {
+  id: string;
+  externalUUID: string;
   /**
    * aggregate data from review
    * @type AggregateReviewDTO
@@ -65,7 +62,7 @@ export class RestaurantController {
     @Request() req,
     @TypedBody()
     input: GetRestaurantInput,
-  ): Promise<BaseResponseDto<GetRestaurantsOutput>> {
+  ): Promise<BaseResponseDto<GetRestaurantsOutput | null>> {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
@@ -81,8 +78,14 @@ export class RestaurantController {
       aggregateData: AggregateReviewDTO;
     };
 
+    // TODO use 204 code or create response that success but no data
+    if (data.restaurant === null) return new BaseResponseDto(null);
+
+    const { id, externalUUID, ...rest } = data.restaurant;
     return new BaseResponseDto({
-      restaurant: data.restaurant,
+      id: id.toString(),
+      externalUUID: externalUUID.toString(),
+      ...rest,
       aggregateReview: data.aggregateData,
     });
   }

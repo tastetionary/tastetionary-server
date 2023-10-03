@@ -157,6 +157,9 @@ export class RestaurantRepository {
     maxDistanceMeter?: number;
     excludedIds?: bigint[];
   }): Promise<ExternalRestaurantInformationEntity[]> {
+    const excludedIds =
+      param.excludedIds?.length != 0 ? (param.excludedIds as bigint[]) : [0n];
+
     const queryRaw = Prisma.sql`
       SELECT id, 
           name, 
@@ -168,8 +171,8 @@ export class RestaurantRepository {
       param.latitude
     })) as distance
       FROM external_restaurant_informations 
-        WHERE id NOT IN (${Prisma.join(param.excludedIds ?? [])}) AND
-          st_dwithin(location, ST_MakePoint(${param.longitude}, ${
+        WHERE id NOT IN (${Prisma.join(excludedIds)})
+        AND st_dwithin(location, ST_MakePoint(${param.longitude}, ${
       param.latitude
     }), ${param.maxDistanceMeter})`;
 

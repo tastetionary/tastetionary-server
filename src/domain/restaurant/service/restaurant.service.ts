@@ -125,7 +125,7 @@ export class RestaurantService {
     });
 
     if (restaurants.length == 0) {
-      return [];
+      return { restaurant: null, aggregateData: null };
     }
 
     const ids = restaurants.map((r) => r.id);
@@ -137,7 +137,7 @@ export class RestaurantService {
     });
 
     if (targetReviews.length == 0) {
-      return [];
+      return { restaurant: null, aggregateData: null };
     }
 
     const { id, data } = this.aggregateRestaurantReview(targetReviews);

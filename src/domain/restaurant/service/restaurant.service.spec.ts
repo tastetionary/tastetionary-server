@@ -139,13 +139,14 @@ describe('restaurant service', () => {
           keywords: ['clean'],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
+          excludeRestaurantIds: [],
         },
         user,
       )) as any;
       expect(res).not.toBeNull();
     });
 
-    it('with not restaurant within distance, should return empty array', async () => {
+    it('with not restaurant within distance, should return null', async () => {
       const userId = 1;
       const user = await createRestaurant(1, {
         latitude: 1,
@@ -159,10 +160,11 @@ describe('restaurant service', () => {
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
+          excludeRestaurantIds: [],
         },
         user,
       );
-      expect(res).toEqual([]);
+      expect(res.restaurant).toBeNull();
     });
 
     it('with un dinning area user, should throw error', async () => {
@@ -173,6 +175,7 @@ describe('restaurant service', () => {
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
+          excludeRestaurantIds: [],
         }),
       ).rejects.toThrowError(ServiceException);
     });
