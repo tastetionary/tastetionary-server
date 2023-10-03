@@ -207,7 +207,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_FoodRecommend_gt_"
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetFoodOutput_space__or__space_null_gt_"
                 }
               }
             },
@@ -675,11 +675,11 @@
           "상큼한"
         ]
       },
-      "BaseResponseDto_lt_FoodRecommend_gt_": {
+      "BaseResponseDto_lt_GetFoodOutput_space__or__space_null_gt_": {
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/FoodRecommend"
+            "$ref": "#/components/schemas/GetFoodOutput.Nullable"
           }
         },
         "nullable": false,
@@ -688,7 +688,7 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "FoodRecommend": {
+      "GetFoodOutput.Nullable": {
         "type": "object",
         "properties": {
           "name": {
@@ -709,7 +709,7 @@
             "type": "string"
           }
         },
-        "nullable": false,
+        "nullable": true,
         "required": [
           "name"
         ],
