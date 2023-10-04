@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
+  AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
@@ -103,10 +104,11 @@ export class RestaurantService {
   async getRecommendedRestaurant(
     param: {
       userId: number;
-      maxDistance: number;
+      masDistanceMeter: number;
       keywords: string[];
       ltePrice: number;
       categories: RestaurantCategory[];
+      excludeRestaurantIds: bigint[];
     },
     user?: EndUser,
   ) {
@@ -118,29 +120,37 @@ export class RestaurantService {
     const restaurants = await this.repo.getExternalRestaurantIdsByDistance({
       latitude: endUser.dinningArea.latitude,
       longitude: endUser.dinningArea.longitude,
-      maxDistanceOnMeter: param.maxDistance,
+      maxDistanceMeter: param.masDistanceMeter,
+      excludedIds: param.excludeRestaurantIds,
     });
 
     if (restaurants.length == 0) {
-      return [];
+      return { restaurant: null, aggregateReviews: null };
     }
 
     const ids = restaurants.map((r) => r.id);
-    const properRestaurants = await this.repo.getRestaurantsByConditions({
+    const targetReviews = await this.repo.getReviewsByConditions({
       restaurantIds: ids,
       keywords: param.keywords,
       ltePrice: param.ltePrice,
       categories: param.categories,
     });
 
-    if (properRestaurants.length == 0) {
-      return [];
+    if (targetReviews.length == 0) {
+      const randomRestaurant = getRandomItem(restaurants);
+      return { restaurant: randomRestaurant, aggregateReviews: null };
     }
 
-    return this.aggregateRestaurant(properRestaurants);
+    const { id, data } = this.aggregateRestaurantReview(targetReviews);
+    const targetRestaurant = restaurants.find((r) => r.id.toString() == id);
+
+    return {
+      restaurant: targetRestaurant,
+      aggregateReviews: data,
+    };
   }
 
-  aggregateRestaurant(reviews: RestaurantReviewEntity[]) {
+  aggregateRestaurantReview(reviews: RestaurantReviewEntity[]) {
     const groupedReview = fx.groupBy(
       (r) => r.external_restaurant_information_id.toString(),
       reviews,
@@ -148,20 +158,14 @@ export class RestaurantService {
     const randomId = getRandomItem(Object.keys(groupedReview));
     const randomReviews = groupedReview[randomId];
 
-    const data: {
-      categories: RestaurantCategory[];
-      summaries: string[];
-      opinions: string[];
-      keywords: string[];
-      prices: number[];
-      aggregatePrice: { [index: string]: number };
-    } = {
+    const data: AggregateReviewDTO = {
       categories: [],
       summaries: [],
       opinions: [],
       keywords: [],
       prices: [],
       aggregatePrice: {},
+      totalCount: randomReviews.length,
     };
     fx.pipe(
       randomReviews,
@@ -179,7 +183,7 @@ export class RestaurantService {
       }),
       fx.toArray,
     );
-    return data;
+    return { id: randomId, data };
   }
 
   aggregatePrice(prices: number[]) {

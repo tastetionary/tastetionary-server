@@ -73,8 +73,8 @@ describe('restaurant service', () => {
         },
       ];
 
-      const res = service.aggregateRestaurant(reviews);
-      expect(res.aggregatePrice.avg).toBe(12_500);
+      const res = service.aggregateRestaurantReview(reviews);
+      expect(res.data.aggregatePrice.avg).toBe(12_500);
     });
 
     it('aggregatePrice, should return expected', () => {
@@ -135,17 +135,18 @@ describe('restaurant service', () => {
       const res = (await service.getRecommendedRestaurant(
         {
           userId,
-          maxDistance,
+          masDistanceMeter: maxDistance,
           keywords: ['clean'],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
+          excludeRestaurantIds: [],
         },
         user,
       )) as any;
       expect(res).not.toBeNull();
     });
 
-    it('with not restaurant within distance, should return empty array', async () => {
+    it('with not restaurant within distance, should return null', async () => {
       const userId = 1;
       const user = await createRestaurant(1, {
         latitude: 1,
@@ -155,24 +156,26 @@ describe('restaurant service', () => {
       const res = await service.getRecommendedRestaurant(
         {
           userId,
-          maxDistance,
+          masDistanceMeter: maxDistance,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
+          excludeRestaurantIds: [],
         },
         user,
       );
-      expect(res).toEqual([]);
+      expect(res.restaurant).toBeNull();
     });
 
     it('with un dinning area user, should throw error', async () => {
       await expect(
         service.getRecommendedRestaurant({
           userId: 1,
-          maxDistance: 1000,
+          masDistanceMeter: 1000,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
+          excludeRestaurantIds: [],
         }),
       ).rejects.toThrowError(ServiceException);
     });

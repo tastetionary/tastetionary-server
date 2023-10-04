@@ -11,13 +11,24 @@ import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
+  AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
+import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
 
 export interface RegisterRestaurantReviewInput {
+  /**
+   * review data
+   * @type RestaurantReviewDTO
+   */
   review: RestaurantReviewDTO;
+
+  /**
+   * external restaurant information for register
+   * @type ExternalRestaurantInformationDTO
+   */
   external: ExternalRestaurantInformationDTO;
 }
 
@@ -31,27 +42,15 @@ export interface GetRestaurantInput
   excludeIds: number[];
 }
 
-export interface GetRestaurantsOutput extends ExternalRestaurantInformationDTO {
+export interface GetRestaurantsOutput
+  extends Omit<ExternalRestaurantInformationEntity, 'id' | 'externalUUID'> {
+  id: string;
+  externalUUID: string;
   /**
-   * price per person,
-   * example: 10000
-   * @type number
+   * aggregate data from review, if not reviewed, it will be null
+   * @type AggregateReviewDTO
    */
-  pricePerPerson: number;
-
-  /**
-   * rejoin count / total review count, 0 ~ 100
-   * example: 80,
-   * @type string
-   */
-  ratioOfRejoin: number;
-
-  /**
-   * total count by condition
-   * example: 998
-   * @type number
-   */
-  resultCount: number;
+  aggregateReviews: AggregateReviewDTO | null;
 }
 
 @Controller('v1/restaurant')
@@ -72,21 +71,32 @@ export class RestaurantController {
     @Request() req,
     @TypedBody()
     input: GetRestaurantInput,
-  ): Promise<BaseResponseDto<GetRestaurantsOutput[]>> {
+  ): Promise<BaseResponseDto<GetRestaurantsOutput | null>> {
     const userId = req.user.userId;
-    console.log(input, userId);
-    return new BaseResponseDto([
-      {
-        name: '놀부 부대찌개',
-        externalUUID: 1112233,
-        latitude: 37.1231232,
-        longitude: 127.1231223,
-        referenceLink: 'https://naver.com',
-        pricePerPerson: 12_000,
-        ratioOfRejoin: 20,
-        resultCount: 1,
-      },
-    ]);
+    const maxDistanceMeter = 1_000;
+
+    const data = (await this.service.getRecommendedRestaurant({
+      userId,
+      masDistanceMeter: maxDistanceMeter,
+      ltePrice: input.price,
+      keywords: input.keywords,
+      categories: [input.category],
+      excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
+    })) as {
+      restaurant: ExternalRestaurantInformationEntity;
+      aggregateReviews: AggregateReviewDTO;
+    };
+
+    // TODO use 204 code or create response that success but no data
+    if (data.restaurant === null) return new BaseResponseDto(null);
+
+    const { id, externalUUID, ...rest } = data.restaurant;
+    return new BaseResponseDto({
+      id: id.toString(),
+      externalUUID: externalUUID.toString(),
+      ...rest,
+      aggregateReviews: data.aggregateReviews,
+    });
   }
 
   /**

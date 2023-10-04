@@ -65,3 +65,13 @@ export interface ExternalRestaurantInformationDTO {
    */
   referenceLink?: string;
 }
+
+export interface AggregateReviewDTO {
+  categories: RestaurantCategory[];
+  summaries: string[];
+  opinions: string[];
+  keywords: string[];
+  prices: number[];
+  aggregatePrice: { [index: string]: number };
+  totalCount: number;
+}

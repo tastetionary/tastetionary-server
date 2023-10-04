@@ -6,11 +6,15 @@ import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
+import { UserService } from '@domain/user/service/user.service';
+import { EndUser } from '@domain/user/core/end-user';
+import { AreaCategory } from '@domain/user/user.enum';
 
 describe('restaurant controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
   let service: RestaurantService;
+  let userService: UserService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -21,11 +25,8 @@ describe('restaurant controller', () => {
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
     service = module.get(RestaurantService);
+    userService = module.get(UserService);
     await app.init();
-  });
-
-  beforeEach(async () => {
-    await jest.clearAllMocks();
   });
 
   const REVIEW_INPUT = {
@@ -45,8 +46,22 @@ describe('restaurant controller', () => {
   };
 
   it('/recommendation, should return 200', async () => {
+    const userId = 123;
+    jest.spyOn(userService, 'getEndUser').mockImplementation(async () => {
+      return new EndUser(userId, [
+        {
+          id: 1,
+          userId,
+          category: AreaCategory.DINING_AREA,
+          order: 1,
+          address: 'address',
+          latitude: 37.517331925853,
+          longitude: 127.047377408384,
+        },
+      ]);
+    });
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(123, key, {
+    const token = createUserToken(userId, key, {
       expiresIn: '10h',
     });
 
@@ -59,17 +74,7 @@ describe('restaurant controller', () => {
         keywords: ['key'],
         price: 10_000,
       });
-
     expect(res.statusCode).toEqual(200);
-    const data = res.body.data[0];
-
-    expect(data).toHaveProperty('name');
-    expect(data).toHaveProperty('externalUUID');
-    expect(data).toHaveProperty('latitude');
-    expect(data).toHaveProperty('longitude');
-    expect(data).toHaveProperty('referenceLink');
-    expect(data).toHaveProperty('pricePerPerson');
-    expect(data).toHaveProperty('ratioOfRejoin');
   });
 
   it('/review, not activity user, should return 400', async () => {
