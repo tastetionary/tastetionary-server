@@ -158,7 +158,7 @@ export class RestaurantRepository {
     excludedIds?: bigint[];
   }): Promise<ExternalRestaurantInformationEntity[]> {
     const excludedIds =
-      param.excludedIds?.length != 0 ? (param.excludedIds as bigint[]) : [0n];
+      param.excludedIds?.length != 0 ? (param.excludedIds as bigint[]) : [0];
 
     const queryRaw = Prisma.sql`
       SELECT id, 
