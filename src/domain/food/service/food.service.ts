@@ -20,6 +20,10 @@ export class FoodService {
       categories: param.categories,
     });
 
+    if (foods.length === 0) {
+      return null;
+    }
+
     return getRandomItem(foods);
   }
 }

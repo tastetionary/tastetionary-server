@@ -34,6 +34,10 @@ export class FoodController {
       categories: dto.categories,
     });
 
+    if (res === null) {
+      return new BaseResponseDto(null);
+    }
+
     return new BaseResponseDto({
       name: res.name,
     });
