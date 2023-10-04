@@ -183,7 +183,7 @@
         "x-nestia-method": "GET"
       }
     },
-    "/v1/food/recommend": {
+    "/v1/food/recommendation": {
       "post": {
         "tags": [
           "food"
@@ -219,7 +219,7 @@
             "bearer": []
           }
         ],
-        "x-nestia-namespace": "v1.food.recommend.getRecommendedFood",
+        "x-nestia-namespace": "v1.food.recommendation.getRecommentation",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
@@ -252,7 +252,7 @@
         "x-nestia-method": "POST"
       }
     },
-    "/v1/food/options": {
+    "/v1/food/option": {
       "get": {
         "tags": [
           "food"
@@ -271,7 +271,7 @@
             "x-nestia-encrypted": false
           }
         },
-        "x-nestia-namespace": "v1.food.options.getFoodOptions",
+        "x-nestia-namespace": "v1.food.option.getOption",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
@@ -596,7 +596,7 @@
         "type": "object",
         "properties": {
           "categories": {
-            "description": "food category,\nexample: \"한식\"",
+            "description": "food category,\nexample: [\"한식\"]",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
@@ -616,7 +616,7 @@
             }
           },
           "keywords": {
-            "description": "food keywords\nexample: \"깨끗해요\"",
+            "description": "food keywords\nexample: [\"깨끗해요\"]",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
