@@ -157,8 +157,10 @@ export class RestaurantRepository {
     maxDistanceMeter?: number;
     excludedIds?: bigint[];
   }): Promise<ExternalRestaurantInformationEntity[]> {
-    const excludedIds =
-      param.excludedIds?.length != 0 ? (param.excludedIds as bigint[]) : [0];
+    let excludedIds = [0];
+    if (param.excludedIds && param.excludedIds.length > 0) {
+      excludedIds = param.excludedIds as any;
+    }
 
     const queryRaw = Prisma.sql`
       SELECT id, 

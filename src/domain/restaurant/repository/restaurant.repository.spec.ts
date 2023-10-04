@@ -137,7 +137,6 @@ describe('Restaurant repository', () => {
       longitude,
       maxDistanceMeter: 1000,
     });
-    console.log(res);
     const ids = res.map((r) => r.externalUUID);
     expect(ids).toEqual([1000n, 1001n]);
   });
