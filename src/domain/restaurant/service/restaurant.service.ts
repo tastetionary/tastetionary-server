@@ -3,11 +3,16 @@ import {
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import {
+  RestaurantRepository,
+  RestaurantReviewEntity,
+} from '@domain/restaurant/repository/restaurant.repository';
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import * as fx from '@fxts/core';
+import { getRandomItem } from '@common/util';
 
 @Injectable()
 export class RestaurantService {
@@ -132,6 +137,63 @@ export class RestaurantService {
       return [];
     }
 
-    return properRestaurants;
+    return this.aggregateRestaurant(properRestaurants);
+  }
+
+  aggregateRestaurant(reviews: RestaurantReviewEntity[]) {
+    const groupedReview = fx.groupBy(
+      (r) => r.external_restaurant_information_id.toString(),
+      reviews,
+    );
+    const randomId = getRandomItem(Object.keys(groupedReview));
+    const randomReviews = groupedReview[randomId];
+
+    const data: {
+      categories: RestaurantCategory[];
+      summaries: string[];
+      opinions: string[];
+      keywords: string[];
+      prices: number[];
+      aggregatePrice: { [index: string]: number };
+    } = {
+      categories: [],
+      summaries: [],
+      opinions: [],
+      keywords: [],
+      prices: [],
+      aggregatePrice: {},
+    };
+    fx.pipe(
+      randomReviews,
+      fx.map((review) => {
+        data.categories.push(review.category);
+        data.summaries.push(review.summary);
+        data.opinions.push(review.opinion ?? '');
+        data.keywords.push(...review.keywords);
+        data.prices.push(review.price);
+        return data;
+      }),
+      fx.map((data) => {
+        data['aggregatePrice'] = this.aggregatePrice(data.prices);
+        return data;
+      }),
+      fx.toArray,
+    );
+    return data;
+  }
+
+  aggregatePrice(prices: number[]) {
+    const data: { [index: string]: number } = {};
+
+    prices.forEach((price) => {
+      if (data[price.toString()]) {
+        data[price.toString()] += 1;
+      } else {
+        data[price.toString()] = 1;
+      }
+    });
+    const uniquePrices = [...new Set(prices)];
+    data['avg'] = fx.average(uniquePrices);
+    return data;
   }
 }

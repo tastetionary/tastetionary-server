@@ -3,6 +3,19 @@ import { PrismaService } from '@common/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
+export interface RestaurantReviewEntity {
+  id: number;
+  external_restaurant_information_id: bigint;
+  userId: number;
+  category: RestaurantCategory;
+  summary: string;
+  opinion: string | null;
+  keywords: string[];
+  price: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 @Injectable()
 export class RestaurantRepository {
   constructor(private prisma: PrismaService) {}
@@ -89,7 +102,7 @@ export class RestaurantRepository {
     keywords?: string[];
     ltePrice?: number;
     categories?: RestaurantCategory[];
-  }) {
+  }): Promise<RestaurantReviewEntity[]> {
     const condition = {};
 
     if (param.restaurantIds && param.restaurantIds.length >= 1) {
@@ -112,8 +125,17 @@ export class RestaurantRepository {
       };
     }
 
-    return this.prisma.restaurantReviews.findMany({
+    const res = await this.prisma.restaurantReviews.findMany({
       where: condition,
+    });
+
+    return res.map((r) => {
+      const { category, ...rest } = r;
+      const enumCategory = Object.values(RestaurantCategory).find(
+        (key) => key == category,
+      ) as RestaurantCategory;
+
+      return { ...rest, category: enumCategory };
     });
   }
 
