@@ -50,7 +50,7 @@ describe('food controller', () => {
     });
 
     const res = await request(app.getHttpServer())
-      .post('/v1/food/recommend')
+      .post('/v1/food/recommendation')
       .set('Authorization', `Bearer ${token}`)
       .send(DATA);
 

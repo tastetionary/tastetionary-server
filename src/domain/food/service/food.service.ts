@@ -15,12 +15,11 @@ export class FoodService {
     keywords: FoodKeyword[];
     categories: FoodCategory[];
   }) {
-    const food = await this.repo.getFoodsByCondition({
+    const foods = await this.repo.getFoodsByCondition({
       keywords: param.keywords,
       categories: param.categories,
     });
 
-    const randomFood = getRandomItem(food);
-    return randomFood;
+    return getRandomItem(foods);
   }
 }

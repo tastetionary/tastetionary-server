@@ -24,9 +24,9 @@ export class FoodController {
    * @security bearer
    */
   @UseGuards(AuthGuard)
-  @TypedRoute.Post('/recommend')
+  @TypedRoute.Post('/recommendation')
   @HttpCode(200)
-  async getRecommendedFood(
+  async getRecommentation(
     @TypedBody() dto: FoodOption,
   ): Promise<BaseResponseDto<GetFoodOutput | null>> {
     const res = await this.service.getRecommendedFood({
@@ -43,9 +43,9 @@ export class FoodController {
    * @tag food
    * @summary get food recommentation
    */
-  @TypedRoute.Get('options')
+  @TypedRoute.Get('option')
   @HttpCode(200)
-  async getFoodOptions(): Promise<BaseResponseDto<FoodOption>> {
+  async getOption(): Promise<BaseResponseDto<FoodOption>> {
     const res = await this.service.getFoodOptions();
 
     return new BaseResponseDto({
