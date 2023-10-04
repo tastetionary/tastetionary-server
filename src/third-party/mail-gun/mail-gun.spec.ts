@@ -1,4 +1,4 @@
-import { sendEmail } from './mail-gun';
+import { sendEmail } from '@thirdParty/mail-gun/mail-gun';
 
 xdescribe('mail-gun, real', () => {
   it('should send email', async () => {
