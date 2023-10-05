@@ -11,21 +11,93 @@ import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
+  AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
+import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
 
-export interface registerRestaurantReviewInput {
+export interface RegisterRestaurantReviewInput {
+  /**
+   * review data
+   * @type RestaurantReviewDTO
+   */
   review: RestaurantReviewDTO;
+
+  /**
+   * external restaurant information for register
+   * @type ExternalRestaurantInformationDTO
+   */
   external: ExternalRestaurantInformationDTO;
 }
 
-@Controller('v1/restaurant/review')
+export interface GetRestaurantInput
+  extends Omit<RestaurantReviewDTO, 'summary'> {
+  /**
+   * already recommended restaurant ids, it will be ignored
+   * example: 10000
+   * @type number
+   */
+  excludeIds: number[];
+}
+
+export interface GetRestaurantsOutput
+  extends Omit<ExternalRestaurantInformationEntity, 'id' | 'externalUUID'> {
+  id: string;
+  externalUUID: string;
+  /**
+   * aggregate data from review, if not reviewed, it will be null
+   * @type AggregateReviewDTO
+   */
+  aggregateReviews: AggregateReviewDTO | null;
+}
+
+@Controller('v1/restaurant')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class RestaurantController {
   constructor(private service: RestaurantService) {}
+
+  /**
+   * @tag restaurant
+   * @summary get restaurants by condition
+   * @security bearer
+   */
+  @UseGuards(AuthGuard)
+  @HttpCode(200)
+  @TypedRoute.Post('/recommendation')
+  async getRestaurants(
+    @Request() req,
+    @TypedBody()
+    input: GetRestaurantInput,
+  ): Promise<BaseResponseDto<GetRestaurantsOutput | null>> {
+    const userId = req.user.userId;
+    const maxDistanceMeter = 1_000;
+
+    const data = (await this.service.getRecommendedRestaurant({
+      userId,
+      masDistanceMeter: maxDistanceMeter,
+      ltePrice: input.price,
+      keywords: input.keywords,
+      categories: [input.category],
+      excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
+    })) as {
+      restaurant: ExternalRestaurantInformationEntity;
+      aggregateReviews: AggregateReviewDTO;
+    };
+
+    // TODO use 204 code or create response that success but no data
+    if (data.restaurant === null) return new BaseResponseDto(null);
+
+    const { id, externalUUID, ...rest } = data.restaurant;
+    return new BaseResponseDto({
+      id: id.toString(),
+      externalUUID: externalUUID.toString(),
+      ...rest,
+      aggregateReviews: data.aggregateReviews,
+    });
+  }
 
   /**
    * @tag restaurant
@@ -34,11 +106,11 @@ export class RestaurantController {
    */
   @UseGuards(AuthGuard)
   @HttpCode(200)
-  @TypedRoute.Post('/')
+  @TypedRoute.Post('/review')
   async registerRestaurantReview(
     @Request() req,
     @TypedBody()
-    input: registerRestaurantReviewInput,
+    input: RegisterRestaurantReviewInput,
   ): Promise<BaseResponseDto<object>> {
     const userId = req.user.userId;
     await this.service.registerReview({

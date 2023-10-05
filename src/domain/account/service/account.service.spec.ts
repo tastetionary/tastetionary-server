@@ -26,7 +26,7 @@ describe('account service', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['accounts', 'user_tokens']);
+    await truncateTables(prisma, ['accounts', 'user_tokens', 'users']);
   });
 
   it('should delete token', async () => {
