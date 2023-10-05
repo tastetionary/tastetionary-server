@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "resolveJsonModule": true,
-    "esModuleInterop":true,
+    "esModuleInterop": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -34,6 +34,9 @@
       ],
       "@utils/*": [
         "src/utils/*"
+      ],
+      "@thirdParty/*": [
+        "src/third-party/*"
       ]
     },
     "plugins": [{
