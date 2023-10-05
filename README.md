@@ -38,7 +38,10 @@ npm run package:publish
 			"base_url": "http://localhost:3000",
 			"content_type_json": "{{$shared content_type_json}}"
 		},
-
+				"dev": {
+			"base_url": " http://175.45.201.100:8080",
+			"content_type_json": "{{$shared content_type_json}}"
+		},
 	}
 }
 ```

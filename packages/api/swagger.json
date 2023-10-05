@@ -141,7 +141,9 @@
     },
     "/v1/configuration": {
       "get": {
-        "tags": [],
+        "tags": [
+          "configuration"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -157,13 +159,43 @@
           }
         },
         "x-nestia-namespace": "v1.configuration.getServerConfig",
-        "x-nestia-jsDocTags": [],
+        "x-nestia-jsDocTags": [
+          {
+            "name": "TODO",
+            "text": [
+              {
+                "text": "add validation rule, only check for us",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "configuration",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get server configuration",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
         "x-nestia-method": "GET"
       }
     },
     "/v1/configuration/server-status": {
       "get": {
-        "tags": [],
+        "tags": [
+          "configuration"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -179,7 +211,26 @@
           }
         },
         "x-nestia-namespace": "v1.configuration.server-status.getServerStatus",
-        "x-nestia-jsDocTags": [],
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "configuration",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get server status",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
         "x-nestia-method": "GET"
       }
     },
@@ -306,7 +357,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/__type"
+                "$ref": "#/components/schemas/registerRestaurantReviewInput"
               }
             }
           },
@@ -366,7 +417,9 @@
     },
     "/v1/user": {
       "post": {
-        "tags": [],
+        "tags": [
+          "user"
+        ],
         "parameters": [],
         "requestBody": {
           "description": "",
@@ -394,30 +447,27 @@
           }
         },
         "x-nestia-namespace": "v1.user.registerAccount",
-        "x-nestia-jsDocTags": [],
-        "x-nestia-method": "POST"
-      }
-    },
-    "/v1/user/test": {
-      "get": {
-        "tags": [],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
-                }
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "user",
+                "kind": "text"
               }
-            },
-            "x-nestia-encrypted": false
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "register user",
+                "kind": "text"
+              }
+            ]
           }
-        },
-        "x-nestia-namespace": "v1.user.test.test",
-        "x-nestia-jsDocTags": [],
-        "x-nestia-method": "GET"
+        ],
+        "x-nestia-method": "POST"
       }
     }
   },
@@ -728,7 +778,7 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "__type": {
+      "registerRestaurantReviewInput": {
         "type": "object",
         "properties": {
           "review": {
