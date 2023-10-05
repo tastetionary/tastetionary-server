@@ -3,7 +3,7 @@ import { appModuleFixture } from '@root/jest.setup';
 import { FoodRepository } from './food.repository';
 import { FoodCategory, FoodKeyword } from '../food.enum';
 
-describe('Restaurant repository', () => {
+describe('Food repository', () => {
   let repo: FoodRepository;
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -16,7 +16,7 @@ describe('Restaurant repository', () => {
   it('should get food options', async () => {
     const res = await repo.getFoodOptions();
     const expected = {
-      category: [
+      categories: [
         '한식',
         '양식',
         '중식',
@@ -48,14 +48,14 @@ describe('Restaurant repository', () => {
   });
 
   it('should return foods by condition', async () => {
-    const category = [FoodCategory.KOREAN, FoodCategory.CHINESE];
+    const categories = [FoodCategory.KOREAN, FoodCategory.CHINESE];
     const keywords = [FoodKeyword.SPICY, FoodKeyword.GREASY];
 
-    const res = await repo.getFoodsByCondition({ category, keywords });
+    const res = await repo.getFoodsByCondition({ categories, keywords });
 
     const categoryResult = res.map((r) => r.category);
     const containsCategory = categoryResult.map((arr) =>
-      arr.some((c) => category.includes(c as FoodCategory)),
+      arr.some((c) => categories.includes(c as FoodCategory)),
     );
     expect(containsCategory.every((value) => value === true)).toBe(true);
 
