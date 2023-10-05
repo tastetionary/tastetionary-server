@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "ENV=dev" > .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "API_SERVER_PORT=${{ secrets.API_SERVER_PORT }}"" >> .env
+          echo "API_SERVER_PORT=${{ secrets.API_SERVER_PORT }}" >> .env
           echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCACCESS_TOKEN_SECRET }}" >> .env
           echo "ACCESS_TOKEN_EXPIRED_AT=${{ secrets.ACCESS_TOKEN_EXPIRED_AT }}" >> .env
           echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
