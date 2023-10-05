@@ -1,12 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
+  AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import {
+  RestaurantRepository,
+  RestaurantReviewEntity,
+} from '@domain/restaurant/repository/restaurant.repository';
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import * as fx from '@fxts/core';
+import { getRandomItem } from '@common/util';
 
 @Injectable()
 export class RestaurantService {
@@ -92,5 +99,105 @@ export class RestaurantService {
     return await this.repo.getExternalRestaurantInformation(
       BigInt(externalUUID),
     );
+  }
+
+  async getRecommendedRestaurant(
+    param: {
+      userId: number;
+      masDistanceMeter: number;
+      keywords: string[];
+      ltePrice: number;
+      categories: RestaurantCategory[];
+      excludeRestaurantIds: bigint[];
+    },
+    user?: EndUser,
+  ) {
+    const endUser = user ?? (await this.userService.getEndUser(param.userId));
+    if (!endUser.dinningArea) {
+      throw new ServiceException('no dinning area, should register first');
+    }
+
+    const restaurants = await this.repo.getExternalRestaurantIdsByDistance({
+      latitude: endUser.dinningArea.latitude,
+      longitude: endUser.dinningArea.longitude,
+      maxDistanceMeter: param.masDistanceMeter,
+      excludedIds: param.excludeRestaurantIds,
+    });
+
+    if (restaurants.length == 0) {
+      return { restaurant: null, aggregateReviews: null };
+    }
+
+    const ids = restaurants.map((r) => r.id);
+    const targetReviews = await this.repo.getReviewsByConditions({
+      restaurantIds: ids,
+      keywords: param.keywords,
+      ltePrice: param.ltePrice,
+      categories: param.categories,
+    });
+
+    if (targetReviews.length == 0) {
+      const randomRestaurant = getRandomItem(restaurants);
+      return { restaurant: randomRestaurant, aggregateReviews: null };
+    }
+
+    const { id, data } = this.aggregateRestaurantReview(targetReviews);
+    const targetRestaurant = restaurants.find((r) => r.id.toString() == id);
+
+    return {
+      restaurant: targetRestaurant,
+      aggregateReviews: data,
+    };
+  }
+
+  aggregateRestaurantReview(reviews: RestaurantReviewEntity[]) {
+    const groupedReview = fx.groupBy(
+      (r) => r.external_restaurant_information_id.toString(),
+      reviews,
+    );
+    const randomId = getRandomItem(Object.keys(groupedReview));
+    const randomReviews = groupedReview[randomId];
+
+    const data: AggregateReviewDTO = {
+      categories: [],
+      summaries: [],
+      opinions: [],
+      keywords: [],
+      prices: [],
+      aggregatePrice: {},
+      totalCount: randomReviews.length,
+    };
+    fx.pipe(
+      randomReviews,
+      fx.map((review) => {
+        data.categories.push(review.category);
+        data.summaries.push(review.summary);
+        data.opinions.push(review.opinion ?? '');
+        data.keywords.push(...review.keywords);
+        data.prices.push(review.price);
+        return data;
+      }),
+      fx.map((data) => {
+        data['aggregatePrice'] = this.aggregatePrice(data.prices);
+        return data;
+      }),
+      fx.toArray,
+    );
+    return { id: randomId, data };
+  }
+
+  aggregatePrice(prices: number[]) {
+    const data: { [index: string]: number } = {};
+
+    prices.forEach((price) => {
+      if (data[price.toString()]) {
+        data[price.toString()] += 1;
+      } else {
+        data[price.toString()] = 1;
+      }
+    });
+    const uniquePrices = [...new Set(prices)];
+    data['avg'] = fx.average(uniquePrices);
+    return data;
   }
 }
