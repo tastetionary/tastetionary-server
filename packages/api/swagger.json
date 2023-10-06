@@ -234,6 +234,118 @@
         "x-nestia-method": "GET"
       }
     },
+    "/v1/food/recommendation": {
+      "post": {
+        "tags": [
+          "food"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FoodOption"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetFoodOutput_space__or__space_null_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-nestia-namespace": "v1.food.recommendation.getRecommentation",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "food",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get food recommentation",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/food/option": {
+      "get": {
+        "tags": [
+          "food"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_FoodOption_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.food.option.getOption",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "food",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get food recommentation",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "GET"
+      }
+    },
     "/v1/restaurant/recommendation": {
       "post": {
         "tags": [
@@ -596,6 +708,142 @@
         "required": [
           "serverTime",
           "version"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "FoodOption": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "description": "food category,\nexample: [\"한식\"]",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "FoodCategory[]",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FoodCategory"
+            }
+          },
+          "keywords": {
+            "description": "food keywords\nexample: [\"깨끗해요\"]",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "FoodKeyword[]",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FoodKeyword"
+            }
+          }
+        },
+        "nullable": false,
+        "required": [
+          "categories",
+          "keywords"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "FoodCategory": {
+        "type": "string",
+        "enum": [
+          "한식",
+          "양식",
+          "중식",
+          "일식",
+          "분식",
+          "아시아 음식",
+          "뷔페",
+          "기타",
+          "패스트푸드",
+          "카페/디저트"
+        ]
+      },
+      "FoodKeyword": {
+        "type": "string",
+        "enum": [
+          "매콤한",
+          "고소한",
+          "가벼운",
+          "국물이 진한",
+          "차가운",
+          "해장에 제격",
+          "깔끔한",
+          "따뜻한",
+          "풍미가 진한",
+          "느끼한",
+          "달콤한",
+          "상큼한"
+        ]
+      },
+      "BaseResponseDto_lt_GetFoodOutput_space__or__space_null_gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/GetFoodOutput.Nullable"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "GetFoodOutput.Nullable": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "recommended food\nexample: \"김치찌개\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          }
+        },
+        "nullable": true,
+        "required": [
+          "name"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "BaseResponseDto_lt_FoodOption_gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FoodOption"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
         ],
         "x-typia-jsDocTags": []
       },
