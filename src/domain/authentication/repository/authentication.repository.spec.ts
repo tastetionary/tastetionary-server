@@ -3,6 +3,11 @@ import { PrismaService } from '@common/database/prisma.service';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { TestingModule } from '@nestjs/testing';
 import { AuthenticationRepository } from '@domain/authentication/repository/authentication.repository';
+import {
+  AuthenticationCategory,
+  AuthenticationState,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
 
 describe('authentication', () => {
   let repo: AuthenticationRepository;
@@ -27,24 +32,27 @@ describe('authentication', () => {
     const data = {
       userId: 1,
       identification: 'identification',
-      category: 'category',
-      type: 'type',
-      state: 'inProgress',
+      category: AuthenticationCategory.COMPANY,
+      type: AuthenticationType.EMAIL,
+      state: AuthenticationState.INPROGRESS,
     };
     await repo.saveAuthentication(data);
 
     let res = await repo.getAuthenticationByUserId(data.userId);
-    await repo.updateAuthentication({ id: res[0].id, state: 'done' });
+    await repo.updateAuthentication({
+      id: res[0].id,
+      state: AuthenticationState.DONE,
+    });
 
     res = await repo.getAuthenticationByUserId(data.userId);
-    expect(res[0].state).toEqual('done');
+    expect(res[0].state).toEqual(AuthenticationState.DONE);
   });
 
   it('should create authentication history ', async () => {
     const data = {
       userId: 1,
       identification: 'identification',
-      type: 'type',
+      type: AuthenticationType.EMAIL,
       code: '123',
       expiredAt: new Date(),
     };
@@ -54,15 +62,16 @@ describe('authentication', () => {
       data.type,
     );
     expect(res.length).toEqual(1);
+    expect(res[0].type).toEqual(AuthenticationType.EMAIL);
   });
 
   it('should create authentication ', async () => {
     const data = {
       userId: 1,
       identification: 'identification',
-      category: 'category',
-      type: 'type',
-      state: 'state',
+      category: AuthenticationCategory.COMPANY,
+      type: AuthenticationType.EMAIL,
+      state: AuthenticationState.INPROGRESS,
     };
     await repo.saveAuthentication(data);
     const res = await repo.getAuthenticationByUserId(data.userId);
