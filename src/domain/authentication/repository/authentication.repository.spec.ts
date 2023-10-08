@@ -17,10 +17,46 @@ describe('authentication', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['authentications']);
+    await truncateTables(prisma, [
+      'authentications',
+      'authentication_histories',
+    ]);
   });
 
-  it('should save data ', async () => {
+  it('should update authentication', async () => {
+    const data = {
+      userId: 1,
+      identification: 'identification',
+      category: 'category',
+      type: 'type',
+      state: 'inProgress',
+    };
+    await repo.saveAuthentication(data);
+
+    let res = await repo.getAuthenticationByUserId(data.userId);
+    await repo.updateAuthentication({ id: res[0].id, state: 'done' });
+
+    res = await repo.getAuthenticationByUserId(data.userId);
+    expect(res[0].state).toEqual('done');
+  });
+
+  it('should create authentication history ', async () => {
+    const data = {
+      userId: 1,
+      identification: 'identification',
+      type: 'type',
+      code: '123',
+      expiredAt: new Date(),
+    };
+    await repo.saveAuthenticationHistory(data);
+    const res = await repo.getAuthenticationHistoryByUserId(
+      data.userId,
+      data.type,
+    );
+    expect(res.length).toEqual(1);
+  });
+
+  it('should create authentication ', async () => {
     const data = {
       userId: 1,
       identification: 'identification',
