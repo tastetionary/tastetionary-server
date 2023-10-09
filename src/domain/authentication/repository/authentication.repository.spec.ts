@@ -49,12 +49,14 @@ describe('authentication', () => {
   });
 
   it('should create authentication history ', async () => {
+    const expiredAt = new Date();
+    expiredAt.setSeconds(expiredAt.getSeconds() + 180);
     const data = {
       userId: 1,
       identification: 'identification',
       type: AuthenticationType.EMAIL,
       code: '123',
-      expiredAt: new Date(),
+      expiredAt: expiredAt,
     };
     await repo.saveAuthenticationHistory(data);
     const res = await repo.getAuthenticationHistoryByUserId(

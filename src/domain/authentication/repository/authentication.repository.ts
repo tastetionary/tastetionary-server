@@ -6,6 +6,28 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 
+export interface AuthenticationHistoryEntity {
+  id: number;
+  userId: number;
+  identification: string;
+  type: AuthenticationType;
+  code: string;
+  expiredAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface AuthenticationEntity {
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+  state: AuthenticationState;
+  id: number;
+  userId: number;
+  identification: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 @Injectable()
 export class AuthenticationRepository {
   constructor(private prisma: PrismaService) {}
@@ -45,8 +67,11 @@ export class AuthenticationRepository {
       },
     });
   }
+
   // TODO change mapping way about enum ..
-  async getAuthenticationByUserId(userId: number) {
+  async getAuthenticationByUserId(
+    userId: number,
+  ): Promise<AuthenticationEntity[]> {
     const records = await this.prisma.authentications.findMany({
       where: { userId },
     });
@@ -63,7 +88,9 @@ export class AuthenticationRepository {
     });
   }
 
-  async getHistoryById(id: number) {
+  async getHistoryById(
+    id: number,
+  ): Promise<AuthenticationHistoryEntity | null> {
     const record = await this.prisma.authenticationHistories.findUnique({
       where: { id },
     });
@@ -81,7 +108,7 @@ export class AuthenticationRepository {
     userId: number,
     type: AuthenticationType,
     gteExpiredAt?: Date,
-  ) {
+  ): Promise<AuthenticationHistoryEntity[]> {
     const records = await this.prisma.authenticationHistories.findMany({
       where: {
         userId,
@@ -91,7 +118,7 @@ export class AuthenticationRepository {
         },
       },
     });
-
+    console.log(records);
     return records.map((record) => {
       const { type, ...rest } = record;
       return {
