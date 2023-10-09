@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
 import { Prisma } from '@prisma/client';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantKeyword,
+  RestaurantPrice,
+} from '@domain/restaurant/restaurant.enum';
 
 export interface RestaurantReviewEntity {
   id: number;
@@ -31,6 +35,11 @@ export interface ExternalRestaurantInformationEntity {
 @Injectable()
 export class RestaurantRepository {
   constructor(private prisma: PrismaService) {}
+  private readonly options = {
+    categories: Object.values(RestaurantCategory),
+    keywords: Object.values(RestaurantKeyword),
+    prices: Object.values(RestaurantPrice),
+  };
 
   async saveReview(param: {
     userId: number;
@@ -179,5 +188,9 @@ export class RestaurantRepository {
     }), ${param.maxDistanceMeter})`;
 
     return await this.prisma.$queryRaw(queryRaw);
+  }
+
+  async getRestaurantOptions() {
+    return this.options;
   }
 }
