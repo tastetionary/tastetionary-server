@@ -21,4 +21,14 @@ export class UserAuth {
     }
     return record.state === AuthenticationState.INPROGRESS;
   }
+
+  isDone(type = AuthenticationType.EMAIL) {
+    const record = this.authentications.find(
+      (history) => history.type === type,
+    );
+    if (!record) {
+      return false;
+    }
+    return record.state === AuthenticationState.DONE;
+  }
 }

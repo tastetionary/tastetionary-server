@@ -39,7 +39,7 @@ export class AuthenticationRepository {
     type: AuthenticationType;
     state: AuthenticationState;
   }) {
-    await this.prisma.authentications.create({
+    return await this.prisma.authentications.create({
       data: {
         userId: param.userId,
         identification: param.identification,
@@ -68,13 +68,18 @@ export class AuthenticationRepository {
     });
   }
 
-  // TODO change mapping way about enum ..
-  async getAuthenticationByUserId(
-    userId: number,
-  ): Promise<AuthenticationEntity[]> {
-    const records = await this.prisma.authentications.findMany({
-      where: { userId },
-    });
+  transformAuthentications(
+    records: {
+      id: number;
+      userId: number;
+      identification: string;
+      category: string;
+      type: string;
+      state: string;
+      createdAt: Date;
+      updatedAt: Date;
+    }[],
+  ): AuthenticationEntity[] {
     return records.map((record) => {
       const { category, type, state, ...rest } = record;
       return {
@@ -86,6 +91,27 @@ export class AuthenticationRepository {
         state: AuthenticationState[state.toUpperCase()] as AuthenticationState,
       };
     });
+  }
+
+  async getAuthenticationByIdentification(
+    identification: string,
+    type: AuthenticationType,
+  ): Promise<AuthenticationEntity | null> {
+    const record = await this.prisma.authentications.findFirst({
+      where: { type, identification },
+    });
+    if (!record) return null;
+
+    return this.transformAuthentications([record])[0];
+  }
+
+  async getAuthenticationByUserId(
+    userId: number,
+  ): Promise<AuthenticationEntity[]> {
+    const records = await this.prisma.authentications.findMany({
+      where: { userId },
+    });
+    return this.transformAuthentications(records);
   }
 
   async getHistoryById(
