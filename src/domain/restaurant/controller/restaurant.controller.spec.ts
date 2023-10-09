@@ -4,7 +4,11 @@ import { INestApplication } from '@nestjs/common';
 import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantKeyword,
+  RestaurantPrice,
+} from '@domain/restaurant/restaurant.enum';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
@@ -101,6 +105,21 @@ describe('restaurant controller', () => {
       .post('/v1/restaurant/review')
       .set('Authorization', `Bearer ${token}`)
       .send(REVIEW_INPUT);
+
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('/option, should return 200', async () => {
+    jest.spyOn(service, 'getRestaurantOptions').mockImplementation(async () => {
+      return {
+        categories: [RestaurantCategory.ASIAN],
+        keywords: [RestaurantKeyword.ATMOSPHERE],
+        prices: [RestaurantPrice.OVER_13000],
+      };
+    });
+    const res = await request(app.getHttpServer())
+      .get('/v1/restaurant/option')
+      .send();
 
     expect(res.statusCode).toEqual(200);
   });
