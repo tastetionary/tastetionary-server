@@ -35,7 +35,7 @@ export class AuthenticationRepository {
     code: string;
     expiredAt: Date;
   }) {
-    await this.prisma.authenticationHistories.create({
+    return await this.prisma.authenticationHistories.create({
       data: {
         userId: param.userId,
         identification: param.identification,
@@ -63,9 +63,33 @@ export class AuthenticationRepository {
     });
   }
 
-  async getAuthenticationHistoryByUserId(userId: number, type: string) {
+  async getHistoryById(id: number) {
+    const record = await this.prisma.authenticationHistories.findUnique({
+      where: { id },
+    });
+    if (!record) {
+      return null;
+    }
+    const { type, ...rest } = record;
+    return {
+      ...rest,
+      type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
+    };
+  }
+
+  async getAuthenticationHistoryByUserId(
+    userId: number,
+    type: AuthenticationType,
+    gteExpiredAt?: Date,
+  ) {
     const records = await this.prisma.authenticationHistories.findMany({
-      where: { userId, type },
+      where: {
+        userId,
+        type,
+        expiredAt: {
+          gte: gteExpiredAt ?? new Date(),
+        },
+      },
     });
 
     return records.map((record) => {

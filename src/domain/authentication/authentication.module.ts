@@ -4,6 +4,7 @@ import { ConfigurationService } from '@domain/configuration/configuration.servic
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticationController } from '@domain/authentication/controller/authentication.controller';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
+import { AuthenticationRepository } from './repository/authentication.repository';
 
 @Module({
   controllers: [AuthenticationController],
@@ -12,6 +13,7 @@ import { AuthenticationService } from '@domain/authentication/service/authentica
     ConfigurationService,
     PrismaService,
     AuthenticationService,
+    AuthenticationRepository,
   ],
   exports: [],
 })
