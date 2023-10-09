@@ -229,4 +229,13 @@ describe('restaurant service', () => {
       expect(res).toHaveLength(1);
     });
   });
+
+  describe('option', () => {
+    it('should get restaurant option', async () => {
+      const res = await service.getRestaurantOptions();
+      expect(res).toHaveProperty('categories');
+      expect(res).toHaveProperty('keywords');
+      expect(res).toHaveProperty('prices');
+    });
+  });
 });
