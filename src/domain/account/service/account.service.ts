@@ -57,10 +57,11 @@ export class AccountService {
   }
 
   private makeTokens(payload: { userId: number }) {
+    const tempSeconds = 86400000;
     const accessTokenExpiredAt =
-      this.configService.getTokenData().accessTokenExpiredAt;
+      this.configService.getTokenData().accessTokenExpiredAt + tempSeconds;
     const refreshTokenExpiredAt =
-      this.configService.getTokenData().refreshTokenExpiredAt;
+      this.configService.getTokenData().refreshTokenExpiredAt + tempSeconds;
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.getTokenData().accessTokenSecret,
@@ -73,9 +74,9 @@ export class AccountService {
     const data = {
       accessToken: accessToken,
       refreshToken: refreshToken,
-      accessTokenExpiredAt: add(new Date(), { seconds: 86400000 }),
+      accessTokenExpiredAt: add(new Date(), { seconds: accessTokenExpiredAt }),
       refreshTokenExpiredAt: add(new Date(), {
-        seconds: 86400000,
+        seconds: refreshTokenExpiredAt,
       }),
     };
     return data;
