@@ -27,3 +27,17 @@ export enum FoodKeyword {
   GREASY = '느끼한',
   FLAVORFUL = '풍미가 있는',
 }
+
+export const FoodCategoryIcons: Record<FoodCategory, string> = {
+  [FoodCategory.ALL]: 'menu_all',
+  [FoodCategory.KOREAN]: 'menu_korean',
+  [FoodCategory.CHINESE]: 'menu_chinese',
+  [FoodCategory.WESTERN]: 'menu_western',
+  [FoodCategory.JAPANESE]: 'menu_japanese',
+  [FoodCategory.FAST_FOOD]: 'menu_fastfood',
+  [FoodCategory.SNACK]: 'menu_snack',
+  [FoodCategory.ASIAN]: 'menu_asian',
+  [FoodCategory.BUFFET]: 'menu_buffet',
+  [FoodCategory.SALAD]: 'menu_salad',
+  [FoodCategory.CAFE_AND_DESERT]: 'menu_cafedessert',
+};
