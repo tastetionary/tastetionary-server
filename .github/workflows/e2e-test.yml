@@ -36,7 +36,7 @@ jobs:
       
       - name: Change Env variables
         run: |
-          echo DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/taste\" > .env
+          cp .env.sample .env
 
       - name: Install dependencies
         run: |
