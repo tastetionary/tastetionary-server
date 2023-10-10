@@ -32,4 +32,13 @@ export class ConfigurationService {
       refreshTokenExpiredAt: this.configService.get('REFRESH_TOKEN_EXPIRED_AT'),
     };
   }
+
+  getMailGunConfig() {
+    return {
+      apiKey: this.configService.get('mailGunApiKey'),
+      domain: this.configService.get('mailGunDomain'),
+      fromEmail: this.configService.get('mailGunFromEmail'),
+      fromTitle: this.configService.get('mailGunFromTitle'),
+    };
+  }
 }

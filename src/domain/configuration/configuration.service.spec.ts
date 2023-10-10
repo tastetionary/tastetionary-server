@@ -1,15 +1,17 @@
 import { TestingModule } from '@nestjs/testing';
 import { appServiceFixture } from '@root/jest.setup';
-import { ConfigurationService as cfgService } from '@root/src/domain/configuration/configuration.service';
+import { ConfigurationService as cfgService } from '@domain/configuration/configuration.service';
 
 describe('configuration service', () => {
   let service: cfgService;
   beforeAll(async () => {
-    const module = (await appServiceFixture(
-      [cfgService],
-      'test',
-    )) as TestingModule;
+    const module = (await appServiceFixture([cfgService])) as TestingModule;
     service = module.get<cfgService>(cfgService);
+  });
+
+  it('should return mail env', () => {
+    const data = service.getMailGunConfig();
+    expect(data).not.toBeNull();
   });
 
   it('should return meta property', () => {
