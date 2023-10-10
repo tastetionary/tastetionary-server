@@ -58,7 +58,7 @@ export class AccountService {
 
   private makeTokens(payload: { userId: number }) {
     // NOTE delete after arranging token
-    const tempSeconds = 864000000;
+    const tempSeconds = 1000000;
     const accessTokenExpiredAt =
       this.configService.getTokenData().accessTokenExpiredAt + tempSeconds;
     const refreshTokenExpiredAt =
