@@ -10,7 +10,11 @@ import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { FoodService } from '@domain/food/service/food.service';
-import { FoodOption, GetFoodOutput } from '@domain/food/dto/food.dto';
+import {
+  FoodOption,
+  GetFoodFilterOption,
+  GetFoodOutput,
+} from '@domain/food/dto/food.dto';
 
 @Controller('v1/food')
 @UseFilters(new HttpExceptionFilter())
@@ -49,7 +53,7 @@ export class FoodController {
    */
   @TypedRoute.Get('option')
   @HttpCode(200)
-  async getOption(): Promise<BaseResponseDto<FoodOption>> {
+  async getOption(): Promise<BaseResponseDto<GetFoodFilterOption>> {
     const res = await this.service.getFoodOptions();
 
     return new BaseResponseDto({

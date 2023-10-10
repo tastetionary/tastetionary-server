@@ -17,32 +17,115 @@ describe('Food repository', () => {
     const res = await repo.getFoodOptions();
     const expected = {
       categories: [
-        '전체',
-        '한식',
-        '중식',
-        '양식',
-        '일식',
-        '패스트푸드',
-        '분식',
-        '아시아식',
-        '뷔페',
-        '샐러드',
-        '카페/디저트',
+        {
+          id: 0,
+          name: '전체',
+          icon: 'menu_all',
+        },
+        {
+          id: 1,
+          name: '한식',
+          icon: 'menu_korean',
+        },
+        {
+          id: 2,
+          name: '중식',
+          icon: 'menu_chinese',
+        },
+        {
+          id: 3,
+          name: '양식',
+          icon: 'menu_western',
+        },
+        {
+          id: 4,
+          name: '일식',
+          icon: 'menu_japanese',
+        },
+        {
+          id: 5,
+          name: '패스트푸드',
+          icon: 'menu_fastfood',
+        },
+        {
+          id: 6,
+          name: '분식',
+          icon: 'menu_snack',
+        },
+        {
+          id: 7,
+          name: '아시아식',
+          icon: 'menu_asian',
+        },
+        {
+          id: 8,
+          name: '뷔페',
+          icon: 'menu_buffet',
+        },
+        {
+          id: 9,
+          name: '샐러드',
+          icon: 'menu_salad',
+        },
+        {
+          id: 10,
+          name: '카페/디저트',
+          icon: 'menu_cafedessert',
+        },
       ],
       keywords: [
-        '전체',
-        '매콤한',
-        '고소한',
-        '가벼운',
-        '차가운',
-        '국물이 진한',
-        '깔끔한',
-        '따뜻한',
-        '달콤한',
-        '상큼한',
-        '해장에 제격',
-        '느끼한',
-        '풍미가 있는',
+        {
+          id: 0,
+          name: '전체',
+        },
+        {
+          id: 1,
+          name: '매콤한',
+        },
+        {
+          id: 2,
+          name: '고소한',
+        },
+        {
+          id: 3,
+          name: '가벼운',
+        },
+        {
+          id: 4,
+          name: '차가운',
+        },
+        {
+          id: 5,
+          name: '국물이 진한',
+        },
+        {
+          id: 6,
+          name: '깔끔한',
+        },
+        {
+          id: 7,
+          name: '따뜻한',
+        },
+        {
+          id: 8,
+          name: '달콤한',
+        },
+        {
+          id: 9,
+          name: '상큼한',
+        },
+        {
+          id: 10,
+          name: '해장에 제격',
+        },
+        {
+          id: 11,
+          name: '느끼한',
+        },
+        {
+          id: 12,
+          name: '풍미가 있는',
+        },
       ],
     };
 

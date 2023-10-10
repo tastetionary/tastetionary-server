@@ -31,3 +31,17 @@ export enum RestaurantPrice {
   UNDER_13000 = '~13,000원',
   OVER_13000 = '13,000원~',
 }
+
+export const RestaurantCategoryIcons: Record<RestaurantCategory, string> = {
+  [RestaurantCategory.ALL]: 'menu_all',
+  [RestaurantCategory.KOREAN]: 'menu_korean',
+  [RestaurantCategory.CHINESE]: 'menu_chinese',
+  [RestaurantCategory.WESTERN]: 'menu_western',
+  [RestaurantCategory.JAPANESE]: 'menu_japanese',
+  [RestaurantCategory.FAST_FOOD]: 'menu_fastfood',
+  [RestaurantCategory.SNACK]: 'menu_snack',
+  [RestaurantCategory.ASIAN]: 'menu_asian',
+  [RestaurantCategory.BUFFET]: 'menu_buffet',
+  [RestaurantCategory.SALAD]: 'menu_salad',
+  [RestaurantCategory.CAFE_AND_DESERT]: 'menu_cafedessert',
+};

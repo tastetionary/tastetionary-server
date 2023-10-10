@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
+import {
+  FoodCategory,
+  FoodCategoryIcons,
+  FoodKeyword,
+} from '@domain/food/food.enum';
 import * as foodSource from '@domain/food/resource/food.json';
 
 @Injectable()
@@ -10,7 +14,25 @@ export class FoodRepository {
   };
 
   async getFoodOptions() {
-    return this.options;
+    const categories = this.options.categories.map((category, index) => {
+      return {
+        id: index,
+        name: category,
+        icon: FoodCategoryIcons[category],
+      };
+    });
+
+    const keywords = this.options.keywords.map((keyword, index) => {
+      return {
+        id: index,
+        name: keyword,
+      };
+    });
+
+    return {
+      categories,
+      keywords,
+    };
   }
 
   async getFoodsByCondition(param: {

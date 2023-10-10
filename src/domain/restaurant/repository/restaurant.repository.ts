@@ -5,6 +5,7 @@ import {
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantPrice,
+  RestaurantCategoryIcons,
 } from '@domain/restaurant/restaurant.enum';
 
 export interface RestaurantReviewEntity {
@@ -191,6 +192,32 @@ export class RestaurantRepository {
   }
 
   async getRestaurantOptions() {
-    return this.options;
+    const categories = this.options.categories.map((category, index) => {
+      return {
+        id: index,
+        name: category,
+        icon: RestaurantCategoryIcons[category],
+      };
+    });
+
+    const keywords = this.options.keywords.map((keyword, index) => {
+      return {
+        id: index,
+        name: keyword,
+      };
+    });
+
+    const prices = this.options.prices.map((price, index) => {
+      return {
+        id: index,
+        name: price,
+      };
+    });
+
+    return {
+      categories,
+      keywords,
+      prices,
+    };
   }
 }

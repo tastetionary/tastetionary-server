@@ -16,6 +16,61 @@ export interface FoodOption {
   keywords: FoodKeyword[];
 }
 
+export interface FoodCategoryOption {
+  /**
+   * food category id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * food category keyword
+   * example: "한식"
+   * @type FoodCategory
+   */
+  name: FoodCategory;
+
+  /**
+   * category icon
+   * example: "menu_korean"
+   * @type string
+   */
+  icon: string;
+}
+
+export interface FoodKeywordOption {
+  /**
+   * food keyword id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * food keyword
+   * example: "매콤한"
+   * @type FoodKeyword
+   */
+  name: FoodKeyword;
+}
+
+export interface GetFoodFilterOption {
+  /**
+   * food categories
+   * example: [{id: 0, name: "한식", icon: "menu_korean"}]
+   * @type FoodCategoryOption[]
+   */
+  categories: FoodCategoryOption[];
+
+  /**
+   * food keywords
+   * example: [{id: 0, name: "매콤한"}]
+   * @type FoodKeywordOption[]
+   */
+  keywords: FoodKeywordOption[];
+}
+
 export interface GetFoodOutput {
   /**
    * recommended food
