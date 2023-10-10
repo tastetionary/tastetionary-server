@@ -11,7 +11,6 @@ let appModuleFixture: CallableFunction;
 beforeAll(async () => {
   appServiceFixture = async (
     providers: Provider<any>[],
-    env = 'test',
   ): Promise<TestingModule> => {
     return await Test.createTestingModule({
       providers: providers,
@@ -19,7 +18,6 @@ beforeAll(async () => {
         ConfigModule.forRoot({
           cache: true,
           isGlobal: true,
-          envFilePath: `.env.${env}`,
           validate,
         }),
       ],
@@ -30,7 +28,6 @@ beforeAll(async () => {
     controllers: any[],
     providers: Provider<any>[],
     importers: any[] = [],
-    env = 'test',
   ): Promise<TestingModule> => {
     return await Test.createTestingModule({
       controllers,
@@ -40,7 +37,6 @@ beforeAll(async () => {
         ConfigModule.forRoot({
           cache: true,
           isGlobal: true,
-          envFilePath: `.env.${env}`,
           validate,
         }),
       ],
