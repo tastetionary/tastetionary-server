@@ -73,9 +73,9 @@ export class AccountService {
     const data = {
       accessToken: accessToken,
       refreshToken: refreshToken,
-      accessTokenExpiredAt: add(new Date(), { seconds: 86400000 }),
+      accessTokenExpiredAt: add(new Date(), { seconds: accessTokenExpiredAt }),
       refreshTokenExpiredAt: add(new Date(), {
-        seconds: 86400000,
+        seconds: refreshTokenExpiredAt,
       }),
     };
     return data;
