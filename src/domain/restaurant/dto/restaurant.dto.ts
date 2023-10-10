@@ -80,25 +80,80 @@ export interface AggregateReviewDTO {
   totalCount: number;
 }
 
-export interface RestaurantOption {
+export interface RestaurantCategoryOption {
   /**
-   * restaurant category,
-   * example: ["한식"]
-   * @type RestaurantCategory[]
+   * food category id
+   * example: 0
+   * @type number
    */
-  categories: RestaurantCategory[];
+  id: number;
+
+  /**
+   * food category keyword
+   * example: "한식"
+   * @type RestaurantCategory
+   */
+  name: RestaurantCategory;
+
+  /**
+   * category icon
+   * example: "menu_korean"
+   * @type string
+   */
+  icon: string;
+}
+
+export interface RestaurantKeywordOption {
+  /**
+   * food keyword id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * food keyword
+   * example: "깨끗해요"
+   * @type RestaurantKeyword
+   */
+  name: RestaurantKeyword;
+}
+
+export interface RestaurantPriceOption {
+  /**
+   * food price id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * food price
+   * example: "~10,000원"
+   * @type RestaurantPrice
+   */
+  name: RestaurantPrice;
+}
+
+export interface GetRestaurantFilterOption {
+  /**
+   * restaurant categories
+   * example: [{id: 0, name: "한식", icon: "menu_korean"}]
+   * @type RestaurantCategoryOption[]
+   */
+  categories: RestaurantCategoryOption[];
 
   /**
    * restaurant keywords
-   * example: ["깨끗해요"]
-   * @type RestaurantKeyword[]
+   * example: [{id: 0, name: "깨끗해요"}]
+   * @type RestaurantKeywordOption[]
    */
-  keywords: RestaurantKeyword[];
+  keywords: RestaurantKeywordOption[];
 
   /**
-   * restaurant price
-   * example: ["~10,000원"]
-   * @type RestaurantPrice[]
+   * restaurant prices
+   * example: [{id: 0, name: "~10,000원"}]
+   * @type RestaurantPriceOption[]
    */
-  prices: RestaurantPrice[];
+  prices: RestaurantPriceOption[];
 }

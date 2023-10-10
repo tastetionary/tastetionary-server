@@ -13,7 +13,7 @@ import { AuthGuard } from '@common/auth/auth.guard';
 import {
   AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
-  RestaurantOption,
+  GetRestaurantFilterOption,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
@@ -128,7 +128,7 @@ export class RestaurantController {
    */
   @TypedRoute.Get('option')
   @HttpCode(200)
-  async getOption(): Promise<BaseResponseDto<RestaurantOption>> {
+  async getOption(): Promise<BaseResponseDto<GetRestaurantFilterOption>> {
     const res = await this.service.getRestaurantOptions();
 
     return new BaseResponseDto({

@@ -315,7 +315,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetFoodOptionOutput_gt_"
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetFoodFilterOption_gt_"
                 }
               }
             },
@@ -496,7 +496,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_RestaurantOption_gt_"
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetRestaurantFilterOption_gt_"
                 }
               }
             },
@@ -879,11 +879,11 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "BaseResponseDto_lt_GetFoodOptionOutput_gt_": {
+      "BaseResponseDto_lt_GetFoodFilterOption_gt_": {
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/GetFoodOptionOutput"
+            "$ref": "#/components/schemas/GetFoodFilterOption"
           }
         },
         "nullable": false,
@@ -892,7 +892,7 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "GetFoodOptionOutput": {
+      "GetFoodFilterOption": {
         "type": "object",
         "properties": {
           "categories": {
@@ -1508,11 +1508,11 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "BaseResponseDto_lt_RestaurantOption_gt_": {
+      "BaseResponseDto_lt_GetRestaurantFilterOption_gt_": {
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/RestaurantOption"
+            "$ref": "#/components/schemas/GetRestaurantFilterOption"
           }
         },
         "nullable": false,
@@ -1521,17 +1521,17 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "RestaurantOption": {
+      "GetRestaurantFilterOption": {
         "type": "object",
         "properties": {
           "categories": {
-            "description": "restaurant category,\nexample: [\"한식\"]",
+            "description": "restaurant categories\nexample: [{id: 0, name: \"한식\", icon: \"menu_korean\"}]",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
                 "text": [
                   {
-                    "text": "RestaurantCategory[]",
+                    "text": "RestaurantCategoryOption[]",
                     "kind": "text"
                   }
                 ]
@@ -1541,17 +1541,17 @@
             "x-typia-optional": false,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RestaurantCategory"
+              "$ref": "#/components/schemas/RestaurantCategoryOption"
             }
           },
           "keywords": {
-            "description": "restaurant keywords\nexample: [\"깨끗해요\"]",
+            "description": "restaurant keywords\nexample: [{id: 0, name: \"깨끗해요\"}]",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
                 "text": [
                   {
-                    "text": "RestaurantKeyword[]",
+                    "text": "RestaurantKeywordOption[]",
                     "kind": "text"
                   }
                 ]
@@ -1561,17 +1561,17 @@
             "x-typia-optional": false,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RestaurantKeyword"
+              "$ref": "#/components/schemas/RestaurantKeywordOption"
             }
           },
           "prices": {
-            "description": "restaurant price\nexample: [\"~10,000원\"]",
+            "description": "restaurant prices\nexample: [{id: 0, name: \"~10,000원\"}]",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
                 "text": [
                   {
-                    "text": "RestaurantPrice[]",
+                    "text": "RestaurantPriceOption[]",
                     "kind": "text"
                   }
                 ]
@@ -1581,7 +1581,7 @@
             "x-typia-optional": false,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RestaurantPrice"
+              "$ref": "#/components/schemas/RestaurantPriceOption"
             }
           }
         },
@@ -1590,6 +1590,86 @@
           "categories",
           "keywords",
           "prices"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "RestaurantCategoryOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "food category id\nexample: 0",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "name": {
+            "$ref": "#/components/schemas/RestaurantCategory"
+          },
+          "icon": {
+            "description": "category icon\nexample: \"menu_korean\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "name",
+          "icon"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "RestaurantKeywordOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "food keyword id\nexample: 0",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "name": {
+            "$ref": "#/components/schemas/RestaurantKeyword"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "name"
         ],
         "x-typia-jsDocTags": []
       },
@@ -1606,6 +1686,37 @@
           "양이 많아요",
           "넓고 쾌적해요"
         ]
+      },
+      "RestaurantPriceOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "food price id\nexample: 0",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "name": {
+            "$ref": "#/components/schemas/RestaurantPrice"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "x-typia-jsDocTags": []
       },
       "RestaurantPrice": {
         "type": "string",

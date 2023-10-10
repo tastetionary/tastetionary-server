@@ -112,9 +112,25 @@ describe('restaurant controller', () => {
   it('/option, should return 200', async () => {
     jest.spyOn(service, 'getRestaurantOptions').mockImplementation(async () => {
       return {
-        categories: [RestaurantCategory.ASIAN],
-        keywords: [RestaurantKeyword.ATMOSPHERE],
-        prices: [RestaurantPrice.OVER_13000],
+        categories: [
+          {
+            id: 1,
+            name: RestaurantCategory.ASIAN,
+            icon: 'icon',
+          },
+        ],
+        keywords: [
+          {
+            id: 1,
+            name: RestaurantKeyword.ATMOSPHERE,
+          },
+        ],
+        prices: [
+          {
+            id: 1,
+            name: RestaurantPrice.OVER_13000,
+          },
+        ],
       };
     });
     const res = await request(app.getHttpServer())
