@@ -25,6 +25,7 @@ export function validate(config: Record<string, unknown>) {
   });
 
   if (errors.length > 0) {
+    console.log(config);
     throw new Error(
       `fail setting config, check env and EnvironmentVariables, desc: ${errors.toString()}`,
     );
