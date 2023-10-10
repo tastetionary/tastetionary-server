@@ -200,4 +200,8 @@ export class RestaurantService {
     data['avg'] = fx.average(uniquePrices);
     return data;
   }
+
+  async getRestaurantOptions() {
+    return await this.repo.getRestaurantOptions();
+  }
 }

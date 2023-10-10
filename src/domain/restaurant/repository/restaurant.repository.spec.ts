@@ -175,4 +175,37 @@ describe('Restaurant repository', () => {
     const res = await repo.getReviewsByUserId(data[0].userId);
     expect(res).toHaveLength(1);
   });
+
+  it('should get restaurant options', async () => {
+    const res = await repo.getRestaurantOptions();
+    const expected = {
+      categories: [
+        '전체',
+        '한식',
+        '중식',
+        '양식',
+        '일식',
+        '패스트푸드',
+        '분식',
+        '아시아식',
+        '뷔페',
+        '샐러드',
+        '카페/디저트',
+      ],
+      keywords: [
+        '전체',
+        '깨끗해요',
+        '친절해요',
+        '분위기 좋아요',
+        '가성비 좋아요',
+        '주차 가능해요',
+        '회전율 좋아요',
+        '양이 많아요',
+        '넓고 쾌적해요',
+      ],
+      prices: ['~10,000원', '~11,000원', '~12,000원', '~13,000원', '13,000원~'],
+    };
+
+    expect(res).toEqual(expected);
+  });
 });

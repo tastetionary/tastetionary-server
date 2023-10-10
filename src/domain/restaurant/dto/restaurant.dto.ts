@@ -1,4 +1,8 @@
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantKeyword,
+  RestaurantPrice,
+} from '@domain/restaurant/restaurant.enum';
 
 export interface RestaurantReviewDTO {
   /**
@@ -74,4 +78,27 @@ export interface AggregateReviewDTO {
   prices: number[];
   aggregatePrice: { [index: string]: number };
   totalCount: number;
+}
+
+export interface RestaurantOption {
+  /**
+   * restaurant category,
+   * example: ["한식"]
+   * @type RestaurantCategory[]
+   */
+  categories: RestaurantCategory[];
+
+  /**
+   * restaurant keywords
+   * example: ["깨끗해요"]
+   * @type RestaurantKeyword[]
+   */
+  keywords: RestaurantKeyword[];
+
+  /**
+   * restaurant price
+   * example: ["~10,000원"]
+   * @type RestaurantPrice[]
+   */
+  prices: RestaurantPrice[];
 }

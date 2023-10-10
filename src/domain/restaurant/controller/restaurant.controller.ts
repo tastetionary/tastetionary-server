@@ -13,6 +13,7 @@ import { AuthGuard } from '@common/auth/auth.guard';
 import {
   AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
+  RestaurantOption,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
@@ -119,5 +120,21 @@ export class RestaurantController {
       dto: input.review,
     });
     return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary get restaurant filter option
+   */
+  @TypedRoute.Get('option')
+  @HttpCode(200)
+  async getOption(): Promise<BaseResponseDto<RestaurantOption>> {
+    const res = await this.service.getRestaurantOptions();
+
+    return new BaseResponseDto({
+      categories: res.categories,
+      keywords: res.keywords,
+      prices: res.prices,
+    });
   }
 }

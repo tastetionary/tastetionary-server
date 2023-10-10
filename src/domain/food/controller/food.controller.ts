@@ -45,7 +45,7 @@ export class FoodController {
 
   /**
    * @tag food
-   * @summary get food recommentation
+   * @summary get food filter option
    */
   @TypedRoute.Get('option')
   @HttpCode(200)
