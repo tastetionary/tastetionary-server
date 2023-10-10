@@ -114,6 +114,11 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## deployment
+
+- [dev](https://docs.google.com/document/d/1hKW66dKuNfxiJk8gBfWDret-erIavvCKaX0UBBfTnew/edit)
+- prod (TBD)
+
 ## License
 
 TBD
