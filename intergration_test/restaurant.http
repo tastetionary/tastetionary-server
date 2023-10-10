@@ -19,7 +19,7 @@ Content-Type: {{content_type_json}}
 
 {
     "review":{
-        "category":"아시안",
+        "category":"분식",
         "keywords":["test"],
         "price":10000,
         "summary":"one-line summary"
@@ -40,7 +40,7 @@ Content-Type: {{content_type_json}}
 
 {
     "excludeIds": [],
-    "category": "아시안",
+    "category": "분식",
     "keywords": ["test"],
     "price": 10000
 }
