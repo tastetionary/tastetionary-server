@@ -54,6 +54,7 @@ describe('authentication', () => {
     const data = {
       userId: 1,
       identification: 'identification',
+      category: AuthenticationCategory.ACCOUNT,
       type: AuthenticationType.EMAIL,
       code: '123',
       expiredAt: expiredAt,

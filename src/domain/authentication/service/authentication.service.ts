@@ -41,6 +41,7 @@ export class AuthenticationService {
     const history = await this.repo.saveAuthenticationHistory({
       userId: param.userId,
       identification: param.identification,
+      category: param.category,
       type: param.type,
       code: this.createSixDigitCode(),
       expiredAt: this.createExpiredAt(),
@@ -118,6 +119,7 @@ export class AuthenticationService {
 
     const authRecord = await this.repo.getAuthenticationByIdentification(
       historyRecord.identification,
+      historyRecord.category,
       historyRecord.type,
     );
 

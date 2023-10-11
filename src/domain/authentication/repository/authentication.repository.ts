@@ -11,6 +11,7 @@ export interface AuthenticationHistoryEntity {
   userId: number;
   identification: string;
   type: AuthenticationType;
+  category: AuthenticationCategory;
   code: string;
   expiredAt: Date;
   createdAt?: Date;
@@ -53,6 +54,7 @@ export class AuthenticationRepository {
   async saveAuthenticationHistory(param: {
     userId: number;
     identification: string;
+    category: AuthenticationCategory;
     type: AuthenticationType;
     code: string;
     expiredAt: Date;
@@ -61,6 +63,7 @@ export class AuthenticationRepository {
       data: {
         userId: param.userId,
         identification: param.identification,
+        category: param.category,
         type: param.type,
         code: param.code,
         expiredAt: param.expiredAt,
@@ -95,10 +98,11 @@ export class AuthenticationRepository {
 
   async getAuthenticationByIdentification(
     identification: string,
+    category: AuthenticationCategory,
     type: AuthenticationType,
   ): Promise<AuthenticationEntity | null> {
     const record = await this.prisma.authentications.findFirst({
-      where: { type, identification },
+      where: { category, type, identification },
     });
     if (!record) return null;
 
@@ -123,9 +127,12 @@ export class AuthenticationRepository {
     if (!record) {
       return null;
     }
-    const { type, ...rest } = record;
+    const { category, type, ...rest } = record;
     return {
       ...rest,
+      category: AuthenticationCategory[
+        category.toUpperCase()
+      ] as AuthenticationCategory,
       type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
     };
   }
@@ -144,11 +151,13 @@ export class AuthenticationRepository {
         },
       },
     });
-    console.log(records);
     return records.map((record) => {
-      const { type, ...rest } = record;
+      const { category, type, ...rest } = record;
       return {
         ...rest,
+        category: AuthenticationCategory[
+          category.toUpperCase()
+        ] as AuthenticationCategory,
         type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
       };
     });
