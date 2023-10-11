@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
     if (this.isMasterToken(request)) {
       const [_, token] = request.headers.authorization?.split(' ') ?? [];
       const [__, userId] = token.split(`${this.masterToken}:`);
-      request['user'] = { userId };
+      request['user'] = { userId: parseInt(userId) };
       return true;
     }
 
