@@ -58,7 +58,6 @@ export class AuthenticationService {
       expiredAt: history.expiredAt,
     };
   }
-
   private sendAuthenticationCode(
     category: AuthenticationCategory,
     type: AuthenticationType,
@@ -139,5 +138,31 @@ export class AuthenticationService {
   async getUserAuth(userId: number) {
     const records = await this.repo.getAuthenticationByUserId(userId);
     return new UserAuth(userId, records);
+  }
+
+  async resetAuthentication(
+    userId: number,
+    identification: string,
+    category: AuthenticationCategory,
+    type: AuthenticationType,
+  ) {
+    const auth = await this.repo.getAuthenticationByIdentification(
+      identification,
+      category,
+      type,
+    );
+
+    if (!auth) {
+      return;
+    }
+
+    if (auth.userId != userId) {
+      throw new ServiceException(
+        'not differ user trying to delete other auth',
+        `triedUser: ${userId}, targetAuthId: ${auth.id}`,
+      );
+    }
+
+    await this.repo.deleteAuthentications([auth.id]);
   }
 }

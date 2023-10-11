@@ -37,6 +37,41 @@ describe('authentication service', () => {
     ]);
   });
 
+  describe('resetAuthentication', () => {
+    const tempMock = jest.spyOn(mailGun, 'sendEmail');
+    tempMock.mockResolvedValue(Promise.resolve(true));
+
+    it('should reset authentication', async () => {
+      const userId = 999;
+      const data = {
+        userId,
+        category: AuthenticationCategory.COMPANY,
+        identification: 'some@test.com',
+        type: AuthenticationType.EMAIL,
+      };
+      const res = await service.createProgressAuthentication(data);
+
+      const history = (await repo.getHistoryById(
+        res.id,
+      )) as AuthenticationHistoryEntity;
+
+      await service.doneProgressAuthentication(history.id, history.code);
+
+      let userAuth = await service.getUserAuth(userId);
+      expect(userAuth.isDone(data.category, data.type)).toBe(true);
+
+      await service.resetAuthentication(
+        userId,
+        data.identification,
+        data.category,
+        data.type,
+      );
+
+      userAuth = await service.getUserAuth(userId);
+      expect(userAuth.isDone(data.category, data.type)).toBe(false);
+    });
+  });
+
   describe('createProgressAuthentication', () => {
     const tempMock = jest.spyOn(mailGun, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));

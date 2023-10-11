@@ -173,4 +173,10 @@ export class AuthenticationRepository {
       data: { state: param.state },
     });
   }
+
+  async deleteAuthentications(ids: number[]) {
+    await this.prisma.authentications.deleteMany({
+      where: { id: { in: ids } },
+    });
+  }
 }
