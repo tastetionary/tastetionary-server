@@ -57,10 +57,14 @@ export class AccountService {
   }
 
   private makeTokens(payload: { userId: number }) {
+    // NOTE delete after arranging token
+    const tempSeconds = 1000000;
     const accessTokenExpiredAt =
-      this.configService.getTokenData().accessTokenExpiredAt;
+      parseInt(this.configService.getTokenData().accessTokenExpiredAt) +
+      tempSeconds;
     const refreshTokenExpiredAt =
-      this.configService.getTokenData().refreshTokenExpiredAt;
+      parseInt(this.configService.getTokenData().refreshTokenExpiredAt) +
+      tempSeconds;
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.getTokenData().accessTokenSecret,
