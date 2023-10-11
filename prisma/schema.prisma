@@ -147,9 +147,8 @@ model Authentications {
   @@index([userId])
   @@index([identification])
   @@index([userId, category])
-  @@index([userId, category, type, state])
-  @@index([userId, identification, category, type])
-  @@index([identification, category, type])
+  @@index([userId, category, state])
+  @@index([userId, identification, category])
   @@map("authentications")
 }
 
@@ -165,8 +164,7 @@ model AuthenticationHistories {
   expiredAt      DateTime @map("expired_at") // 인증 만료 시간
 
   @@index([userId])
-  @@index([identification, category, type])
-  @@index([identification, category, type, code])
-  @@index([userId, identification, category, type])
+  @@index([identification, type, category])
+  @@index([identification, type, code])
   @@map("authentication_histories")
 }
