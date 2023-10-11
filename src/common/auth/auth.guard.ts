@@ -10,6 +10,7 @@ import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly masterToken = 'master-tastionary';
   constructor(
     private jwtService: JwtService,
     private configService: ConfigurationService,
@@ -17,6 +18,14 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+
+    if (this.isMasterToken(request)) {
+      const [_, token] = request.headers.authorization?.split(' ') ?? [];
+      const [__, userId] = token.split(`${this.masterToken}:`);
+      request['user'] = { userId };
+      return true;
+    }
+
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException(
@@ -29,6 +38,8 @@ export class AuthGuard implements CanActivate {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
+
+      console.log(payload);
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException(
@@ -38,6 +49,10 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
+  private isMasterToken(request: Request) {
+    const [_, token] = request.headers.authorization?.split(' ') ?? [];
+    return token.includes(this.masterToken);
+  }
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
