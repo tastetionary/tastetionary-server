@@ -1,4 +1,5 @@
 export enum AuthenticationCategory {
+  ACCOUNT = 'account',
   COMPANY = 'company',
 }
 

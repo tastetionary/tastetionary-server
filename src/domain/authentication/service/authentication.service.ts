@@ -8,6 +8,7 @@ import { AuthenticationRepository } from '@domain/authentication/repository/auth
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserAuth } from '@domain/authentication/core/user-auth';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { sendEmail } from '@thirdParty/mail-gun/mail-gun';
 
 @Injectable()
 export class AuthenticationService {
@@ -58,22 +59,13 @@ export class AuthenticationService {
     code: string,
     identification: string,
   ) {
-    switch (type) {
-      case AuthenticationType.EMAIL:
-        console.log(code, identification);
-        // const env = this.cfgService.getServerConfig();
-        // const contents = {
-        //   toEmail: identification,
-        //   subject: '',
-        //   content: '',
-        // };
-        // sendEmail(contents, undefined, env.ENV);
-        break;
-      default:
-        throw new ServiceException(
-          `not supported type: ${type}`,
-          'should implement code by type',
-        );
+    if (type == AuthenticationType.EMAIL) {
+      const contents = {
+        toEmail: identification,
+        subject: '',
+        content: '',
+      };
+      sendEmail(contents);
     }
   }
 

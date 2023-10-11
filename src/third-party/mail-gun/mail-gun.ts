@@ -33,13 +33,7 @@ function initMailGun(config: MailGunConfig) {
   return mailer;
 }
 
-export function sendEmail(
-  contents: MailContents,
-  config?: MailGunConfig,
-  env?: string,
-) {
-  if (env === 'test') return true;
-
+export function sendEmail(contents: MailContents, config?: MailGunConfig) {
   const mailer = initMailGun(config ?? getDefaultConfig());
   return mailer
     .send(contents.toEmail, contents.subject, contents.content)
