@@ -156,7 +156,6 @@ model AuthenticationHistories {
   id             Int      @id @default(autoincrement())
   userId         Int      @map("user_id")
   identification String   @map("identification") @db.VarChar(256) // 인증에서 사용된 고유값, email, phone-number 등
-  category       String   @map("category") @db.VarChar(32) // 인증의 종류, 회사 인증, 동아리 인증 등
   type           String   @map("type") @db.VarChar(16) // 인증에서 사용되는 수단, email, sms 등
   code           String   @map("code") @db.VarChar(16) // 인증을 위해 사용되는 code 값
   createdAt      DateTime @default(now()) @map("created_at")
@@ -164,7 +163,7 @@ model AuthenticationHistories {
   expiredAt      DateTime @map("expired_at") // 인증 만료 시간
 
   @@index([userId])
-  @@index([identification, type, category])
+  @@index([identification, type])
   @@index([identification, type, code])
   @@map("authentication_histories")
 }
