@@ -35,10 +35,19 @@ export class ConfigurationService {
 
   getMailGunConfig() {
     return {
-      apiKey: this.configService.get('mailGunApiKey'),
-      domain: this.configService.get('mailGunDomain'),
-      fromEmail: this.configService.get('mailGunFromEmail'),
-      fromTitle: this.configService.get('mailGunFromTitle'),
+      apiKey: this.configService.get<string>('mailGunApiKey', ''),
+      domain: this.configService.get<string>(
+        'mailGunDomain',
+        'sandbox3337a931a909471584fd050d91a3d035.mailgun.org',
+      ),
+      fromEmail: this.configService.get<string>(
+        'mailGunFromEmail',
+        'no-reply@tastetionary.com',
+      ),
+      fromTitle: this.configService.get<string>(
+        'mailGunFromTitle',
+        '맛셔너리팀',
+      ),
     };
   }
 }

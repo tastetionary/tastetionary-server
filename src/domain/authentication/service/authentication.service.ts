@@ -26,8 +26,7 @@ export class AuthenticationService {
     const userAuth = await this.getUserAuth(param.userId);
     if (userAuth.isDone(param.category, param.type)) {
       throw new ServiceException(
-        'already authenticated, cannot create progress authentication',
-        `already authenticated ${param.type}`,
+        `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
       );
     }
 
@@ -47,7 +46,12 @@ export class AuthenticationService {
       expiredAt: this.createExpiredAt(),
     });
 
-    this.sendAuthenticationCode(param.type, history.code, param.identification);
+    this.sendAuthenticationCode(
+      param.category,
+      param.type,
+      history.code,
+      param.identification,
+    );
     return {
       id: history.id,
       expiredAt: history.expiredAt,
@@ -55,18 +59,32 @@ export class AuthenticationService {
   }
 
   private sendAuthenticationCode(
+    category: AuthenticationCategory,
     type: AuthenticationType,
     code: string,
     identification: string,
   ) {
-    if (type == AuthenticationType.EMAIL) {
-      const contents = {
-        toEmail: identification,
-        subject: '',
-        content: '',
-      };
-      sendEmail(contents);
+    if (type != AuthenticationType.EMAIL) {
+      throw new ServiceException(
+        `not supported type ${type}`,
+        'check AuthenticationType',
+      );
     }
+    const contents = {
+      toEmail: identification,
+      subject: '',
+      content: `인증코드 ${code}`,
+    };
+
+    if (category == AuthenticationCategory.ACCOUNT) {
+      contents.subject = '계정인증';
+    }
+
+    if (category == AuthenticationCategory.COMPANY) {
+      contents.subject = '회사인증';
+    }
+    const config = this.cfgService.getMailGunConfig();
+    sendEmail(contents, config);
   }
 
   private createExpiredAt(seconds = 180) {
