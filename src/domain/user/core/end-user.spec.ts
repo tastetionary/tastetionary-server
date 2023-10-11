@@ -15,6 +15,8 @@ describe('end-user', () => {
       category: AreaCategory.ACTIVITY_AREA,
       order: 1,
       address: 'address',
+      latitude: 1,
+      longitude: 1,
     };
 
     const user = new EndUser(userId, [area]);

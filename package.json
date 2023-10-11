@@ -1,6 +1,6 @@
 {
   "name": "taste-dictionary-api",
-  "version": "0.1.11",
+  "version": "0.2.3",
   "description": "",
   "author": "",
   "private": true,
@@ -36,6 +36,7 @@
     }
   },
   "dependencies": {
+    "@fxts/core": "^0.21.0",
     "@nestia/core": "^1.6.3",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
