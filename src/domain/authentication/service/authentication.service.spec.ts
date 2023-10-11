@@ -68,14 +68,15 @@ describe('authentication service', () => {
 
     it('should create auth history', async () => {
       const userId = 999;
-      await service.createProgressAuthentication({
+      const data = {
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@test.com',
         type: AuthenticationType.EMAIL,
-      });
+      };
+      await service.createProgressAuthentication(data);
       const userAuth = await service.getUserAuth(userId);
-      expect(userAuth.isInProgress()).toBe(true);
+      expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
     });
   });
 
@@ -88,15 +89,16 @@ describe('authentication service', () => {
 
     it('should update inProgress history to done', async () => {
       const userId = 999;
-      const res = await service.createProgressAuthentication({
+      const data = {
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@test.com',
         type: AuthenticationType.EMAIL,
-      });
+      };
+      const res = await service.createProgressAuthentication(data);
 
       let userAuth = await service.getUserAuth(userId);
-      expect(userAuth.isInProgress()).toBe(true);
+      expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
 
       const history = (await repo.getHistoryById(
         res.id,
@@ -105,7 +107,7 @@ describe('authentication service', () => {
       await service.doneProgressAuthentication(history.id, history.code);
 
       userAuth = await service.getUserAuth(userId);
-      expect(userAuth.isInProgress()).toBe(false);
+      expect(userAuth.isInProgress(data.category, data.type)).toBe(false);
     });
   });
 });

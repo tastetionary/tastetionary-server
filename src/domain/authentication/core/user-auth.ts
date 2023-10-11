@@ -1,4 +1,5 @@
 import {
+  AuthenticationCategory,
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
@@ -12,9 +13,9 @@ export class UserAuth {
     this.authentications = records;
   }
 
-  isInProgress(type = AuthenticationType.EMAIL) {
+  isInProgress(category: AuthenticationCategory, type: AuthenticationType) {
     const record = this.authentications.find(
-      (history) => history.type === type,
+      (history) => history.category === category && history.type === type,
     );
     if (!record) {
       return false;
@@ -22,9 +23,9 @@ export class UserAuth {
     return record.state === AuthenticationState.INPROGRESS;
   }
 
-  isDone(type = AuthenticationType.EMAIL) {
+  isDone(category: AuthenticationCategory, type: AuthenticationType) {
     const record = this.authentications.find(
-      (history) => history.type === type,
+      (history) => history.category === category && history.type === type,
     );
     if (!record) {
       return false;

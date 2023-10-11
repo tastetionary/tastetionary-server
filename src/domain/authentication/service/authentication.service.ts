@@ -24,7 +24,7 @@ export class AuthenticationService {
     type: AuthenticationType;
   }) {
     const userAuth = await this.getUserAuth(param.userId);
-    if (userAuth.isDone(param.type)) {
+    if (userAuth.isDone(param.category, param.type)) {
       throw new ServiceException(
         'already authenticated, cannot create progress authentication',
         `already authenticated ${param.type}`,
