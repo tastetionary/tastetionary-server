@@ -147,8 +147,9 @@ model Authentications {
   @@index([userId])
   @@index([identification])
   @@index([userId, category])
-  @@index([userId, category, state])
-  @@index([userId, identification, category])
+  @@index([userId, category, type, state])
+  @@index([userId, identification, category, type])
+  @@index([identification, category, type])
   @@map("authentications")
 }
 
@@ -156,6 +157,7 @@ model AuthenticationHistories {
   id             Int      @id @default(autoincrement())
   userId         Int      @map("user_id")
   identification String   @map("identification") @db.VarChar(256) // 인증에서 사용된 고유값, email, phone-number 등
+  category       String   @map("category") @db.VarChar(32) // 인증의 종류, 회사 인증, 동아리 인증 등
   type           String   @map("type") @db.VarChar(16) // 인증에서 사용되는 수단, email, sms 등
   code           String   @map("code") @db.VarChar(16) // 인증을 위해 사용되는 code 값
   createdAt      DateTime @default(now()) @map("created_at")
@@ -163,7 +165,8 @@ model AuthenticationHistories {
   expiredAt      DateTime @map("expired_at") // 인증 만료 시간
 
   @@index([userId])
-  @@index([identification, type])
-  @@index([identification, type, code])
+  @@index([identification, category, type])
+  @@index([identification, category, type, code])
+  @@index([userId, identification, category, type])
   @@map("authentication_histories")
 }
