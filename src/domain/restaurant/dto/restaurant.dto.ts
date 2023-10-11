@@ -1,4 +1,8 @@
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantKeyword,
+  RestaurantPrice,
+} from '@domain/restaurant/restaurant.enum';
 
 export interface RestaurantReviewDTO {
   /**
@@ -64,4 +68,92 @@ export interface ExternalRestaurantInformationDTO {
    * @type string
    */
   referenceLink?: string;
+}
+
+export interface AggregateReviewDTO {
+  categories: RestaurantCategory[];
+  summaries: string[];
+  opinions: string[];
+  keywords: string[];
+  prices: number[];
+  aggregatePrice: { [index: string]: number };
+  totalCount: number;
+}
+
+export interface RestaurantCategoryOption {
+  /**
+   * food category id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * food category keyword
+   * example: "한식"
+   * @type RestaurantCategory
+   */
+  name: RestaurantCategory;
+
+  /**
+   * category icon
+   * example: "menu_korean"
+   * @type string
+   */
+  icon: string;
+}
+
+export interface RestaurantKeywordOption {
+  /**
+   * food keyword id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * food keyword
+   * example: "깨끗해요"
+   * @type RestaurantKeyword
+   */
+  name: RestaurantKeyword;
+}
+
+export interface RestaurantPriceOption {
+  /**
+   * food price id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * food price
+   * example: "~10,000원"
+   * @type RestaurantPrice
+   */
+  name: RestaurantPrice;
+}
+
+export interface GetRestaurantFilterOption {
+  /**
+   * restaurant categories
+   * example: [{id: 0, name: "한식", icon: "menu_korean"}]
+   * @type RestaurantCategoryOption[]
+   */
+  categories: RestaurantCategoryOption[];
+
+  /**
+   * restaurant keywords
+   * example: [{id: 0, name: "깨끗해요"}]
+   * @type RestaurantKeywordOption[]
+   */
+  keywords: RestaurantKeywordOption[];
+
+  /**
+   * restaurant prices
+   * example: [{id: 0, name: "~10,000원"}]
+   * @type RestaurantPriceOption[]
+   */
+  prices: RestaurantPriceOption[];
 }

@@ -1,5 +1,5 @@
 
-### Register User 
+### get token 
 POST {{base_url}}/v1/account/tokens
 Content-Type: {{content_type_json}}
 

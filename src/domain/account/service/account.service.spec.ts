@@ -26,7 +26,7 @@ describe('account service', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['accounts', 'user_tokens']);
+    await truncateTables(prisma, ['accounts', 'user_tokens', 'users']);
   });
 
   it('should delete token', async () => {
@@ -35,7 +35,7 @@ describe('account service', () => {
       password: 'pwd',
       category: AccountCategory.EMAIL,
     };
-    const userId = 1;
+    const userId = 777;
     await accountService.register(userId, dto);
 
     await accountService.createToken(dto);

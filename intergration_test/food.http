@@ -1,0 +1,23 @@
+### get token(use after register user)
+# @name token
+POST {{base_url}}/v1/account/tokens
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "matthew2",
+  "password": "pwd",
+  "category": "email"
+}
+
+###
+@access_token = {{token.response.body.data.accessToken}}
+
+
+POST {{base_url}}/v1/food/recommendation
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+    "categories":["한식"],
+    "keywords":["가벼운"]
+}
