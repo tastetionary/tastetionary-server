@@ -43,6 +43,7 @@ export class FoodController {
     }
 
     return new BaseResponseDto({
+      id: res.id,
       name: res.name,
     });
   }
