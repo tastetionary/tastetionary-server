@@ -73,6 +73,13 @@ export interface GetFoodFilterOption {
 
 export interface GetFoodOutput {
   /**
+   * recommended food id
+   * example: 1
+   * @type number
+   */
+  id: number;
+
+  /**
    * recommended food
    * example: "김치찌개"
    * @type string
