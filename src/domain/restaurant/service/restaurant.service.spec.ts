@@ -190,7 +190,7 @@ describe('restaurant service', () => {
           externalDto: EXTERNAL_DTO,
           dto: DTO,
         }),
-      ).rejects.toThrowError(new ServiceException('domaine rule error'));
+      ).rejects.toThrowError(new ServiceException('domain rule error'));
     });
 
     it('with new restaurant, should save or update', async () => {
