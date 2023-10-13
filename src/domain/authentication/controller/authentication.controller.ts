@@ -25,13 +25,13 @@ export class AuthenticationController {
 
   /**
    * @tag authentication
-   * @summary create authentication progress, return progress id
+   * @summary create authentication in progress, return progress id, it need when check
    * @security bearer
    */
   @UseGuards(AuthGuard)
   @TypedRoute.Post('/:category')
   @HttpCode(200)
-  async createAuthentication(
+  async createProgress(
     @Request() req,
     @TypedParam('category') category: AuthenticationCategory,
     @TypedBody() dto: CreateAuthenticationRequest,
