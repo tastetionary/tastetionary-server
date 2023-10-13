@@ -10,8 +10,9 @@ import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
-  CreateAuthenticationRequest,
+  CreateProgressRequest,
   CreateAuthenticationResponse,
+  DoneProgressRequest,
 } from '@domain/authentication/dto/authentication.dto';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
@@ -34,7 +35,7 @@ export class AuthenticationController {
   async createProgress(
     @Request() req,
     @TypedParam('category') category: AuthenticationCategory,
-    @TypedBody() dto: CreateAuthenticationRequest,
+    @TypedBody() dto: CreateProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
     const res = await this.service.createProgressAuthentication({
       userId: req.user.userId,
@@ -43,5 +44,18 @@ export class AuthenticationController {
       type: dto.type,
     });
     return new BaseResponseDto(res);
+  }
+
+  /**
+   * @tag authentication
+   * @summary done in progress authentication
+   * @security bearer
+   */
+  @UseGuards(AuthGuard)
+  @TypedRoute.Post('/status/done')
+  @HttpCode(200)
+  async doneProgress(@TypedBody() dto: DoneProgressRequest) {
+    await this.service.doneProgressAuthentication(dto.historyId, dto.code);
+    return new BaseResponseDto(null);
   }
 }

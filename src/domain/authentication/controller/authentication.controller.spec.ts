@@ -27,7 +27,25 @@ describe('authentication controller', () => {
     await app.init();
   });
 
-  it('should return 200', async () => {
+  it('doneProgress should return 200', async () => {
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(123, key, {
+      expiresIn: '10h',
+    });
+
+    jest.spyOn(service, 'doneProgressAuthentication').mockResolvedValue();
+
+    const res = await request(app.getHttpServer())
+      .post('/v1/authentication/status/done')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        historyId: 1,
+        code: '1234',
+      });
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('progress should return 200', async () => {
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
       expiresIn: '10h',
