@@ -4,7 +4,7 @@ import { CoreException } from '@common/exception/custom.exception';
 type AccountEntity = {
   id: number;
   userId: number;
-  category: AccountCategory;
+  category: AccountCategory | string;
   identification: string;
   password: string; // encrypted
   createdAt: Date;
