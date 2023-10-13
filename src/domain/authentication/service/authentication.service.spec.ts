@@ -55,7 +55,11 @@ describe('authentication service', () => {
         res.id,
       )) as AuthenticationHistoryEntity;
 
-      await service.doneProgressAuthentication(history.id, history.code);
+      await service.doneProgressAuthentication(
+        userId,
+        history.id,
+        history.code,
+      );
 
       let userAuth = await service.getUserAuth(userId);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
@@ -89,7 +93,11 @@ describe('authentication service', () => {
         res.id,
       )) as AuthenticationHistoryEntity;
 
-      await service.doneProgressAuthentication(history.id, history.code);
+      await service.doneProgressAuthentication(
+        userId,
+        history.id,
+        history.code,
+      );
 
       await expect(
         service.createProgressAuthentication({
@@ -118,7 +126,7 @@ describe('authentication service', () => {
   describe('doneProgressAuthentication', () => {
     it('not history should raise error', async () => {
       await expect(
-        service.doneProgressAuthentication(999, '1234'),
+        service.doneProgressAuthentication(888, 999, '1234'),
       ).rejects.toThrowError();
     });
 
@@ -139,7 +147,11 @@ describe('authentication service', () => {
         res.id,
       )) as AuthenticationHistoryEntity;
 
-      await service.doneProgressAuthentication(history.id, history.code);
+      await service.doneProgressAuthentication(
+        userId,
+        history.id,
+        history.code,
+      );
 
       userAuth = await service.getUserAuth(userId);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(false);

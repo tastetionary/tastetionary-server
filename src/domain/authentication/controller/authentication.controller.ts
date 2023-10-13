@@ -54,8 +54,12 @@ export class AuthenticationController {
   @UseGuards(AuthGuard)
   @TypedRoute.Post('/status/done')
   @HttpCode(200)
-  async doneProgress(@TypedBody() dto: DoneProgressRequest) {
-    await this.service.doneProgressAuthentication(dto.historyId, dto.code);
+  async doneProgress(@Request() req, @TypedBody() dto: DoneProgressRequest) {
+    await this.service.doneProgressAuthentication(
+      req.user.userId,
+      dto.historyId,
+      dto.code,
+    );
     return new BaseResponseDto(null);
   }
 }
