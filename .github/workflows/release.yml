@@ -33,7 +33,7 @@ jobs:
           cd packages/api
           npm version $TAG -m "bump to $TAG"
           npm run package:publish
-          git diff-index --quiet HEAD || git commit -am "bump to $TAG"
+          git diff-index --quiet HEAD || git add . && git commit -m "bump to $TAG"
           git push --set-upstream origin bump-$TAG
           gh pr create --title "bump to $TAG" --body "bump to $TAG" --base develop --head bump-$TAG
         env:
@@ -41,6 +41,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
   build_and_push:
+    if: success() && github.event.action == 'published'
+    needs: [ publish ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
