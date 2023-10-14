@@ -28,12 +28,14 @@ jobs:
           git config user.name "taste-bot"
           git config user.email "noreply@github.com"
           git switch -c bump-$TAG
+      - name: Publish packages
+        run: |
           npx nestia swagger
           npm version $TAG -m "bump to $TAG"
           cd packages/api
           npm version $TAG -m "bump to $TAG"
           npm run package:publish
-          git diff-index --quiet HEAD || git add . && git commit -m "bump to $TAG"
+          git diff-index --quiet HEAD || git add -A && git commit -m "bump to $TAG"
           git push --set-upstream origin bump-$TAG
           gh pr create --title "bump to $TAG" --body "bump to $TAG" --base develop --head bump-$TAG
         env:
