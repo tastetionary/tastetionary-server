@@ -66,12 +66,10 @@ export class AuthenticationController {
   /**
    * @tag authentication
    * @summary done in progress authentication
-   * @security bearer
    */
-  @UseGuards(AuthGuard)
   @TypedRoute.Post('/status/done')
   @HttpCode(200)
-  async doneProgress(@Request() req, @TypedBody() dto: DoneProgressRequest) {
+  async doneProgress(@TypedBody() dto: DoneProgressRequest) {
     await this.service.doneProgressAuthentication(dto.historyId, dto.code);
     return new BaseResponseDto(null);
   }

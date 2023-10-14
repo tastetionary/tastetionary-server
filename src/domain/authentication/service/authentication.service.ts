@@ -32,6 +32,20 @@ export class AuthenticationService {
       }
     }
 
+    const code = this.createSixDigitCode();
+
+    const res = await this.sendAuthenticationCode(
+      param.category,
+      param.type,
+      code,
+      param.identification,
+    );
+    if (!res) {
+      throw new ServiceException(
+        'can not send authentication code, ask service center',
+      );
+    }
+
     await this.repo.saveAuthentication({
       userId: param.userId,
       identification: param.identification,
@@ -44,22 +58,16 @@ export class AuthenticationService {
       identification: param.identification,
       category: param.category,
       type: param.type,
-      code: this.createSixDigitCode(),
+      code,
       expiredAt: this.createExpiredAt(),
     });
 
-    this.sendAuthenticationCode(
-      param.category,
-      param.type,
-      history.code,
-      param.identification,
-    );
     return {
       id: history.id,
       expiredAt: history.expiredAt,
     };
   }
-  private sendAuthenticationCode(
+  private async sendAuthenticationCode(
     category: AuthenticationCategory,
     type: AuthenticationType,
     code: string,
@@ -85,7 +93,7 @@ export class AuthenticationService {
       contents.subject = '회사인증';
     }
     const config = this.cfgService.getMailGunConfig();
-    sendEmail(contents, config);
+    return sendEmail(contents, config);
   }
 
   private createExpiredAt(seconds = 180) {
