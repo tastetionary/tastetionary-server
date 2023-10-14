@@ -30,11 +30,12 @@ jobs:
           git switch -c bump-$TAG
       - name: Publish packages
         run: |
-          npx nestia swagger
+          TAG=$(git tag --sort=version:refname | tail -n 1)
           npm version $TAG -m "bump to $TAG"
           cd packages/api
           npm version $TAG -m "bump to $TAG"
           cd ../../
+          npx nestia swagger
           npm run package:publish
           git diff-index --quiet HEAD || git add -A && git commit -m "bump to $TAG"
           git push --set-upstream origin bump-$TAG
