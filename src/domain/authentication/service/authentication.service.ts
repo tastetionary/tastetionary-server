@@ -100,12 +100,23 @@ export class AuthenticationService {
     return randomNumber.toString().padStart(6, '0');
   }
 
-  async doneProgressAuthentication(historyId: number, code: string) {
+  async doneProgressAuthentication(
+    userId: number,
+    historyId: number,
+    code: string,
+  ) {
     const historyRecord = await this.repo.getHistoryById(historyId);
     if (!historyRecord) {
       throw new ServiceException(
         'not found history',
         `history: ${historyId} not found, check history id`,
+      );
+    }
+
+    if (userId != historyRecord.userId) {
+      throw new ServiceException(
+        'not matched user',
+        'request user and in progress user is different',
       );
     }
 

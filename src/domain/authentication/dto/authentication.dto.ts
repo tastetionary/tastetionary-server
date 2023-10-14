@@ -1,15 +1,43 @@
-export interface CreateAuthenticationRequest {
+import { AuthenticationType } from '@domain/authentication/authentication.enum';
+
+export interface DoneProgressRequest {
   /**
-   * unique identification for authentication, such as email
+   * history id to validate create authentication
+   * @type number
+   */
+  historyId: number;
+
+  /**
+   * authentication code for validating
+   * @type string
+   */
+  code: string;
+}
+
+export interface CreateProgressRequest {
+  /**
+   * unique identification for authentication, such as test@gmail.com
    * @type string
    */
   identification: string;
+
+  /**
+   * authentication type, such as email
+   * @type AuthenticationType
+   */
+  type: AuthenticationType;
 }
 
 export interface CreateAuthenticationResponse {
   /**
-   * authentication progress id
-   * @type string
+   * authentication history id
+   * @type number
    */
-  id: string;
+  id: number;
+
+  /**
+   * authentication expire time
+   * @type Date
+   */
+  expiredAt: Date;
 }
