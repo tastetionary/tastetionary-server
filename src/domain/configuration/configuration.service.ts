@@ -32,4 +32,22 @@ export class ConfigurationService {
       refreshTokenExpiredAt: this.configService.get('REFRESH_TOKEN_EXPIRED_AT'),
     };
   }
+
+  getMailGunConfig() {
+    return {
+      apiKey: this.configService.get<string>('mailGunApiKey', ''),
+      domain: this.configService.get<string>(
+        'mailGunDomain',
+        'sandbox3337a931a909471584fd050d91a3d035.mailgun.org',
+      ),
+      fromEmail: this.configService.get<string>(
+        'mailGunFromEmail',
+        'no-reply@tastetionary.com',
+      ),
+      fromTitle: this.configService.get<string>(
+        'mailGunFromTitle',
+        '맛셔너리팀',
+      ),
+    };
+  }
 }

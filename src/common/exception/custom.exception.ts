@@ -3,14 +3,12 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 class BaseException extends HttpException {
   readonly additionalData;
   constructor(
-    type: 'Service' | 'Core' | 'Repository',
     cause?: string,
     howToSolve?: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     additionalData?: Record<string, any>,
   ) {
-    super(type, HttpStatus.BAD_REQUEST, {
-      cause,
+    super(cause ?? '', HttpStatus.BAD_REQUEST, {
       description: howToSolve,
     });
     this.additionalData = additionalData;
@@ -24,7 +22,7 @@ export class ServiceException extends BaseException {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     additionalData?: Record<string, any>,
   ) {
-    super('Service', cause, description, additionalData);
+    super(cause, description, additionalData);
   }
 }
 
@@ -35,7 +33,7 @@ export class CoreException extends BaseException {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     additionalData?: Record<string, any>,
   ) {
-    super('Core', cause, description, additionalData);
+    super(cause, description, additionalData);
   }
 }
 
@@ -46,6 +44,6 @@ export class RepositoryException extends BaseException {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     additionalData?: Record<string, any>,
   ) {
-    super('Repository', cause, description, additionalData);
+    super(cause, description, additionalData);
   }
 }

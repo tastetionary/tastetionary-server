@@ -14,9 +14,12 @@ describe('account core', () => {
 
     const account = new Account(entity);
     try {
-      account.checkDuplicatedIdentification(AccountCategory.EMAIL, 'test');
+      account.checkDuplicatedIdentification(
+        entity.category,
+        entity.identification,
+      );
     } catch (e) {
-      expect(e.cause).toBe('duplicated identification');
+      expect(e.response).toBe('duplicated identification');
     }
   });
 });
