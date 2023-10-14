@@ -18,16 +18,18 @@ export class AuthenticationService {
   private readonly cfgService: ConfigurationService;
 
   async createProgressAuthentication(param: {
-    userId: number;
+    userId?: number;
     identification: string;
     category: AuthenticationCategory;
     type: AuthenticationType;
   }) {
-    const userAuth = await this.getUserAuth(param.userId);
-    if (userAuth.isDone(param.category, param.type)) {
-      throw new ServiceException(
-        `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
-      );
+    if (param.category == AuthenticationCategory.COMPANY) {
+      const userAuth = await this.getUserAuth(param.userId as number);
+      if (userAuth.isDone(param.category, param.type)) {
+        throw new ServiceException(
+          `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
+        );
+      }
     }
 
     await this.repo.saveAuthentication({
@@ -39,7 +41,6 @@ export class AuthenticationService {
     });
 
     const history = await this.repo.saveAuthenticationHistory({
-      userId: param.userId,
       identification: param.identification,
       category: param.category,
       type: param.type,
@@ -100,23 +101,12 @@ export class AuthenticationService {
     return randomNumber.toString().padStart(6, '0');
   }
 
-  async doneProgressAuthentication(
-    userId: number,
-    historyId: number,
-    code: string,
-  ) {
+  async doneProgressAuthentication(historyId: number, code: string) {
     const historyRecord = await this.repo.getHistoryById(historyId);
     if (!historyRecord) {
       throw new ServiceException(
         'not found history',
         `history: ${historyId} not found, check history id`,
-      );
-    }
-
-    if (userId != historyRecord.userId) {
-      throw new ServiceException(
-        'not matched user',
-        'request user and in progress user is different',
       );
     }
 

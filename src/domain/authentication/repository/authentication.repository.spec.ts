@@ -59,13 +59,10 @@ describe('authentication', () => {
       code: '123',
       expiredAt: expiredAt,
     };
-    await repo.saveAuthenticationHistory(data);
-    const res = await repo.getAuthenticationHistoryByUserId(
-      data.userId,
-      data.type,
-    );
-    expect(res.length).toEqual(1);
-    expect(res[0].type).toEqual(AuthenticationType.EMAIL);
+    const history = await repo.saveAuthenticationHistory(data);
+    const res = await repo.getHistoryById(history.id);
+    expect(res).not.toBeNull();
+    expect(res?.type).toEqual(data.type);
   });
 
   it('should create authentication ', async () => {
