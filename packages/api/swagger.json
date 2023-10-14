@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "version": "0.2.3",
+    "version": "0.3.7",
     "title": "taste-dictionary-api",
     "description": "",
     "license": {
@@ -855,6 +855,23 @@
       "GetFoodOutput.Nullable": {
         "type": "object",
         "properties": {
+          "id": {
+            "description": "recommended food id\nexample: 1",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
           "name": {
             "description": "recommended food\nexample: \"김치찌개\"",
             "x-typia-jsDocTags": [
@@ -875,6 +892,7 @@
         },
         "nullable": true,
         "required": [
+          "id",
           "name"
         ],
         "x-typia-jsDocTags": []
