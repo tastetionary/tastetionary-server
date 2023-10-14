@@ -1,6 +1,6 @@
 
 ### get token 
-POST {{base_url}}/authentication/account
+POST {{base_url}}/v1/authentication/account
 Content-Type: {{content_type_json}}
 
 {
