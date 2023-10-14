@@ -56,7 +56,7 @@ describe('authentication controller', () => {
       .mockResolvedValue({ id: 1, expiredAt: new Date() });
 
     const res = await request(app.getHttpServer())
-      .post(`/v1/authentication/${AuthenticationCategory.ACCOUNT}`)
+      .post(`/v1/authentication/${AuthenticationCategory.COMPANY}`)
       .set('Authorization', `Bearer ${token}`)
       .send({
         identification: 'test@email.com',

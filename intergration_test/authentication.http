@@ -1,0 +1,9 @@
+
+### get token 
+POST {{base_url}}/authentication/account
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "homekeeper89@gmail.com",
+  "type":"email"
+}

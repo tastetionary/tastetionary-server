@@ -7,7 +7,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
-import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
+import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
   CreateProgressRequest,
@@ -27,20 +27,37 @@ export class AuthenticationController {
   /**
    * @tag authentication
    * @summary create authentication in progress, return progress id, it need when check
+   */
+  @TypedRoute.Post('/account')
+  @HttpCode(200)
+  async createProgressAboutAccount(
+    @TypedBody() dto: CreateProgressRequest,
+  ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
+    // TODO add limit logic
+    const res = await this.service.createProgressAuthentication({
+      identification: dto.identification,
+      category: AuthenticationCategory.ACCOUNT,
+      type: dto.type,
+    });
+    return new BaseResponseDto(res);
+  }
+
+  /**
+   * @tag authentication
+   * @summary create company authentication in progress, return progress id, it need when check
    * @security bearer
    */
   @UseGuards(AuthGuard)
-  @TypedRoute.Post('/:category')
+  @TypedRoute.Post('/company')
   @HttpCode(200)
-  async createProgress(
+  async createProgressAboutCompany(
     @Request() req,
-    @TypedParam('category') category: AuthenticationCategory,
     @TypedBody() dto: CreateProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
     const res = await this.service.createProgressAuthentication({
       userId: req.user.userId,
       identification: dto.identification,
-      category,
+      category: AuthenticationCategory.COMPANY,
       type: dto.type,
     });
     return new BaseResponseDto(res);
