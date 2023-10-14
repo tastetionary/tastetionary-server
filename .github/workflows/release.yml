@@ -55,6 +55,7 @@ jobs:
       - name: inject env
         run: |
           echo "ENV=dev" > .env
+          echo "API_SERVER_URL=${{ secrets.API_SERVER_URL }}" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "API_SERVER_PORT=${{ secrets.API_SERVER_PORT }}" >> .env
           echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}" >> .env
