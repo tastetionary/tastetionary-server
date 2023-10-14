@@ -34,6 +34,7 @@ jobs:
           npm version $TAG -m "bump to $TAG"
           cd packages/api
           npm version $TAG -m "bump to $TAG"
+          cd ../../
           npm run package:publish
           git diff-index --quiet HEAD || git add -A && git commit -m "bump to $TAG"
           git push --set-upstream origin bump-$TAG
