@@ -24,6 +24,11 @@ export class AuthenticationService {
     type: AuthenticationType;
   }) {
     if (param.category == AuthenticationCategory.COMPANY) {
+      if (this.isGeneralEmailDomain(param.type, param.identification)) {
+        throw new ServiceException(
+          `only company email can be used, not general domain, given: ${param.identification}`,
+        );
+      }
       const userAuth = await this.getUserAuth(param.userId as number);
       if (userAuth.isDone(param.category, param.type)) {
         throw new ServiceException(
@@ -67,6 +72,24 @@ export class AuthenticationService {
       expiredAt: history.expiredAt,
     };
   }
+
+  private isGeneralEmailDomain(
+    type: AuthenticationType,
+    identification: string,
+  ) {
+    if (type != AuthenticationType.EMAIL) {
+      return false;
+    }
+
+    if (!identification.includes('@')) {
+      return false;
+    }
+
+    const generalDomainList = ['test', 'gmail', 'naver', 'daum', 'hanmail'];
+    const domain = identification.split('@')[1].split('.')[0];
+    return generalDomainList.includes(domain);
+  }
+
   private async sendAuthenticationCode(
     category: AuthenticationCategory,
     type: AuthenticationType,
