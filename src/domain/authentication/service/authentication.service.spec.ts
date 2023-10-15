@@ -12,7 +12,7 @@ import {
   AuthenticationRepository,
 } from '@domain/authentication/repository/authentication.repository';
 import { ServiceException } from '@common/exception/custom.exception';
-import * as mailGun from '@thirdParty/mail-gun/mail-gun';
+import * as brevo from '@thirdParty/brevo/brevo';
 
 describe('authentication service', () => {
   let module: TestingModule;
@@ -38,7 +38,7 @@ describe('authentication service', () => {
   });
 
   describe('resetAuthentication', () => {
-    const tempMock = jest.spyOn(mailGun, 'sendEmail');
+    const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
 
     it('should reset authentication', async () => {
@@ -46,7 +46,7 @@ describe('authentication service', () => {
       const data = {
         userId,
         category: AuthenticationCategory.COMPANY,
-        identification: 'some@test.com',
+        identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       };
       const res = await service.createProgressAuthentication(data);
@@ -73,15 +73,29 @@ describe('authentication service', () => {
   });
 
   describe('createProgressAuthentication', () => {
-    const tempMock = jest.spyOn(mailGun, 'sendEmail');
+    const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
+    it.each([['test'], ['daum'], ['naver'], ['gmail'], ['hanmail']])(
+      'with not valid company domain should raise error',
+      async (domain) => {
+        const userId = 999;
+        await expect(
+          service.createProgressAuthentication({
+            userId,
+            category: AuthenticationCategory.COMPANY,
+            identification: `some@${domain}.com`,
+            type: AuthenticationType.EMAIL,
+          }),
+        ).rejects.toThrowError(ServiceException);
+      },
+    );
 
     it('already exist email should throw error', async () => {
       const userId = 999;
       const res = await service.createProgressAuthentication({
         userId,
         category: AuthenticationCategory.COMPANY,
-        identification: 'some@test.com',
+        identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       });
 
@@ -95,7 +109,7 @@ describe('authentication service', () => {
         service.createProgressAuthentication({
           userId,
           category: AuthenticationCategory.COMPANY,
-          identification: 'some@test.com',
+          identification: 'some@crud.com',
           type: AuthenticationType.EMAIL,
         }),
       ).rejects.toThrowError(ServiceException);
@@ -106,7 +120,7 @@ describe('authentication service', () => {
       const data = {
         userId,
         category: AuthenticationCategory.COMPANY,
-        identification: 'some@test.com',
+        identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       };
       await service.createProgressAuthentication(data);
@@ -127,7 +141,7 @@ describe('authentication service', () => {
       const data = {
         userId,
         category: AuthenticationCategory.COMPANY,
-        identification: 'some@test.com',
+        identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       };
       const res = await service.createProgressAuthentication(data);

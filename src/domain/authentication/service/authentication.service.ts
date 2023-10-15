@@ -8,7 +8,7 @@ import { AuthenticationRepository } from '@domain/authentication/repository/auth
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserAuth } from '@domain/authentication/core/user-auth';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { sendEmail } from '@thirdParty/mail-gun/mail-gun';
+import { sendEmail } from '@thirdParty/brevo/brevo';
 
 @Injectable()
 export class AuthenticationService {
@@ -24,6 +24,11 @@ export class AuthenticationService {
     type: AuthenticationType;
   }) {
     if (param.category == AuthenticationCategory.COMPANY) {
+      if (this.isGeneralEmailDomain(param.type, param.identification)) {
+        throw new ServiceException(
+          `only company email can be used, not general domain, given: ${param.identification}`,
+        );
+      }
       const userAuth = await this.getUserAuth(param.userId as number);
       if (userAuth.isDone(param.category, param.type)) {
         throw new ServiceException(
@@ -67,6 +72,24 @@ export class AuthenticationService {
       expiredAt: history.expiredAt,
     };
   }
+
+  private isGeneralEmailDomain(
+    type: AuthenticationType,
+    identification: string,
+  ) {
+    if (type != AuthenticationType.EMAIL) {
+      return false;
+    }
+
+    if (!identification.includes('@')) {
+      return false;
+    }
+
+    const generalDomainList = ['test', 'gmail', 'naver', 'daum', 'hanmail'];
+    const domain = identification.split('@')[1].split('.')[0];
+    return generalDomainList.includes(domain);
+  }
+
   private async sendAuthenticationCode(
     category: AuthenticationCategory,
     type: AuthenticationType,
@@ -80,9 +103,9 @@ export class AuthenticationService {
       );
     }
     const contents = {
-      toEmail: identification,
       subject: '',
-      content: `인증코드 ${code}`,
+      htmlContent: `<h1> 인증코드 ${code} 입니다. </h1>`,
+      to: [{ email: identification }],
     };
 
     if (category == AuthenticationCategory.ACCOUNT) {
@@ -92,7 +115,7 @@ export class AuthenticationService {
     if (category == AuthenticationCategory.COMPANY) {
       contents.subject = '회사인증';
     }
-    const config = this.cfgService.getMailGunConfig();
+    const config = this.cfgService.getBrevoConfig();
     return sendEmail(contents, config);
   }
 
