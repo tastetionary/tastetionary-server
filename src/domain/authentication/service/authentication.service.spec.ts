@@ -12,7 +12,7 @@ import {
   AuthenticationRepository,
 } from '@domain/authentication/repository/authentication.repository';
 import { ServiceException } from '@common/exception/custom.exception';
-import * as mailGun from '@thirdParty/mail-gun/mail-gun';
+import * as brevo from '@thirdParty/brevo/brevo';
 
 describe('authentication service', () => {
   let module: TestingModule;
@@ -38,7 +38,7 @@ describe('authentication service', () => {
   });
 
   describe('resetAuthentication', () => {
-    const tempMock = jest.spyOn(mailGun, 'sendEmail');
+    const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
 
     it('should reset authentication', async () => {
@@ -73,7 +73,7 @@ describe('authentication service', () => {
   });
 
   describe('createProgressAuthentication', () => {
-    const tempMock = jest.spyOn(mailGun, 'sendEmail');
+    const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
 
     it('already exist email should throw error', async () => {

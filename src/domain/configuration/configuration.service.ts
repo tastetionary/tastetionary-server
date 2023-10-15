@@ -35,7 +35,14 @@ export class ConfigurationService {
 
   getBrevoConfig() {
     return {
-      brevoApiKey: this.configService.get('BREVO_API_KEY', ''),
+      apiKey: this.configService.get('BREVO_API_KEY', ''),
+      sender: {
+        email: this.configService.get(
+          'BREVO_SENDER_EMAIL',
+          'no-reply@tastetionary.com',
+        ),
+        name: this.configService.get('BREVO_SENDER_NAME', '맛셔너러팀'),
+      },
     };
   }
 }

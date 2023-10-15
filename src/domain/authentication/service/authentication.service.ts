@@ -8,7 +8,7 @@ import { AuthenticationRepository } from '@domain/authentication/repository/auth
 import { ServiceException } from '@common/exception/custom.exception';
 import { UserAuth } from '@domain/authentication/core/user-auth';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { sendEmail } from '@thirdParty/mail-gun/mail-gun';
+import { sendEmail } from '@thirdParty/brevo/brevo';
 
 @Injectable()
 export class AuthenticationService {
@@ -80,9 +80,9 @@ export class AuthenticationService {
       );
     }
     const contents = {
-      toEmail: identification,
       subject: '',
-      content: `인증코드 ${code}`,
+      htmlContent: `<h1> 인증코드 ${code} 입니다. </h1>`,
+      to: [{ email: identification }],
     };
 
     if (category == AuthenticationCategory.ACCOUNT) {
@@ -92,7 +92,7 @@ export class AuthenticationService {
     if (category == AuthenticationCategory.COMPANY) {
       contents.subject = '회사인증';
     }
-    const config = this.cfgService.getMailGunConfig();
+    const config = this.cfgService.getBrevoConfig();
     return sendEmail(contents, config);
   }
 
