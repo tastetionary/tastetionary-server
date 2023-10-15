@@ -57,7 +57,7 @@ describe('authentication service', () => {
 
       await service.doneProgressAuthentication(history.id, history.code);
 
-      let userAuth = await service.getUserAuth(userId);
+      let userAuth = await service.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
 
       await service.resetAuthentication(
@@ -67,7 +67,7 @@ describe('authentication service', () => {
         data.type,
       );
 
-      userAuth = await service.getUserAuth(userId);
+      userAuth = await service.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(false);
     });
   });
@@ -124,7 +124,7 @@ describe('authentication service', () => {
         type: AuthenticationType.EMAIL,
       };
       await service.createProgressAuthentication(data);
-      const userAuth = await service.getUserAuth(userId);
+      const userAuth = await service.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
     });
   });
@@ -146,7 +146,7 @@ describe('authentication service', () => {
       };
       const res = await service.createProgressAuthentication(data);
 
-      let userAuth = await service.getUserAuth(userId);
+      let userAuth = await service.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
 
       const history = (await repo.getHistoryById(
@@ -155,7 +155,7 @@ describe('authentication service', () => {
 
       await service.doneProgressAuthentication(history.id, history.code);
 
-      userAuth = await service.getUserAuth(userId);
+      userAuth = await service.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(false);
     });
   });
