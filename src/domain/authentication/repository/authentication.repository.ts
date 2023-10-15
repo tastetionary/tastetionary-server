@@ -8,7 +8,6 @@ import {
 
 export interface AuthenticationHistoryEntity {
   id: number;
-  userId: number;
   identification: string;
   type: AuthenticationType;
   category: AuthenticationCategory;
@@ -23,7 +22,7 @@ export interface AuthenticationEntity {
   type: AuthenticationType;
   state: AuthenticationState;
   id: number;
-  userId: number;
+  userId: number | null;
   identification: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -34,7 +33,7 @@ export class AuthenticationRepository {
   constructor(private prisma: PrismaService) {}
 
   async saveAuthentication(param: {
-    userId: number;
+    userId?: number;
     identification: string;
     category: AuthenticationCategory;
     type: AuthenticationType;
@@ -52,7 +51,6 @@ export class AuthenticationRepository {
   }
 
   async saveAuthenticationHistory(param: {
-    userId: number;
     identification: string;
     category: AuthenticationCategory;
     type: AuthenticationType;
@@ -61,7 +59,6 @@ export class AuthenticationRepository {
   }) {
     return await this.prisma.authenticationHistories.create({
       data: {
-        userId: param.userId,
         identification: param.identification,
         category: param.category,
         type: param.type,
@@ -74,7 +71,7 @@ export class AuthenticationRepository {
   transformAuthentications(
     records: {
       id: number;
-      userId: number;
+      userId: number | null;
       identification: string;
       category: string;
       type: string;
@@ -135,32 +132,6 @@ export class AuthenticationRepository {
       ] as AuthenticationCategory,
       type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
     };
-  }
-
-  async getAuthenticationHistoryByUserId(
-    userId: number,
-    type: AuthenticationType,
-    gteExpiredAt?: Date,
-  ): Promise<AuthenticationHistoryEntity[]> {
-    const records = await this.prisma.authenticationHistories.findMany({
-      where: {
-        userId,
-        type,
-        expiredAt: {
-          gte: gteExpiredAt ?? new Date(),
-        },
-      },
-    });
-    return records.map((record) => {
-      const { category, type, ...rest } = record;
-      return {
-        ...rest,
-        category: AuthenticationCategory[
-          category.toUpperCase()
-        ] as AuthenticationCategory,
-        type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
-      };
-    });
   }
 
   // @NOTE add params when needed

@@ -136,7 +136,7 @@ model Agreements {
 // 개인 인증 내용을 저장, 회사인증 조직인증 등 
 model Authentications {
   id             Int      @id @default(autoincrement())
-  userId         Int      @map("user_id")
+  userId         Int?     @map("user_id")
   identification String   @map("identification") @db.VarChar(256) // 인증시 사용한 수단의 고유값, email, phone_number 등
   category       String   @map("category") @db.VarChar(32) // 인증의 종류, 회사 인증, 동아리 인증 등
   type           String   @map("type") @db.VarChar(16) // 인증시 사용된 수단, Email, SMS 등
@@ -156,7 +156,6 @@ model Authentications {
 
 model AuthenticationHistories {
   id             Int      @id @default(autoincrement())
-  userId         Int      @map("user_id")
   identification String   @map("identification") @db.VarChar(256) // 인증에서 사용된 고유값, email, phone-number 등
   category       String   @map("category") @db.VarChar(32) // 인증의 종류, 회사 인증, 동아리 인증 등
   type           String   @map("type") @db.VarChar(16) // 인증에서 사용되는 수단, email, sms 등
@@ -165,10 +164,7 @@ model AuthenticationHistories {
   updatedAt      DateTime @updatedAt @map("updated_at")
   expiredAt      DateTime @map("expired_at") // 인증 만료 시간
 
-  @@index([userId])
   @@index([identification, category, type])
   @@index([identification, category, type, code])
-  @@index([userId, identification, category, type])
   @@map("authentication_histories")
 }
-

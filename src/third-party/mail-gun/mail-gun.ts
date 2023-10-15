@@ -42,7 +42,7 @@ export function sendEmail(contents: MailContents, config?: MailGunConfig) {
       return true;
     })
     .catch((error) => {
-      console.error('Error: ', error);
+      console.error(`Error: ${error}, config: ${JSON.stringify(config)}}`);
       return false;
     });
 }

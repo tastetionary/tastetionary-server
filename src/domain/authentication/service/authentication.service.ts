@@ -18,15 +18,31 @@ export class AuthenticationService {
   private readonly cfgService: ConfigurationService;
 
   async createProgressAuthentication(param: {
-    userId: number;
+    userId?: number;
     identification: string;
     category: AuthenticationCategory;
     type: AuthenticationType;
   }) {
-    const userAuth = await this.getUserAuth(param.userId);
-    if (userAuth.isDone(param.category, param.type)) {
+    if (param.category == AuthenticationCategory.COMPANY) {
+      const userAuth = await this.getUserAuth(param.userId as number);
+      if (userAuth.isDone(param.category, param.type)) {
+        throw new ServiceException(
+          `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
+        );
+      }
+    }
+
+    const code = this.createSixDigitCode();
+
+    const res = await this.sendAuthenticationCode(
+      param.category,
+      param.type,
+      code,
+      param.identification,
+    );
+    if (!res) {
       throw new ServiceException(
-        `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
+        'can not send authentication code, ask service center',
       );
     }
 
@@ -39,26 +55,19 @@ export class AuthenticationService {
     });
 
     const history = await this.repo.saveAuthenticationHistory({
-      userId: param.userId,
       identification: param.identification,
       category: param.category,
       type: param.type,
-      code: this.createSixDigitCode(),
+      code,
       expiredAt: this.createExpiredAt(),
     });
 
-    this.sendAuthenticationCode(
-      param.category,
-      param.type,
-      history.code,
-      param.identification,
-    );
     return {
       id: history.id,
       expiredAt: history.expiredAt,
     };
   }
-  private sendAuthenticationCode(
+  private async sendAuthenticationCode(
     category: AuthenticationCategory,
     type: AuthenticationType,
     code: string,
@@ -84,7 +93,7 @@ export class AuthenticationService {
       contents.subject = '회사인증';
     }
     const config = this.cfgService.getMailGunConfig();
-    sendEmail(contents, config);
+    return sendEmail(contents, config);
   }
 
   private createExpiredAt(seconds = 180) {
@@ -100,23 +109,12 @@ export class AuthenticationService {
     return randomNumber.toString().padStart(6, '0');
   }
 
-  async doneProgressAuthentication(
-    userId: number,
-    historyId: number,
-    code: string,
-  ) {
+  async doneProgressAuthentication(historyId: number, code: string) {
     const historyRecord = await this.repo.getHistoryById(historyId);
     if (!historyRecord) {
       throw new ServiceException(
         'not found history',
         `history: ${historyId} not found, check history id`,
-      );
-    }
-
-    if (userId != historyRecord.userId) {
-      throw new ServiceException(
-        'not matched user',
-        'request user and in progress user is different',
       );
     }
 

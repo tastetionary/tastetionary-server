@@ -6,12 +6,14 @@ import { validate } from '@src/env.validation';
 import { UserModule } from '@domain/user/user.module';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { FoodModule } from '@domain/food/food.module';
+import { AuthenticationModule } from '@domain/authentication/authentication.module';
 @Module({
   imports: [
     ConfigurationModule,
     UserModule,
     RestaurantModule,
     FoodModule,
+    AuthenticationModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
