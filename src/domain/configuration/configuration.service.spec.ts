@@ -10,7 +10,7 @@ describe('configuration service', () => {
   });
 
   it('should return mail env', () => {
-    const data = service.getMailGunConfig();
+    const data = service.getBrevoConfig();
     expect(data).not.toBeNull();
   });
 
