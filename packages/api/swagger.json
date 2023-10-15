@@ -139,22 +139,67 @@
         "x-nestia-method": "DELETE"
       }
     },
-    "/v1/authentication/{category}": {
+    "/v1/authentication/account": {
       "post": {
         "tags": [
           "authentication"
         ],
-        "parameters": [
-          {
-            "name": "category",
-            "in": "path",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProgressRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
             "description": "",
-            "schema": {
-              "$ref": "#/components/schemas/AuthenticationCategory"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_CreateAuthenticationResponse_gt_"
+                }
+              }
             },
-            "required": true
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.authentication.account.createProgressAboutAccount",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "authentication",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "create authentication in progress, return progress id, it need when check",
+                "kind": "text"
+              }
+            ]
           }
         ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/authentication/company": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "parameters": [],
         "requestBody": {
           "description": "",
           "content": {
@@ -185,7 +230,7 @@
             "bearer": []
           }
         ],
-        "x-nestia-namespace": "v1.authentication.createProgress",
+        "x-nestia-namespace": "v1.authentication.company.createProgressAboutCompany",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
@@ -200,7 +245,7 @@
             "name": "summary",
             "text": [
               {
-                "text": "create authentication in progress, return progress id, it need when check",
+                "text": "create company authentication in progress, return progress id, it need when check",
                 "kind": "text"
               }
             ]
@@ -249,11 +294,6 @@
             "x-nestia-encrypted": false
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
         "x-nestia-namespace": "v1.authentication.status.done.doneProgress",
         "x-nestia-jsDocTags": [
           {
@@ -270,15 +310,6 @@
             "text": [
               {
                 "text": "done in progress authentication",
-                "kind": "text"
-              }
-            ]
-          },
-          {
-            "name": "security",
-            "text": [
-              {
-                "text": "bearer",
                 "kind": "text"
               }
             ]
@@ -865,13 +896,6 @@
         "properties": {},
         "nullable": false,
         "x-typia-jsDocTags": []
-      },
-      "AuthenticationCategory": {
-        "type": "string",
-        "enum": [
-          "account",
-          "company"
-        ]
       },
       "CreateProgressRequest": {
         "type": "object",
