@@ -29,7 +29,6 @@ export async function sendEmail(content: BrevoContent, config?: BrevoConfig) {
   sendSmtpEmail.htmlContent = content.htmlContent;
   sendSmtpEmail.sender = config.sender;
   sendSmtpEmail.to = content.to;
-  console.log(sendSmtpEmail);
 
   return apiInstance.sendTransacEmail(sendSmtpEmail).then(
     function (data) {
