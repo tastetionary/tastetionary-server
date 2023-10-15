@@ -33,21 +33,9 @@ export class ConfigurationService {
     };
   }
 
-  getMailGunConfig() {
+  getBrevoConfig() {
     return {
-      apiKey: this.configService.get<string>('MAIL_GUN_API_KEY', ''),
-      domain: this.configService.get<string>(
-        'MAIL_GUN_DOMAIN',
-        'sandbox3337a931a909471584fd050d91a3d035.mailgun.org',
-      ),
-      fromEmail: this.configService.get<string>(
-        'MAIL_GUN_FROM_EMAIL',
-        'no-reply@tastetionary.com',
-      ),
-      fromTitle: this.configService.get<string>(
-        'MAIL_GUN_FROM_TITLE',
-        '맛셔너리팀',
-      ),
+      brevoApiKey: this.configService.get('BREVO_API_KEY', ''),
     };
   }
 }
