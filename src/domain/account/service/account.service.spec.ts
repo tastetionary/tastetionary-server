@@ -35,7 +35,7 @@ describe('account service', () => {
       password: 'pwd',
       category: AccountCategory.EMAIL,
     };
-    const userId = 777;
+    const userId = 666;
     await accountService.register(userId, dto);
 
     await accountService.createToken(dto);

@@ -45,6 +45,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.1.1",
+    "@sendinblue/client": "^3.3.1",
     "@types/bcrypt": "^5.0.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -54,6 +55,7 @@
     "nest-winston": "^1.9.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "ts-mailgun": "^0.5.1",
     "typescript-transform-paths": "^3.4.6",
     "typia": "^4.2.3",
     "winston": "^3.10.0",
@@ -101,7 +103,8 @@
       "^@src/(.*)$": "<rootDir>/src/$1",
       "^@domain/(.*)$": "<rootDir>/src/domain/$1",
       "^@common/(.*)$": "<rootDir>/src/common/$1",
-      "^@utils/(.*)$": "<rootDir>/src/utils/$1"
+      "^@utils/(.*)$": "<rootDir>/src/utils/$1",
+      "^@thirdParty/(.*)$": "<rootDir>/src/third-party/$1"
     },
     "moduleFileExtensions": [
       "js",

@@ -51,6 +51,8 @@ type tableNames =
   | 'user_areas'
   | 'user_tokens'
   | 'restaurant_reviews'
+  | 'authentications'
+  | 'authentication_histories'
   | 'external_restaurant_informations';
 async function truncateTables(prisma: PrismaService, tableNames: tableNames[]) {
   for (const name of tableNames) {

@@ -9,6 +9,11 @@ describe('configuration service', () => {
     service = module.get<cfgService>(cfgService);
   });
 
+  it('should return mail env', () => {
+    const data = service.getBrevoConfig();
+    expect(data).not.toBeNull();
+  });
+
   it('should return meta property', () => {
     const meta = service.getServerMetaData();
     expect(meta).toHaveProperty('serverTime');

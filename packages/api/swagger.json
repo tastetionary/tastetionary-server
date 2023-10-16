@@ -139,6 +139,185 @@
         "x-nestia-method": "DELETE"
       }
     },
+    "/v1/authentication/account": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProgressRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_CreateAuthenticationResponse_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.authentication.account.createProgressAboutAccount",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "authentication",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "create authentication in progress, return progress id, it need when check",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/authentication/company": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProgressRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_CreateAuthenticationResponse_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-nestia-namespace": "v1.authentication.company.createProgressAboutCompany",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "authentication",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "create company authentication in progress, return progress id, it need when check",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/authentication/status/done": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoneProgressRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_null_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.authentication.status.done.doneProgress",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "authentication",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "done in progress authentication",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
     "/v1/configuration": {
       "get": {
         "tags": [
@@ -716,6 +895,173 @@
         "type": "object",
         "properties": {},
         "nullable": false,
+        "x-typia-jsDocTags": []
+      },
+      "CreateProgressRequest": {
+        "type": "object",
+        "properties": {
+          "identification": {
+            "description": "unique identification for authentication, such as test@gmail.com",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "type": {
+            "description": "authentication type, such as email",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "AuthenticationType",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "email"
+            ]
+          }
+        },
+        "nullable": false,
+        "required": [
+          "identification",
+          "type"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "BaseResponseDto_lt_CreateAuthenticationResponse_gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CreateAuthenticationResponse"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "CreateAuthenticationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "authentication history id",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "expiredAt": {
+            "description": "authentication expire time",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "Date",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "expiredAt"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "DoneProgressRequest": {
+        "type": "object",
+        "properties": {
+          "historyId": {
+            "description": "history id to validate create authentication",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "code": {
+            "description": "authentication code for validating",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "historyId",
+          "code"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "BaseResponseDto_lt_null_gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "null",
+            "x-typia-required": true,
+            "x-typia-optional": false
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
         "x-typia-jsDocTags": []
       },
       "ServerConfig": {

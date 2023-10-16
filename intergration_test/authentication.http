@@ -1,0 +1,19 @@
+
+### create progress
+POST {{base_url}}/v1/authentication/account
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "wkdgndldi@naver.com",
+  "type":"email"
+}
+
+
+### donw progress
+POST {{base_url}}/v1/authentication/status/done
+Content-Type: {{content_type_json}}
+
+{
+  "historyId": 2,
+  "code":402200
+}
