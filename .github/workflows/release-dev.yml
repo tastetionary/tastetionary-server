@@ -1,4 +1,4 @@
-name: build_and_push
+name: build_and_push_dev
 
 on:
   release:
@@ -55,13 +55,13 @@ jobs:
       - name: inject env
         run: |
           echo "ENV=dev" > .env
-          echo "API_SERVER_URL=${{ secrets.API_SERVER_URL }}" >> .env
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "API_SERVER_PORT=${{ secrets.API_SERVER_PORT }}" >> .env
-          echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}" >> .env
-          echo "ACCESS_TOKEN_EXPIRED_AT=${{ secrets.ACCESS_TOKEN_EXPIRED_AT }}" >> .env
-          echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
-          echo "REFRESH_TOKEN_EXPIRED_AT=${{ secrets.REFRESH_TOKEN_EXPIRED_AT }}" >> .env
+          echo "API_SERVER_URL=${{ secrets.API_SERVER_DEV_URL }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_DEV_URL }}" >> .env
+          echo "API_SERVER_PORT=${{ secrets.API_SERVER_DEV_PORT }}" >> .env
+          echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_DEV_SECRET }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRED_AT=${{ secrets.ACCESS_TOKEN_DEV_EXPIRED_AT }}" >> .env
+          echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_DEV_SECRET }}" >> .env
+          echo "REFRESH_TOKEN_EXPIRED_AT=${{ secrets.REFRESH_TOKEN_DEV_EXPIRED_AT }}" >> .env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -77,7 +77,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./docker/Dockerfile.dev
+          file: ./docker/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/taste-server:latest
