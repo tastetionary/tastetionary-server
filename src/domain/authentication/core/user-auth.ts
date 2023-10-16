@@ -6,9 +6,9 @@ import {
 import { AuthenticationEntity } from '@domain/authentication/repository/authentication.repository';
 
 export class UserAuth {
-  readonly userId: number;
+  readonly userId: number | null;
   readonly authentications: AuthenticationEntity[];
-  constructor(userId: number, records: AuthenticationEntity[]) {
+  constructor(userId: number | null, records: AuthenticationEntity[]) {
     this.userId = userId;
     this.authentications = records;
   }

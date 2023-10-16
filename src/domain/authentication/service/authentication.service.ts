@@ -29,12 +29,13 @@ export class AuthenticationService {
           `only company email can be used, not general domain, given: ${param.identification}`,
         );
       }
-      const userAuth = await this.getUserAuth(param.userId as number);
-      if (userAuth.isDone(param.category, param.type)) {
-        throw new ServiceException(
-          `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
-        );
-      }
+    }
+
+    const userAuth = await this.getUserAuth(param);
+    if (userAuth.isDone(param.category, param.type)) {
+      throw new ServiceException(
+        `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
+      );
     }
 
     const code = this.createSixDigitCode();
@@ -167,9 +168,19 @@ export class AuthenticationService {
     });
   }
 
-  async getUserAuth(userId: number) {
-    const records = await this.repo.getAuthenticationByUserId(userId);
-    return new UserAuth(userId, records);
+  async getUserAuth(param: {
+    identification: string;
+    category: AuthenticationCategory;
+    type: AuthenticationType;
+    userId?: number;
+  }) {
+    const record = await this.repo.getAuthenticationByIdentification(
+      param.identification,
+      param.category,
+      param.type,
+    );
+    const data = record ? [record] : [];
+    return new UserAuth(param.userId ?? null, data);
   }
 
   async resetAuthentication(
