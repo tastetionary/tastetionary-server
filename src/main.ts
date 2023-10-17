@@ -3,6 +3,17 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@src/app.module';
 import { winstonLogger } from '@utils/winston.config';
 import { SwaggerModule } from '@nestjs/swagger';
+import * as Sentry from '@sentry/node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
+
+function initSentry(dsn: string, env: string) {
+  Sentry.init({
+    dsn,
+    environment: env,
+    integrations: [new ProfilingIntegration()],
+    profilesSampleRate: 1.0,
+  });
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -20,6 +31,9 @@ async function bootstrap() {
     },
   ];
   SwaggerModule.setup('api', app, docs);
+  const sentryDsn = config.get<string>('SENTRY_DSN') as string;
+  const env = config.get<string>('ENV') as string;
+  initSentry(sentryDsn, env);
   await app.listen(port);
 }
 
