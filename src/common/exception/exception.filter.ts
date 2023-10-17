@@ -5,6 +5,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import * as Sentry from '@sentry/node';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -38,6 +39,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       };
     }
 
+    Sentry.captureException(exception, { extra: detailResponse });
     // TODO modify detail property on env, when dev, return full response, but prod no
     response.status(status).json(detailResponse);
   }
