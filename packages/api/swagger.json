@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "version": "0.3.15",
+    "version": "0.3.16",
     "title": "taste-dictionary-api",
     "description": "",
     "license": {
@@ -1067,17 +1067,24 @@
       "ServerConfig": {
         "type": "object",
         "properties": {
-          "ENV": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
+          "env": {
+            "$ref": "#/components/schemas/Environment"
           }
         },
         "nullable": false,
         "required": [
-          "ENV"
+          "env"
         ],
         "x-typia-jsDocTags": []
+      },
+      "Environment": {
+        "type": "string",
+        "enum": [
+          "local",
+          "test",
+          "dev",
+          "prod"
+        ]
       },
       "ServerMetaData": {
         "type": "object",
