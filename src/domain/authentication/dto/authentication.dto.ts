@@ -52,3 +52,11 @@ export interface CreateAuthenticationResponse {
    */
   expiredAt: Date;
 }
+
+export interface DoneAuthenticationResponse {
+  /**
+   * authentication id which is done
+   * @type number
+   */
+  authenticationId: number;
+}

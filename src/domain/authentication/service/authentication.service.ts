@@ -181,6 +181,10 @@ export class AuthenticationService {
       id: authRecord.id,
       state: AuthenticationState.DONE,
     });
+
+    return {
+      id: authRecord.id,
+    };
   }
 
   async getUserAuth(param: {
