@@ -22,6 +22,6 @@ describe('configuration service', () => {
 
   it('should return expected', async () => {
     const res = service.getServerConfig();
-    expect(res).toHaveProperty('ENV');
+    expect(res).toHaveProperty('env');
   });
 });
