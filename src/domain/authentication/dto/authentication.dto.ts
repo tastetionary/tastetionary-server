@@ -1,4 +1,7 @@
-import { AuthenticationType } from '@domain/authentication/authentication.enum';
+import {
+  AuthenticationCategory,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
 
 export interface DoneProgressRequest {
   /**
@@ -26,6 +29,14 @@ export interface CreateProgressRequest {
    * @type AuthenticationType
    */
   type: AuthenticationType;
+}
+
+export interface CreateAccountProgressRequest extends CreateProgressRequest {
+  /**
+   * authentication category, such as account, company
+   * @type AuthenticationCategory
+   */
+  category: AuthenticationCategory;
 }
 
 export interface CreateAuthenticationResponse {
