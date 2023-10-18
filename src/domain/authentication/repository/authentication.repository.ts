@@ -5,7 +5,6 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import { number } from 'joi';
 
 export interface AuthenticationHistoryEntity {
   id: number;
