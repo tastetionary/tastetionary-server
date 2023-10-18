@@ -76,9 +76,9 @@ export interface AreaDto {
 
 export interface UserPropertyDto {
   /**
-   * company name,
+   * company name, it will come with company authentication
    * example: google
    * @type string
    */
-  companyName: string;
+  companyName?: string;
 }
