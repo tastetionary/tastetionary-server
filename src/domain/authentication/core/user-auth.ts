@@ -13,6 +13,14 @@ export class UserAuth {
     this.authentications = records;
   }
 
+  getAuth(identification: string, category: AuthenticationCategory) {
+    return this.authentications.find(
+      (history) =>
+        history.identification === identification &&
+        history.category === category,
+    );
+  }
+
   isInProgress(category: AuthenticationCategory, type: AuthenticationType) {
     const record = this.authentications.find(
       (history) => history.category === category && history.type === type,
