@@ -52,7 +52,11 @@ export class UserRepository {
 
   async updateUserById(
     id: number,
-    param: { nickname?: string; state?: string },
+    param: {
+      nickname?: string;
+      state?: string;
+      property?: Record<string, any>;
+    },
   ) {
     return this.prisma.users.update({
       where: { id },

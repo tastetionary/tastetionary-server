@@ -15,6 +15,6 @@ import { AuthenticationRepository } from './repository/authentication.repository
     AuthenticationService,
     AuthenticationRepository,
   ],
-  exports: [],
+  exports: [AuthenticationService],
 })
 export class AuthenticationModule {}

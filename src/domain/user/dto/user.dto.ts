@@ -76,9 +76,23 @@ export interface AreaDto {
 
 export interface UserPropertyDto {
   /**
+   * company data, not essential, when user authenticate with company
+   * @type CompanyDto
+   */
+  companyData?: CompanyDto;
+}
+
+export interface CompanyDto {
+  /**
+   * authentication id which is done
+   * @type number
+   */
+  authenticationId: number;
+
+  /**
    * company name, it will come with company authentication
    * example: google
    * @type string
    */
-  companyName?: string;
+  companyName: string;
 }

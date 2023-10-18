@@ -7,11 +7,19 @@ import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { UserModule } from '@domain/user/user.module';
 import { AccountModule } from '@domain/account/account.module';
 import { AccountCategory } from '@domain/account/account.enum';
+import { AuthenticationService } from '@domain/authentication/service/authentication.service';
+import {
+  AuthenticationCategory,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
+import * as brevo from '@thirdParty/brevo/brevo';
 
 describe('user service', () => {
   let service: UserService;
   let prisma: PrismaService;
   let module: TestingModule;
+  let authenticationService: AuthenticationService;
+
   beforeAll(async () => {
     module = (await appModuleFixture(
       [],
@@ -20,14 +28,20 @@ describe('user service', () => {
     )) as TestingModule;
     service = module.get(UserService);
     prisma = module.get(PrismaService);
+    authenticationService = module.get(AuthenticationService);
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['users', 'accounts']);
+    await truncateTables(prisma, [
+      'users',
+      'accounts',
+      'authentications',
+      'authentication_histories',
+    ]);
   });
 
   const DTO: RegisterUserDTO = {
-    userProperty: { companyName: 'test' },
+    userProperty: {},
     areas: [
       {
         latitude: 1,
@@ -55,7 +69,34 @@ describe('user service', () => {
     ],
   };
 
+  it('with company data should update company authentication', async () => {
+    const tempMock = jest.spyOn(brevo, 'sendEmail');
+    tempMock.mockResolvedValue(Promise.resolve(true));
+    const authData = {
+      category: AuthenticationCategory.COMPANY,
+      identification: 'user-service@crud.com',
+      type: AuthenticationType.EMAIL,
+    };
+    const res = await authenticationService.createProgressAuthentication(
+      authData,
+    );
+    const { id: authId } =
+      await authenticationService.doneProgressAuthentication(res.id, '000000');
+
+    const deepCopiedData = JSON.parse(JSON.stringify(DTO));
+    deepCopiedData.userProperty.companyData = {
+      companyName: 'test',
+      authenticationId: authId,
+    };
+    const user = await service.register(deepCopiedData);
+
+    const userAuth = await authenticationService.getUserAuth(authData);
+    const auth = userAuth.getAuth(authData.identification, authData.category);
+    expect(auth?.userId).toEqual(user.id);
+  });
+
   it('should return end-user', async () => {
+    console.log(DTO);
     const user = await service.register(DTO);
     const endUser = await service.getEndUser(user.id);
     expect(endUser).not.toBeNull();

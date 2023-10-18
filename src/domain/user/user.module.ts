@@ -8,9 +8,10 @@ import { AgreementRepository } from '@domain/user/repository/agreements.reposito
 import { AreaRepository } from '@domain/user/repository/area.repository';
 import { JwtService } from '@nestjs/jwt';
 import { AccountModule } from '@domain/account/account.module';
+import { AuthenticationModule } from '@domain/authentication/authentication.module';
 
 @Module({
-  imports: [AccountModule],
+  imports: [AccountModule, AuthenticationModule],
   controllers: [UserController],
   providers: [
     UserService,
