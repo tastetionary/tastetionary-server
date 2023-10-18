@@ -5,6 +5,7 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
+import { number } from 'joi';
 
 export interface AuthenticationHistoryEntity {
   id: number;
@@ -27,6 +28,10 @@ export interface AuthenticationEntity {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+type UpdateParam =
+  | { id: number; userId: number }
+  | { id: number; state: string };
 
 @Injectable()
 export class AuthenticationRepository {
@@ -135,13 +140,17 @@ export class AuthenticationRepository {
   }
 
   // @NOTE add params when needed
-  async updateAuthentication(param: {
-    id: number;
-    state: AuthenticationState;
-  }) {
+  async updateAuthentication(param: UpdateParam) {
+    const data = {};
+    if ('userId' in param) {
+      data['userId'] = param.userId;
+    }
+    if ('state' in param) {
+      data['state'] = param.state;
+    }
     await this.prisma.authentications.update({
       where: { id: param.id },
-      data: { state: param.state },
+      data,
     });
   }
 

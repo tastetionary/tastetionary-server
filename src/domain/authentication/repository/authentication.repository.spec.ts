@@ -30,22 +30,20 @@ describe('authentication', () => {
 
   it('should update authentication', async () => {
     const data = {
-      userId: 1,
       identification: 'identification',
       category: AuthenticationCategory.COMPANY,
       type: AuthenticationType.EMAIL,
       state: AuthenticationState.INPROGRESS,
     };
-    await repo.saveAuthentication(data);
-
-    let res = await repo.getAuthenticationByUserId(data.userId);
+    const res = await repo.saveAuthentication(data);
+    const userId = 1244;
     await repo.updateAuthentication({
-      id: res[0].id,
-      state: AuthenticationState.DONE,
+      id: res.id,
+      userId,
     });
 
-    res = await repo.getAuthenticationByUserId(data.userId);
-    expect(res[0].state).toEqual(AuthenticationState.DONE);
+    const records = await repo.getAuthenticationByUserId(userId);
+    expect(records[0].id).toEqual(res.id);
   });
 
   it('should create authentication history ', async () => {

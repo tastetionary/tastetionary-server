@@ -227,4 +227,11 @@ export class AuthenticationService {
 
     await this.repo.deleteAuthentications([auth.id]);
   }
+
+  async syncAuthentication(param: {
+    userId: number;
+    authenticationId: number;
+  }) {
+    // this.repo.updateAuthentication({})
+  }
 }
