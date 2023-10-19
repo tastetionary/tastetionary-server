@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "version": "0.3.15",
+    "version": "0.3.17",
     "title": "taste-dictionary-api",
     "description": "",
     "license": {
@@ -150,7 +150,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateProgressRequest"
+                "$ref": "#/components/schemas/CreateAccountProgressRequest"
               }
             }
           },
@@ -185,7 +185,7 @@
             "name": "summary",
             "text": [
               {
-                "text": "create authentication in progress, return progress id, it need when check",
+                "text": "create authentication in progress, return progress id, it need when check. it can be used for account, company",
                 "kind": "text"
               }
             ]
@@ -287,7 +287,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_null_gt_"
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_DoneAuthenticationResponse_gt_"
                 }
               }
             },
@@ -309,7 +309,7 @@
             "name": "summary",
             "text": [
               {
-                "text": "done in progress authentication",
+                "text": "done in progress authentication, return id will be uses",
                 "kind": "text"
               }
             ]
@@ -897,9 +897,12 @@
         "nullable": false,
         "x-typia-jsDocTags": []
       },
-      "CreateProgressRequest": {
+      "CreateAccountProgressRequest": {
         "type": "object",
         "properties": {
+          "category": {
+            "$ref": "#/components/schemas/AuthenticationCategory"
+          },
           "identification": {
             "description": "unique identification for authentication, such as test@gmail.com",
             "x-typia-jsDocTags": [
@@ -940,10 +943,18 @@
         },
         "nullable": false,
         "required": [
+          "category",
           "identification",
           "type"
         ],
         "x-typia-jsDocTags": []
+      },
+      "AuthenticationCategory": {
+        "type": "string",
+        "enum": [
+          "account",
+          "company"
+        ]
       },
       "BaseResponseDto_lt_CreateAuthenticationResponse_gt_": {
         "type": "object",
@@ -1004,6 +1015,54 @@
         ],
         "x-typia-jsDocTags": []
       },
+      "CreateProgressRequest": {
+        "type": "object",
+        "properties": {
+          "identification": {
+            "description": "unique identification for authentication, such as test@gmail.com",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "type": {
+            "description": "authentication type, such as email",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "AuthenticationType",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "email"
+            ]
+          }
+        },
+        "nullable": false,
+        "required": [
+          "identification",
+          "type"
+        ],
+        "x-typia-jsDocTags": []
+      },
       "DoneProgressRequest": {
         "type": "object",
         "properties": {
@@ -1049,13 +1108,11 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "BaseResponseDto_lt_null_gt_": {
+      "BaseResponseDto_lt_DoneAuthenticationResponse_gt_": {
         "type": "object",
         "properties": {
           "data": {
-            "type": "null",
-            "x-typia-required": true,
-            "x-typia-optional": false
+            "$ref": "#/components/schemas/DoneAuthenticationResponse"
           }
         },
         "nullable": false,
@@ -1064,20 +1121,54 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "ServerConfig": {
+      "DoneAuthenticationResponse": {
         "type": "object",
         "properties": {
-          "ENV": {
+          "authenticationId": {
+            "description": "authentication id which is done",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
             "x-typia-required": true,
             "x-typia-optional": false,
-            "type": "string"
+            "type": "number"
           }
         },
         "nullable": false,
         "required": [
-          "ENV"
+          "authenticationId"
         ],
         "x-typia-jsDocTags": []
+      },
+      "ServerConfig": {
+        "type": "object",
+        "properties": {
+          "env": {
+            "$ref": "#/components/schemas/Environment"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "env"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "Environment": {
+        "type": "string",
+        "enum": [
+          "local",
+          "test",
+          "dev",
+          "prod"
+        ]
       },
       "ServerMetaData": {
         "type": "object",
@@ -2154,8 +2245,35 @@
       "UserPropertyDto": {
         "type": "object",
         "properties": {
+          "companyData": {
+            "$ref": "#/components/schemas/CompanyDto"
+          }
+        },
+        "nullable": false,
+        "x-typia-jsDocTags": []
+      },
+      "CompanyDto": {
+        "type": "object",
+        "properties": {
+          "authenticationId": {
+            "description": "authentication id which is done",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
           "companyName": {
-            "description": "company name,\nexample: google",
+            "description": "company name, it will come with company authentication\nexample: google",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
@@ -2174,6 +2292,7 @@
         },
         "nullable": false,
         "required": [
+          "authenticationId",
           "companyName"
         ],
         "x-typia-jsDocTags": []
