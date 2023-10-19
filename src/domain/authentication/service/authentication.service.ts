@@ -24,8 +24,8 @@ export class AuthenticationService {
     category: AuthenticationCategory;
     type: AuthenticationType;
   }) {
+    const { env } = this.cfgService.getServerConfig();
     if (param.category == AuthenticationCategory.COMPANY) {
-      const { env } = this.cfgService.getServerConfig();
       if (this.isGeneralEmailDomain(param.type, param.identification, env)) {
         throw new ServiceException(
           `only company email can be used, not general domain, given: ${param.identification}`,
@@ -48,7 +48,7 @@ export class AuthenticationService {
       await this.repo.deleteAuthentications([inProgressAuth.id]);
     }
 
-    const code = this.createSixDigitCode();
+    const code = this.createSixDigitCode(env);
 
     const res = await this.sendAuthenticationCode(
       param.category,
@@ -141,7 +141,10 @@ export class AuthenticationService {
     return currentDate;
   }
 
-  private createSixDigitCode() {
+  private createSixDigitCode(env?: Environment) {
+    if (env == Environment.TEST || env == Environment.LOCAL) {
+      return '000000';
+    }
     const min = 100000;
     const max = 999999;
     const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -156,7 +159,6 @@ export class AuthenticationService {
         `history: ${historyId} not found, check history id`,
       );
     }
-
     if (historyRecord.code != code) {
       throw new ServiceException(
         'not matched code',
@@ -181,6 +183,10 @@ export class AuthenticationService {
       id: authRecord.id,
       state: AuthenticationState.DONE,
     });
+
+    return {
+      id: authRecord.id,
+    };
   }
 
   async getUserAuth(param: {
@@ -222,5 +228,15 @@ export class AuthenticationService {
     }
 
     await this.repo.deleteAuthentications([auth.id]);
+  }
+
+  async syncAuthentication(param: {
+    userId: number;
+    authenticationId: number;
+  }) {
+    return this.repo.updateAuthentication({
+      id: param.authenticationId,
+      userId: param.userId,
+    });
   }
 }

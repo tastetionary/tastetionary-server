@@ -14,6 +14,7 @@ import {
   CreateAuthenticationResponse,
   DoneProgressRequest,
   CreateAccountProgressRequest,
+  DoneAuthenticationResponse,
 } from '@domain/authentication/dto/authentication.dto';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
@@ -66,12 +67,15 @@ export class AuthenticationController {
 
   /**
    * @tag authentication
-   * @summary done in progress authentication
+   * @summary done in progress authentication, return id will be uses
    */
   @TypedRoute.Post('/status/done')
   @HttpCode(200)
-  async doneProgress(@TypedBody() dto: DoneProgressRequest) {
-    await this.service.doneProgressAuthentication(dto.historyId, dto.code);
-    return new BaseResponseDto(null);
+  async doneProgress(
+    @TypedBody() dto: DoneProgressRequest,
+  ): Promise<BaseResponseDto<DoneAuthenticationResponse>> {
+    const { id: authenticationId } =
+      await this.service.doneProgressAuthentication(dto.historyId, dto.code);
+    return new BaseResponseDto({ authenticationId });
   }
 }

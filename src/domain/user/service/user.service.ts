@@ -13,6 +13,7 @@ import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { getRandomItem } from '@common/util';
 import { AgreementDTO } from '@domain/user/dto/user.dto';
 import { EndUser } from '@domain/user/core/end-user';
+import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,9 @@ export class UserService {
   ) {}
   @Inject(AccountService)
   private readonly accountService: AccountService;
+
+  @Inject(AuthenticationService)
+  private readonly authenticationService: AuthenticationService;
 
   async getEndUser(userId: number) {
     const areas = await this.areaRepo.getAreasByUserId(userId);
@@ -62,11 +66,21 @@ export class UserService {
 
   private async registerUser(dto: UserPropertyDto) {
     const nickname = this.getNickname();
+
     const user = await this.userRepo.saveUser({
       state: UserState.ACTIVE,
       nickname,
-      property: dto,
+      property: {},
     });
+    if (dto.companyData) {
+      await this.authenticationService.syncAuthentication({
+        userId: user.id,
+        authenticationId: dto.companyData.authenticationId,
+      });
+      await this.userRepo.updateUserById(user.id, {
+        property: { companyName: dto.companyData.companyName },
+      });
+    }
     return user;
   }
 
