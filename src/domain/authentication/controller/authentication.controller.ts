@@ -13,6 +13,7 @@ import {
   CreateProgressRequest,
   CreateAuthenticationResponse,
   DoneProgressRequest,
+  CreateAccountProgressRequest,
 } from '@domain/authentication/dto/authentication.dto';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
@@ -26,17 +27,17 @@ export class AuthenticationController {
 
   /**
    * @tag authentication
-   * @summary create authentication in progress, return progress id, it need when check
+   * @summary create authentication in progress, return progress id, it need when check. it can be used for account, company
    */
   @TypedRoute.Post('/account')
   @HttpCode(200)
   async createProgressAboutAccount(
-    @TypedBody() dto: CreateProgressRequest,
+    @TypedBody() dto: CreateAccountProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
     // TODO add limit logic
     const res = await this.service.createProgressAuthentication({
       identification: dto.identification,
-      category: AuthenticationCategory.ACCOUNT,
+      category: dto.category,
       type: dto.type,
     });
     return new BaseResponseDto(res);

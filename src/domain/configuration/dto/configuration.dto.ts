@@ -1,5 +1,7 @@
+import { Environment } from '@root/src/env.validation';
+
 export interface ServerConfig {
-  ENV: string;
+  env: Environment;
 }
 
 export interface ServerMetaData {

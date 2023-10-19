@@ -4,15 +4,16 @@ import {
   ServerConfig,
   ServerMetaData,
 } from '@domain/configuration/dto/configuration.dto';
+import { Environment } from '@root/src/env.validation';
 
 @Injectable()
 export class ConfigurationService {
   constructor(private configService: ConfigService) {}
 
   getServerConfig(): ServerConfig {
-    const ENV = this.configService.get<string>('ENV', 'undefined');
+    const env = this.configService.get<Environment>('ENV', Environment.LOCAL);
     return {
-      ENV,
+      env,
     };
   }
 

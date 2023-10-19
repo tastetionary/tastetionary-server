@@ -9,6 +9,7 @@ import { ServiceException } from '@common/exception/custom.exception';
 import { UserAuth } from '@domain/authentication/core/user-auth';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { sendEmail } from '@thirdParty/brevo/brevo';
+import { Environment } from '@root/src/env.validation';
 
 @Injectable()
 export class AuthenticationService {
@@ -24,7 +25,8 @@ export class AuthenticationService {
     type: AuthenticationType;
   }) {
     if (param.category == AuthenticationCategory.COMPANY) {
-      if (this.isGeneralEmailDomain(param.type, param.identification)) {
+      const { env } = this.cfgService.getServerConfig();
+      if (this.isGeneralEmailDomain(param.type, param.identification, env)) {
         throw new ServiceException(
           `only company email can be used, not general domain, given: ${param.identification}`,
         );
@@ -36,6 +38,14 @@ export class AuthenticationService {
       throw new ServiceException(
         `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
       );
+    }
+
+    const inProgressAuth = userAuth.getAuth(
+      param.identification,
+      param.category,
+    );
+    if (inProgressAuth) {
+      await this.repo.deleteAuthentications([inProgressAuth.id]);
     }
 
     const code = this.createSixDigitCode();
@@ -77,7 +87,12 @@ export class AuthenticationService {
   private isGeneralEmailDomain(
     type: AuthenticationType,
     identification: string,
+    env: Environment,
   ) {
+    if (env != Environment.PRODUCTION) {
+      return false;
+    }
+
     if (type != AuthenticationType.EMAIL) {
       return false;
     }

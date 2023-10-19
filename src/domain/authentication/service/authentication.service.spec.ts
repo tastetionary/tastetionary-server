@@ -13,12 +13,15 @@ import {
 } from '@domain/authentication/repository/authentication.repository';
 import { ServiceException } from '@common/exception/custom.exception';
 import * as brevo from '@thirdParty/brevo/brevo';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { Environment } from '@root/src/env.validation';
 
 describe('authentication service', () => {
   let module: TestingModule;
   let service: AuthenticationService;
   let prisma: PrismaService;
   let repo: AuthenticationRepository;
+  let cfgService: ConfigurationService;
   beforeAll(async () => {
     module = (await appModuleFixture(
       [],
@@ -28,6 +31,7 @@ describe('authentication service', () => {
     service = module.get<AuthenticationService>(AuthenticationService);
     prisma = module.get(PrismaService);
     repo = module.get(AuthenticationRepository);
+    cfgService = module.get(ConfigurationService);
   });
 
   beforeEach(async () => {
@@ -75,9 +79,12 @@ describe('authentication service', () => {
   describe('createProgressAuthentication', () => {
     const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
+
     it.each([['test'], ['daum'], ['naver'], ['gmail'], ['hanmail']])(
       'with not valid company domain should raise error',
       async (domain) => {
+        const tempCfg = jest.spyOn(cfgService, 'getServerConfig');
+        tempCfg.mockReturnValue({ env: Environment.PRODUCTION });
         const userId = 999;
         await expect(
           service.createProgressAuthentication({
@@ -89,6 +96,29 @@ describe('authentication service', () => {
         ).rejects.toThrowError(ServiceException);
       },
     );
+
+    it('duplicated should progress', async () => {
+      const userId = 999;
+      await service.createProgressAuthentication({
+        userId,
+        category: AuthenticationCategory.COMPANY,
+        identification: 'some@crud.com',
+        type: AuthenticationType.EMAIL,
+      });
+
+      const res = await service.createProgressAuthentication({
+        userId,
+        category: AuthenticationCategory.COMPANY,
+        identification: 'some@crud.com',
+        type: AuthenticationType.EMAIL,
+      });
+
+      const history = (await repo.getHistoryById(
+        res.id,
+      )) as AuthenticationHistoryEntity;
+
+      expect(history).toBeDefined();
+    });
 
     it('already exist email should throw error', async () => {
       const userId = 999;
