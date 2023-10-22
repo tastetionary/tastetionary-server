@@ -51,6 +51,8 @@ export class AuthGuard implements CanActivate {
 
   private isMasterToken(request: Request) {
     const [_, token] = request.headers.authorization?.split(' ') ?? [];
+    if (!token) return false;
+
     return token.includes(this.masterToken);
   }
   private extractTokenFromHeader(request: Request): string | undefined {
