@@ -1,15 +1,17 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture } from '@root/jest.setup';
+import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { UserModule } from '@domain/user/user.module';
 import { UserService } from '@domain/user/service/user.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
 
 describe('user controller', () => {
   let app: INestApplication;
   let service: UserService;
+  let configService: ConfigurationService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -19,10 +21,31 @@ describe('user controller', () => {
     )) as TestingModule;
     service = module.get<UserService>(UserService);
     app = module.createNestApplication();
+    configService = module.get<ConfigurationService>(ConfigurationService);
     await app.init();
   });
 
-  it('should return success', async () => {
+  it('updateArea should return success', async () => {
+    jest.spyOn(service, 'updateArea').mockImplementation();
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(122, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .put('/v1/user')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        latitude: 1,
+        longitude: 1,
+        category: AreaCategory.ACTIVITY_AREA,
+        address: 'test',
+      });
+
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('register should return success', async () => {
     jest.spyOn(service, 'register').mockImplementation();
 
     const res = await request(app.getHttpServer())
