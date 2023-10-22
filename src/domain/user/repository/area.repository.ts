@@ -64,4 +64,10 @@ export class AreaRepository {
       FROM user_areas WHERE user_id = ${userId}`;
     return areas;
   }
+
+  async deleteArea(params: { userId; category: AreaCategory }) {
+    await this.prisma.userAreas.deleteMany({
+      where: { userId: params.userId, category: params.category },
+    });
+  }
 }
