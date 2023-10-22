@@ -7,6 +7,7 @@ import { UserService } from '@domain/user/service/user.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { EndUser } from '@domain/user/core/end-user';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -23,6 +24,28 @@ describe('user controller', () => {
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
     await app.init();
+  });
+  it('getProfile should return data', async () => {
+    const userId = 122;
+    jest
+      .spyOn(service, 'getEndUser')
+      .mockResolvedValueOnce(
+        new EndUser({ id: userId, nickname: 'nick', state: 'state' }),
+      );
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/user')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toEqual(200);
+
+    expect(res.body).toHaveProperty('id');
+    expect(res.body).toHaveProperty('nickname');
+    expect(res.body).toHaveProperty('activity_area');
+    expect(res.body).toHaveProperty('dining_area');
   });
 
   it('updateArea should return success', async () => {

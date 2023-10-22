@@ -34,6 +34,18 @@ export class UserController {
 
   /**
    * @tag user
+   * @summary get profile
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Get('/')
+  async getProfile(@Request() req): Promise<BaseResponseDto<object>> {
+    const user = await this.service.getEndUser(req.user.userId);
+    return new BaseResponseDto(user);
+  }
+
+  /**
+   * @tag user
    * @summary update user area
    */
   @HttpCode(200)
