@@ -760,6 +760,47 @@
         ],
         "x-nestia-method": "POST"
       },
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_ProfileResponse_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.user.getProfile",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "user",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get profile",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "GET"
+      },
       "put": {
         "tags": [
           "user"
@@ -2469,6 +2510,113 @@
         "required": [
           "category",
           "is_agree"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "BaseResponseDto_lt_ProfileResponse_gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProfileResponse"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "ProfileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "userId",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "nickname": {
+            "description": "user nickname created by server\nexample: google",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "activity_area": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/object"
+              },
+              {
+                "$ref": "#/components/schemas/AreaDto"
+              }
+            ],
+            "description": "user activity_area, if not, return empty object",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "AreaDto",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false
+          },
+          "dining_area": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/object"
+              },
+              {
+                "$ref": "#/components/schemas/AreaDto"
+              }
+            ],
+            "description": "user dining_area,",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "AreaDto",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": false,
+            "x-typia-optional": true
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "nickname",
+          "activity_area"
         ],
         "x-typia-jsDocTags": []
       }
