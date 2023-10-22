@@ -4,7 +4,7 @@ xdescribe('test', () => {
   it('should send custom', async () => {
     const config = {
       apiKey: '',
-      sender: { email: 'no-reply@tastetionary.com', name: '맛셔너러팀' },
+      sender: { email: 'no-reply@tastetionary.com', name: '맛셔너리팀' },
     };
     const content = {
       subject: 'local test',
