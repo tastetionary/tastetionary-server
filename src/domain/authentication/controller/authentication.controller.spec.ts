@@ -33,7 +33,9 @@ describe('authentication controller', () => {
       expiresIn: '10h',
     });
 
-    jest.spyOn(service, 'doneProgressAuthentication').mockResolvedValue();
+    jest
+      .spyOn(service, 'doneProgressAuthentication')
+      .mockResolvedValue({ id: 1 });
 
     const res = await request(app.getHttpServer())
       .post('/v1/authentication/status/done')

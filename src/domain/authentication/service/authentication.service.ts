@@ -33,20 +33,12 @@ export class AuthenticationService {
       }
     }
 
-    const userAuth = await this.getUserAuth(param);
-    if (userAuth.isDone(param.category, param.type)) {
-      throw new ServiceException(
-        `already authenticated, cannot create progress authentication, ${param.category}, ${param.type}`,
-      );
-    }
-
-    const inProgressAuth = userAuth.getAuth(
+    await this.resetAuthentication(
       param.identification,
       param.category,
+      param.type,
+      param.userId,
     );
-    if (inProgressAuth) {
-      await this.repo.deleteAuthentications([inProgressAuth.id]);
-    }
 
     const code = this.createSixDigitCode(env);
 
@@ -205,10 +197,10 @@ export class AuthenticationService {
   }
 
   async resetAuthentication(
-    userId: number,
     identification: string,
     category: AuthenticationCategory,
     type: AuthenticationType,
+    userId?: number,
   ) {
     const auth = await this.repo.getAuthenticationByIdentification(
       identification,
@@ -220,11 +212,13 @@ export class AuthenticationService {
       return;
     }
 
-    if (auth.userId != userId) {
-      throw new ServiceException(
-        'not differ user trying to delete other auth',
-        `triedUser: ${userId}, targetAuthId: ${auth.id}`,
-      );
+    if (userId) {
+      if (auth.userId != userId) {
+        throw new ServiceException(
+          'not differ user trying to delete other auth',
+          `triedUser: ${userId}, targetAuthId: ${auth.id}`,
+        );
+      }
     }
 
     await this.repo.deleteAuthentications([auth.id]);

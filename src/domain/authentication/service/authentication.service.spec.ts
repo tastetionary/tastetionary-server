@@ -65,10 +65,10 @@ describe('authentication service', () => {
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
 
       await service.resetAuthentication(
-        userId,
         data.identification,
         data.category,
         data.type,
+        userId,
       );
 
       userAuth = await service.getUserAuth(data);
@@ -120,9 +120,9 @@ describe('authentication service', () => {
       expect(history).toBeDefined();
     });
 
-    it('already exist email should throw error', async () => {
+    it('already exist email should return code', async () => {
       const userId = 999;
-      const res = await service.createProgressAuthentication({
+      let res = await service.createProgressAuthentication({
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
@@ -135,14 +135,14 @@ describe('authentication service', () => {
 
       await service.doneProgressAuthentication(history.id, history.code);
 
-      await expect(
-        service.createProgressAuthentication({
-          userId,
-          category: AuthenticationCategory.COMPANY,
-          identification: 'some@crud.com',
-          type: AuthenticationType.EMAIL,
-        }),
-      ).rejects.toThrowError(ServiceException);
+      res = await service.createProgressAuthentication({
+        userId,
+        category: AuthenticationCategory.COMPANY,
+        identification: 'some@crud.com',
+        type: AuthenticationType.EMAIL,
+      });
+
+      expect(res).toBeDefined();
     });
 
     it('should create auth history', async () => {
