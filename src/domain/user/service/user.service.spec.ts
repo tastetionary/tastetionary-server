@@ -69,6 +69,19 @@ describe('user service', () => {
     ],
   };
 
+  it('update area should update', async () => {
+    const user = await service.register(DTO);
+    await service.updateArea(user.id, {
+      category: AreaCategory.ACTIVITY_AREA,
+      address: 'update activity',
+      latitude: 100,
+      longitude: 1000,
+    });
+
+    const updatedUser = await service.getEndUser(user.id);
+    expect(updatedUser.activityArea?.address).toEqual('update activity');
+  });
+
   it('with company data should update company authentication', async () => {
     const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
@@ -96,7 +109,6 @@ describe('user service', () => {
   });
 
   it('should return end-user', async () => {
-    console.log(DTO);
     const user = await service.register(DTO);
     const endUser = await service.getEndUser(user.id);
     expect(endUser).not.toBeNull();
