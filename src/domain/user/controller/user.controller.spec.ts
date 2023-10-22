@@ -42,10 +42,10 @@ describe('user controller', () => {
       .set('Authorization', `Bearer ${token}`);
     expect(res.statusCode).toEqual(200);
 
-    expect(res.body).toHaveProperty('id');
-    expect(res.body).toHaveProperty('nickname');
-    expect(res.body).toHaveProperty('activity_area');
-    expect(res.body).toHaveProperty('dining_area');
+    expect(res.body.data).toHaveProperty('id');
+    expect(res.body.data).toHaveProperty('nickname');
+    expect(res.body.data).toHaveProperty('activity_area');
+    expect(res.body.data).toHaveProperty('dining_area');
   });
 
   it('updateArea should return success', async () => {
