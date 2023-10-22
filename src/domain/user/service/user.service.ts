@@ -103,4 +103,11 @@ export class UserService {
   } {
     return nicknameSource;
   }
+
+  // @TODO modify to use area-id and update, not delete and insert
+  async updateArea(userId: number, dto: AreaDto) {
+    await this.areaRepo.deleteArea({ userId, category: dto.category });
+    await this.registerArea(userId, [dto]);
+    return true;
+  }
 }

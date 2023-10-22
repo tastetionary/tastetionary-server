@@ -21,6 +21,26 @@ describe('area repository', () => {
     await truncateTables(prisma, ['user_areas']);
   });
 
+  it('should delete area', async () => {
+    const data = [
+      {
+        userId: 1,
+        category: AreaCategory.ACTIVITY_AREA,
+        order: 0,
+        address: 'address',
+        location: {
+          latitude: 1,
+          longitude: 1,
+        },
+      },
+    ];
+    await repo.saveAreas(data);
+
+    await repo.deleteArea({ userId: 1, category: AreaCategory.ACTIVITY_AREA });
+    const res = await repo.getAreasByUserId(1);
+    expect(res.length).toEqual(0);
+  });
+
   it('should save area', async () => {
     const data = [
       {
