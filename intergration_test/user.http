@@ -22,7 +22,7 @@ Content-Type: {{content_type_json}}
     }
   ],
   "account": {
-    "identification": "matthew",
+    "identification": "matthew-1022",
     "password": "pwd",
     "category": "email"
     
@@ -33,4 +33,30 @@ Content-Type: {{content_type_json}}
       "is_agree": true
     }
   ]
+}
+
+
+### get token(use after register user)
+# @name token
+post {{base_url}}/v1/account/tokens
+content-type: {{content_type_json}}
+
+{
+  "identification": "matthew-1022",
+  "password": "pwd",
+  "category": "email"
+}
+
+###
+@access_token = {{token.response.body.data.accessToken}}
+### Register User 
+PUT {{base_url}}/v1/user
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+      "latitude": 100,
+      "longitude": 100,
+      "category": "activity_area",
+      "address":"activity-update"
 }
