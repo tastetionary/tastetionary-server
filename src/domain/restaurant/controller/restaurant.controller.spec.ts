@@ -1,7 +1,11 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture, createUserToken } from '@root/jest.setup';
+import {
+  appModuleFixture,
+  createUserToken,
+  userEntityFactory,
+} from '@root/jest.setup';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import {
@@ -51,18 +55,21 @@ describe('restaurant controller', () => {
 
   it('/recommendation, should return 200', async () => {
     const userId = 123;
+    const userEntity = userEntityFactory(userId);
     jest.spyOn(userService, 'getEndUser').mockImplementation(async () => {
-      return new EndUser(userId, [
-        {
-          id: 1,
-          userId,
-          category: AreaCategory.DINING_AREA,
-          order: 1,
-          address: 'address',
-          latitude: 37.517331925853,
-          longitude: 127.047377408384,
-        },
-      ]);
+      return new EndUser(userEntity, {
+        areas: [
+          {
+            id: 1,
+            userId,
+            category: AreaCategory.DINING_AREA,
+            order: 1,
+            address: 'address',
+            latitude: 37.517331925853,
+            longitude: 127.047377408384,
+          },
+        ],
+      });
     });
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(userId, key, {
