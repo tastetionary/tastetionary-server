@@ -4,7 +4,7 @@ post {{base_url}}/v1/account/tokens
 content-type: {{content_type_json}}
 
 {
-  "identification": "matthew-1023",
+  "identification": "matthew-0917",
   "password": "pwd",
   "category": "email"
 }
