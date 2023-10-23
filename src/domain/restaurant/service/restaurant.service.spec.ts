@@ -61,7 +61,7 @@ describe('restaurant service', () => {
           userId: 1,
           category: RestaurantCategory.ASIAN,
           summary: 'asian',
-          opinion: null,
+          opinion: 'Y',
           keywords: ['clean'],
           price: 10_000,
         },
@@ -71,7 +71,17 @@ describe('restaurant service', () => {
           userId: 1,
           category: RestaurantCategory.BUFFET,
           summary: 'buffet',
-          opinion: null,
+          opinion: 'N',
+          keywords: ['kind'],
+          price: 15_000,
+        },
+        {
+          id: 3,
+          external_restaurant_information_id: 1n,
+          userId: 1,
+          category: RestaurantCategory.BUFFET,
+          summary: 'buffet',
+          opinion: 'N',
           keywords: ['kind'],
           price: 15_000,
         },
@@ -79,6 +89,7 @@ describe('restaurant service', () => {
 
       const res = service.aggregateRestaurantReview(reviews);
       expect(res.data.aggregatePrice.avg).toBe(12_500);
+      expect(res.data.revisitRatio).toBe(33.3);
     });
 
     it('aggregatePrice, should return expected', () => {

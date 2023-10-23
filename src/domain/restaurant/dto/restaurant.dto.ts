@@ -77,6 +77,7 @@ export interface AggregateReviewDTO {
   keywords: string[];
   prices: number[];
   aggregatePrice: { [index: string]: number };
+  revisitRatio: number;
   totalCount: number;
 }
 

@@ -165,6 +165,7 @@ export class RestaurantService {
       keywords: [],
       prices: [],
       aggregatePrice: {},
+      revisitRatio: 0,
       totalCount: randomReviews.length,
     };
     fx.pipe(
@@ -179,11 +180,17 @@ export class RestaurantService {
       }),
       fx.map((data) => {
         data['aggregatePrice'] = this.aggregatePrice(data.prices);
+        data['revisitRatio'] = this.calcRevisitRatio(data.opinions);
         return data;
       }),
       fx.toArray,
     );
     return { id: randomId, data };
+  }
+
+  calcRevisitRatio(opinions: string[], standard = 'Y') {
+    const standardCount = opinions.filter((op) => op === standard).length;
+    return parseFloat(((standardCount / opinions.length) * 100).toFixed(1));
   }
 
   aggregatePrice(prices: number[]) {
