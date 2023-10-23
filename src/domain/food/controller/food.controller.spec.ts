@@ -9,7 +9,6 @@ import { ConfigurationService } from '@domain/configuration/configuration.servic
 
 describe('food controller', () => {
   let app: INestApplication;
-  let configService: ConfigurationService;
   let service: FoodService;
 
   beforeAll(async () => {
@@ -19,7 +18,6 @@ describe('food controller', () => {
       [FoodModule],
     )) as TestingModule;
     app = module.createNestApplication();
-    configService = module.get<ConfigurationService>(ConfigurationService);
     service = module.get(FoodService);
     await app.init();
   });
@@ -44,14 +42,8 @@ describe('food controller', () => {
       return mock;
     });
 
-    const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(123, key, {
-      expiresIn: '10h',
-    });
-
     const res = await request(app.getHttpServer())
       .post('/v1/food/recommendation')
-      .set('Authorization', `Bearer ${token}`)
       .send(DATA);
 
     expect(res.statusCode).toEqual(200);

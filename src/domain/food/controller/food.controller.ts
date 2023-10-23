@@ -25,9 +25,7 @@ export class FoodController {
   /**
    * @tag food
    * @summary get food recommentation
-   * @security bearer
    */
-  @UseGuards(AuthGuard)
   @TypedRoute.Post('/recommendation')
   @HttpCode(200)
   async getRecommentation(

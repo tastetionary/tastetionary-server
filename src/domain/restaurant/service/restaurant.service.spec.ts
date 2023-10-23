@@ -1,5 +1,9 @@
 import { TestingModule } from '@nestjs/testing';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
+import {
+  appModuleFixture,
+  truncateTables,
+  userEntityFactory,
+} from '@root/jest.setup';
 import { PrismaService } from '@common/database/prisma.service';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
@@ -113,8 +117,8 @@ describe('restaurant service', () => {
         latitude: LATITUDE,
         longitude: LONGITUDE,
       };
-
-      const user = new EndUser(userId, [diningArea, activityArea]);
+      const tempUser = userEntityFactory(userId);
+      const user = new EndUser(tempUser, { areas: [diningArea, activityArea] });
       await service.registerReview(
         {
           userId,
@@ -183,13 +187,16 @@ describe('restaurant service', () => {
 
   describe('registerReview', () => {
     it('with not register activity_area, should not register review', async () => {
-      const userId = 1;
+      const endUser = new EndUser(userEntityFactory(1));
       await expect(
-        service.registerReview({
-          userId,
-          externalDto: EXTERNAL_DTO,
-          dto: DTO,
-        }),
+        service.registerReview(
+          {
+            userId: 1,
+            externalDto: EXTERNAL_DTO,
+            dto: DTO,
+          },
+          endUser,
+        ),
       ).rejects.toThrowError(new ServiceException('domain rule error'));
     });
 
@@ -214,8 +221,8 @@ describe('restaurant service', () => {
         latitude: 1,
         longitude: 1,
       };
-
-      const user = new EndUser(userId, [area]);
+      const tempUser = userEntityFactory(userId);
+      const user = new EndUser(tempUser, { areas: [area] });
       await service.registerReview(
         {
           userId,

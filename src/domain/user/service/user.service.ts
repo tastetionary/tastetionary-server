@@ -14,6 +14,7 @@ import { getRandomItem } from '@common/util';
 import { AgreementDTO } from '@domain/user/dto/user.dto';
 import { EndUser } from '@domain/user/core/end-user';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
+import { ServiceException } from '@common/exception/custom.exception';
 
 @Injectable()
 export class UserService {
@@ -30,6 +31,9 @@ export class UserService {
 
   async getEndUser(userId: number) {
     const user = await this.userRepo.getUserById(userId);
+    if (!user) {
+      throw new ServiceException('not found', `user not found: ${userId}`);
+    }
     const areas = await this.areaRepo.getAreasByUserId(userId);
     return new EndUser(user, { areas });
   }
