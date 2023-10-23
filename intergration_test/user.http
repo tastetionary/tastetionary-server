@@ -9,20 +9,20 @@ Content-Type: {{content_type_json}}
   },
   "areas": [
     {
-      "latitude": 1,
-      "longitude": 1,
+      "latitude": 37.48913764364786,
+      "longitude": 127.0311629855974,
       "category": "activity_area",
       "address":"activity"
     },
     {
-      "latitude": 1,
-      "longitude": 1,
+      "latitude": 37.48913764364786,
+      "longitude": 127.0311629855974,
       "category": "dining_area",
       "address":"dining"
     }
   ],
   "account": {
-    "identification": "matthew-1022",
+    "identification": "matthew-1023",
     "password": "pwd",
     "category": "email"
     

@@ -4,7 +4,7 @@ post {{base_url}}/v1/account/tokens
 content-type: {{content_type_json}}
 
 {
-  "identification": "matthew",
+  "identification": "matthew-1023",
   "password": "pwd",
   "category": "email"
 }
@@ -20,20 +20,21 @@ Content-Type: {{content_type_json}}
 {
     "review":{
         "category":"분식",
-        "keywords":["test"],
+        "keywords":["test2"],
         "price":10000,
-        "summary":"one-line summary"
+        "summary":"one-line summary",
+        "opinion":"Y"
     },
     "external":{
-        "externalUUID":2,
-        "name":"http-test",
-        "latitude":1,
-        "longitude":1,
-        "referenceLink":"https://www.naver.com"
+        "externalUUID":8323721,
+        "name":"버드나무집 서초본점",
+        "latitude":37.48913764364786,
+        "longitude":127.0311629855974,
+        "referenceLink":"http://place.map.kakao.com/8323721"
     }
 }
 
-### get recommendation
+### get recommenda tion
 POST {{base_url}}/v1/restaurant/recommendation
 Authorization: Bearer {{access_token}}
 Content-Type: {{content_type_json}}
@@ -41,6 +42,6 @@ Content-Type: {{content_type_json}}
 {
     "excludeIds": [],
     "category": "분식",
-    "keywords": ["test"],
+    "keywords": ["test2"],
     "price": 10000
 }
