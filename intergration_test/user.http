@@ -49,7 +49,14 @@ content-type: {{content_type_json}}
 
 ###
 @access_token = {{token.response.body.data.accessToken}}
-### Register User 
+
+
+### get profile 
+GET {{base_url}}/v1/user
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+### modify user area
 PUT {{base_url}}/v1/user
 Authorization: Bearer {{access_token}}
 Content-Type: {{content_type_json}}
