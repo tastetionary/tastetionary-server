@@ -31,6 +31,13 @@ export interface RestaurantReviewDTO {
    * @type string
    */
   summary: string;
+
+  /**
+   * want to revisit?
+   * example: "Y"
+   * @type string
+   */
+  opinion: 'Y' | 'N' | string;
 }
 
 export interface ExternalRestaurantInformationDTO {

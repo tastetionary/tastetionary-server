@@ -43,6 +43,7 @@ describe('restaurant service', () => {
     keywords: ['clean'],
     price: 10_000,
     summary: 'never come again',
+    opinion: 'N',
   };
 
   const EXTERNAL_DTO: ExternalRestaurantInformationDTO = {
