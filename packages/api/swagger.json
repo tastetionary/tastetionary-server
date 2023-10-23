@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "version": "0.3.17",
+    "version": "0.5.5",
     "title": "taste-dictionary-api",
     "description": "",
     "license": {
@@ -444,11 +444,6 @@
             "x-nestia-encrypted": false
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
         "x-nestia-namespace": "v1.food.recommendation.getRecommentation",
         "x-nestia-jsDocTags": [
           {
@@ -465,15 +460,6 @@
             "text": [
               {
                 "text": "get food recommentation",
-                "kind": "text"
-              }
-            ]
-          },
-          {
-            "name": "security",
-            "text": [
-              {
-                "text": "bearer",
                 "kind": "text"
               }
             ]
