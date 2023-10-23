@@ -96,3 +96,30 @@ export interface CompanyDto {
    */
   companyName: string;
 }
+
+export interface ProfileResponse {
+  /**
+   * userId
+   * @type number
+   */
+  id: number;
+
+  /**
+   * user nickname created by server
+   * example: google
+   * @type string
+   */
+  nickname: string;
+
+  /**
+   * user activity_area, if not, return empty object
+   * @type AreaDto
+   */
+  activity_area: AreaDto | object;
+
+  /**
+   * user dining_area,
+   * @type AreaDto
+   */
+  dining_area?: AreaDto | object;
+}

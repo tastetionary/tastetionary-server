@@ -1,7 +1,7 @@
 ### get token(use after register user)
 # @name token
-POST {{base_url}}/v1/account/tokens
-Content-Type: {{content_type_json}}
+post {{base_url}}/v1/account/tokens
+content-type: {{content_type_json}}
 
 {
   "identification": "matthew",

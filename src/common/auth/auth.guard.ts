@@ -39,7 +39,6 @@ export class AuthGuard implements CanActivate {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
 
-      console.log(payload);
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException(
@@ -51,6 +50,8 @@ export class AuthGuard implements CanActivate {
 
   private isMasterToken(request: Request) {
     const [_, token] = request.headers.authorization?.split(' ') ?? [];
+    if (!token) return false;
+
     return token.includes(this.masterToken);
   }
   private extractTokenFromHeader(request: Request): string | undefined {

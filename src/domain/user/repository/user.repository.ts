@@ -1,6 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
 import { UserState } from '@domain/user/user.enum';
+import { Prisma } from '@prisma/client';
+
+export interface UserEntity {
+  id: number;
+  nickname: string;
+  state: string;
+  property?: Prisma.JsonValue;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 @Injectable()
 export class UserRepository {
@@ -27,7 +37,8 @@ export class UserRepository {
   }
 
   async getUserById(id: number) {
-    return this.getUsers({ ids: [id] }, 1);
+    const user = await this.getUsers({ ids: [id] }, 1);
+    return user[0];
   }
 
   async getUsers(

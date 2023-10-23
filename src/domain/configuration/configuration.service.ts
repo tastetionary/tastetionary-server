@@ -42,7 +42,7 @@ export class ConfigurationService {
           'BREVO_SENDER_EMAIL',
           'no-reply@tastetionary.com',
         ),
-        name: this.configService.get('BREVO_SENDER_NAME', '맛셔너러팀'),
+        name: this.configService.get('BREVO_SENDER_NAME', '맛셔너리팀'),
       },
     };
   }

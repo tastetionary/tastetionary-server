@@ -29,8 +29,9 @@ export class UserService {
   private readonly authenticationService: AuthenticationService;
 
   async getEndUser(userId: number) {
+    const user = await this.userRepo.getUserById(userId);
     const areas = await this.areaRepo.getAreasByUserId(userId);
-    return new EndUser(userId, areas);
+    return new EndUser(user, { areas });
   }
 
   async register(dto: RegisterUserDTO) {
@@ -102,5 +103,12 @@ export class UserService {
     };
   } {
     return nicknameSource;
+  }
+
+  // @TODO modify to use area-id and update, not delete and insert
+  async updateArea(userId: number, dto: AreaDto) {
+    await this.areaRepo.deleteArea({ userId, category: dto.category });
+    await this.registerArea(userId, [dto]);
+    return true;
   }
 }
