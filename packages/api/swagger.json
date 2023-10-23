@@ -1648,6 +1648,23 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
+          },
+          "opinion": {
+            "description": "want to revisit?\nexample: \"Y\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
           }
         },
         "nullable": false,
@@ -1655,7 +1672,8 @@
           "excludeIds",
           "category",
           "keywords",
-          "price"
+          "price",
+          "opinion"
         ],
         "x-typia-jsDocTags": []
       },
@@ -1810,6 +1828,11 @@
           "aggregatePrice": {
             "$ref": "#/components/schemas/__type"
           },
+          "revisitRatio": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
           "totalCount": {
             "x-typia-required": true,
             "x-typia-optional": false,
@@ -1824,6 +1847,7 @@
           "keywords",
           "prices",
           "aggregatePrice",
+          "revisitRatio",
           "totalCount"
         ],
         "x-typia-jsDocTags": []
@@ -1934,6 +1958,23 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
+          },
+          "opinion": {
+            "description": "want to revisit?\nexample: \"Y\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
           }
         },
         "nullable": false,
@@ -1941,7 +1982,8 @@
           "category",
           "keywords",
           "price",
-          "summary"
+          "summary",
+          "opinion"
         ],
         "x-typia-jsDocTags": []
       },
