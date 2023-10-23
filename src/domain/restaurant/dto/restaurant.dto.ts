@@ -31,6 +31,13 @@ export interface RestaurantReviewDTO {
    * @type string
    */
   summary: string;
+
+  /**
+   * want to revisit?
+   * example: "Y"
+   * @type string
+   */
+  opinion: 'Y' | 'N' | string;
 }
 
 export interface ExternalRestaurantInformationDTO {
@@ -77,6 +84,7 @@ export interface AggregateReviewDTO {
   keywords: string[];
   prices: number[];
   aggregatePrice: { [index: string]: number };
+  revisitRatio: number;
   totalCount: number;
 }
 

@@ -43,6 +43,7 @@ describe('restaurant controller', () => {
       keywords: ['key'],
       price: 10_000,
       summary: 'one-line summary',
+      opinion: 'N',
     },
     external: {
       externalUUID: 1,
@@ -84,6 +85,7 @@ describe('restaurant controller', () => {
         category: RestaurantCategory.ASIAN,
         keywords: ['key'],
         price: 10_000,
+        opinion: 'N',
       });
     expect(res.statusCode).toEqual(200);
   });
