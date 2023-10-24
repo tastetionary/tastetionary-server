@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "version": "0.5.6",
+    "version": "0.5.9",
     "title": "taste-dictionary-api",
     "description": "",
     "license": {
@@ -1648,23 +1648,6 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
-          },
-          "opinion": {
-            "description": "want to revisit?\nexample: \"Y\"",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
           }
         },
         "nullable": false,
@@ -1672,8 +1655,7 @@
           "excludeIds",
           "category",
           "keywords",
-          "price",
-          "opinion"
+          "price"
         ],
         "x-typia-jsDocTags": []
       },
@@ -2240,7 +2222,21 @@
             "type": "number"
           },
           "name": {
-            "$ref": "#/components/schemas/RestaurantKeyword"
+            "description": "food keyword\nexample: \"깨끗해요\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "RestaurantKeyword",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
           }
         },
         "nullable": false,
@@ -2249,20 +2245,6 @@
           "name"
         ],
         "x-typia-jsDocTags": []
-      },
-      "RestaurantKeyword": {
-        "type": "string",
-        "enum": [
-          "전체",
-          "깨끗해요",
-          "친절해요",
-          "분위기 좋아요",
-          "가성비 좋아요",
-          "주차 가능해요",
-          "회전율 좋아요",
-          "양이 많아요",
-          "넓고 쾌적해요"
-        ]
       },
       "RestaurantPriceOption": {
         "type": "object",
