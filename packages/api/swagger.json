@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "version": "0.5.6",
+    "version": "0.5.8",
     "title": "taste-dictionary-api",
     "description": "",
     "license": {
@@ -1648,23 +1648,6 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
-          },
-          "opinion": {
-            "description": "want to revisit?\nexample: \"Y\"",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
           }
         },
         "nullable": false,
@@ -1672,8 +1655,7 @@
           "excludeIds",
           "category",
           "keywords",
-          "price",
-          "opinion"
+          "price"
         ],
         "x-typia-jsDocTags": []
       },
