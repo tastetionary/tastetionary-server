@@ -45,3 +45,15 @@ export const RestaurantCategoryIcons: Record<RestaurantCategory, string> = {
   [RestaurantCategory.SALAD]: 'menu_salad',
   [RestaurantCategory.CAFE_AND_DESERT]: 'menu_cafedessert',
 };
+
+export const RestaurantKeywordEmoji: Record<RestaurantKeyword, string> = {
+  [RestaurantKeyword.ALL]: '',
+  [RestaurantKeyword.CLEAN]: '✨',
+  [RestaurantKeyword.KIND]: '💕',
+  [RestaurantKeyword.ATMOSPHERE]: '🍷',
+  [RestaurantKeyword.CHEAP]: '👍',
+  [RestaurantKeyword.PARKING]: '🚘',
+  [RestaurantKeyword.ROTATION]: '⏩',
+  [RestaurantKeyword.LARGE]: '🥰',
+  [RestaurantKeyword.WIDE]: '🖼️',
+};
