@@ -34,7 +34,7 @@ export interface RegisterRestaurantReviewInput {
 }
 
 export interface GetRestaurantInput
-  extends Omit<RestaurantReviewDTO, 'summary'> {
+  extends Omit<RestaurantReviewDTO, 'summary' | 'opinion'> {
   /**
    * already recommended restaurant ids, it will be ignored
    * example: 10000
