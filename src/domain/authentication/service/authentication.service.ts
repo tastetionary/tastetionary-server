@@ -10,6 +10,7 @@ import { UserAuth } from '@domain/authentication/core/user-auth';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { sendEmail } from '@thirdParty/brevo/brevo';
 import { Environment } from '@root/src/env.validation';
+import * as fs from 'fs';
 
 @Injectable()
 export class AuthenticationService {
@@ -110,19 +111,29 @@ export class AuthenticationService {
         'check AuthenticationType',
       );
     }
-    const contents = {
-      subject: '',
-      htmlContent: `<h1> 인증코드 ${code} 입니다. </h1>`,
-      to: [{ email: identification }],
-    };
 
+    let subject = '';
+    let htmlContentFile = '';
     if (category == AuthenticationCategory.ACCOUNT) {
-      contents.subject = '계정인증';
+      subject = '계정인증';
+      htmlContentFile =
+        'src/domain/authentication/resource/verify-account/index.html';
     }
 
     if (category == AuthenticationCategory.COMPANY) {
-      contents.subject = '회사인증';
+      subject = '회사인증';
+      htmlContentFile =
+        'src/domain/authentication/resource/verify-company/index.html';
     }
+
+    let htmlContent = fs.readFileSync(htmlContentFile, 'utf8');
+    htmlContent = htmlContent.replace('{{verificationCode}}', code);
+
+    const contents = {
+      subject: subject,
+      htmlContent: htmlContent,
+      to: [{ email: identification }],
+    };
     const config = this.cfgService.getBrevoConfig();
     return sendEmail(contents, config);
   }
