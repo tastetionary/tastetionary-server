@@ -1,0 +1,51 @@
+<!-- 회사 인증 안내 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="src/third-party/brevo/src/verify-company/style.css">
+  <title>Document</title>
+</head>
+<style>
+  body {
+    margin : 0;
+  }
+
+  @media screen and (min-width:360px) and (max-width:1024px){
+    #main {
+      width: 360px;
+      margin : 0 auto;
+      height : 100vh;
+    }
+  }
+  @media screen and (min-width:1025px){
+    #main {
+      width: 640px;
+      margin : 0 auto;
+      height : 100vh;
+    }
+  }
+
+  .auth_box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 36px;
+    background: #FFEDB3;
+    margin: 32px 0px;
+  }
+  .auth_num {
+    font-weight: 700;
+    font-size: 20px;
+  }
+</style>
+<body>
+  <div id="main">
+      <div class="auth_box">
+        <p class="auth_num">{{verificationCode}}</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
