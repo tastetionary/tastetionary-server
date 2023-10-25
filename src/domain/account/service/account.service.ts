@@ -45,7 +45,7 @@ export class AccountService {
     }
 
     const account = new Account(accountRecord);
-    account.checkPassword(dto.password);
+    await account.checkPassword(dto.password);
 
     const tokens = this.makeTokens({ userId: accountRecord.userId });
     this.tokenRepo.saveToken({

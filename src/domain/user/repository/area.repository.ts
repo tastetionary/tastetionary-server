@@ -46,7 +46,6 @@ export class AreaRepository {
           param.location.latitude
         }), ${new Date()})`,
     );
-    console.log(query);
     await this.prisma.$queryRaw`
       INSERT INTO user_areas (user_id, category, "order", address, location, updated_at) 
       VALUES ${Prisma.join(query)}`;

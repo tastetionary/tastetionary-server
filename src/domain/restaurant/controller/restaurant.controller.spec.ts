@@ -85,7 +85,6 @@ describe('restaurant controller', () => {
         category: RestaurantCategory.ASIAN,
         keywords: ['key'],
         price: 10_000,
-        opinion: 'N',
       });
     expect(res.statusCode).toEqual(200);
   });
