@@ -7,7 +7,6 @@ describe('util', () => {
     ['💕', ['']],
   ])('should return only word', (target, expected) => {
     const res = detachEmoji([target]);
-    console.log(res);
     expect(res).toEqual(expected);
   });
 });
