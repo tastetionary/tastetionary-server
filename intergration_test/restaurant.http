@@ -4,8 +4,8 @@ post {{base_url}}/v1/account/tokens
 content-type: {{content_type_json}}
 
 {
-  "identification": "backend-1@naver.com",
-  "password": "qordpsem1!",
+  "identification": "matthew-0917",
+  "password": "pwd",
   "category": "email"
 }
 
@@ -19,18 +19,18 @@ Content-Type: {{content_type_json}}
 
 {
     "review":{
-        "category":"일식",
-        "keywords":["양이 많아요🥰"],
-        "price":13000,
+        "category":"분식",
+        "keywords":["test2"],
+        "price":10000,
         "summary":"one-line summary",
         "opinion":"Y"
     },
     "external":{
-        "externalUUID": 9657256,
-        "name": "구찌라쿠",
-        "referenceLink": "http://place.map.kakao.com/9657256",
-        "latitude": 37.4873289576785,
-        "longitude": 127.103138388805
+        "externalUUID":8323721,
+        "name":"버드나무집 서초본점",
+        "latitude":37.48913764364786,
+        "longitude":127.0311629855974,
+        "referenceLink":"http://place.map.kakao.com/8323721"
     }
 }
 
@@ -40,8 +40,8 @@ Authorization: Bearer {{access_token}}
 Content-Type: {{content_type_json}}
 
 {
-    "category":"일식",
-    "keywords":["분위기 좋아요🍷"],
-    "price":14000,
-    "excludeIds":[]
+    "excludeIds": [],
+    "category": "분식",
+    "keywords": ["test2"],
+    "price": 10000
 }
