@@ -6,6 +6,7 @@ import {
   RestaurantKeyword,
   RestaurantPrice,
   RestaurantCategoryIcons,
+  RestaurantKeywordEmoji,
 } from '@domain/restaurant/restaurant.enum';
 
 export interface RestaurantReviewEntity {
@@ -203,7 +204,7 @@ export class RestaurantRepository {
     const keywords = this.options.keywords.map((keyword, index) => {
       return {
         id: index,
-        name: keyword,
+        name: keyword + RestaurantKeywordEmoji[keyword],
       };
     });
 

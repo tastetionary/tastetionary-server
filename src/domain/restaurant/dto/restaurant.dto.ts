@@ -124,7 +124,7 @@ export interface RestaurantKeywordOption {
    * example: "깨끗해요"
    * @type RestaurantKeyword
    */
-  name: RestaurantKeyword;
+  name: string;
 }
 
 export interface RestaurantPriceOption {

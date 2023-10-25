@@ -243,35 +243,35 @@ describe('Restaurant repository', () => {
         },
         {
           id: 1,
-          name: '깨끗해요',
+          name: '깨끗해요✨',
         },
         {
           id: 2,
-          name: '친절해요',
+          name: '친절해요💕',
         },
         {
           id: 3,
-          name: '분위기 좋아요',
+          name: '분위기 좋아요🍷',
         },
         {
           id: 4,
-          name: '가성비 좋아요',
+          name: '가성비 좋아요👍',
         },
         {
           id: 5,
-          name: '주차 가능해요',
+          name: '주차 가능해요🚘',
         },
         {
           id: 6,
-          name: '회전율 좋아요',
+          name: '회전율 좋아요⏩',
         },
         {
           id: 7,
-          name: '양이 많아요',
+          name: '양이 많아요🥰',
         },
         {
           id: 8,
-          name: '넓고 쾌적해요',
+          name: '넓고 쾌적해요🖼️',
         },
       ],
       prices: [
