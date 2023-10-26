@@ -1,149 +1,40 @@
-<!-- 회사 인증 안내 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="src/third-party/brevo/src/verify-company/style.css">
   <title>Document</title>
 </head>
-<style>
-  body {
-    margin : 0;
-  }
+<body style="margin: 0;">
 
-  @media screen and (min-width:360px) and (max-width:1024px){
-    #main {
-      width: 360px;
-      margin : 0 auto;
-      height : 100vh;
-    }
-  }
-  @media screen and (min-width:1025px){
-    #main {
-      width: 640px;
-      margin : 0 auto;
-      height : 100vh;
-    }
-  }
-
-  .img_box {
-    margin: 16px 0px;
-    text-align : center;
-  }
-
-  .title_box {
-    position: relative;
-    display : flex;
-    justify-content : center;
-    background : #FFC30B;
-    height: 112px;
-    padding: 0px 16px;
-    margin: 0px 24px;
-  }
-
-  .title {
-    position : absolute;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
-    top: 50%;
-    left : 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-  }
-
-  #contents {
-    margin: 0px 32px;
-  }
-
-  .description_box {
-    margin-top: 24px;
-    font-size: 14px;
-    padding: 0px 8px;
-    line-height: 180%;
-  }
-
-  .highlight {
-    font-weight: 700;
-    color : #FF5601;
-  }
-
-  .auth_box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 36px;
-    background: #FFEDB3;
-    margin: 32px 0px;
-  }
-  .auth_num {
-    font-weight: 700;
-    font-size: 20px;
-  }
-
-  .warning_box {
-    font-size: 10px;
-    text-align: center;
-  }
-
-  .bolder {
-    color : #607D8B;
-    font-weight: 700;
-  }
-
-  .warn_txt {
-    color : #607D8B;
-    font-weight: 400;
-  }
-
-  .email_box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius : 4px;
-    background: #455A64;
-    padding: 4px 8px;
-    width: 130px;
-    margin: 0 auto;
-  }
-
-  .email {
-    margin: 0;
-    color : white;
-    font-size: 12px;
-  }
-</style>
-<body>
-  <div id="main">
-    <div class="img_box">
+  <div id="main" style="width: 360px; margin: 0 auto; height: 100vh;">
+    <div style="margin: 16px 0; text-align: center;">
       <!-- <img src="/public/image/horizontal-logo.svg" alt="logo"> -->
     </div>
-
-    <div class="title_box">
-      <p class="title">맛셔너리 회사 이메일 인증 안내</p>
+    <div style="background: #FFC30B; height: 112px; padding: 0 16px; margin: 0 24px; display: flex; justify-content: center; align-items: center;">
+      <p style="font-size: 20px; font-weight: 700; margin: 0; text-align: center; width: calc(100% - 120px);">맛셔너리 회사 이메일 인증 안내</p>
     </div>
-
-    <div id="contents">
-      <div class="description_box">
+    
+    <div style="margin: 0 32px;">
+      <div style="margin-top: 24px; font-size: 14px; padding: 0 8px; line-height: 180%;">
         안녕하세요, 고객님 <br/>
-        <span  class="highlight">회사인증</span>을 위해 이메일 인증을 진행합니다. <br/>
+        <span style="font-weight: 700; color: #FF5601;">회사인증</span>을 위해 이메일 인증을 진행합니다. <br/>
         아래 발급된 이메일 인증코드를 복사하거나 직접 입력하여 인증을 완료해주세요. <br/>
         개인정보 보호를 위해 인증코드는 1시간 동안 유효합니다.
       </div>
 
       <!-- 인증코드가 들어가는 자리 -->
-      <div class="auth_box">
-        <p class="auth_num">{{verificationCode}}</p>
+      <div style="display: flex; justify-content: center; align-items: center; height: 36px; background: #FFEDB3; margin: 32px 0;">
+        <p style="font-weight: 700; font-size: 20px;">{{verificationCode}}</p>
       </div>
-      <div class="warning_box">
-        <p class="bolder">※지금 받은 이메일로 맛셔너리에 가입한 적이 없나요?</p>
-        <p class="warn_txt">타인이 이메일을 도용했거나 잘못 입력했을 수 있습니다.</p>
-        <p class="warn_txt">본인이 회원 가입하지 않은 경우 이메일 도용신고를 접수해 주세요.</p>
+      <div style="font-size: 10px; text-align: center; margin-bottom: 5px;">
+        <p style="color: #607D8B; font-weight: 700;">※지금 받은 이메일로 맛셔너리에 가입한 적이 없나요?</p>
+        <p style="color: #607D8B; font-weight: 400;">타인이 이메일을 도용했거나 잘못 입력했을 수 있습니다.</p>
+        <p style="color: #607D8B; font-weight: 400;">본인이 회원 가입하지 않은 경우 이메일 도용신고를 접수해 주세요.</p>
       </div>
-      <div class="email_box">
-        <!-- <img src="../../public/image/ImageToStl.com_review.png" alt="review" width="16" height="16"> -->
-        <p class="email">mationary@gmail.com</p>
+      <div style="display: flex; align-items: center; justify-content: center; border-radius: 4px; background: #455A64; padding: 4px 8px; width: 130px; margin: 0 auto;">
+        <!-- <img src="../../public/image/review.svg" alt="review" width="16" height="16"> -->
+        <p style="margin: 0; color: white; font-size: 12px;">tastetionary@gmail.com</p>
       </div>
     </div>
   </div>
