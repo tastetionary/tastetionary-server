@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body style="margin: 0;">
+
+  <div id="main" style="width: 360px; margin: 0 auto; height: 100vh;">
+    <div style="margin: 16px 0; text-align: center;">
+      <!-- <img src="/public/image/horizontal-logo.svg" alt="logo"> -->
+    </div>
+    <div style="background: #FFC30B; height: 112px; padding: 0 16px; margin: 0 24px; display: flex; justify-content: center; align-items: center;">
+      <p style="font-size: 20px; font-weight: 700; margin: 0; text-align: center; width: calc(100% - 120px);">맛셔너리 회원가입 이메일 인증 안내</p>
+    </div>
+    
+    <div style="margin: 0 32px;">
+      <div style="margin-top: 24px; font-size: 14px; padding: 0 8px; line-height: 180%;">
+        안녕하세요, 고객님 <br/>
+        <span style="font-weight: 700; color: #FF5601;">회원가입</span>을 위해 이메일 인증을 진행합니다. <br/>
+        아래 발급된 이메일 인증코드를 복사하거나 직접 입력하여 인증을 완료해주세요. <br/>
+        개인정보 보호를 위해 인증코드는 1시간 동안 유효합니다.
+      </div>
+
+      <!-- 인증코드가 들어가는 자리 -->
+      <div style="display: flex; justify-content: center; align-items: center; height: 36px; background: #FFEDB3; margin: 32px 0;">
+        <p style="font-weight: 700; font-size: 20px;">{{verificationCode}}</p>
+      </div>
+      <div style="font-size: 10px; text-align: center; margin-bottom: 5px;">
+        <p style="color: #607D8B; font-weight: 700;">※지금 받은 이메일로 맛셔너리에 가입한 적이 없나요?</p>
+        <p style="color: #607D8B; font-weight: 400;">타인이 이메일을 도용했거나 잘못 입력했을 수 있습니다.</p>
+        <p style="color: #607D8B; font-weight: 400;">본인이 회원 가입하지 않은 경우 이메일 도용신고를 접수해 주세요.</p>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; border-radius: 4px; background: #455A64; padding: 4px 8px; width: 130px; margin: 0 auto;">
+        <!-- <img src="../../public/image/review.svg" alt="review" width="16" height="16"> -->
+        <p style="margin: 0; color: white; font-size: 12px;">tastetionary@gmail.com</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
