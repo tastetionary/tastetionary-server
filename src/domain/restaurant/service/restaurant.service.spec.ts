@@ -40,7 +40,7 @@ describe('restaurant service', () => {
   const LONGITUDE = 127.047377408384;
   const DTO = {
     category: RestaurantCategory.ASIAN,
-    keywords: ['clean'],
+    keywords: ['clean🥰'],
     price: 10_000,
     summary: 'never come again',
     opinion: 'N',

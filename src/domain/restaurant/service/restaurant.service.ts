@@ -13,7 +13,7 @@ import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
-import { getRandomItem } from '@common/util';
+import { detachEmoji, getRandomItem } from '@common/util';
 
 @Injectable()
 export class RestaurantService {
@@ -131,7 +131,7 @@ export class RestaurantService {
     const ids = restaurants.map((r) => r.id);
     const targetReviews = await this.repo.getReviewsByConditions({
       restaurantIds: ids,
-      keywords: param.keywords,
+      keywords: detachEmoji(param.keywords),
       ltePrice: param.ltePrice,
       categories: param.categories,
     });
