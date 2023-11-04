@@ -13,6 +13,7 @@ import { ServiceException } from '@common/exception/custom.exception';
 import { UserModule } from '@domain/user/user.module';
 import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
+import { EmptyContentDto } from '@domain/domain.type';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
@@ -151,7 +152,7 @@ describe('restaurant service', () => {
       const res = (await service.getRecommendedRestaurant(
         {
           userId,
-          masDistanceMeter: maxDistance,
+          maxDistanceMeter: maxDistance,
           keywords: ['clean'],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
@@ -169,25 +170,26 @@ describe('restaurant service', () => {
         longitude: 1,
       });
       const maxDistance = 1000;
-      const res = await service.getRecommendedRestaurant(
+      const res = (await service.getRecommendedRestaurant(
         {
           userId,
-          masDistanceMeter: maxDistance,
+          maxDistanceMeter: maxDistance,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         },
         user,
-      );
-      expect(res.restaurant).toBeNull();
+      )) as EmptyContentDto;
+      expect(res.data).toEqual([]);
+      expect(res.message).toBeDefined();
     });
 
     it('with un dinning area user, should throw error', async () => {
       await expect(
         service.getRecommendedRestaurant({
           userId: 1,
-          masDistanceMeter: 1000,
+          maxDistanceMeter: 1000,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],

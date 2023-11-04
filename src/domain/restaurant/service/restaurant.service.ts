@@ -5,6 +5,7 @@ import {
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
+  ExternalRestaurantInformationEntity,
   RestaurantRepository,
   RestaurantReviewEntity,
 } from '@domain/restaurant/repository/restaurant.repository';
@@ -14,6 +15,12 @@ import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
+import { EmptyContentDto } from '@domain/domain.type';
+
+interface GetRecommendedRestaurant {
+  restaurant: ExternalRestaurantInformationEntity | null;
+  aggregateReviews: AggregateReviewDTO | null;
+}
 
 @Injectable()
 export class RestaurantService {
@@ -104,28 +111,22 @@ export class RestaurantService {
   async getRecommendedRestaurant(
     param: {
       userId: number;
-      masDistanceMeter: number;
+      maxDistanceMeter: number;
       keywords: string[];
       ltePrice: number;
       categories: RestaurantCategory[];
       excludeRestaurantIds: bigint[];
     },
     user?: EndUser,
-  ) {
+  ): Promise<GetRecommendedRestaurant | EmptyContentDto> {
     const endUser = user ?? (await this.userService.getEndUser(param.userId));
     if (!endUser.dinningArea) {
       throw new ServiceException('no dinning area, should register first');
     }
 
-    const restaurants = await this.repo.getExternalRestaurantIdsByDistance({
-      latitude: endUser.dinningArea.latitude,
-      longitude: endUser.dinningArea.longitude,
-      maxDistanceMeter: param.masDistanceMeter,
-      excludedIds: param.excludeRestaurantIds,
-    });
-
+    const restaurants = await this.getRestaurantsByDistance(endUser, param);
     if (restaurants.length == 0) {
-      return { restaurant: null, aggregateReviews: null };
+      return { message: '식사 지역 내 식당이 존재하지 않음', data: [] };
     }
 
     const ids = restaurants.map((r) => r.id);
@@ -135,19 +136,41 @@ export class RestaurantService {
       ltePrice: param.ltePrice,
       categories: param.categories,
     });
-
     if (targetReviews.length == 0) {
-      const randomRestaurant = getRandomItem(restaurants);
-      return { restaurant: randomRestaurant, aggregateReviews: null };
+      return {
+        message: '검색 조건에 부합 되는 식당이 존재 하지 않음',
+        data: [],
+      };
     }
 
     const { id, data } = this.aggregateRestaurantReview(targetReviews);
     const targetRestaurant = restaurants.find((r) => r.id.toString() == id);
 
     return {
-      restaurant: targetRestaurant,
+      restaurant: targetRestaurant ?? null,
       aggregateReviews: data,
     };
+  }
+
+  private async getRestaurantsByDistance(
+    endUser: EndUser,
+    param: {
+      userId: number;
+      maxDistanceMeter: number;
+      keywords: string[];
+      ltePrice: number;
+      categories: RestaurantCategory[];
+      excludeRestaurantIds: bigint[];
+    },
+  ) {
+    if (!endUser.dinningArea) return [];
+
+    return await this.repo.getExternalRestaurantIdsByDistance({
+      latitude: endUser.dinningArea?.latitude,
+      longitude: endUser.dinningArea?.longitude,
+      maxDistanceMeter: param.maxDistanceMeter,
+      excludedIds: param.excludeRestaurantIds,
+    });
   }
 
   aggregateRestaurantReview(reviews: RestaurantReviewEntity[]) {

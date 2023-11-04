@@ -78,7 +78,7 @@ export class RestaurantController {
 
     const data = (await this.service.getRecommendedRestaurant({
       userId,
-      masDistanceMeter: maxDistanceMeter,
+      maxDistanceMeter: maxDistanceMeter,
       ltePrice: input.price,
       keywords: input.keywords,
       categories: [input.category],
