@@ -18,6 +18,8 @@ import {
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
+import { isEmptyContentDto } from '@common/util';
+import { EmptyContentDto } from '@domain/domain.dto';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -72,24 +74,22 @@ export class RestaurantController {
     @Request() req,
     @TypedBody()
     input: GetRestaurantInput,
-  ): Promise<BaseResponseDto<GetRestaurantsOutput | null>> {
+  ): Promise<BaseResponseDto<GetRestaurantsOutput | EmptyContentDto>> {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
-    const data = (await this.service.getRecommendedRestaurant({
+    const data = await this.service.getRecommendedRestaurant({
       userId,
       maxDistanceMeter: maxDistanceMeter,
       ltePrice: input.price,
       keywords: input.keywords,
       categories: [input.category],
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
-    })) as {
-      restaurant: ExternalRestaurantInformationEntity;
-      aggregateReviews: AggregateReviewDTO;
-    };
+    });
 
-    // TODO use 204 code or create response that success but no data
-    if (data.restaurant === null) return new BaseResponseDto(null);
+    if (isEmptyContentDto(data)) {
+      return new BaseResponseDto(data);
+    }
 
     const { id, externalUUID, ...rest } = data.restaurant;
     return new BaseResponseDto({

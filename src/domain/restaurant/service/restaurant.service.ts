@@ -15,11 +15,11 @@ import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
-import { EmptyContentDto } from '@domain/domain.type';
+import { EmptyContentDto } from '@domain/domain.dto';
 
 interface GetRecommendedRestaurant {
-  restaurant: ExternalRestaurantInformationEntity | null;
-  aggregateReviews: AggregateReviewDTO | null;
+  restaurant: ExternalRestaurantInformationEntity;
+  aggregateReviews: AggregateReviewDTO;
 }
 
 @Injectable()
@@ -144,10 +144,12 @@ export class RestaurantService {
     }
 
     const { id, data } = this.aggregateRestaurantReview(targetReviews);
-    const targetRestaurant = restaurants.find((r) => r.id.toString() == id);
+    const targetRestaurant = restaurants.find(
+      (r) => r.id.toString() == id,
+    ) as ExternalRestaurantInformationEntity;
 
     return {
-      restaurant: targetRestaurant ?? null,
+      restaurant: targetRestaurant,
       aggregateReviews: data,
     };
   }

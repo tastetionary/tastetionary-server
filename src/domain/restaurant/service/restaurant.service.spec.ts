@@ -13,7 +13,7 @@ import { ServiceException } from '@common/exception/custom.exception';
 import { UserModule } from '@domain/user/user.module';
 import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
-import { EmptyContentDto } from '@domain/domain.type';
+import { EmptyContentDto } from '@root/src/domain/domain.dto';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
