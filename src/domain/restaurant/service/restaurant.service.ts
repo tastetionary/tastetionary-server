@@ -220,12 +220,9 @@ export class RestaurantService {
     const data: { [index: string]: number } = {};
 
     prices.forEach((price) => {
-      if (data[price.toString()]) {
-        data[price.toString()] += 1;
-      } else {
-        data[price.toString()] = 1;
-      }
+      data[price.toString()] = (data[price.toString()] || 0) + 1;
     });
+
     const uniquePrices = [...new Set(prices)];
     data['avg'] = fx.average(uniquePrices);
     return data;
