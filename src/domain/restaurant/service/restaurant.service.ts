@@ -8,12 +8,16 @@ import {
   RestaurantRepository,
   RestaurantReviewEntity,
 } from '@domain/restaurant/repository/restaurant.repository';
-import { ServiceException } from '@common/exception/custom.exception';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
+import {
+  CallerWrongDomainRuleException,
+  InternalDomainException,
+} from '@common/exception/internal.exception';
+import { ErrorNameEnum } from '@common/exception/enum';
 
 @Injectable()
 export class RestaurantService {
@@ -33,8 +37,8 @@ export class RestaurantService {
     const endUser = user ?? (await this.userService.getEndUser(param.userId));
 
     if (!endUser.activityArea) {
-      throw new ServiceException(
-        'domain rule error',
+      throw new CallerWrongDomainRuleException(
+        ErrorNameEnum.INVALID_INPUT,
         `user: ${param.userId} has no area, should register area first`,
       );
     }
@@ -45,8 +49,8 @@ export class RestaurantService {
       );
 
     if (!externalInfo) {
-      throw new ServiceException(
-        'internal exception occur',
+      throw new InternalDomainException(
+        ErrorNameEnum.NO_DATA,
         `no data or can not register about uuid: ${param.externalDto.externalUUID}`,
       );
     }
@@ -114,7 +118,11 @@ export class RestaurantService {
   ) {
     const endUser = user ?? (await this.userService.getEndUser(param.userId));
     if (!endUser.dinningArea) {
-      throw new ServiceException('no dinning area, should register first');
+      throw new CallerWrongDomainRuleException(
+        ErrorNameEnum.NO_DATA,
+        'no dinning area',
+        'should register first',
+      );
     }
 
     const restaurants = await this.repo.getExternalRestaurantIdsByDistance({

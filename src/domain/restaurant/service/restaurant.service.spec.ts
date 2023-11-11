@@ -9,10 +9,10 @@ import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
-import { ServiceException } from '@common/exception/custom.exception';
 import { UserModule } from '@domain/user/user.module';
 import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
+import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
@@ -193,7 +193,7 @@ describe('restaurant service', () => {
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),
-      ).rejects.toThrowError(ServiceException);
+      ).rejects.toThrowError(CallerWrongDomainRuleException);
     });
   });
 
@@ -209,7 +209,7 @@ describe('restaurant service', () => {
           },
           endUser,
         ),
-      ).rejects.toThrowError(new ServiceException('domain rule error'));
+      ).rejects.toThrowError(CallerWrongDomainRuleException);
     });
 
     it('with new restaurant, should save or update', async () => {
