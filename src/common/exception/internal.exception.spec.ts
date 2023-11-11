@@ -1,24 +1,29 @@
-import { ErrorCategory } from '@common/exception/enum';
+import { ErrorCategoryEnum, ErrorNameEnum } from '@common/exception/enum';
 import {
   BaseException,
   CallerWrongUsageException,
-} from '@root/src/common/exception/internal.exception';
+} from '@common/exception/internal.exception';
 
 describe('exception', () => {
   it('should create caller error', () => {
-    const error = new CallerWrongUsageException('type', 'message', 'hint', {
-      userId: 'userId',
-    });
+    const error = new CallerWrongUsageException(
+      ErrorNameEnum.INVALID_INPUT,
+      'message',
+      'hint',
+      {
+        userId: 'userId',
+      },
+    );
 
-    expect(error.category).toBe(ErrorCategory.CALLER_WRONG_USAGE_ERROR);
+    expect(error.category).toBe(ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR);
     expect(error.hint).toBe('hint');
     expect(error.loggedData).toEqual({ userId: 'userId' });
   });
 
   it('should create error', () => {
     const error = new BaseException(
-      ErrorCategory.CALLER_WRONG_DOMAIN_ERROR,
-      'type',
+      ErrorCategoryEnum.CALLER_WRONG_DOMAIN_ERROR,
+      ErrorNameEnum.INVALID_INPUT,
       'message',
       'hint',
       { userId: 'userId' },
