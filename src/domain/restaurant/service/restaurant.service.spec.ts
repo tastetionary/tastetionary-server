@@ -12,7 +12,10 @@ import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { UserModule } from '@domain/user/user.module';
 import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
-import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
+import {
+  CallerWrongDomainRuleException,
+  CallerWrongUsageException,
+} from '@common/exception/internal.exception';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
@@ -186,14 +189,14 @@ describe('restaurant service', () => {
     it('with un dinning area user, should throw error', async () => {
       await expect(
         service.getRecommendedRestaurant({
-          userId: 1,
+          userId: 129292929,
           masDistanceMeter: 1000,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),
-      ).rejects.toThrowError(CallerWrongDomainRuleException);
+      ).rejects.toThrowError(CallerWrongUsageException);
     });
   });
 
