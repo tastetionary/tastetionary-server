@@ -11,10 +11,10 @@ import {
   AuthenticationHistoryEntity,
   AuthenticationRepository,
 } from '@domain/authentication/repository/authentication.repository';
-import { ServiceException } from '@common/exception/custom.exception';
 import * as brevo from '@thirdParty/brevo/brevo';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { Environment } from '@root/src/env.validation';
+import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
 
 describe('authentication service', () => {
   let module: TestingModule;
@@ -93,7 +93,7 @@ describe('authentication service', () => {
             identification: `some@${domain}.com`,
             type: AuthenticationType.EMAIL,
           }),
-        ).rejects.toThrowError(ServiceException);
+        ).rejects.toThrowError(CallerWrongDomainRuleException);
       },
     );
 

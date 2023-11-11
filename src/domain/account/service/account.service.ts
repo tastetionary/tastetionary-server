@@ -5,8 +5,9 @@ import { JwtService } from '@nestjs/jwt';
 import { add } from 'date-fns';
 import { Account } from '@domain/account/core/account';
 import { Injectable } from '@nestjs/common';
-import { ServiceException } from '@common/exception/custom.exception';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { CallerWrongUsageException } from '@root/src/common/exception/internal.exception';
+import { ErrorNameEnum } from '@common/exception/enum';
 
 @Injectable()
 export class AccountService {
@@ -41,7 +42,12 @@ export class AccountService {
     );
 
     if (!accountRecord) {
-      throw new ServiceException('no account');
+      throw new CallerWrongUsageException(
+        ErrorNameEnum.NO_DATA,
+        'no account',
+        'check identification',
+        { category: dto.category, identification: dto.identification },
+      );
     }
 
     const account = new Account(accountRecord);

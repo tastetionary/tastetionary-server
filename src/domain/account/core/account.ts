@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { AccountCategory } from '@domain/account/account.enum';
-import { CoreException } from '@common/exception/custom.exception';
+import { CallerWrongUsageException } from '@common/exception/internal.exception';
+import { ErrorNameEnum } from '@common/exception/enum';
 type AccountEntity = {
   id: number;
   userId: number;
@@ -22,20 +23,25 @@ export class Account {
       this.entity?.category === category &&
       this.entity?.identification === identification
     ) {
-      throw new CoreException('duplicated identification');
+      throw new CallerWrongUsageException(
+        ErrorNameEnum.INVALID_INPUT,
+        'duplicated identification',
+        'already registered identification, change other identification',
+        { category, identification },
+      );
     }
   }
 
   async checkPassword(password: string) {
     const isMatched = await bcrypt.compare(
       password,
-      this.entity?.password || '',
+      this.entity?.password ?? '',
     );
     if (isMatched) {
       return;
     }
-    throw new CoreException(
-      'invalid account',
+    throw new CallerWrongUsageException(
+      ErrorNameEnum.INVALID_INPUT,
       'identification or password is wrong',
     );
   }

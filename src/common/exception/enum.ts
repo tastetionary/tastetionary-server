@@ -7,4 +7,6 @@ export enum ErrorCategoryEnum {
 
 export enum ErrorNameEnum {
   INVALID_INPUT = 'invalid_input',
+  UNEXPECTED_STATUS = 'unexpected_status',
+  NO_DATA = 'no_data',
 }
