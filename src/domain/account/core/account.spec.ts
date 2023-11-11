@@ -19,7 +19,7 @@ describe('account core', () => {
         entity.identification,
       );
     } catch (e) {
-      expect(e.response).toBe('duplicated identification');
+      expect(e.response.message).toBe('duplicated identification');
     }
   });
 });
