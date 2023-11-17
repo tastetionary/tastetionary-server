@@ -1,14 +1,14 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ErrorCategory } from '@common/exception/enum';
+import { ErrorCategoryEnum, ErrorNameEnum } from '@common/exception/enum';
 
 type loggedData = { [key: string]: any };
 export class BaseException extends HttpException {
-  private readonly _category: ErrorCategory;
+  private readonly _category: ErrorCategoryEnum;
   private readonly _hint?: string;
   private readonly _loggedData?: loggedData;
   constructor(
-    category: ErrorCategory,
-    name: string,
+    category: ErrorCategoryEnum,
+    name: ErrorNameEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
@@ -24,7 +24,7 @@ export class BaseException extends HttpException {
     this._loggedData = loggedData;
   }
 
-  get category(): ErrorCategory {
+  get category(): ErrorCategoryEnum {
     return this._category;
   }
 
@@ -39,13 +39,13 @@ export class BaseException extends HttpException {
 
 export class CallerWrongUsageException extends BaseException {
   constructor(
-    name: string,
+    name: ErrorNameEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
   ) {
     super(
-      ErrorCategory.CALLER_WRONG_USAGE_ERROR,
+      ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
       name,
       message,
       hint,
@@ -56,13 +56,13 @@ export class CallerWrongUsageException extends BaseException {
 
 export class CallerWrongDomainRuleException extends BaseException {
   constructor(
-    name: string,
+    name: ErrorNameEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
   ) {
     super(
-      ErrorCategory.CALLER_WRONG_DOMAIN_ERROR,
+      ErrorCategoryEnum.CALLER_WRONG_DOMAIN_ERROR,
       name,
       message,
       hint,
@@ -73,22 +73,34 @@ export class CallerWrongDomainRuleException extends BaseException {
 
 export class SupplierSystemException extends BaseException {
   constructor(
-    name: string,
+    name: ErrorNameEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
   ) {
-    super(ErrorCategory.SUPPLIER_SYSTEM_ERROR, name, message, hint, loggedData);
+    super(
+      ErrorCategoryEnum.SUPPLIER_SYSTEM_ERROR,
+      name,
+      message,
+      hint,
+      loggedData,
+    );
   }
 }
 
 export class InternalDomainException extends BaseException {
   constructor(
-    name: string,
+    name: ErrorNameEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
   ) {
-    super(ErrorCategory.INTERNAL_DOMAIN_ERROR, name, message, hint, loggedData);
+    super(
+      ErrorCategoryEnum.INTERNAL_DOMAIN_ERROR,
+      name,
+      message,
+      hint,
+      loggedData,
+    );
   }
 }
