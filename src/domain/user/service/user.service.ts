@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from '@domain/user/repository/user.repository';
 import {
+  AgreementDTO,
   AreaDto,
   RegisterUserDTO,
   UserPropertyDto,
@@ -11,10 +12,10 @@ import { AccountService } from '@domain/account/service/account.service';
 import { UserState } from '@domain/user/user.enum';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { getRandomItem } from '@common/util';
-import { AgreementDTO } from '@domain/user/dto/user.dto';
 import { EndUser } from '@domain/user/core/end-user';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
-import { ServiceException } from '@common/exception/custom.exception';
+import { CallerWrongUsageException } from '@common/exception/internal.exception';
+import { ErrorNameEnum } from '@common/exception/enum';
 
 @Injectable()
 export class UserService {
@@ -32,7 +33,10 @@ export class UserService {
   async getEndUser(userId: number) {
     const user = await this.userRepo.getUserById(userId);
     if (!user) {
-      throw new ServiceException('not found', `user not found: ${userId}`);
+      throw new CallerWrongUsageException(
+        ErrorNameEnum.NO_DATA,
+        `user not found: ${userId}`,
+      );
     }
     const areas = await this.areaRepo.getAreasByUserId(userId);
     return new EndUser(user, { areas });
@@ -109,7 +113,7 @@ export class UserService {
     return nicknameSource;
   }
 
-  // @TODO modify to use area-id and update, not delete and insert
+  // TODO modify to use area-id and update, not delete and insert
   async updateArea(userId: number, dto: AreaDto) {
     await this.areaRepo.deleteArea({ userId, category: dto.category });
     await this.registerArea(userId, [dto]);

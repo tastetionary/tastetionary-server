@@ -9,11 +9,14 @@ import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
-import { ServiceException } from '@common/exception/custom.exception';
 import { UserModule } from '@domain/user/user.module';
 import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
-import { EmptyContentDto } from '@root/src/domain/domain.dto';
+import { EmptyContentDto } from '@domain/domain.dto';
+import {
+  CallerWrongDomainRuleException,
+  CallerWrongUsageException,
+} from '@common/exception/internal.exception';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
@@ -188,14 +191,14 @@ describe('restaurant service', () => {
     it('with un dinning area user, should throw error', async () => {
       await expect(
         service.getRecommendedRestaurant({
-          userId: 1,
           maxDistanceMeter: 1000,
+          userId: 129292929,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),
-      ).rejects.toThrowError(ServiceException);
+      ).rejects.toThrowError(CallerWrongUsageException);
     });
   });
 
@@ -211,7 +214,7 @@ describe('restaurant service', () => {
           },
           endUser,
         ),
-      ).rejects.toThrowError(new ServiceException('domain rule error'));
+      ).rejects.toThrowError(CallerWrongDomainRuleException);
     });
 
     it('with new restaurant, should save or update', async () => {

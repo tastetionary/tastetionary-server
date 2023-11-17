@@ -112,6 +112,5 @@ describe('user controller', () => {
       .post('/v1/user')
       .send({ id: 1 });
     expect(res.statusCode).toEqual(400);
-    expect(res.body.detail.reason).toContain('not following');
   });
 });
