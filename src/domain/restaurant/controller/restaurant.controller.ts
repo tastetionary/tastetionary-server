@@ -5,6 +5,7 @@ import {
   UseFilters,
   UseGuards,
   Request,
+  Res,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -19,7 +20,8 @@ import {
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
 import { isEmptyContentDto } from '@common/util';
-import { EmptyContentDto } from '@domain/domain.dto';
+import { EmptyContentException } from '@root/src/common/exception/internal.exception';
+import { Response } from 'express';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -74,7 +76,8 @@ export class RestaurantController {
     @Request() req,
     @TypedBody()
     input: GetRestaurantInput,
-  ): Promise<BaseResponseDto<GetRestaurantsOutput | EmptyContentDto>> {
+    @Res() res: Response,
+  ): Promise<BaseResponseDto<GetRestaurantsOutput> | any> {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
@@ -88,7 +91,7 @@ export class RestaurantController {
     });
 
     if (isEmptyContentDto(data)) {
-      return new BaseResponseDto(data);
+      return res.status(204).header('kk', 'kk');
     }
 
     const { id, externalUUID, ...rest } = data.restaurant;

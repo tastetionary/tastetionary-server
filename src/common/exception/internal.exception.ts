@@ -104,3 +104,9 @@ export class InternalDomainException extends BaseException {
     );
   }
 }
+
+export class EmptyContentException extends HttpException {
+  constructor(message: string) {
+    super(HttpException.createBody({ message }), HttpStatus.NO_CONTENT);
+  }
+}

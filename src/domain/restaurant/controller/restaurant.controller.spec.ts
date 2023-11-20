@@ -54,6 +54,38 @@ describe('restaurant controller', () => {
     },
   };
 
+  it('/recommendation, with empty should return 204', async () => {
+    jest
+      .spyOn(service, 'getRecommendedRestaurant')
+      .mockImplementation(async () => {
+        return {
+          message: 'empty',
+        };
+      });
+
+    const userId = 999;
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .post('/v1/restaurant/recommendation')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        excludeIds: [],
+        category: RestaurantCategory.ASIAN,
+        keywords: ['key'],
+        price: 10_000,
+      });
+
+    console.log(res.header);
+    console.log(res.headers);
+    console.log(res.body);
+    expect(res.statusCode).toEqual(204);
+    expect(res.body).toHaveProperty('message');
+  });
+
   it('/recommendation, should return 200', async () => {
     const userId = 123;
     const userEntity = userEntityFactory(userId);

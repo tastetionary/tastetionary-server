@@ -1,7 +1,7 @@
 import { EmptyContentDto } from '@domain/domain.dto';
 
 export function isEmptyContentDto(obj: any): obj is EmptyContentDto {
-  return obj && obj.data && obj.message;
+  return obj && obj.message;
 }
 
 export function getRandomItem<T>(items: Array<T>): T {

@@ -134,7 +134,7 @@ export class RestaurantService {
 
     const restaurants = await this.getRestaurantsByDistance(endUser, param);
     if (restaurants.length == 0) {
-      return { message: '식사 지역 내 식당이 존재하지 않음', data: [] };
+      return { message: '식사 지역 내 식당이 존재하지 않음' };
     }
 
     const ids = restaurants.map((r) => r.id);
@@ -147,7 +147,6 @@ export class RestaurantService {
     if (targetReviews.length == 0) {
       return {
         message: '검색 조건에 부합 되는 식당이 존재 하지 않음',
-        data: [],
       };
     }
 
