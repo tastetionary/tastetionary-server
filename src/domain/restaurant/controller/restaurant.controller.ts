@@ -19,8 +19,6 @@ import {
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
-import { isEmptyContentDto } from '@common/util';
-import { EmptyContentException } from '@root/src/common/exception/internal.exception';
 import { Response } from 'express';
 
 export interface RegisterRestaurantReviewInput {
@@ -77,7 +75,7 @@ export class RestaurantController {
     @TypedBody()
     input: GetRestaurantInput,
     @Res() res: Response,
-  ): Promise<BaseResponseDto<GetRestaurantsOutput> | any> {
+  ): Promise<BaseResponseDto<GetRestaurantsOutput>> {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
@@ -89,10 +87,6 @@ export class RestaurantController {
       categories: [input.category],
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
     });
-
-    if (isEmptyContentDto(data)) {
-      return res.status(204).header('kk', 'kk');
-    }
 
     const { id, externalUUID, ...rest } = data.restaurant;
     return new BaseResponseDto({

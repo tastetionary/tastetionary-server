@@ -105,6 +105,7 @@ export class InternalDomainException extends BaseException {
   }
 }
 
+// TODO 차후 empty content 방법 정리 되면 제거할 예정, 현재는 short return 때문에만 사용
 export class EmptyContentException extends HttpException {
   constructor(message: string) {
     super(HttpException.createBody({ message }), HttpStatus.NO_CONTENT);

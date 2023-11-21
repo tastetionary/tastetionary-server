@@ -21,9 +21,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
 
     if (exception instanceof EmptyContentException) {
-      console.log(exception.getResponse());
-      response.status(200).json({ kk: 'kk' });
-      return response;
+      const noContentReason =
+        exception.getResponse()['message'] || 'no content';
+      response
+        .status(204)
+        .setHeader('no-content-reason', noContentReason)
+        .send();
+      return;
     } else {
       const detailResponse = {
         statusCode: status,

@@ -12,10 +12,10 @@ import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { UserModule } from '@domain/user/user.module';
 import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
-import { EmptyContentDto } from '@domain/domain.dto';
 import {
   CallerWrongDomainRuleException,
   CallerWrongUsageException,
+  EmptyContentException,
 } from '@common/exception/internal.exception';
 
 describe('restaurant service', () => {
@@ -173,19 +173,19 @@ describe('restaurant service', () => {
         longitude: 1,
       });
       const maxDistance = 1000;
-      const res = (await service.getRecommendedRestaurant(
-        {
-          userId,
-          maxDistanceMeter: maxDistance,
-          keywords: [],
-          ltePrice: 10_000,
-          categories: [RestaurantCategory.ASIAN],
-          excludeRestaurantIds: [],
-        },
-        user,
-      )) as EmptyContentDto;
-      expect(res.data).toEqual([]);
-      expect(res.message).toBeDefined();
+      await expect(
+        service.getRecommendedRestaurant(
+          {
+            userId,
+            maxDistanceMeter: maxDistance,
+            keywords: [],
+            ltePrice: 10_000,
+            categories: [RestaurantCategory.ASIAN],
+            excludeRestaurantIds: [],
+          },
+          user,
+        ),
+      ).rejects.toThrow(EmptyContentException);
     });
 
     it('with un dinning area user, should throw error', async () => {

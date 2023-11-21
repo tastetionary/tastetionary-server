@@ -14,9 +14,9 @@ import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
-import { EmptyContentDto } from '@domain/domain.dto';
 import {
   CallerWrongDomainRuleException,
+  EmptyContentException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
@@ -122,7 +122,7 @@ export class RestaurantService {
       excludeRestaurantIds: bigint[];
     },
     user?: EndUser,
-  ): Promise<GetRecommendedRestaurant | EmptyContentDto> {
+  ): Promise<GetRecommendedRestaurant> {
     const endUser = user ?? (await this.userService.getEndUser(param.userId));
     if (!endUser.dinningArea) {
       throw new CallerWrongDomainRuleException(
@@ -134,7 +134,7 @@ export class RestaurantService {
 
     const restaurants = await this.getRestaurantsByDistance(endUser, param);
     if (restaurants.length == 0) {
-      return { message: '식사 지역 내 식당이 존재하지 않음' };
+      throw new EmptyContentException('식사 지역 내 식당이 존재하지 않음');
     }
 
     const ids = restaurants.map((r) => r.id);
@@ -145,9 +145,9 @@ export class RestaurantService {
       categories: param.categories,
     });
     if (targetReviews.length == 0) {
-      return {
-        message: '검색 조건에 부합 되는 식당이 존재 하지 않음',
-      };
+      throw new EmptyContentException(
+        '검색 조건에 부합 되는 식당이 존재 하지 않음',
+      );
     }
 
     const { id, data } = this.aggregateRestaurantReview(targetReviews);

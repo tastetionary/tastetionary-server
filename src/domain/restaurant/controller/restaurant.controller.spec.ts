@@ -17,6 +17,7 @@ import { RestaurantService } from '@domain/restaurant/service/restaurant.service
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
+import { EmptyContentException } from '@common/exception/internal.exception';
 
 describe('restaurant controller', () => {
   let app: INestApplication;
@@ -57,11 +58,7 @@ describe('restaurant controller', () => {
   it('/recommendation, with empty should return 204', async () => {
     jest
       .spyOn(service, 'getRecommendedRestaurant')
-      .mockImplementation(async () => {
-        return {
-          message: 'empty',
-        };
-      });
+      .mockRejectedValue(new EmptyContentException('no data'));
 
     const userId = 999;
     const key = configService.getTokenData().accessTokenSecret;
@@ -79,11 +76,8 @@ describe('restaurant controller', () => {
         price: 10_000,
       });
 
-    console.log(res.header);
-    console.log(res.headers);
-    console.log(res.body);
     expect(res.statusCode).toEqual(204);
-    expect(res.body).toHaveProperty('message');
+    expect(res.headers).toHaveProperty('no-content-reason');
   });
 
   it('/recommendation, should return 200', async () => {
