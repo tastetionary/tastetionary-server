@@ -17,11 +17,13 @@ import {
   CallerWrongUsageException,
   EmptyContentException,
 } from '@common/exception/internal.exception';
+import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
   let module: TestingModule;
   let service: RestaurantService;
+  let repo: RestaurantRepository;
   beforeAll(async () => {
     module = (await appModuleFixture(
       [],
@@ -30,6 +32,7 @@ describe('restaurant service', () => {
     )) as TestingModule;
     prisma = module.get(PrismaService);
     service = module.get(RestaurantService);
+    repo = module.get(RestaurantRepository);
   });
 
   beforeEach(async () => {
@@ -146,6 +149,18 @@ describe('restaurant service', () => {
       return user;
     };
     it('should return proper restaurant', async () => {
+      jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValue([
+        {
+          id: 1,
+          external_restaurant_information_id: 1n,
+          userId: 1,
+          category: RestaurantCategory.ASIAN,
+          summary: 'summary',
+          opinion: null,
+          keywords: ['clean'],
+          price: 100,
+        },
+      ]);
       const userId = 1;
       const user = await createRestaurant(1, {
         latitude: LATITUDE,

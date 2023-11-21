@@ -1,11 +1,7 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import {
-  appModuleFixture,
-  createUserToken,
-  userEntityFactory,
-} from '@root/jest.setup';
+import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import {
@@ -15,10 +11,7 @@ import {
 } from '@domain/restaurant/restaurant.enum';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { UserService } from '@domain/user/service/user.service';
-import { EndUser } from '@domain/user/core/end-user';
-import { AreaCategory } from '@domain/user/user.enum';
 import { EmptyContentException } from '@common/exception/internal.exception';
-
 describe('restaurant controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
@@ -36,6 +29,10 @@ describe('restaurant controller', () => {
     service = module.get(RestaurantService);
     userService = module.get(UserService);
     await app.init();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   const REVIEW_INPUT = {
@@ -82,22 +79,28 @@ describe('restaurant controller', () => {
 
   it('/recommendation, should return 200', async () => {
     const userId = 123;
-    const userEntity = userEntityFactory(userId);
-    jest.spyOn(userService, 'getEndUser').mockImplementation(async () => {
-      return new EndUser(userEntity, {
-        areas: [
-          {
-            id: 1,
-            userId,
-            category: AreaCategory.DINING_AREA,
-            order: 1,
-            address: 'address',
-            latitude: 37.517331925853,
-            longitude: 127.047377408384,
-          },
-        ],
-      });
+    jest.spyOn(service, 'getRecommendedRestaurant').mockResolvedValueOnce({
+      restaurant: {
+        id: 1n,
+        name: 'name',
+        externalUUID: 123n,
+        referenceLink: null,
+        latitude: 12,
+        longitude: 12,
+        distance: 10,
+      },
+      aggregateReviews: {
+        categories: [RestaurantCategory.ALL],
+        summaries: [''],
+        opinions: [''],
+        keywords: [''],
+        prices: [10],
+        aggregatePrice: { '10': 10 },
+        revisitRatio: 10,
+        totalCount: 10,
+      },
     });
+
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(userId, key, {
       expiresIn: '10h',

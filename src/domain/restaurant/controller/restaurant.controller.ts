@@ -74,7 +74,6 @@ export class RestaurantController {
     @Request() req,
     @TypedBody()
     input: GetRestaurantInput,
-    @Res() res: Response,
   ): Promise<BaseResponseDto<GetRestaurantsOutput>> {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
