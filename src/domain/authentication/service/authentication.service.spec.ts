@@ -8,8 +8,8 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import {
-  AuthenticationHistoryEntity,
-  AuthenticationRepository,
+  AuthenticationHistoryRecord,
+  getHistoryById,
 } from '@domain/authentication/repository/authentication.repository';
 import * as brevo from '@thirdParty/brevo/brevo';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
@@ -20,7 +20,6 @@ describe('authentication service', () => {
   let module: TestingModule;
   let service: AuthenticationService;
   let prisma: PrismaService;
-  let repo: AuthenticationRepository;
   let cfgService: ConfigurationService;
   beforeAll(async () => {
     module = (await appModuleFixture(
@@ -30,7 +29,6 @@ describe('authentication service', () => {
     )) as TestingModule;
     service = module.get<AuthenticationService>(AuthenticationService);
     prisma = module.get(PrismaService);
-    repo = module.get(AuthenticationRepository);
     cfgService = module.get(ConfigurationService);
   });
 
@@ -55,9 +53,9 @@ describe('authentication service', () => {
       };
       const res = await service.createProgressAuthentication(data);
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       await service.doneProgressAuthentication(history.id, history.code);
 
@@ -113,9 +111,9 @@ describe('authentication service', () => {
         type: AuthenticationType.EMAIL,
       });
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       expect(history).toBeDefined();
     });
@@ -129,9 +127,9 @@ describe('authentication service', () => {
         type: AuthenticationType.EMAIL,
       });
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       await service.doneProgressAuthentication(history.id, history.code);
 
@@ -179,9 +177,9 @@ describe('authentication service', () => {
       let userAuth = await service.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       await service.doneProgressAuthentication(history.id, history.code);
 

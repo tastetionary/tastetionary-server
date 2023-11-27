@@ -3,12 +3,12 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import { AuthenticationEntity } from '@domain/authentication/repository/authentication.repository';
+import { AuthenticationRecord } from '@domain/authentication/repository/authentication.repository';
 
 export class UserAuth {
   readonly userId: number | null;
-  readonly authentications: AuthenticationEntity[];
-  constructor(userId: number | null, records: AuthenticationEntity[]) {
+  readonly authentications: AuthenticationRecord[];
+  constructor(userId: number | null, records: AuthenticationRecord[]) {
     this.userId = userId;
     this.authentications = records;
   }
