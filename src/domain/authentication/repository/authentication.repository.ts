@@ -110,6 +110,19 @@ export class AuthenticationRepository {
     return this.transformAuthentications([record])[0];
   }
 
+  async getAuthenticationsByUserId(param: {
+    userId: number;
+    type: AuthenticationType;
+  }): Promise<AuthenticationEntity[]> {
+    const records = await this.prisma.authentications.findMany({
+      where: {
+        userId: param.userId,
+        type: param.type,
+      },
+    });
+    return this.transformAuthentications(records);
+  }
+
   async getAuthenticationByUserId(
     userId: number,
   ): Promise<AuthenticationEntity[]> {

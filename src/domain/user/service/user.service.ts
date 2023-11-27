@@ -39,7 +39,13 @@ export class UserService {
       );
     }
     const areas = await this.areaRepo.getAreasByUserId(userId);
-    return new EndUser(user, { areas });
+    const authList = await this.authenticationService.getUserDoneEmailList(
+      userId,
+    );
+    return new EndUser(user, {
+      areas,
+      authentications: authList,
+    });
   }
 
   async register(dto: RegisterUserDTO) {
