@@ -5,7 +5,6 @@ import { UserController } from '@domain/user/controller/user.controller';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { UserService } from '@domain/user/service/user.service';
 import { AgreementRepository } from '@domain/user/repository/agreements.repository';
-import { AreaRepository } from '@domain/user/repository/area.repository';
 import { JwtService } from '@nestjs/jwt';
 import { AccountModule } from '@domain/account/account.module';
 import { AuthenticationModule } from '@domain/authentication/authentication.module';
@@ -20,7 +19,6 @@ import { AuthenticationModule } from '@domain/authentication/authentication.modu
     PrismaService,
     UserRepository,
     AgreementRepository,
-    AreaRepository,
   ],
   exports: [UserService],
 })
