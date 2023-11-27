@@ -1,46 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
 import { AgreementCategory } from '@domain/user/user.enum';
+import newPrisma from '@common/database/new.prisma';
 
-@Injectable()
-export class AgreementRepository {
-  constructor(private prisma: PrismaService) {}
+export async function saveAgreement(param: {
+  userId: number;
+  category: AgreementCategory;
+  is_agree: boolean;
+}) {
+  await saveAgreements([param]);
+}
 
-  async saveAgreement(param: {
+export async function saveAgreements(
+  params: {
     userId: number;
     category: AgreementCategory;
     is_agree: boolean;
-  }) {
-    await this.saveAgreements([param]);
-  }
+  }[],
+) {
+  return newPrisma.agreements.createMany({ data: params });
+}
 
-  async saveAgreements(
-    params: {
-      userId: number;
-      category: AgreementCategory;
-      is_agree: boolean;
-    }[],
-  ) {
-    return this.prisma.agreements.createMany({ data: params });
-  }
+export async function getAgreementById(id: number) {
+  return newPrisma.agreements.findUnique({ where: { id } });
+}
 
-  async getAgreementById(id: number) {
-    return this.prisma.agreements.findUnique({ where: { id } });
-  }
+export async function getAgreementsByUserId(userId: number) {
+  return newPrisma.agreements.findMany({ where: { userId } });
+}
 
-  async getAgreementsByUserId(userId: number) {
-    return this.prisma.agreements.findMany({ where: { userId } });
-  }
-
-  async updateAgreementById(
-    id: number,
-    param: {
-      is_agree: boolean;
-    },
-  ) {
-    return this.prisma.agreements.update({
-      where: { id },
-      data: param,
-    });
-  }
+export async function updateAgreementById(
+  id: number,
+  param: {
+    is_agree: boolean;
+  },
+) {
+  return newPrisma.agreements.update({
+    where: { id },
+    data: param,
+  });
 }

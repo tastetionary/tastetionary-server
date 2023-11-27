@@ -5,7 +5,6 @@ import {
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
-import { AgreementRepository } from '@domain/user/repository/agreements.repository';
 import { AccountService } from '@domain/account/service/account.service';
 import { UserState } from '@domain/user/user.enum';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
@@ -24,10 +23,10 @@ import {
   saveUser,
   updateUserById,
 } from '@domain/user/repository/user.repository';
+import { saveAgreements } from '@domain/user/repository/agreements.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private agreementRepo: AgreementRepository) {}
   @Inject(AccountService)
   private readonly accountService: AccountService;
 
@@ -74,7 +73,7 @@ export class UserService {
     const params = dtoList.map((dto) => {
       return { userId, ...dto };
     });
-    await this.agreementRepo.saveAgreements(params);
+    await saveAgreements(params);
   }
 
   private async registerUser(dto: UserPropertyDto) {
