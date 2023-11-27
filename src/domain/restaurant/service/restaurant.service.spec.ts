@@ -15,12 +15,15 @@ import { AreaCategory } from '@domain/user/user.enum';
 import {
   CallerWrongDomainRuleException,
   CallerWrongUsageException,
+  EmptyContentException,
 } from '@common/exception/internal.exception';
+import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
 
 describe('restaurant service', () => {
   let prisma: PrismaService;
   let module: TestingModule;
   let service: RestaurantService;
+  let repo: RestaurantRepository;
   beforeAll(async () => {
     module = (await appModuleFixture(
       [],
@@ -29,6 +32,7 @@ describe('restaurant service', () => {
     )) as TestingModule;
     prisma = module.get(PrismaService);
     service = module.get(RestaurantService);
+    repo = module.get(RestaurantRepository);
   });
 
   beforeEach(async () => {
@@ -145,6 +149,18 @@ describe('restaurant service', () => {
       return user;
     };
     it('should return proper restaurant', async () => {
+      jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValue([
+        {
+          id: 1,
+          external_restaurant_information_id: 1n,
+          userId: 1,
+          category: RestaurantCategory.ASIAN,
+          summary: 'summary',
+          opinion: null,
+          keywords: ['clean'],
+          price: 100,
+        },
+      ]);
       const userId = 1;
       const user = await createRestaurant(1, {
         latitude: LATITUDE,
@@ -154,7 +170,7 @@ describe('restaurant service', () => {
       const res = (await service.getRecommendedRestaurant(
         {
           userId,
-          masDistanceMeter: maxDistance,
+          maxDistanceMeter: maxDistance,
           keywords: ['clean'],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
@@ -172,25 +188,26 @@ describe('restaurant service', () => {
         longitude: 1,
       });
       const maxDistance = 1000;
-      const res = await service.getRecommendedRestaurant(
-        {
-          userId,
-          masDistanceMeter: maxDistance,
-          keywords: [],
-          ltePrice: 10_000,
-          categories: [RestaurantCategory.ASIAN],
-          excludeRestaurantIds: [],
-        },
-        user,
-      );
-      expect(res.restaurant).toBeNull();
+      await expect(
+        service.getRecommendedRestaurant(
+          {
+            userId,
+            maxDistanceMeter: maxDistance,
+            keywords: [],
+            ltePrice: 10_000,
+            categories: [RestaurantCategory.ASIAN],
+            excludeRestaurantIds: [],
+          },
+          user,
+        ),
+      ).rejects.toThrow(EmptyContentException);
     });
 
     it('with un dinning area user, should throw error', async () => {
       await expect(
         service.getRecommendedRestaurant({
+          maxDistanceMeter: 1000,
           userId: 129292929,
-          masDistanceMeter: 1000,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
