@@ -1,17 +1,17 @@
 import { AreaCategory } from '@domain/user/user.enum';
-import { AreaEntity } from '@domain/user/repository/area.repository';
+import { AreaRecord } from '@domain/user/repository/area.repository';
 import { UserEntity } from '@domain/user/repository/user.repository';
 
 export class EndUser {
   readonly id: number;
   readonly nickname: string;
   readonly state: string;
-  readonly areas?: AreaEntity[];
+  readonly areas?: AreaRecord[];
 
   constructor(
     user: UserEntity,
     param?: {
-      areas?: AreaEntity[];
+      areas?: AreaRecord[];
     },
   ) {
     this.id = user.id;
