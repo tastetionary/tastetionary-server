@@ -17,7 +17,7 @@ import {
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
-import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
+import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -44,7 +44,7 @@ export interface GetRestaurantInput
 }
 
 export interface GetRestaurantsOutput
-  extends Omit<ExternalRestaurantInformationEntity, 'id' | 'externalUUID'> {
+  extends Omit<ExternalRestaurantInformationRecord, 'id' | 'externalUUID'> {
   id: string;
   externalUUID: string;
   /**
@@ -84,7 +84,7 @@ export class RestaurantController {
       categories: [input.category],
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
     })) as {
-      restaurant: ExternalRestaurantInformationEntity;
+      restaurant: ExternalRestaurantInformationRecord;
       aggregateReviews: AggregateReviewDTO;
     };
 

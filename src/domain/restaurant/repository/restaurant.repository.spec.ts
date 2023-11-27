@@ -1,24 +1,20 @@
-import { PrismaService } from '@common/database/prisma.service';
-import { TestingModule } from '@nestjs/testing';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import { truncateTables } from '@root/jest.setup';
+import {
+  getExternalRestaurantIdsByDistance,
+  getExternalRestaurantInformation,
+  getRestaurantOptionsRecord,
+  getReviewsByConditions,
+  getReviewsByUserId,
+  saveExternalRestaurantInformation,
+  saveExternalRestaurantInformations,
+  saveReview,
+} from '@domain/restaurant/repository/restaurant.repository';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import newPrisma from '@common/database/new.prisma';
 
 describe('Restaurant repository', () => {
-  let repo: RestaurantRepository;
-  let prisma: PrismaService;
-  beforeAll(async () => {
-    const module = (await appModuleFixture(
-      [],
-      [ConfigurationService, PrismaService, RestaurantRepository],
-    )) as TestingModule;
-    repo = module.get(RestaurantRepository);
-    prisma = module.get(PrismaService);
-  });
-
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(newPrisma, [
       'restaurant_reviews',
       'external_restaurant_informations',
     ]);
@@ -37,9 +33,9 @@ describe('Restaurant repository', () => {
       },
     ];
 
-    await repo.saveReview(data[0]);
+    await saveReview(data[0]);
 
-    const res = await repo.getReviewsByConditions({
+    const res = await getReviewsByConditions({
       categories: [RestaurantCategory.ASIAN],
     });
     expect(res).toHaveLength(1);
@@ -58,15 +54,15 @@ describe('Restaurant repository', () => {
       },
     ];
 
-    await repo.saveReview(data[0]);
+    await saveReview(data[0]);
 
-    const res = await repo.getReviewsByConditions({
+    const res = await getReviewsByConditions({
       keywords: [],
       ltePrice: 12_000,
     });
     expect(res).toHaveLength(1);
 
-    const wrongRes = await repo.getReviewsByConditions({
+    const wrongRes = await getReviewsByConditions({
       keywords: [],
       ltePrice: 9_000,
     });
@@ -86,24 +82,24 @@ describe('Restaurant repository', () => {
       },
     ];
 
-    await repo.saveReview(data[0]);
+    await saveReview(data[0]);
 
-    const cleanRes = await repo.getReviewsByConditions({
+    const cleanRes = await getReviewsByConditions({
       keywords: ['clean'],
     });
     expect(cleanRes).toHaveLength(1);
 
-    const onlyOneRes = await repo.getReviewsByConditions({
+    const onlyOneRes = await getReviewsByConditions({
       keywords: ['clean', 'never'],
     });
     expect(onlyOneRes).toHaveLength(1);
 
-    const nothingRes = await repo.getReviewsByConditions({
+    const nothingRes = await getReviewsByConditions({
       keywords: ['nothing'],
     });
     expect(nothingRes).toHaveLength(0);
 
-    const allRes = await repo.getReviewsByConditions({});
+    const allRes = await getReviewsByConditions({});
     expect(allRes).toHaveLength(1);
   });
 
@@ -131,8 +127,8 @@ describe('Restaurant repository', () => {
         referenceLink: 'https://www.naver.com',
       },
     ];
-    await repo.saveExternalRestaurantInformations(data);
-    const res = await repo.getExternalRestaurantIdsByDistance({
+    await saveExternalRestaurantInformations(data);
+    const res = await getExternalRestaurantIdsByDistance({
       latitude,
       longitude,
       maxDistanceMeter: 1000,
@@ -152,8 +148,8 @@ describe('Restaurant repository', () => {
       referenceLink: 'https://www.naver.com',
     };
 
-    await repo.saveExternalRestaurantInformation(data);
-    const res = repo.getExternalRestaurantInformation(data.externalUUID);
+    await saveExternalRestaurantInformation(data);
+    const res = getExternalRestaurantInformation(data.externalUUID);
     expect(res).not.toBeNull();
   });
 
@@ -170,14 +166,14 @@ describe('Restaurant repository', () => {
       },
     ];
 
-    await repo.saveReview(data[0]);
+    await saveReview(data[0]);
 
-    const res = await repo.getReviewsByUserId(data[0].userId);
+    const res = await getReviewsByUserId(data[0].userId);
     expect(res).toHaveLength(1);
   });
 
   it('should get restaurant options', async () => {
-    const res = await repo.getRestaurantOptions();
+    const res = await getRestaurantOptionsRecord();
     const expected = {
       categories: [
         {
