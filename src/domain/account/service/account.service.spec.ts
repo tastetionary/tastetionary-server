@@ -4,13 +4,13 @@ import { PrismaService } from '@common/database/prisma.service';
 import { AccountService } from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
-import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { AccountModule } from '@domain/account/account.module';
 import { getIdentification } from '@domain/account/repository/account.repository';
+import { getTokenByUserId } from '@domain/account/repository/user-token.repository';
+
 describe('account service', () => {
   let prisma;
   let accountService: AccountService;
-  let tokenRepo: UserTokenRepository;
   beforeAll(async () => {
     const module = (await appModuleFixture(
       [],
@@ -18,7 +18,6 @@ describe('account service', () => {
       [AccountModule],
     )) as TestingModule;
     accountService = module.get<AccountService>(AccountService);
-    tokenRepo = module.get<UserTokenRepository>(UserTokenRepository);
     prisma = module.get(PrismaService);
   });
 
@@ -38,7 +37,7 @@ describe('account service', () => {
     await accountService.createToken(dto);
     await accountService.deleteTokens(userId);
 
-    const tokens = await tokenRepo.getTokenByUserId(userId);
+    const tokens = await getTokenByUserId(userId);
     expect(tokens).toBeNull();
   });
 

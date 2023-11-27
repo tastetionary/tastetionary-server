@@ -3,18 +3,11 @@ import { PrismaService } from '@common/database/prisma.service';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { JwtService } from '@nestjs/jwt';
 import { AccountService } from '@domain/account/service/account.service';
-import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { AccountController } from './controller/account.controller';
 
 @Module({
   controllers: [AccountController],
-  providers: [
-    AccountService,
-    JwtService,
-    UserTokenRepository,
-    ConfigurationService,
-    PrismaService,
-  ],
+  providers: [AccountService, JwtService, ConfigurationService, PrismaService],
   exports: [AccountService],
 })
 export class AccountModule {}

@@ -1,5 +1,4 @@
 import { AccountDTO } from '@domain/account/dto/account.dto';
-import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { add } from 'date-fns';
 import { Account } from '@domain/account/core/account';
@@ -11,13 +10,17 @@ import {
   getIdentification,
   saveAccount,
 } from '@domain/account/repository/account.repository';
+import {
+  deleteToken,
+  getTokenByUserId,
+  saveToken,
+} from '@domain/account/repository/user-token.repository';
 
 @Injectable()
 export class AccountService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigurationService,
-    private readonly tokenRepo: UserTokenRepository,
   ) {}
   async register(userId: number, dto: AccountDTO) {
     const accountRecord = await getIdentification(
@@ -56,7 +59,7 @@ export class AccountService {
     await account.checkPassword(dto.password);
 
     const tokens = this.makeTokens({ userId: accountRecord.userId });
-    this.tokenRepo.saveToken({
+    await saveToken({
       userId: accountRecord.userId,
       ...tokens,
     });
@@ -94,9 +97,9 @@ export class AccountService {
   }
 
   async deleteTokens(userId: number) {
-    const token = await this.tokenRepo.getTokenByUserId(userId);
+    const token = await getTokenByUserId(userId);
     if (!token) return;
 
-    await this.tokenRepo.deleteToken(token.id);
+    await deleteToken(token.id);
   }
 }
