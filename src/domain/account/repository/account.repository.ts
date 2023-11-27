@@ -1,55 +1,55 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/database/prisma.service';
 import { AccountCategory } from '@domain/account/account.enum';
+import newPrisma from '@common/database/new.prisma';
 
-@Injectable()
-export class AccountRepository {
-  constructor(private prisma: PrismaService) {}
+export async function saveAccount(param: {
+  userId: number;
+  category: AccountCategory;
+  identification: string;
+  password: string;
+}) {
+  await saveAccounts([param]);
+}
 
-  async saveAccount(param: {
+export async function saveAccounts(
+  params: {
     userId: number;
     category: AccountCategory;
     identification: string;
     password: string;
-  }) {
-    await this.saveAccounts([param]);
-  }
+  }[],
+) {
+  return newPrisma.accounts.createMany({ data: params });
+}
 
-  async saveAccounts(
-    params: {
-      userId: number;
-      category: AccountCategory;
-      identification: string;
-      password: string;
-    }[],
-  ) {
-    return this.prisma.accounts.createMany({ data: params });
-  }
+export async function getIdentification(
+  identification: string,
+  category: AccountCategory,
+) {
+  return newPrisma.accounts.findFirst({
+    where: { identification, category },
+  });
+}
 
-  async getIdentification(identification: string, category: AccountCategory) {
-    return this.prisma.accounts.findFirst({
-      where: { identification, category },
-    });
-  }
+export async function getAccountById(id: number) {
+  return newPrisma.accounts.findUnique({ where: { id } });
+}
 
-  async getAccountById(id: number) {
-    return this.prisma.accounts.findUnique({ where: { id } });
-  }
+export async function getAccount(param: {
+  identification: string;
+  password: string;
+}) {
+  return newPrisma.accounts.findFirst({ where: param });
+}
 
-  async getAccount(param: { identification: string; password: string }) {
-    return this.prisma.accounts.findFirst({ where: param });
-  }
-
-  async updateAccountById(
-    id: number,
-    param: {
-      identification: string;
-      password: string;
-    },
-  ) {
-    return this.prisma.accounts.update({
-      where: { id },
-      data: param,
-    });
-  }
+export async function updateAccountById(
+  id: number,
+  param: {
+    identification: string;
+    password: string;
+  },
+) {
+  return newPrisma.accounts.update({
+    where: { id },
+    data: param,
+  });
 }

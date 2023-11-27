@@ -1,5 +1,4 @@
 import { AccountDTO } from '@domain/account/dto/account.dto';
-import { AccountRepository } from '@domain/account/repository/account.repository';
 import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { add } from 'date-fns';
@@ -8,17 +7,20 @@ import { Injectable } from '@nestjs/common';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { CallerWrongUsageException } from '@root/src/common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
+import {
+  getIdentification,
+  saveAccount,
+} from '@domain/account/repository/account.repository';
 
 @Injectable()
 export class AccountService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigurationService,
-    private readonly accountRepo: AccountRepository,
     private readonly tokenRepo: UserTokenRepository,
   ) {}
   async register(userId: number, dto: AccountDTO) {
-    const accountRecord = await this.accountRepo.getIdentification(
+    const accountRecord = await getIdentification(
       dto.identification,
       dto.category,
     );
@@ -27,7 +29,7 @@ export class AccountService {
     account.checkDuplicatedIdentification(dto.category, dto.identification);
     const password = await account.encryptValue(dto.password);
 
-    await this.accountRepo.saveAccount({
+    await saveAccount({
       userId,
       category: dto.category,
       identification: dto.identification,
@@ -36,7 +38,7 @@ export class AccountService {
   }
 
   async createToken(dto: AccountDTO) {
-    const accountRecord = await this.accountRepo.getIdentification(
+    const accountRecord = await getIdentification(
       dto.identification,
       dto.category,
     );
