@@ -59,16 +59,11 @@ describe('Food repository', () => {
         },
         {
           id: 8,
-          name: '뷔페',
-          icon: 'menu_buffet',
-        },
-        {
-          id: 9,
           name: '샐러드',
           icon: 'menu_salad',
         },
         {
-          id: 10,
+          id: 9,
           name: '카페/디저트',
           icon: 'menu_cafedessert',
         },
