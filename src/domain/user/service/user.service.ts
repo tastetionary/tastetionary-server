@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserRepository } from '@domain/user/repository/user.repository';
 import {
   AgreementDTO,
   AreaDto,
@@ -20,13 +19,15 @@ import {
   getAreasByUserId,
   saveAreas,
 } from '@domain/user/repository/area.repository';
+import {
+  getUserById,
+  saveUser,
+  updateUserById,
+} from '@domain/user/repository/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private userRepo: UserRepository,
-    private agreementRepo: AgreementRepository,
-  ) {}
+  constructor(private agreementRepo: AgreementRepository) {}
   @Inject(AccountService)
   private readonly accountService: AccountService;
 
@@ -34,7 +35,7 @@ export class UserService {
   private readonly authenticationService: AuthenticationService;
 
   async getEndUser(userId: number) {
-    const user = await this.userRepo.getUserById(userId);
+    const user = await getUserById(userId);
     if (!user) {
       throw new CallerWrongUsageException(
         ErrorNameEnum.NO_DATA,
@@ -79,7 +80,7 @@ export class UserService {
   private async registerUser(dto: UserPropertyDto) {
     const nickname = this.getNickname();
 
-    const user = await this.userRepo.saveUser({
+    const user = await saveUser({
       state: UserState.ACTIVE,
       nickname,
       property: {},
@@ -89,7 +90,7 @@ export class UserService {
         userId: user.id,
         authenticationId: dto.companyData.authenticationId,
       });
-      await this.userRepo.updateUserById(user.id, {
+      await updateUserById(user.id, {
         property: { companyName: dto.companyData.companyName },
       });
     }

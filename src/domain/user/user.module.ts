@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from '@common/database/prisma.service';
-import { UserRepository } from '@domain/user/repository/user.repository';
 import { UserController } from '@domain/user/controller/user.controller';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { UserService } from '@domain/user/service/user.service';
@@ -17,7 +16,6 @@ import { AuthenticationModule } from '@domain/authentication/authentication.modu
     JwtService,
     ConfigurationService,
     PrismaService,
-    UserRepository,
     AgreementRepository,
   ],
   exports: [UserService],
