@@ -1,6 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
 import { AuthenticationModule } from '@domain/authentication/authentication.module';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import {
@@ -15,11 +14,11 @@ import * as brevo from '@thirdParty/brevo/brevo';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { Environment } from '@root/src/env.validation';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
+import newPrisma from '@common/database/new.prisma';
 
 describe('authentication service', () => {
   let module: TestingModule;
   let service: AuthenticationService;
-  let prisma: PrismaService;
   let cfgService: ConfigurationService;
   beforeAll(async () => {
     module = (await appModuleFixture(
@@ -28,12 +27,11 @@ describe('authentication service', () => {
       [AuthenticationModule],
     )) as TestingModule;
     service = module.get<AuthenticationService>(AuthenticationService);
-    prisma = module.get(PrismaService);
     cfgService = module.get(ConfigurationService);
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(newPrisma, [
       'authentications',
       'authentication_histories',
     ]);

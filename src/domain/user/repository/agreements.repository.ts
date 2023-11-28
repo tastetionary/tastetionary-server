@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/database/prisma.service';
 import { AgreementCategory } from '@domain/user/user.enum';
 import newPrisma from '@common/database/new.prisma';
 

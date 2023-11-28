@@ -3,7 +3,6 @@ import { Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { validate } from '@src/env.validation';
-import { PrismaService } from '@common/database/prisma.service';
 import * as jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
@@ -55,10 +54,7 @@ type tableNames =
   | 'authentications'
   | 'authentication_histories'
   | 'external_restaurant_informations';
-async function truncateTables(
-  prisma: PrismaService | PrismaClient,
-  tableNames: tableNames[],
-) {
+async function truncateTables(prisma: PrismaClient, tableNames: tableNames[]) {
   for (const name of tableNames) {
     await prisma.$queryRawUnsafe(
       `TRUNCATE "${name}" RESTART IDENTITY CASCADE;`,

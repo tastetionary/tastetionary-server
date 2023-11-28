@@ -1,6 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
 import { AccountService } from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
@@ -18,7 +17,6 @@ describe('account service', () => {
       [AccountModule],
     )) as TestingModule;
     accountService = module.get<AccountService>(AccountService);
-    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
