@@ -4,7 +4,10 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import { AuthenticationRepository } from '@domain/authentication/repository/authentication.repository';
+import {
+  AuthenticationEntity,
+  AuthenticationRepository,
+} from '@domain/authentication/repository/authentication.repository';
 import { UserAuth } from '@domain/authentication/core/user-auth';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { sendEmail } from '@thirdParty/brevo/brevo';
@@ -221,6 +224,14 @@ export class AuthenticationService {
     );
     const data = record ? [record] : [];
     return new UserAuth(param.userId ?? null, data);
+  }
+
+  async getUserDoneEmailList(userId: number): Promise<AuthenticationEntity[]> {
+    const record = await this.repo.getAuthenticationsByUserId({
+      userId: userId,
+      type: AuthenticationType.EMAIL,
+    });
+    return record;
   }
 
   async resetAuthentication(
