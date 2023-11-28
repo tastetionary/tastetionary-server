@@ -23,10 +23,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof EmptyContentException) {
       const noContentReason =
         exception.getResponse()['message'] || 'no content';
-      response
-        .status(204)
-        .setHeader('no-content-reason', noContentReason)
-        .send();
+      try {
+        response
+          .status(204)
+          .setHeader('no-content-reason', noContentReason)
+          .send();
+      } catch (e) {
+        console.error(e, `data: ${noContentReason}`);
+        response.status(204).send();
+      }
       return;
     } else {
       const detailResponse = {
