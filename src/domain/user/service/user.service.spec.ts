@@ -111,8 +111,11 @@ describe('user service', () => {
   it('should return end-user', async () => {
     const user = await service.register(DTO);
     const endUser = await service.getEndUser(user.id);
+
     expect(endUser).not.toBeNull();
     expect(endUser.activityArea).not.toBeNull();
+    expect(endUser.activityArea).not.toBeNull();
+    expect(endUser.authentications).not.toBeNull();
   });
 
   it('should create user and account and agreement and location', async () => {

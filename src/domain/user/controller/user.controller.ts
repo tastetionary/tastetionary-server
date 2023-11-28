@@ -50,6 +50,10 @@ export class UserController {
       nickname: user.nickname,
       activity_area: user.activityArea ?? {},
       dining_area: user.dinningArea ?? {},
+      authentication: {
+        account_email: user.accountEmail ?? '',
+        company_email: user.companyEmail ?? '',
+      },
     });
   }
 
