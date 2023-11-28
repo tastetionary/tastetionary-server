@@ -130,7 +130,7 @@ export interface ProfileResponse {
   authentication?:
     | {
         account_email: string;
-        company_name?: string;
+        company_email?: string;
       }
     | object;
 }
