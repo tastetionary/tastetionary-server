@@ -5,6 +5,7 @@ import {
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
+  ExternalRestaurantInformationRecord,
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
   getRestaurantOptionsRecord,
@@ -21,9 +22,15 @@ import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
 import {
   CallerWrongDomainRuleException,
+  EmptyContentException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
+
+interface GetRecommendedRestaurant {
+  restaurant: ExternalRestaurantInformationRecord;
+  aggregateReviews: AggregateReviewDTO;
+}
 
 @Injectable()
 export class RestaurantService {
@@ -112,14 +119,14 @@ export class RestaurantService {
   async getRecommendedRestaurant(
     param: {
       userId: number;
-      masDistanceMeter: number;
+      maxDistanceMeter: number;
       keywords: string[];
       ltePrice: number;
       categories: RestaurantCategory[];
       excludeRestaurantIds: bigint[];
     },
     user?: EndUser,
-  ) {
+  ): Promise<GetRecommendedRestaurant> {
     const endUser = user ?? (await this.userService.getEndUser(param.userId));
     if (!endUser.dinningArea) {
       throw new CallerWrongDomainRuleException(
@@ -129,15 +136,9 @@ export class RestaurantService {
       );
     }
 
-    const restaurants = await getExternalRestaurantIdsByDistance({
-      latitude: endUser.dinningArea.latitude,
-      longitude: endUser.dinningArea.longitude,
-      maxDistanceMeter: param.masDistanceMeter,
-      excludedIds: param.excludeRestaurantIds,
-    });
-
+    const restaurants = await this.getRestaurantsByDistance(endUser, param);
     if (restaurants.length == 0) {
-      return { restaurant: null, aggregateReviews: null };
+      throw new EmptyContentException('식사 지역 내 식당이 존재하지 않음');
     }
 
     const ids = restaurants.map((r) => r.id);
@@ -147,19 +148,42 @@ export class RestaurantService {
       ltePrice: param.ltePrice,
       categories: param.categories,
     });
-
     if (targetReviews.length == 0) {
-      const randomRestaurant = getRandomItem(restaurants);
-      return { restaurant: randomRestaurant, aggregateReviews: null };
+      throw new EmptyContentException(
+        '검색 조건에 부합 되는 식당이 존재 하지 않음',
+      );
     }
 
     const { id, data } = this.aggregateRestaurantReview(targetReviews);
-    const targetRestaurant = restaurants.find((r) => r.id.toString() == id);
+    const targetRestaurant = restaurants.find(
+      (r) => r.id.toString() == id,
+    ) as ExternalRestaurantInformationRecord;
 
     return {
       restaurant: targetRestaurant,
       aggregateReviews: data,
     };
+  }
+
+  private async getRestaurantsByDistance(
+    endUser: EndUser,
+    param: {
+      userId: number;
+      maxDistanceMeter: number;
+      keywords: string[];
+      ltePrice: number;
+      categories: RestaurantCategory[];
+      excludeRestaurantIds: bigint[];
+    },
+  ) {
+    if (!endUser.dinningArea) return [];
+
+    return await getExternalRestaurantIdsByDistance({
+      latitude: endUser.dinningArea?.latitude,
+      longitude: endUser.dinningArea?.longitude,
+      maxDistanceMeter: param.maxDistanceMeter,
+      excludedIds: param.excludeRestaurantIds,
+    });
   }
 
   aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
@@ -209,12 +233,9 @@ export class RestaurantService {
     const data: { [index: string]: number } = {};
 
     prices.forEach((price) => {
-      if (data[price.toString()]) {
-        data[price.toString()] += 1;
-      } else {
-        data[price.toString()] = 1;
-      }
+      data[price.toString()] = (data[price.toString()] || 0) + 1;
     });
+
     const uniquePrices = [...new Set(prices)];
     data['avg'] = fx.average(uniquePrices);
     return data;
