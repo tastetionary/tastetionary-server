@@ -3,7 +3,7 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 export interface AuthenticationHistoryRecord {
   id: number;
@@ -34,7 +34,7 @@ export async function saveAuthentication(param: {
   type: AuthenticationType;
   state: AuthenticationState;
 }) {
-  return await newPrisma.authentications.create({
+  return await prismaClient.authentications.create({
     data: {
       userId: param.userId,
       identification: param.identification,
@@ -52,7 +52,7 @@ export async function saveAuthenticationHistory(param: {
   code: string;
   expiredAt: Date;
 }) {
-  return await newPrisma.authenticationHistories.create({
+  return await prismaClient.authenticationHistories.create({
     data: {
       identification: param.identification,
       category: param.category,
@@ -93,7 +93,7 @@ export async function getAuthenticationByIdentification(
   category: AuthenticationCategory,
   type: AuthenticationType,
 ): Promise<AuthenticationRecord | null> {
-  const record = await newPrisma.authentications.findFirst({
+  const record = await prismaClient.authentications.findFirst({
     where: { category, type, identification },
   });
   if (!record) return null;
@@ -104,7 +104,7 @@ export async function getAuthenticationByIdentification(
 export async function getAuthenticationByUserId(
   userId: number,
 ): Promise<AuthenticationRecord[]> {
-  const records = await newPrisma.authentications.findMany({
+  const records = await prismaClient.authentications.findMany({
     where: { userId },
   });
   return transformAuthentications(records);
@@ -113,7 +113,7 @@ export async function getAuthenticationByUserId(
 export async function getHistoryById(
   id: number,
 ): Promise<AuthenticationHistoryRecord | null> {
-  const record = await newPrisma.authenticationHistories.findUnique({
+  const record = await prismaClient.authenticationHistories.findUnique({
     where: { id },
   });
   if (!record) {
@@ -138,14 +138,14 @@ export async function updateAuthentication(param: UpdateParam) {
   if ('state' in param) {
     data['state'] = param.state;
   }
-  await newPrisma.authentications.update({
+  await prismaClient.authentications.update({
     where: { id: param.id },
     data,
   });
 }
 
 export async function deleteAuthentications(ids: number[]) {
-  await newPrisma.authentications.deleteMany({
+  await prismaClient.authentications.deleteMany({
     where: { id: { in: ids } },
   });
 }

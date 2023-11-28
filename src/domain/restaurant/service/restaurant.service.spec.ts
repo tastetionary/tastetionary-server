@@ -15,7 +15,7 @@ import {
   CallerWrongDomainRuleException,
   CallerWrongUsageException,
 } from '@common/exception/internal.exception';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 describe('restaurant service', () => {
   let module: TestingModule;
@@ -30,7 +30,7 @@ describe('restaurant service', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(newPrisma, [
+    await truncateTables(prismaClient, [
       'user_areas',
       'restaurant_reviews',
       'external_restaurant_informations',

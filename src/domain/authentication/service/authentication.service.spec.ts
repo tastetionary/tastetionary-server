@@ -14,7 +14,7 @@ import * as brevo from '@thirdParty/brevo/brevo';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { Environment } from '@root/src/env.validation';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 describe('authentication service', () => {
   let module: TestingModule;
@@ -31,7 +31,7 @@ describe('authentication service', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(newPrisma, [
+    await truncateTables(prismaClient, [
       'authentications',
       'authentication_histories',
     ]);

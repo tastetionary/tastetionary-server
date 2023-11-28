@@ -1,4 +1,4 @@
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 export async function saveToken(param: {
   userId: number;
@@ -7,15 +7,15 @@ export async function saveToken(param: {
   accessTokenExpiredAt: Date;
   refreshTokenExpiredAt: Date;
 }) {
-  return await newPrisma.userTokens.create({ data: param });
+  return await prismaClient.userTokens.create({ data: param });
 }
 
 export async function getTokenByUserId(userId: number) {
-  return newPrisma.userTokens.findFirst({
+  return prismaClient.userTokens.findFirst({
     where: { userId },
   });
 }
 
 export async function deleteToken(id: number) {
-  return newPrisma.userTokens.delete({ where: { id } });
+  return prismaClient.userTokens.delete({ where: { id } });
 }

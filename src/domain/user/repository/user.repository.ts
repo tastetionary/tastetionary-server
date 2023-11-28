@@ -1,6 +1,6 @@
 import { UserState } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 export interface UserRecord {
   id: number;
@@ -16,7 +16,7 @@ export async function saveUser(param: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   property: Record<string, any>;
 }) {
-  return newPrisma.users.create({ data: param });
+  return prismaClient.users.create({ data: param });
 }
 
 export async function saveUsers(
@@ -27,7 +27,7 @@ export async function saveUsers(
     property: Record<string, any>;
   }[],
 ) {
-  return newPrisma.users.createMany({ data: params });
+  return prismaClient.users.createMany({ data: params });
 }
 
 export async function getUserById(id: number) {
@@ -39,7 +39,7 @@ export async function getUsers(
   param: { ids?: number[]; nicknames?: string[]; states?: UserState[] },
   take = 100,
 ) {
-  return newPrisma.users.findMany({
+  return prismaClient.users.findMany({
     where: {
       id: {
         in: param.ids,
@@ -63,7 +63,7 @@ export async function updateUserById(
     property?: Record<string, any>;
   },
 ) {
-  return newPrisma.users.update({
+  return prismaClient.users.update({
     where: { id },
     data: param,
   });

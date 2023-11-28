@@ -1,6 +1,6 @@
 import { truncateTables } from '@root/jest.setup';
 import { UserState } from '@domain/user/user.enum';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 import {
   getUsers,
   saveUser,
@@ -10,7 +10,7 @@ import {
 
 describe('user repository', () => {
   beforeEach(async () => {
-    await truncateTables(newPrisma, ['users']);
+    await truncateTables(prismaClient, ['users']);
   });
 
   it('should update user', async () => {

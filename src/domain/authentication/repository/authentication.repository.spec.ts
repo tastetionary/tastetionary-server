@@ -4,7 +4,7 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 import {
   getAuthenticationByUserId,
   getHistoryById,
@@ -15,7 +15,7 @@ import {
 
 describe('authentication', () => {
   beforeEach(async () => {
-    await truncateTables(newPrisma, [
+    await truncateTables(prismaClient, [
       'authentications',
       'authentication_histories',
     ]);

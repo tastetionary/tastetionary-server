@@ -1,6 +1,6 @@
 import { AreaCategory } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 export interface AreaRecord {
   id: number;
@@ -31,7 +31,7 @@ export async function saveAreas(
         param.location.latitude
       }), ${new Date()})`,
   );
-  await newPrisma.$queryRaw`
+  await prismaClient.$queryRaw`
       INSERT INTO user_areas (user_id, category, "order", address, location, updated_at) 
       VALUES ${Prisma.join(query)}`;
 }
@@ -47,7 +47,7 @@ export async function saveArea(param: {
 }
 
 export async function getAreasByUserId(userId: number) {
-  const areas: AreaRecord[] = await newPrisma.$queryRaw`
+  const areas: AreaRecord[] = await prismaClient.$queryRaw`
       SELECT
           id,
           user_id,
@@ -61,7 +61,7 @@ export async function getAreasByUserId(userId: number) {
 }
 
 export async function deleteAreas(params: { userId; category: AreaCategory }) {
-  await newPrisma.userAreas.deleteMany({
+  await prismaClient.userAreas.deleteMany({
     where: { userId: params.userId, category: params.category },
   });
 }

@@ -6,7 +6,7 @@ import {
   RestaurantCategoryIcons,
   RestaurantKeywordEmoji,
 } from '@domain/restaurant/restaurant.enum';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 export interface RestaurantReviewRecord {
   id: number;
@@ -62,11 +62,11 @@ export async function saveReviews(
       externalRestaurantInformationId;
     return rest;
   });
-  await newPrisma.restaurantReviews.createMany({ data });
+  await prismaClient.restaurantReviews.createMany({ data });
 }
 
 export async function getReviewsByUserId(userId: number) {
-  return newPrisma.restaurantReviews.findMany({ where: { userId } });
+  return prismaClient.restaurantReviews.findMany({ where: { userId } });
 }
 
 export async function saveExternalRestaurantInformation(param: {
@@ -99,13 +99,13 @@ export async function saveExternalRestaurantInformations(
         ${param.referenceLink},
         ${new Date()})`,
   );
-  await newPrisma.$queryRaw`
+  await prismaClient.$queryRaw`
       INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
       VALUES ${Prisma.join(values)}`;
 }
 
 export async function getExternalRestaurantInformation(externalUUid: bigint) {
-  return newPrisma.externalRestaurantInformations.findFirst({
+  return prismaClient.externalRestaurantInformations.findFirst({
     where: { external_uuid: externalUUid },
   });
 }
@@ -138,7 +138,7 @@ export async function getReviewsByConditions(param: {
     };
   }
 
-  const res = await newPrisma.restaurantReviews.findMany({
+  const res = await prismaClient.restaurantReviews.findMany({
     where: condition,
   });
 
@@ -179,7 +179,7 @@ export async function getExternalRestaurantIdsByDistance(param: {
     param.latitude
   }), ${param.maxDistanceMeter})`;
 
-  return await newPrisma.$queryRaw(queryRaw);
+  return await prismaClient.$queryRaw(queryRaw);
 }
 
 export async function getRestaurantOptionsRecord() {

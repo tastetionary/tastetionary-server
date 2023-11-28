@@ -12,7 +12,7 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import * as brevo from '@thirdParty/brevo/brevo';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 describe('user service', () => {
   let service: UserService;
@@ -30,7 +30,7 @@ describe('user service', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(newPrisma, [
+    await truncateTables(prismaClient, [
       'users',
       'accounts',
       'authentications',

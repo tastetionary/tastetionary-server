@@ -1,5 +1,5 @@
 import { truncateTables } from '@root/jest.setup';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 import {
   getTokenByUserId,
   saveToken,
@@ -7,7 +7,7 @@ import {
 
 describe('user-token repository', () => {
   beforeEach(async () => {
-    await truncateTables(newPrisma, ['user_tokens']);
+    await truncateTables(prismaClient, ['user_tokens']);
   });
 
   it('should return token', async () => {

@@ -10,11 +10,11 @@ import {
   saveReview,
 } from '@domain/restaurant/repository/restaurant.repository';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 
 describe('Restaurant repository', () => {
   beforeEach(async () => {
-    await truncateTables(newPrisma, [
+    await truncateTables(prismaClient, [
       'restaurant_reviews',
       'external_restaurant_informations',
     ]);

@@ -1,6 +1,6 @@
 import { truncateTables } from '@root/jest.setup';
 import { AgreementCategory } from '@domain/user/user.enum';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 import {
   getAgreementById,
   getAgreementsByUserId,
@@ -11,7 +11,7 @@ import {
 
 describe('agreement repository', () => {
   beforeEach(async () => {
-    await truncateTables(newPrisma, ['agreements']);
+    await truncateTables(prismaClient, ['agreements']);
   });
 
   it('should update agreement', async () => {

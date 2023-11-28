@@ -1,6 +1,6 @@
 import { truncateTables } from '@root/jest.setup';
 import { AccountCategory } from '@domain/account/account.enum';
-import newPrisma from '@common/database/new.prisma';
+import prismaClient from '@common/database/new.prisma';
 import {
   getAccount,
   saveAccount,
@@ -10,7 +10,7 @@ import {
 
 describe('account repository', () => {
   beforeEach(async () => {
-    await truncateTables(newPrisma, ['accounts']);
+    await truncateTables(prismaClient, ['accounts']);
   });
 
   it('should update account', async () => {
