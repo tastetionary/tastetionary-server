@@ -6,9 +6,9 @@ import { AccountCategory } from '@domain/account/account.enum';
 import { AccountModule } from '@domain/account/account.module';
 import { getIdentification } from '@domain/account/repository/account.repository';
 import { getTokenByUserId } from '@domain/account/repository/user-token.repository';
+import prismaClient from '@common/database/new.prisma';
 
 describe('account service', () => {
-  let prisma;
   let accountService: AccountService;
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -20,7 +20,7 @@ describe('account service', () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['accounts', 'user_tokens', 'users']);
+    await truncateTables(prismaClient, ['accounts', 'user_tokens', 'users']);
   });
 
   it('should delete token', async () => {

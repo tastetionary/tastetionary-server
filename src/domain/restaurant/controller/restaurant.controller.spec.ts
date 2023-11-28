@@ -12,6 +12,7 @@ import {
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { UserService } from '@domain/user/service/user.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
+
 describe('restaurant controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
