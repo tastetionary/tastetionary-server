@@ -1,10 +1,18 @@
 import { define, extend, random, sequence } from 'cooky-cutter';
 import { AreaRecord } from '@domain/user/repository/area.repository';
-import { AreaCategory } from '@domain/user/user.enum';
-type Model = { id: number };
-const baseModel = define<Model>({
+import { AreaCategory, UserState } from '@domain/user/user.enum';
+import { UserRecord } from '@root/src/domain/user/repository/user.repository';
+type model = { id: number };
+const baseModel = define<model>({
   id: random,
 });
+
+export function userFactory(param?: { state?: UserState }) {
+  return extend<model, UserRecord>(baseModel, {
+    nickname: (i) => `${i}-nickname`,
+    state: param?.state ?? UserState.ACTIVE,
+  })();
+}
 
 const seoulLatLon = {
   address: 'default seoul',
@@ -12,13 +20,13 @@ const seoulLatLon = {
   lon: 126.97792364116825,
 };
 
-const area = (param: {
+function areaFactory(param: {
   userId?: number;
   location?: { address: string; lat: number; lon: number };
   category: AreaCategory;
-}) => {
+}) {
   const location = param.location ?? seoulLatLon;
-  return extend<Model, AreaRecord>(baseModel, {
+  return extend<model, AreaRecord>(baseModel, {
     userId: param.userId ?? random,
     category: param.category ?? AreaCategory.DINING_AREA,
     order: sequence,
@@ -26,12 +34,12 @@ const area = (param: {
     latitude: location.lat,
     longitude: location.lon,
   })();
-};
+}
 
 export function dinningAreaFactory(userId: number) {
-  return area({ userId, category: AreaCategory.DINING_AREA });
+  return areaFactory({ userId, category: AreaCategory.DINING_AREA });
 }
 
 export function activityAreaFactory(userId: number) {
-  return area({ userId, category: AreaCategory.ACTIVITY_AREA });
+  return areaFactory({ userId, category: AreaCategory.ACTIVITY_AREA });
 }
