@@ -18,7 +18,7 @@ import {
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
-import { ExternalRestaurantInformationEntity } from '@domain/restaurant/repository/restaurant.repository';
+import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
 import { Response } from 'express';
 
 export interface RegisterRestaurantReviewInput {
@@ -46,7 +46,7 @@ export interface GetRestaurantInput
 }
 
 export interface GetRestaurantsOutput
-  extends Omit<ExternalRestaurantInformationEntity, 'id' | 'externalUUID'> {
+  extends Omit<ExternalRestaurantInformationRecord, 'id' | 'externalUUID'> {
   id: string;
   externalUUID: string;
   /**

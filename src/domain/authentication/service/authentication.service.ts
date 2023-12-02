@@ -4,7 +4,6 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import { AuthenticationRepository } from '@domain/authentication/repository/authentication.repository';
 import { UserAuth } from '@domain/authentication/core/user-auth';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { sendEmail } from '@thirdParty/brevo/brevo';
@@ -16,11 +15,17 @@ import {
   InternalDomainException,
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
+import {
+  deleteAuthentications,
+  getAuthenticationByIdentification,
+  getHistoryById,
+  saveAuthentication,
+  saveAuthenticationHistory,
+  updateAuthentication,
+} from '@domain/authentication/repository/authentication.repository';
 
 @Injectable()
 export class AuthenticationService {
-  constructor(private repo: AuthenticationRepository) {}
-
   @Inject(ConfigurationService)
   private readonly cfgService: ConfigurationService;
 
@@ -65,7 +70,7 @@ export class AuthenticationService {
       );
     }
 
-    await this.repo.saveAuthentication({
+    await saveAuthentication({
       userId: param.userId,
       identification: param.identification,
       category: param.category,
@@ -73,7 +78,7 @@ export class AuthenticationService {
       state: AuthenticationState.INPROGRESS,
     });
 
-    const history = await this.repo.saveAuthenticationHistory({
+    const history = await saveAuthenticationHistory({
       identification: param.identification,
       category: param.category,
       type: param.type,
@@ -171,7 +176,7 @@ export class AuthenticationService {
   }
 
   async doneProgressAuthentication(historyId: number, code: string) {
-    const historyRecord = await this.repo.getHistoryById(historyId);
+    const historyRecord = await getHistoryById(historyId);
     if (!historyRecord) {
       throw new InternalDomainException(
         ErrorNameEnum.NO_DATA,
@@ -185,7 +190,7 @@ export class AuthenticationService {
       );
     }
 
-    const authRecord = await this.repo.getAuthenticationByIdentification(
+    const authRecord = await getAuthenticationByIdentification(
       historyRecord.identification,
       historyRecord.category,
       historyRecord.type,
@@ -198,7 +203,7 @@ export class AuthenticationService {
       );
     }
 
-    await this.repo.updateAuthentication({
+    await updateAuthentication({
       id: authRecord.id,
       state: AuthenticationState.DONE,
     });
@@ -214,7 +219,7 @@ export class AuthenticationService {
     type: AuthenticationType;
     userId?: number;
   }) {
-    const record = await this.repo.getAuthenticationByIdentification(
+    const record = await getAuthenticationByIdentification(
       param.identification,
       param.category,
       param.type,
@@ -229,7 +234,7 @@ export class AuthenticationService {
     type: AuthenticationType,
     userId?: number,
   ) {
-    const auth = await this.repo.getAuthenticationByIdentification(
+    const auth = await getAuthenticationByIdentification(
       identification,
       category,
       type,
@@ -250,14 +255,14 @@ export class AuthenticationService {
       }
     }
 
-    await this.repo.deleteAuthentications([auth.id]);
+    await deleteAuthentications([auth.id]);
   }
 
   async syncAuthentication(param: {
     userId: number;
     authenticationId: number;
   }) {
-    return this.repo.updateAuthentication({
+    return updateAuthentication({
       id: param.authenticationId,
       userId: param.userId,
     });

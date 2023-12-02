@@ -1,6 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
 import { AuthenticationModule } from '@domain/authentication/authentication.module';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import {
@@ -8,19 +7,18 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import {
-  AuthenticationHistoryEntity,
-  AuthenticationRepository,
+  AuthenticationHistoryRecord,
+  getHistoryById,
 } from '@domain/authentication/repository/authentication.repository';
 import * as brevo from '@thirdParty/brevo/brevo';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { Environment } from '@root/src/env.validation';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
+import prismaClient from '@common/database/new.prisma';
 
 describe('authentication service', () => {
   let module: TestingModule;
   let service: AuthenticationService;
-  let prisma: PrismaService;
-  let repo: AuthenticationRepository;
   let cfgService: ConfigurationService;
   beforeAll(async () => {
     module = (await appModuleFixture(
@@ -29,13 +27,11 @@ describe('authentication service', () => {
       [AuthenticationModule],
     )) as TestingModule;
     service = module.get<AuthenticationService>(AuthenticationService);
-    prisma = module.get(PrismaService);
-    repo = module.get(AuthenticationRepository);
     cfgService = module.get(ConfigurationService);
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(prismaClient, [
       'authentications',
       'authentication_histories',
     ]);
@@ -55,9 +51,9 @@ describe('authentication service', () => {
       };
       const res = await service.createProgressAuthentication(data);
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       await service.doneProgressAuthentication(history.id, history.code);
 
@@ -113,9 +109,9 @@ describe('authentication service', () => {
         type: AuthenticationType.EMAIL,
       });
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       expect(history).toBeDefined();
     });
@@ -129,9 +125,9 @@ describe('authentication service', () => {
         type: AuthenticationType.EMAIL,
       });
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       await service.doneProgressAuthentication(history.id, history.code);
 
@@ -179,9 +175,9 @@ describe('authentication service', () => {
       let userAuth = await service.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       await service.doneProgressAuthentication(history.id, history.code);
 

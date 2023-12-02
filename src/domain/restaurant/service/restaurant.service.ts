@@ -5,9 +5,15 @@ import {
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
-  ExternalRestaurantInformationEntity,
-  RestaurantRepository,
-  RestaurantReviewEntity,
+  ExternalRestaurantInformationRecord,
+  getExternalRestaurantIdsByDistance,
+  getExternalRestaurantInformation,
+  getRestaurantOptionsRecord,
+  getReviewsByConditions,
+  getReviewsByUserId,
+  RestaurantReviewRecord,
+  saveExternalRestaurantInformation,
+  saveReview,
 } from '@domain/restaurant/repository/restaurant.repository';
 import { UserService } from '@domain/user/service/user.service';
 import { EndUser } from '@domain/user/core/end-user';
@@ -22,13 +28,13 @@ import {
 import { ErrorNameEnum } from '@common/exception/enum';
 
 interface GetRecommendedRestaurant {
-  restaurant: ExternalRestaurantInformationEntity;
+  restaurant: ExternalRestaurantInformationRecord;
   aggregateReviews: AggregateReviewDTO;
 }
 
 @Injectable()
 export class RestaurantService {
-  constructor(private repo: RestaurantRepository) {}
+  constructor() {}
 
   @Inject(UserService)
   private readonly userService: UserService;
@@ -74,7 +80,7 @@ export class RestaurantService {
     externalInfoId: bigint;
     dto: RestaurantReviewDTO;
   }) {
-    await this.repo.saveReview({
+    await saveReview({
       userId: param.userId,
       externalRestaurantInformationId: param.externalInfoId,
       ...param.dto,
@@ -82,7 +88,7 @@ export class RestaurantService {
   }
 
   async getReviews(userId: number) {
-    return this.repo.getReviewsByUserId(userId);
+    return getReviewsByUserId(userId);
   }
 
   async registerExternalRestaurantInformationWhenNoData(
@@ -93,7 +99,7 @@ export class RestaurantService {
       return info;
     }
 
-    await this.repo.saveExternalRestaurantInformation({
+    await saveExternalRestaurantInformation({
       externalUUID: BigInt(param.externalUUID),
       name: param.name,
       location: {
@@ -107,9 +113,7 @@ export class RestaurantService {
   }
 
   async getExternalRestaurant(externalUUID: number) {
-    return await this.repo.getExternalRestaurantInformation(
-      BigInt(externalUUID),
-    );
+    return await getExternalRestaurantInformation(BigInt(externalUUID));
   }
 
   async getRecommendedRestaurant(
@@ -138,7 +142,7 @@ export class RestaurantService {
     }
 
     const ids = restaurants.map((r) => r.id);
-    const targetReviews = await this.repo.getReviewsByConditions({
+    const targetReviews = await getReviewsByConditions({
       restaurantIds: ids,
       keywords: detachEmoji(param.keywords),
       ltePrice: param.ltePrice,
@@ -153,7 +157,7 @@ export class RestaurantService {
     const { id, data } = this.aggregateRestaurantReview(targetReviews);
     const targetRestaurant = restaurants.find(
       (r) => r.id.toString() == id,
-    ) as ExternalRestaurantInformationEntity;
+    ) as ExternalRestaurantInformationRecord;
 
     return {
       restaurant: targetRestaurant,
@@ -174,7 +178,7 @@ export class RestaurantService {
   ) {
     if (!endUser.dinningArea) return [];
 
-    return await this.repo.getExternalRestaurantIdsByDistance({
+    return await getExternalRestaurantIdsByDistance({
       latitude: endUser.dinningArea?.latitude,
       longitude: endUser.dinningArea?.longitude,
       maxDistanceMeter: param.maxDistanceMeter,
@@ -182,7 +186,7 @@ export class RestaurantService {
     });
   }
 
-  aggregateRestaurantReview(reviews: RestaurantReviewEntity[]) {
+  aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
     const groupedReview = fx.groupBy(
       (r) => r.external_restaurant_information_id.toString(),
       reviews,
@@ -238,6 +242,6 @@ export class RestaurantService {
   }
 
   async getRestaurantOptions() {
-    return await this.repo.getRestaurantOptions();
+    return await getRestaurantOptionsRecord();
   }
 }

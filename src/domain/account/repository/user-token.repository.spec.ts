@@ -1,23 +1,13 @@
-import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
-import { TestingModule } from '@nestjs/testing';
-import { PrismaService } from '@common/database/prisma.service';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { truncateTables } from '@root/jest.setup';
+import prismaClient from '@common/database/new.prisma';
+import {
+  getTokenByUserId,
+  saveToken,
+} from '@domain/account/repository/user-token.repository';
 
 describe('user-token repository', () => {
-  let repo: UserTokenRepository;
-  let prisma: PrismaService;
-  beforeAll(async () => {
-    const module = (await appModuleFixture(
-      [],
-      [ConfigurationService, PrismaService, UserTokenRepository],
-    )) as TestingModule;
-    repo = module.get(UserTokenRepository);
-    prisma = module.get(PrismaService);
-  });
-
   beforeEach(async () => {
-    await truncateTables(prisma, ['user_tokens']);
+    await truncateTables(prismaClient, ['user_tokens']);
   });
 
   it('should return token', async () => {
@@ -28,9 +18,9 @@ describe('user-token repository', () => {
       accessTokenExpiredAt: new Date(),
       refreshTokenExpiredAt: new Date(),
     };
-    await repo.saveToken(data);
+    await saveToken(data);
 
-    const res = await repo.getTokenByUserId(data.userId);
+    const res = await getTokenByUserId(data.userId);
     expect(res).not.toBeNull();
   });
 
@@ -42,7 +32,7 @@ describe('user-token repository', () => {
       accessTokenExpiredAt: new Date(),
       refreshTokenExpiredAt: new Date(),
     };
-    const res = await repo.saveToken(data);
+    const res = await saveToken(data);
 
     expect(res).not.toBeNull();
   });
