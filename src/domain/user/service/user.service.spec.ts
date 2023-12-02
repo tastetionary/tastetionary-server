@@ -1,6 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
 import { UserService } from '@domain/user/service/user.service';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
@@ -13,10 +12,10 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import * as brevo from '@thirdParty/brevo/brevo';
+import prismaClient from '@common/database/new.prisma';
 
 describe('user service', () => {
   let service: UserService;
-  let prisma: PrismaService;
   let module: TestingModule;
   let authenticationService: AuthenticationService;
 
@@ -27,12 +26,11 @@ describe('user service', () => {
       [UserModule, AccountModule],
     )) as TestingModule;
     service = module.get(UserService);
-    prisma = module.get(PrismaService);
     authenticationService = module.get(AuthenticationService);
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(prismaClient, [
       'users',
       'accounts',
       'authentications',

@@ -1,18 +1,15 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
 import { AccountService } from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
-import { AccountRepository } from '@domain/account/repository/account.repository';
-import { UserTokenRepository } from '@domain/account/repository/user-token.repository';
 import { AccountModule } from '@domain/account/account.module';
+import { getIdentification } from '@domain/account/repository/account.repository';
+import { getTokenByUserId } from '@domain/account/repository/user-token.repository';
+import prismaClient from '@common/database/new.prisma';
 
 describe('account service', () => {
-  let prisma;
   let accountService: AccountService;
-  let accountRepo: AccountRepository;
-  let tokenRepo: UserTokenRepository;
   beforeAll(async () => {
     const module = (await appModuleFixture(
       [],
@@ -20,13 +17,10 @@ describe('account service', () => {
       [AccountModule],
     )) as TestingModule;
     accountService = module.get<AccountService>(AccountService);
-    accountRepo = module.get<AccountRepository>(AccountRepository);
-    tokenRepo = module.get<UserTokenRepository>(UserTokenRepository);
-    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, ['accounts', 'user_tokens', 'users']);
+    await truncateTables(prismaClient, ['accounts', 'user_tokens', 'users']);
   });
 
   it('should delete token', async () => {
@@ -41,7 +35,7 @@ describe('account service', () => {
     await accountService.createToken(dto);
     await accountService.deleteTokens(userId);
 
-    const tokens = await tokenRepo.getTokenByUserId(userId);
+    const tokens = await getTokenByUserId(userId);
     expect(tokens).toBeNull();
   });
 
@@ -68,10 +62,7 @@ describe('account service', () => {
     };
     await accountService.register(1, dto);
 
-    const res = await accountRepo.getIdentification(
-      dto.identification,
-      dto.category,
-    );
+    const res = await getIdentification(dto.identification, dto.category);
     expect(res).not.toBeNull();
   });
 });

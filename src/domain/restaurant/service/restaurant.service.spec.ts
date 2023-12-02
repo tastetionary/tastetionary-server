@@ -4,7 +4,6 @@ import {
   truncateTables,
   userEntityFactory,
 } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
@@ -17,26 +16,23 @@ import {
   CallerWrongUsageException,
   EmptyContentException,
 } from '@common/exception/internal.exception';
-import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+import prismaClient from '@common/database/new.prisma';
+import * as repo from '@domain/restaurant/repository/restaurant.repository';
 
 describe('restaurant service', () => {
-  let prisma: PrismaService;
   let module: TestingModule;
   let service: RestaurantService;
-  let repo: RestaurantRepository;
   beforeAll(async () => {
     module = (await appModuleFixture(
       [],
       [],
       [UserModule, RestaurantModule],
     )) as TestingModule;
-    prisma = module.get(PrismaService);
     service = module.get(RestaurantService);
-    repo = module.get(RestaurantRepository);
   });
 
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(prismaClient, [
       'user_areas',
       'restaurant_reviews',
       'external_restaurant_informations',

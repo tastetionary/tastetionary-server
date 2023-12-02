@@ -1,13 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserRepository } from '@domain/user/repository/user.repository';
 import {
   AgreementDTO,
   AreaDto,
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
-import { AgreementRepository } from '@domain/user/repository/agreements.repository';
-import { AreaRepository } from '@domain/user/repository/area.repository';
 import { AccountService } from '@domain/account/service/account.service';
 import { UserState } from '@domain/user/user.enum';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
@@ -16,14 +13,20 @@ import { EndUser } from '@domain/user/core/end-user';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
+import {
+  deleteAreas,
+  getAreasByUserId,
+  saveAreas,
+} from '@domain/user/repository/area.repository';
+import {
+  getUserById,
+  saveUser,
+  updateUserById,
+} from '@domain/user/repository/user.repository';
+import { saveAgreements } from '@domain/user/repository/agreements.repository';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private userRepo: UserRepository,
-    private agreementRepo: AgreementRepository,
-    private areaRepo: AreaRepository,
-  ) {}
   @Inject(AccountService)
   private readonly accountService: AccountService;
 
@@ -31,14 +34,14 @@ export class UserService {
   private readonly authenticationService: AuthenticationService;
 
   async getEndUser(userId: number) {
-    const user = await this.userRepo.getUserById(userId);
+    const user = await getUserById(userId);
     if (!user) {
       throw new CallerWrongUsageException(
         ErrorNameEnum.NO_DATA,
         `user not found: ${userId}`,
       );
     }
-    const areas = await this.areaRepo.getAreasByUserId(userId);
+    const areas = await getAreasByUserId(userId);
     return new EndUser(user, { areas });
   }
 
@@ -63,20 +66,20 @@ export class UserService {
         location: { latitude: dto.latitude, longitude: dto.longitude },
       };
     });
-    await this.areaRepo.saveAreas(areaParams);
+    await saveAreas(areaParams);
   }
 
   private async registerAgreements(userId: number, dtoList: AgreementDTO[]) {
     const params = dtoList.map((dto) => {
       return { userId, ...dto };
     });
-    await this.agreementRepo.saveAgreements(params);
+    await saveAgreements(params);
   }
 
   private async registerUser(dto: UserPropertyDto) {
     const nickname = this.getNickname();
 
-    const user = await this.userRepo.saveUser({
+    const user = await saveUser({
       state: UserState.ACTIVE,
       nickname,
       property: {},
@@ -86,7 +89,7 @@ export class UserService {
         userId: user.id,
         authenticationId: dto.companyData.authenticationId,
       });
-      await this.userRepo.updateUserById(user.id, {
+      await updateUserById(user.id, {
         property: { companyName: dto.companyData.companyName },
       });
     }
@@ -115,7 +118,7 @@ export class UserService {
 
   // TODO modify to use area-id and update, not delete and insert
   async updateArea(userId: number, dto: AreaDto) {
-    await this.areaRepo.deleteArea({ userId, category: dto.category });
+    await deleteAreas({ userId, category: dto.category });
     await this.registerArea(userId, [dto]);
     return true;
   }
