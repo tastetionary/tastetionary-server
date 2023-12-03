@@ -1,6 +1,10 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { UserService } from '@domain/user/service/user.service';
+import {
+  registerUser,
+  UserService,
+  _private,
+} from '@domain/user/service/user.service';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { UserModule } from '@domain/user/user.module';
@@ -116,5 +120,33 @@ describe('user service', () => {
   it('should create user and account and agreement and location', async () => {
     const user = await service.register(DTO);
     expect(user).not.toBeNull();
+  });
+
+  it('should create user and account and agreement and location', async () => {
+    const user = await registerUser(DTO);
+    expect(user).not.toBeNull();
+    expect(user).toHaveProperty('state');
+    expect(user).toHaveProperty('id');
+  });
+
+  describe('[private] ', () => {
+    it('createUser with company data should update user property', async () => {
+      const dto = {
+        companyData: { authenticationId: 1, companyName: 'name' },
+      };
+      const res = await _private.createUser(dto);
+      expect(res).toHaveProperty('id');
+    });
+
+    it('createUser should create user', async () => {
+      const dto = {};
+      const res = await _private.createUser(dto);
+      expect(res).toHaveProperty('id');
+    });
+
+    it('createRandomNickname should return random nickname', () => {
+      const nick = _private.createRandomNickname();
+      expect(nick).not.toBeNull();
+    });
   });
 });
