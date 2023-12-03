@@ -1,13 +1,30 @@
 import { define, extend, random, sequence } from 'cooky-cutter';
 import { AreaRecord } from '@domain/user/repository/area.repository';
 import { AreaCategory, UserState } from '@domain/user/user.enum';
-import { UserRecord } from '@root/src/domain/user/repository/user.repository';
+import { UserRecord } from '@domain/user/repository/user.repository';
+import { UserEntity, AreaEntity } from '@domain/user/service/user.service';
 type model = { id: number };
 const baseModel = define<model>({
   id: random,
 });
 
-export function userFactory(param?: { state?: UserState }) {
+export function userEntityFactory(param?: {
+  state?: UserState;
+  dinningArea?: AreaEntity;
+  activityArea?: AreaEntity;
+}) {
+  const user = userRecordFactory({ state: param?.state });
+  const diningArea = param?.dinningArea ?? dinningAreaFactory(user.id);
+  const activityArea = param?.activityArea ?? activityAreaFactory(user.id);
+
+  return extend<model, UserEntity>(baseModel, {
+    nickname: user.nickname,
+    state: user.state,
+    areas: () => [diningArea, activityArea],
+  })();
+}
+
+export function userRecordFactory(param?: { state?: UserState }) {
   return extend<model, UserRecord>(baseModel, {
     nickname: (i) => `${i}-nickname`,
     state: param?.state ?? UserState.ACTIVE,
@@ -20,7 +37,7 @@ const seoulLatLon = {
   lon: 126.97792364116825,
 };
 
-function areaFactory(param: {
+function areaRecordFactory(param: {
   userId?: number;
   location?: { address: string; lat: number; lon: number };
   category: AreaCategory;
@@ -36,10 +53,11 @@ function areaFactory(param: {
   })();
 }
 
+// TODO entity 변환 로직 추가 해야함
 export function dinningAreaFactory(userId: number) {
-  return areaFactory({ userId, category: AreaCategory.DINING_AREA });
+  return areaRecordFactory({ userId, category: AreaCategory.DINING_AREA });
 }
 
 export function activityAreaFactory(userId: number) {
-  return areaFactory({ userId, category: AreaCategory.ACTIVITY_AREA });
+  return areaRecordFactory({ userId, category: AreaCategory.ACTIVITY_AREA });
 }

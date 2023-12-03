@@ -14,6 +14,7 @@ import { AuthenticationService } from '@domain/authentication/service/authentica
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  AreaRecord,
   deleteAreas,
   getAreasByUserId,
   saveAreas,
@@ -24,6 +25,14 @@ import {
   updateUserById,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
+
+export type AreaEntity = AreaRecord;
+export type UserEntity = {
+  readonly id: number;
+  readonly nickname: string;
+  readonly state: string;
+  readonly areas: AreaEntity[];
+};
 
 @Injectable()
 export class UserService {
