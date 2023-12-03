@@ -5,6 +5,7 @@ import { ConfigurationService } from '@domain/configuration/configuration.servic
 // TODO config 사용 방식 변경 해야함, global 레벨에서 바로 가져올 수 있도록
 const configService = new ConfigurationService(new ConfigService());
 const prismaClientSingleton = () => {
+  console.log(configService);
   return new PrismaClient({
     datasources: {
       db: {
