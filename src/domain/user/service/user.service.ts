@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   AgreementDTO,
   AreaDto,
+  CompanyDto,
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
@@ -13,7 +14,10 @@ import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { UserState } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { EndUser } from '@domain/user/core/end-user';
-import { AuthenticationService } from '@domain/authentication/service/authentication.service';
+import {
+  AuthenticationService,
+  syncAuthentication,
+} from '@domain/authentication/service/authentication.service';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
@@ -94,16 +98,17 @@ async function createUser(dto: UserPropertyDto) {
   });
 
   if (dto.companyData) {
-    await this.authenticationService.syncAuthentication({
-      userId: user.id,
-      authenticationId: dto.companyData.authenticationId,
-    });
-    await updateUserById(user.id, {
-      property: { companyName: dto.companyData.companyName },
-    });
+    await changeCompany(user.id, dto.companyData);
   }
 
   return user;
+}
+
+async function changeCompany(userId: number, dto: CompanyDto) {
+  await syncAuthentication(userId, dto.authenticationId);
+  return await updateUserById(userId, {
+    property: { companyName: dto.companyName },
+  });
 }
 
 function createRandomNickname() {
@@ -118,6 +123,7 @@ function createRandomNickname() {
 export const _private = {
   createRandomNickname,
   createUser,
+  changeCompany,
 };
 
 @Injectable()

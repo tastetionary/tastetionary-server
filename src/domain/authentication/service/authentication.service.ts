@@ -24,6 +24,16 @@ import {
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
 
+export async function syncAuthentication(
+  userId: number,
+  authenticationId: number,
+) {
+  return updateAuthentication({
+    id: authenticationId,
+    userId: userId,
+  });
+}
+
 @Injectable()
 export class AuthenticationService {
   @Inject(ConfigurationService)

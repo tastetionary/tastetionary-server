@@ -13,10 +13,12 @@ import { AccountCategory } from '@domain/account/account.enum';
 import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
+  AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import * as brevo from '@thirdParty/brevo/brevo';
 import prismaClient from '@common/database/new.prisma';
+import { saveAuthentication } from '../../authentication/repository/authentication.repository';
 
 describe('user service', () => {
   let service: UserService;
@@ -130,12 +132,22 @@ describe('user service', () => {
   });
 
   describe('[private] ', () => {
-    it('createUser with company data should update user property', async () => {
+    it('changeCompany should update auth and user property', async () => {
+      const user = await _private.createUser({});
+      const auth = await saveAuthentication({
+        identification: '',
+        category: AuthenticationCategory.COMPANY,
+        type: AuthenticationType.EMAIL,
+        state: AuthenticationState.INPROGRESS,
+      });
       const dto = {
-        companyData: { authenticationId: 1, companyName: 'name' },
+        companyData: { authenticationId: auth.id, companyName: 'name' },
       };
-      const res = await _private.createUser(dto);
-      expect(res).toHaveProperty('id');
+      const updatedUser = await _private.changeCompany(
+        user.id,
+        dto.companyData,
+      );
+      expect(updatedUser).toHaveProperty('property');
     });
 
     it('createUser should create user', async () => {
