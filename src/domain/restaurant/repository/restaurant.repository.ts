@@ -6,7 +6,7 @@ import {
   RestaurantCategoryIcons,
   RestaurantKeywordEmoji,
 } from '@domain/restaurant/restaurant.enum';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 export interface RestaurantReviewRecord {
   id: number;

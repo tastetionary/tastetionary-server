@@ -1,6 +1,6 @@
 import { UserState } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
 
 export interface UserRecord {

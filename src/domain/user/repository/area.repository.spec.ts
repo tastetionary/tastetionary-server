@@ -6,7 +6,7 @@ import {
 } from '@domain/user/repository/area.repository';
 import { truncateTables } from '@root/jest.setup';
 import { AreaCategory } from '@domain/user/user.enum';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 describe('new area repository', () => {
   beforeEach(async () => {

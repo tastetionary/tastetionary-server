@@ -13,7 +13,7 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 import { saveAuthentication } from '@domain/authentication/repository/authentication.repository';
 
 describe('user service', () => {

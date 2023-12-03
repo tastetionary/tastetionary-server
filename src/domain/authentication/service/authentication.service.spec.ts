@@ -14,7 +14,7 @@ import * as brevo from '@thirdParty/brevo/brevo';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { Environment } from '@root/src/env.validation';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 describe('authentication service', () => {
   let module: TestingModule;

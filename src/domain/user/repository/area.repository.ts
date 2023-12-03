@@ -1,6 +1,6 @@
 import { AreaCategory } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 export interface AreaRecord {
   id: number;

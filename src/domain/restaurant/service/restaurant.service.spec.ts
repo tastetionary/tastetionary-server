@@ -11,7 +11,7 @@ import {
   CallerWrongUsageException,
   EmptyContentException,
 } from '@common/exception/internal.exception';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 import * as repo from '@domain/restaurant/repository/restaurant.repository';
 import { userEntityFactory } from '@root/test/factory/user.factory';
 
