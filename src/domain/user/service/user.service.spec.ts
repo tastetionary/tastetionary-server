@@ -1,6 +1,7 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import {
+  getUser,
   registerUser,
   UserService,
   _private,
@@ -74,7 +75,7 @@ describe('user service', () => {
   };
 
   it('update area should update', async () => {
-    const user = await service.register(DTO);
+    const user = await registerUser(DTO);
     await service.updateArea(user.id, {
       category: AreaCategory.ACTIVITY_AREA,
       address: 'update activity',
@@ -86,42 +87,11 @@ describe('user service', () => {
     expect(updatedUser.activityArea?.address).toEqual('update activity');
   });
 
-  it('with company data should update company authentication', async () => {
-    const tempMock = jest.spyOn(brevo, 'sendEmail');
-    tempMock.mockResolvedValue(Promise.resolve(true));
-    const authData = {
-      category: AuthenticationCategory.COMPANY,
-      identification: 'user-service@crud.com',
-      type: AuthenticationType.EMAIL,
-    };
-    const res = await authenticationService.createProgressAuthentication(
-      authData,
-    );
-    const { id: authId } =
-      await authenticationService.doneProgressAuthentication(res.id, '000000');
-
-    const deepCopiedData = JSON.parse(JSON.stringify(DTO));
-    deepCopiedData.userProperty.companyData = {
-      companyName: 'test',
-      authenticationId: authId,
-    };
-    const user = await service.register(deepCopiedData);
-
-    const userAuth = await authenticationService.getUserAuth(authData);
-    const auth = userAuth.getAuth(authData.identification, authData.category);
-    expect(auth?.userId).toEqual(user.id);
-  });
-
-  it('should return end-user', async () => {
-    const user = await service.register(DTO);
-    const endUser = await service.getEndUser(user.id);
-    expect(endUser).not.toBeNull();
-    expect(endUser.activityArea).not.toBeNull();
-  });
-
-  it('should create user and account and agreement and location', async () => {
-    const user = await service.register(DTO);
-    expect(user).not.toBeNull();
+  it('should return user entity and essential field', async () => {
+    const user = await registerUser(DTO);
+    const userEntity = await getUser(user.id);
+    expect(userEntity).not.toBeNull();
+    expect(userEntity.dinningArea).not.toBeNull();
   });
 
   it('should create user and account and agreement and location', async () => {
@@ -148,6 +118,8 @@ describe('user service', () => {
         dto.companyData,
       );
       expect(updatedUser).toHaveProperty('property');
+      const company = updatedUser.property;
+      expect(company).toEqual({ companyName: dto.companyData.companyName });
     });
 
     it('createUser should create user', async () => {

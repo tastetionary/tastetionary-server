@@ -10,8 +10,7 @@ import {
   AccountService,
   register as registerAuth,
 } from '@domain/account/service/account.service';
-import * as nicknameSource from '@domain/user/resource/nickname.json';
-import { UserState } from '@domain/user/user.enum';
+import { AreaCategory, UserState } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { EndUser } from '@domain/user/core/end-user';
 import {
@@ -39,7 +38,8 @@ export type UserEntity = {
   readonly id: number;
   readonly nickname: string;
   readonly state: string;
-  readonly areas: AreaEntity[];
+  readonly dinningArea: AreaEntity;
+  readonly activityArea?: AreaEntity;
 };
 
 function transformToUserEntity(
@@ -50,15 +50,29 @@ function transformToUserEntity(
   },
   areas: AreaRecord[],
 ): UserEntity {
+  const areaParser = (category) =>
+    areas?.find((area) => area.category === category);
+
   return {
     id: user.id,
     nickname: user.nickname,
     state: user.state,
-    areas,
+    dinningArea: areaParser(AreaCategory.DINING_AREA) as AreaEntity,
+    activityArea: areaParser(AreaCategory.ACTIVITY_AREA),
   };
 }
 
-export function getUser(userId: number) {}
+export async function getUser(userId: number) {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new CallerWrongUsageException(
+      ErrorNameEnum.NO_DATA,
+      `user not found: ${userId}`,
+    );
+  }
+  const areas = await getAreasByUserId(userId);
+  return transformToUserEntity({ ...user }, areas);
+}
 
 export async function registerUser(dto: RegisterUserDTO) {
   const user = await createUser(dto.userProperty);
@@ -147,14 +161,7 @@ export class UserService {
   }
 
   async register(dto: RegisterUserDTO) {
-    const user = await this.registerUser(dto.userProperty);
-
-    await this.registerAgreements(user.id, dto.agreements);
-
-    await this.registerArea(user.id, dto.areas);
-
-    await this.accountService.register(user.id, dto.account);
-    return user;
+    return;
   }
 
   private async registerArea(userId: number, dtoList: AreaDto[]) {
@@ -168,53 +175,6 @@ export class UserService {
       };
     });
     await saveAreas(areaParams);
-  }
-
-  private async registerAgreements(userId: number, dtoList: AgreementDTO[]) {
-    const params = dtoList.map((dto) => {
-      return { userId, ...dto };
-    });
-    await saveAgreements(params);
-  }
-
-  private async registerUser(dto: UserPropertyDto) {
-    const nickname = this.getNickname();
-
-    const user = await saveUser({
-      state: UserState.ACTIVE,
-      nickname,
-      property: {},
-    });
-    if (dto.companyData) {
-      await this.authenticationService.syncAuthentication({
-        userId: user.id,
-        authenticationId: dto.companyData.authenticationId,
-      });
-      await updateUserById(user.id, {
-        property: { companyName: dto.companyData.companyName },
-      });
-    }
-    return user;
-  }
-
-  protected getNickname() {
-    const nicknameList = this.getNicknameFromSource();
-    const randomAdj = getRandomItem(nicknameList.adj);
-    const randomNameKey = getRandomItem(Object.keys(nicknameList.name));
-    const randomName = getRandomItem(nicknameList.name[randomNameKey]);
-
-    return `${randomAdj} ${randomName}`;
-  }
-
-  private getNicknameFromSource(): {
-    adj: string[];
-    name: {
-      animal: string[];
-      food: string[];
-      cooking: string[];
-    };
-  } {
-    return nicknameSource;
   }
 
   // TODO modify to use area-id and update, not delete and insert
