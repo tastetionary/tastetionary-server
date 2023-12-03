@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
@@ -15,8 +15,6 @@ import {
   saveExternalRestaurantInformation,
   saveReview,
 } from '@domain/restaurant/repository/restaurant.repository';
-import { UserService } from '@domain/user/service/user.service';
-import { EndUser } from '@domain/user/core/end-user';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
@@ -26,6 +24,7 @@ import {
   InternalDomainException,
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
+import { getUser, userEntity } from '@domain/user/service/user.service';
 
 interface GetRecommendedRestaurant {
   restaurant: ExternalRestaurantInformationRecord;
@@ -36,18 +35,15 @@ interface GetRecommendedRestaurant {
 export class RestaurantService {
   constructor() {}
 
-  @Inject(UserService)
-  private readonly userService: UserService;
-
   async registerReview(
     param: {
       userId: number;
       externalDto: ExternalRestaurantInformationDTO;
       dto: RestaurantReviewDTO;
     },
-    user?: EndUser,
+    user?: userEntity,
   ) {
-    const endUser = user ?? (await this.userService.getEndUser(param.userId));
+    const endUser = user ?? (await getUser(param.userId));
 
     if (!endUser.activityArea) {
       throw new CallerWrongDomainRuleException(
@@ -125,9 +121,9 @@ export class RestaurantService {
       categories: RestaurantCategory[];
       excludeRestaurantIds: bigint[];
     },
-    user?: EndUser,
+    user?: userEntity,
   ): Promise<GetRecommendedRestaurant> {
-    const endUser = user ?? (await this.userService.getEndUser(param.userId));
+    const endUser = user ?? (await getUser(param.userId));
     if (!endUser.dinningArea) {
       throw new CallerWrongDomainRuleException(
         ErrorNameEnum.NO_DATA,
@@ -166,7 +162,7 @@ export class RestaurantService {
   }
 
   private async getRestaurantsByDistance(
-    endUser: EndUser,
+    user: userEntity,
     param: {
       userId: number;
       maxDistanceMeter: number;
@@ -176,11 +172,11 @@ export class RestaurantService {
       excludeRestaurantIds: bigint[];
     },
   ) {
-    if (!endUser.dinningArea) return [];
+    if (!user.dinningArea) return [];
 
     return await getExternalRestaurantIdsByDistance({
-      latitude: endUser.dinningArea?.latitude,
-      longitude: endUser.dinningArea?.longitude,
+      latitude: user.dinningArea?.latitude,
+      longitude: user.dinningArea?.longitude,
       maxDistanceMeter: param.maxDistanceMeter,
       excludedIds: param.excludeRestaurantIds,
     });

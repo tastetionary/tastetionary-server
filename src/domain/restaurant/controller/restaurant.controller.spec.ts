@@ -10,14 +10,12 @@ import {
   RestaurantPrice,
 } from '@domain/restaurant/restaurant.enum';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
-import { UserService } from '@domain/user/service/user.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
 
 describe('restaurant controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
   let service: RestaurantService;
-  let userService: UserService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -28,7 +26,6 @@ describe('restaurant controller', () => {
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
     service = module.get(RestaurantService);
-    userService = module.get(UserService);
     await app.init();
   });
 

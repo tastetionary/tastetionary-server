@@ -70,18 +70,4 @@ function createUserToken(
   return jwt.sign({ userId }, secretKey, options);
 }
 
-function userEntityFactory(userId: number) {
-  return {
-    id: userId,
-    nickname: 'nickname',
-    state: 'state',
-  };
-}
-
-export {
-  appServiceFixture,
-  appModuleFixture,
-  truncateTables,
-  createUserToken,
-  userEntityFactory,
-};
+export { appServiceFixture, appModuleFixture, truncateTables, createUserToken };

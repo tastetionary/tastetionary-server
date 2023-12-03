@@ -3,15 +3,13 @@ import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { UserModule } from '@domain/user/user.module';
-import { UserService } from '@domain/user/service/user.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { EndUser } from '@domain/user/core/end-user';
+import * as service from '@domain/user/service/user.service';
 
 describe('user controller', () => {
   let app: INestApplication;
-  let service: UserService;
   let configService: ConfigurationService;
 
   beforeAll(async () => {
@@ -20,18 +18,26 @@ describe('user controller', () => {
       [],
       [UserModule],
     )) as TestingModule;
-    service = module.get<UserService>(UserService);
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
     await app.init();
   });
   it('getProfile should return data', async () => {
     const userId = 122;
-    jest
-      .spyOn(service, 'getEndUser')
-      .mockResolvedValueOnce(
-        new EndUser({ id: userId, nickname: 'nick', state: 'state' }),
-      );
+    jest.spyOn(service, 'getUser').mockResolvedValueOnce({
+      id: userId,
+      nickname: 'nick',
+      state: 'state',
+      dinningArea: {
+        id: 1,
+        userId,
+        category: AreaCategory.DINING_AREA,
+        order: 0,
+        address: 'addr',
+        latitude: 123,
+        longitude: 123,
+      },
+    });
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(userId, key, {
       expiresIn: '10h',
@@ -49,7 +55,7 @@ describe('user controller', () => {
   });
 
   it('updateArea should return success', async () => {
-    jest.spyOn(service, 'updateArea').mockImplementation();
+    jest.spyOn(service, 'changeArea').mockImplementation();
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(122, key, {
       expiresIn: '10h',
@@ -69,7 +75,7 @@ describe('user controller', () => {
   });
 
   it('register should return success', async () => {
-    jest.spyOn(service, 'register').mockImplementation();
+    jest.spyOn(service, 'registerUser').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')
@@ -106,7 +112,7 @@ describe('user controller', () => {
   });
 
   it('wrong input should return bad request', async () => {
-    jest.spyOn(service, 'register').mockImplementation();
+    jest.spyOn(service, 'registerUser').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')

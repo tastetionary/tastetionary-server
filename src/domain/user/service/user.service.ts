@@ -25,13 +25,13 @@ import {
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
 
-export type AreaEntity = AreaRecord;
-export type UserEntity = {
+export type areaEntity = AreaRecord;
+export type userEntity = {
   readonly id: number;
   readonly nickname: string;
   readonly state: string;
-  readonly dinningArea: AreaEntity;
-  readonly activityArea?: AreaEntity;
+  readonly dinningArea: areaEntity;
+  readonly activityArea?: areaEntity;
 };
 
 function transformToUserEntity(
@@ -41,7 +41,7 @@ function transformToUserEntity(
     state: string;
   },
   areas: AreaRecord[],
-): UserEntity {
+): userEntity {
   const areaParser = (category) =>
     areas?.find((area) => area.category === category);
 
@@ -49,7 +49,7 @@ function transformToUserEntity(
     id: user.id,
     nickname: user.nickname,
     state: user.state,
-    dinningArea: areaParser(AreaCategory.DINING_AREA) as AreaEntity,
+    dinningArea: areaParser(AreaCategory.DINING_AREA) as areaEntity,
     activityArea: areaParser(AreaCategory.ACTIVITY_AREA),
   };
 }
