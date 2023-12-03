@@ -1,4 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
 import {
   AgreementDTO,
   AreaDto,
@@ -6,17 +5,10 @@ import {
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
-import {
-  AccountService,
-  register as registerAuth,
-} from '@domain/account/service/account.service';
+import { register as registerAuth } from '@domain/account/service/account.service';
 import { AreaCategory, UserState } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
-import { EndUser } from '@domain/user/core/end-user';
-import {
-  AuthenticationService,
-  syncAuthentication,
-} from '@domain/authentication/service/authentication.service';
+import { syncAuthentication } from '@domain/authentication/service/authentication.service';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
@@ -84,6 +76,10 @@ export async function registerUser(dto: RegisterUserDTO) {
   return user;
 }
 
+export async function changeArea(userId: number, dto: AreaDto) {
+  await deleteAreas({ userId, category: dto.category });
+  await createAreas(userId, [dto]);
+}
 async function createAreas(userId: number, dtoList: AreaDto[]) {
   const areas = dtoList.map((dto) => {
     return {
@@ -139,48 +135,3 @@ export const _private = {
   createUser,
   changeCompany,
 };
-
-@Injectable()
-export class UserService {
-  @Inject(AccountService)
-  private readonly accountService: AccountService;
-
-  @Inject(AuthenticationService)
-  private readonly authenticationService: AuthenticationService;
-
-  async getEndUser(userId: number) {
-    const user = await getUserById(userId);
-    if (!user) {
-      throw new CallerWrongUsageException(
-        ErrorNameEnum.NO_DATA,
-        `user not found: ${userId}`,
-      );
-    }
-    const areas = await getAreasByUserId(userId);
-    return new EndUser(user, { areas });
-  }
-
-  async register(dto: RegisterUserDTO) {
-    return;
-  }
-
-  private async registerArea(userId: number, dtoList: AreaDto[]) {
-    const areaParams = dtoList.map((dto) => {
-      return {
-        userId,
-        order: 0,
-        category: dto.category,
-        address: dto.address,
-        location: { latitude: dto.latitude, longitude: dto.longitude },
-      };
-    });
-    await saveAreas(areaParams);
-  }
-
-  // TODO modify to use area-id and update, not delete and insert
-  async updateArea(userId: number, dto: AreaDto) {
-    await deleteAreas({ userId, category: dto.category });
-    await this.registerArea(userId, [dto]);
-    return true;
-  }
-}

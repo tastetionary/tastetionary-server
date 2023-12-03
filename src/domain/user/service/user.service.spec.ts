@@ -1,41 +1,22 @@
-import { TestingModule } from '@nestjs/testing';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
+import { truncateTables } from '@root/jest.setup';
 import {
+  changeArea,
   getUser,
   registerUser,
-  UserService,
   _private,
 } from '@domain/user/service/user.service';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
-import { UserModule } from '@domain/user/user.module';
-import { AccountModule } from '@domain/account/account.module';
 import { AccountCategory } from '@domain/account/account.enum';
-import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import * as brevo from '@thirdParty/brevo/brevo';
 import prismaClient from '@common/database/new.prisma';
-import { saveAuthentication } from '../../authentication/repository/authentication.repository';
+import { saveAuthentication } from '@domain/authentication/repository/authentication.repository';
 
 describe('user service', () => {
-  let service: UserService;
-  let module: TestingModule;
-  let authenticationService: AuthenticationService;
-
-  beforeAll(async () => {
-    module = (await appModuleFixture(
-      [],
-      [],
-      [UserModule, AccountModule],
-    )) as TestingModule;
-    service = module.get(UserService);
-    authenticationService = module.get(AuthenticationService);
-  });
-
   beforeEach(async () => {
     await truncateTables(prismaClient, [
       'users',
@@ -74,16 +55,16 @@ describe('user service', () => {
     ],
   };
 
-  it('update area should update', async () => {
+  it('should change area', async () => {
     const user = await registerUser(DTO);
-    await service.updateArea(user.id, {
+    await changeArea(user.id, {
       category: AreaCategory.ACTIVITY_AREA,
       address: 'update activity',
       latitude: 100,
       longitude: 1000,
     });
 
-    const updatedUser = await service.getEndUser(user.id);
+    const updatedUser = await getUser(user.id);
     expect(updatedUser.activityArea?.address).toEqual('update activity');
   });
 
