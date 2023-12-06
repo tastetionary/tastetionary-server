@@ -61,7 +61,8 @@ export class RestaurantService {
         `no data or can not register about uuid: ${param.externalDto.externalUUID}`,
       );
     }
-
+    const keywords = detachEmoji(param.dto.keywords);
+    param.dto.keywords = keywords;
     await this.registerRestaurantReview({
       userId: param.userId,
       externalInfoId: externalInfo.id,
@@ -189,7 +190,6 @@ export class RestaurantService {
     );
     const randomId = getRandomItem(Object.keys(groupedReview));
     const randomReviews = groupedReview[randomId];
-
     const data: AggregateReviewDTO = {
       categories: [],
       summaries: [],
@@ -213,6 +213,7 @@ export class RestaurantService {
       fx.map((data) => {
         data['aggregatePrice'] = this.aggregatePrice(data.prices);
         data['revisitRatio'] = this.calcRevisitRatio(data.opinions);
+        data.keywords = [...new Set(data.keywords)];
         return data;
       }),
       fx.toArray,
