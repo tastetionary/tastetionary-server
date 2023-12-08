@@ -111,7 +111,7 @@ describe('restaurant controller', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({
         excludeIds: [],
-        category: RestaurantCategory.ASIAN,
+        category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         price: 10_000,
       });
