@@ -40,6 +40,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         path: request.url,
         category: exception.category,
         additionalData: exception.loggedData,
+        originMessage: exception.message,
       };
 
       if (!(exception instanceof CallerWrongUsageException)) {

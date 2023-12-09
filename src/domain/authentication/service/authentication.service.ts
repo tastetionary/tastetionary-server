@@ -19,7 +19,7 @@ import {
   AuthenticationRecord,
   deleteAuthentications,
   getAuthenticationByIdentification,
-  getAuthenticationsByUserId,
+  getAuthentications,
   getHistoryById,
   saveAuthentication,
   saveAuthenticationHistory,
@@ -241,7 +241,7 @@ export class AuthenticationService {
   }
 
   async getUserDoneEmailList(userId: number): Promise<AuthenticationRecord[]> {
-    const record = await getAuthenticationsByUserId({
+    const record = await getAuthentications({
       userId: userId,
       type: AuthenticationType.EMAIL,
     });

@@ -1,6 +1,7 @@
 import typia from 'typia';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { AccountDTO } from '@domain/account/dto/account.dto';
+import { authEntity } from '@domain/user/service/user.service';
 
 export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
 
@@ -127,10 +128,8 @@ export interface ProfileResponse {
    * user authentication data, only return email,
    * @type AreaDto
    */
-  authentication?:
-    | {
-        account_email: string;
-        company_email?: string;
-      }
-    | object;
+  authentication: {
+    account_email: authEntity | string;
+    company_email?: authEntity | string;
+  };
 }

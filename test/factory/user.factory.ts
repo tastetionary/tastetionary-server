@@ -2,7 +2,17 @@ import { define, extend, random, sequence } from 'cooky-cutter';
 import { AreaRecord } from '@domain/user/repository/area.repository';
 import { AreaCategory, UserState } from '@domain/user/user.enum';
 import { UserRecord } from '@domain/user/repository/user.repository';
-import { userEntity, areaEntity } from '@domain/user/service/user.service';
+import {
+  userEntity,
+  areaEntity,
+  authEntity,
+} from '@domain/user/service/user.service';
+import {
+  AuthenticationCategory,
+  AuthenticationState,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
+import { AuthenticationRecord } from '@domain/authentication/repository/authentication.repository';
 type model = { id: number };
 const baseModel = define<model>({
   id: random,
@@ -12,6 +22,8 @@ export function userEntityFactory(param?: {
   state?: UserState;
   dinningArea?: areaEntity;
   activityArea?: areaEntity;
+  accountAuth?: authEntity;
+  companyAuth?: authEntity;
 }) {
   const user = userRecordFactory({ state: param?.state });
   const diningArea = param?.dinningArea ?? dinningAreaFactory(user.id);
@@ -23,11 +35,21 @@ export function userEntityFactory(param?: {
     activityArea = activityAreaFactory(user.id);
   }
 
+  const accountAuth = param?.accountAuth ?? accountAuthFactory(user.id);
+  let companyAuth: undefined | AuthenticationRecord = undefined;
+  if (param && param?.companyAuth == undefined) {
+    companyAuth = undefined;
+  } else {
+    companyAuth = companyAuthFactory(user.id);
+  }
+
   return extend<model, userEntity>(baseModel, {
     nickname: user.nickname,
     state: user.state,
     dinningArea: () => diningArea,
     activityArea: () => activityArea,
+    accountEmail: () => accountAuth,
+    companyEmail: () => companyAuth,
   })();
 }
 
@@ -36,6 +58,36 @@ export function userRecordFactory(param?: { state?: UserState }) {
     nickname: (i) => `${i}-nickname`,
     state: param?.state ?? UserState.ACTIVE,
   })();
+}
+
+function authRecordFactory(param: {
+  userId?: number;
+  category?: AuthenticationCategory;
+  type?: AuthenticationType;
+  state?: AuthenticationState;
+}) {
+  return extend<model, AuthenticationRecord>(baseModel, {
+    userId: param.userId ?? random,
+    category: param.category ?? AuthenticationCategory.ACCOUNT,
+    type: param.type ?? AuthenticationType.EMAIL,
+    state: param.state ?? AuthenticationState.DONE,
+    identification: (i) => `${i}@ide.com`,
+  })();
+}
+
+// TODO entity 변환 로직 추가 해야함
+export function accountAuthFactory(userId: number) {
+  return authRecordFactory({
+    userId,
+    category: AuthenticationCategory.ACCOUNT,
+  });
+}
+
+export function companyAuthFactory(userId: number) {
+  return authRecordFactory({
+    userId,
+    category: AuthenticationCategory.COMPANY,
+  });
 }
 
 const seoulLatLon = {

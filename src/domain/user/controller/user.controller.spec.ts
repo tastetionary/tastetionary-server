@@ -1,12 +1,21 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture, createUserToken } from '@root/jest.setup';
+import {
+  appModuleFixture,
+  assertStatusCode,
+  createUserToken,
+} from '@root/jest.setup';
 import { UserModule } from '@domain/user/user.module';
 import { AccountCategory } from '@domain/account/account.enum';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import * as service from '@domain/user/service/user.service';
+import {
+  AuthenticationCategory,
+  AuthenticationState,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -38,6 +47,14 @@ describe('user controller', () => {
         latitude: 123,
         longitude: 123,
       },
+      accountEmail: {
+        id: 1,
+        category: AuthenticationCategory.ACCOUNT,
+        type: AuthenticationType.EMAIL,
+        state: AuthenticationState.INPROGRESS,
+        userId,
+        identification: 'ide',
+      },
     });
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(userId, key, {
@@ -47,7 +64,8 @@ describe('user controller', () => {
     const res = await request(app.getHttpServer())
       .get('/v1/user')
       .set('Authorization', `Bearer ${token}`);
-    expect(res.statusCode).toEqual(200);
+
+    assertStatusCode(res, 200);
 
     expect(res.body.data).toHaveProperty('id');
     expect(res.body.data).toHaveProperty('nickname');

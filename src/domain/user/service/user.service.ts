@@ -24,14 +24,23 @@ import {
   updateUserById,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
+import {
+  AuthenticationRecord,
+  getAuthenticationsByUserId,
+} from '@domain/authentication/repository/authentication.repository';
+import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
 
 export type areaEntity = AreaRecord;
+export type authEntity = AuthenticationRecord;
 export type userEntity = {
   readonly id: number;
   readonly nickname: string;
   readonly state: string;
   readonly dinningArea: areaEntity;
   readonly activityArea?: areaEntity;
+
+  readonly accountEmail: authEntity;
+  readonly companyEmail?: authEntity;
 };
 
 function transformToUserEntity(
@@ -41,9 +50,12 @@ function transformToUserEntity(
     state: string;
   },
   areas: AreaRecord[],
+  authList: AuthenticationRecord[],
 ): userEntity {
   const areaParser = (category) =>
     areas?.find((area) => area.category === category);
+  const authParser = (category) =>
+    authList?.find((auth) => auth.category === category);
 
   return {
     id: user.id,
@@ -51,6 +63,8 @@ function transformToUserEntity(
     state: user.state,
     dinningArea: areaParser(AreaCategory.DINING_AREA) as areaEntity,
     activityArea: areaParser(AreaCategory.ACTIVITY_AREA),
+    accountEmail: authParser(AuthenticationCategory.ACCOUNT) as authEntity,
+    companyEmail: authParser(AuthenticationCategory.COMPANY),
   };
 }
 
@@ -63,7 +77,8 @@ export async function getUser(userId: number) {
     );
   }
   const areas = await getAreasByUserId(userId);
-  return transformToUserEntity({ ...user }, areas);
+  const authList = await getAuthenticationsByUserId(userId);
+  return transformToUserEntity({ ...user }, areas, authList);
 }
 
 export async function registerUser(dto: RegisterUserDTO) {

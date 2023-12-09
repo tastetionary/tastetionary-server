@@ -47,7 +47,7 @@ export class UserController {
   @TypedRoute.Get('/')
   async getProfile(@Request() req): Promise<BaseResponseDto<ProfileResponse>> {
     const user = await getUser(req.user.userId);
-    return new BaseResponseDto({
+    const res = new BaseResponseDto({
       id: user.id,
       nickname: user.nickname,
       activity_area: user.activityArea ?? {},
@@ -57,6 +57,8 @@ export class UserController {
         company_email: user.companyEmail ?? '',
       },
     });
+
+    return res;
   }
 
   /**
