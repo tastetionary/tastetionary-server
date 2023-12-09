@@ -8,7 +8,7 @@ const prismaClientSingleton = () => {
   return new PrismaClient({
     datasources: {
       db: {
-        url: configService.getDataBaseUrl(),
+        url: configService.getDataBaseUrl() || '',
       },
     },
   });

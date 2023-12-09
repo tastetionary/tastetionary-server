@@ -1,6 +1,6 @@
 import { truncateTables } from '@root/jest.setup';
 import { AccountCategory } from '@domain/account/account.enum';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 import {
   getAccount,
   saveAccount,

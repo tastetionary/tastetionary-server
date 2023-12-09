@@ -16,6 +16,10 @@ import {
   saveToken,
 } from '@domain/account/repository/user-token.repository';
 
+export async function register(userId: number, dto: AccountDTO) {
+  return '';
+}
+
 @Injectable()
 export class AccountService {
   constructor(

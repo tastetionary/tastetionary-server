@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AgreementCategory } from '@domain/user/user.enum';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 export async function saveAgreement(param: {
   userId: number;

@@ -535,7 +535,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetRestaurantsOutput_space__or__space_null_gt_"
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetRestaurantsOutput_gt_"
                 }
               }
             },
@@ -1675,11 +1675,11 @@
           "카페/디저트"
         ]
       },
-      "BaseResponseDto_lt_GetRestaurantsOutput_space__or__space_null_gt_": {
+      "BaseResponseDto_lt_GetRestaurantsOutput_gt_": {
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/GetRestaurantsOutput.Nullable"
+            "$ref": "#/components/schemas/GetRestaurantsOutput"
           }
         },
         "nullable": false,
@@ -1688,7 +1688,7 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "GetRestaurantsOutput.Nullable": {
+      "GetRestaurantsOutput": {
         "type": "object",
         "properties": {
           "id": {
@@ -1743,7 +1743,7 @@
             "format": "date-time"
           }
         },
-        "nullable": true,
+        "nullable": false,
         "required": [
           "id",
           "externalUUID",

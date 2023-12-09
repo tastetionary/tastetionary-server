@@ -1,6 +1,7 @@
 import { UserState } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
+import * as nicknameSource from '@domain/user/resource/nickname.json';
 
 export interface UserRecord {
   id: number;
@@ -10,6 +11,7 @@ export interface UserRecord {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
 export async function saveUser(param: {
   nickname: string;
   state: UserState;
@@ -67,4 +69,16 @@ export async function updateUserById(
     where: { id },
     data: param,
   });
+}
+interface nicknamePartsRecord {
+  adj: string[];
+  name: {
+    animal: string[];
+    food: string[];
+    cooking: string[];
+  };
+}
+
+export function getNicknamePartRecord(): nicknamePartsRecord {
+  return nicknameSource;
 }

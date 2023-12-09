@@ -1,23 +1,19 @@
 import { TestingModule } from '@nestjs/testing';
-import {
-  appModuleFixture,
-  truncateTables,
-  userEntityFactory,
-} from '@root/jest.setup';
+import { appModuleFixture, truncateTables } from '@root/jest.setup';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { UserModule } from '@domain/user/user.module';
-import { EndUser } from '@domain/user/core/end-user';
 import { AreaCategory } from '@domain/user/user.enum';
 import {
   CallerWrongDomainRuleException,
   CallerWrongUsageException,
   EmptyContentException,
 } from '@common/exception/internal.exception';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 import * as repo from '@domain/restaurant/repository/restaurant.repository';
+import { userEntityFactory } from '@root/test/factory/user.factory';
 
 describe('restaurant service', () => {
   let module: TestingModule;
@@ -113,7 +109,7 @@ describe('restaurant service', () => {
         longitude: number;
       },
     ) => {
-      const diningArea = {
+      const dinningArea = {
         id: 1,
         userId,
         category: AreaCategory.DINING_AREA,
@@ -132,8 +128,8 @@ describe('restaurant service', () => {
         latitude: LATITUDE,
         longitude: LONGITUDE,
       };
-      const tempUser = userEntityFactory(userId);
-      const user = new EndUser(tempUser, { areas: [diningArea, activityArea] });
+      const tempUser = userEntityFactory();
+      const user = { ...tempUser, dinningArea, activityArea };
       await service.registerReview(
         {
           userId,
@@ -144,6 +140,7 @@ describe('restaurant service', () => {
       );
       return user;
     };
+
     it('should return proper restaurant', async () => {
       jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValue([
         {
@@ -215,7 +212,7 @@ describe('restaurant service', () => {
 
   describe('registerReview', () => {
     it('with not register activity_area, should not register review', async () => {
-      const endUser = new EndUser(userEntityFactory(1));
+      const endUser = userEntityFactory({ activityArea: undefined });
       await expect(
         service.registerReview(
           {
@@ -240,17 +237,7 @@ describe('restaurant service', () => {
 
     it('should create review data and external data', async () => {
       const userId = 999;
-      const area = {
-        id: 1,
-        userId,
-        category: AreaCategory.ACTIVITY_AREA,
-        order: 1,
-        address: 'address',
-        latitude: 1,
-        longitude: 1,
-      };
-      const tempUser = userEntityFactory(userId);
-      const user = new EndUser(tempUser, { areas: [area] });
+      const user = userEntityFactory();
       await service.registerReview(
         {
           userId,

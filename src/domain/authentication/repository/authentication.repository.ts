@@ -3,7 +3,7 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 export interface AuthenticationHistoryRecord {
   id: number;

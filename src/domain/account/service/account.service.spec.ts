@@ -6,7 +6,7 @@ import { AccountCategory } from '@domain/account/account.enum';
 import { AccountModule } from '@domain/account/account.module';
 import { getIdentification } from '@domain/account/repository/account.repository';
 import { getTokenByUserId } from '@domain/account/repository/user-token.repository';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 describe('account service', () => {
   let accountService: AccountService;

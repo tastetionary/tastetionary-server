@@ -14,15 +14,17 @@ import {
   RegisterUserDTO,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
-import { UserService } from '@domain/user/service/user.service';
 import { AuthGuard } from '@common/auth/auth.guard';
+import {
+  changeArea,
+  getUser,
+  registerUser,
+} from '@domain/user/service/user.service';
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class UserController {
-  constructor(private service: UserService) {}
-
   /**
    * @tag user
    * @summary register user
@@ -32,7 +34,7 @@ export class UserController {
   async registerAccount(
     @TypedBody() dto: RegisterUserDTO,
   ): Promise<BaseResponseDto<object>> {
-    await this.service.register(dto);
+    await registerUser(dto);
     return new BaseResponseDto({ state: 'success' });
   }
 
@@ -44,7 +46,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @TypedRoute.Get('/')
   async getProfile(@Request() req): Promise<BaseResponseDto<ProfileResponse>> {
-    const user = await this.service.getEndUser(req.user.userId);
+    const user = await getUser(req.user.userId);
     return new BaseResponseDto({
       id: user.id,
       nickname: user.nickname,
@@ -64,7 +66,7 @@ export class UserController {
     @Request() req,
     @TypedBody() dto: AreaDto,
   ): Promise<BaseResponseDto<object>> {
-    await this.service.updateArea(req.user.userId, dto);
+    await changeArea(req.user.userId, dto);
     return new BaseResponseDto({ state: 'success' });
   }
 }

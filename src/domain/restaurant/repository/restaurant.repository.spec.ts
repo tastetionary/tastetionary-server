@@ -10,7 +10,7 @@ import {
   saveReview,
 } from '@domain/restaurant/repository/restaurant.repository';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
-import prismaClient from '@common/database/new.prisma';
+import prismaClient from '@root/src/common/database/prisma';
 
 describe('Restaurant repository', () => {
   beforeEach(async () => {

@@ -2,7 +2,7 @@ import { define, extend, random, sequence } from 'cooky-cutter';
 import { AreaRecord } from '@domain/user/repository/area.repository';
 import { AreaCategory, UserState } from '@domain/user/user.enum';
 import { UserRecord } from '@domain/user/repository/user.repository';
-import { UserEntity, AreaEntity } from '@domain/user/service/user.service';
+import { userEntity, areaEntity } from '@domain/user/service/user.service';
 type model = { id: number };
 const baseModel = define<model>({
   id: random,
@@ -10,17 +10,24 @@ const baseModel = define<model>({
 
 export function userEntityFactory(param?: {
   state?: UserState;
-  dinningArea?: AreaEntity;
-  activityArea?: AreaEntity;
+  dinningArea?: areaEntity;
+  activityArea?: areaEntity;
 }) {
   const user = userRecordFactory({ state: param?.state });
   const diningArea = param?.dinningArea ?? dinningAreaFactory(user.id);
-  const activityArea = param?.activityArea ?? activityAreaFactory(user.id);
 
-  return extend<model, UserEntity>(baseModel, {
+  let activityArea: undefined | AreaRecord = undefined;
+  if (param && param?.activityArea == undefined) {
+    activityArea = undefined;
+  } else {
+    activityArea = activityAreaFactory(user.id);
+  }
+
+  return extend<model, userEntity>(baseModel, {
     nickname: user.nickname,
     state: user.state,
-    areas: () => [diningArea, activityArea],
+    dinningArea: () => diningArea,
+    activityArea: () => activityArea,
   })();
 }
 
