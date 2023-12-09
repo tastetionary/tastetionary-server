@@ -53,7 +53,7 @@ describe('restaurant service', () => {
     referenceLink: 'https://www.naver.com',
   };
   describe('aggregateRestaurant', () => {
-    it('should calc average price', () => {
+    it('should calc average price and filter duplicated keywords', () => {
       const reviews = [
         {
           id: 1,
@@ -90,6 +90,8 @@ describe('restaurant service', () => {
       const res = service.aggregateRestaurantReview(reviews);
       expect(res.data.aggregatePrice.avg).toBe(12_500);
       expect(res.data.revisitRatio).toBe(33.3);
+
+      expect(res.data.keywords.length).toBe(2);
     });
 
     it('aggregatePrice, should return expected', () => {
@@ -249,6 +251,7 @@ describe('restaurant service', () => {
       const res = await service.getReviews(userId);
 
       expect(res).toHaveLength(1);
+      expect(res[0].keywords).toEqual(['clean']);
     });
   });
 

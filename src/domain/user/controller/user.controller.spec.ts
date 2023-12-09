@@ -22,6 +22,7 @@ describe('user controller', () => {
     configService = module.get<ConfigurationService>(ConfigurationService);
     await app.init();
   });
+
   it('getProfile should return data', async () => {
     const userId = 122;
     jest.spyOn(service, 'getUser').mockResolvedValueOnce({
@@ -52,6 +53,7 @@ describe('user controller', () => {
     expect(res.body.data).toHaveProperty('nickname');
     expect(res.body.data).toHaveProperty('activity_area');
     expect(res.body.data).toHaveProperty('dining_area');
+    expect(res.body.data).toHaveProperty('authentication');
   });
 
   it('updateArea should return success', async () => {

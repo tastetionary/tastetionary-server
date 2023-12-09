@@ -16,8 +16,10 @@ import {
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  AuthenticationRecord,
   deleteAuthentications,
   getAuthenticationByIdentification,
+  getAuthenticationsByUserId,
   getHistoryById,
   saveAuthentication,
   saveAuthenticationHistory,
@@ -236,6 +238,14 @@ export class AuthenticationService {
     );
     const data = record ? [record] : [];
     return new UserAuth(param.userId ?? null, data);
+  }
+
+  async getUserDoneEmailList(userId: number): Promise<AuthenticationRecord[]> {
+    const record = await getAuthenticationsByUserId({
+      userId: userId,
+      type: AuthenticationType.EMAIL,
+    });
+    return record;
   }
 
   async resetAuthentication(

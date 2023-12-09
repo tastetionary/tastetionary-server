@@ -7,7 +7,6 @@ export enum FoodCategory {
   FAST_FOOD = '패스트푸드',
   SNACK = '분식',
   ASIAN = '아시아식',
-  BUFFET = '뷔페',
   SALAD = '샐러드',
   CAFE_AND_DESERT = '카페/디저트',
 }
@@ -37,7 +36,6 @@ export const FoodCategoryIcons: Record<FoodCategory, string> = {
   [FoodCategory.FAST_FOOD]: 'menu_fastfood',
   [FoodCategory.SNACK]: 'menu_snack',
   [FoodCategory.ASIAN]: 'menu_asian',
-  [FoodCategory.BUFFET]: 'menu_buffet',
   [FoodCategory.SALAD]: 'menu_salad',
   [FoodCategory.CAFE_AND_DESERT]: 'menu_cafedessert',
 };

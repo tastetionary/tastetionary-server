@@ -19,7 +19,7 @@ import {
 } from '@domain/restaurant/dto/restaurant.dto';
 import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
 import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
-import { Response } from 'express';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -36,7 +36,14 @@ export interface RegisterRestaurantReviewInput {
 }
 
 export interface GetRestaurantInput
-  extends Omit<RestaurantReviewDTO, 'summary' | 'opinion'> {
+  extends Omit<RestaurantReviewDTO, 'summary' | 'opinion' | 'category'> {
+  /**
+   * restaurant category array,
+   * example: ["한식"]
+   * @type RestaurantCategory
+   */
+  category: RestaurantCategory[];
+
   /**
    * already recommended restaurant ids, it will be ignored
    * example: 10000
@@ -83,7 +90,7 @@ export class RestaurantController {
       maxDistanceMeter: maxDistanceMeter,
       ltePrice: input.price,
       keywords: input.keywords,
-      categories: [input.category],
+      categories: input.category,
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
     });
 

@@ -101,11 +101,12 @@ export async function getAuthenticationByIdentification(
   return transformAuthentications([record])[0];
 }
 
-export async function getAuthenticationByUserId(
-  userId: number,
-): Promise<AuthenticationRecord[]> {
+export async function getAuthenticationsByUserId(param: {
+  userId: number;
+  type: AuthenticationType;
+}): Promise<AuthenticationRecord[]> {
   const records = await prismaClient.authentications.findMany({
-    where: { userId },
+    where: { userId: param.userId, type: param.type },
   });
   return transformAuthentications(records);
 }

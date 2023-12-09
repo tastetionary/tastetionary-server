@@ -122,4 +122,15 @@ export interface ProfileResponse {
    * @type AreaDto
    */
   dining_area?: AreaDto | object;
+
+  /**
+   * user authentication data, only return email,
+   * @type AreaDto
+   */
+  authentication?:
+    | {
+        account_email: string;
+        company_email?: string;
+      }
+    | object;
 }

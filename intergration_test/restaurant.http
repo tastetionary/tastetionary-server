@@ -12,6 +12,18 @@ content-type: {{content_type_json}}
 ###
 @access_token = {{token.response.body.data.accessToken}}
 
+### get recommendation
+POST {{base_url}}/v1/restaurant/recommendation
+Authorization: Bearer master-tastionary:89
+Content-Type: {{content_type_json}}
+
+{
+    "category":["한식"],
+    "keywords":["깨끗해요✨","친절해요💕","분위기 좋아요🍷","가성비 좋아요👍","주차 가능해요🚘","회전율 좋아요⏩","양이 많아요🥰","넓고 쾌적해요🖼️"],
+    "price":13000,"excludeIds":[]
+}
+
+
 ### Register review
 POST {{base_url}}/v1/restaurant/review
 Authorization: Bearer {{access_token}}
@@ -32,16 +44,4 @@ Content-Type: {{content_type_json}}
         "longitude":127.0311629855974,
         "referenceLink":"http://place.map.kakao.com/8323721"
     }
-}
-
-### get recommenda tion
-POST {{base_url}}/v1/restaurant/recommendation
-Authorization: Bearer {{access_token}}
-Content-Type: {{content_type_json}}
-
-{
-    "excludeIds": [],
-    "category": "분식",
-    "keywords": ["test2"],
-    "price": 10000
 }
