@@ -5,6 +5,26 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { validate } from '@src/env.validation';
 import { PrismaService } from '@common/database/prisma.service';
 import * as jwt from 'jsonwebtoken';
+import SuperTest from 'supertest';
+
+export const assertStatusCode = (
+  res: SuperTest.Response,
+  expectedStatus: number = 200,
+): SuperTest.Response => {
+  if (res.status === expectedStatus) {
+    console.log(`response body: ${JSON.stringify(res.body)}`);
+    return res;
+  }
+  const reqData = JSON.parse(JSON.stringify(res)).req;
+  throw new Error(` 
+  request-method  : ${JSON.stringify(reqData.method)} 
+  request-url     : ${JSON.stringify(reqData.url)}
+  request-data    : ${JSON.stringify(reqData.data)}
+  request-headers : ${JSON.stringify(reqData.headers)}
+  response-status  : ${JSON.stringify(res.status)}
+  response-body    : ${JSON.stringify(res.body)}
+  `);
+};
 
 let appServiceFixture: CallableFunction;
 let appModuleFixture: CallableFunction;

@@ -1,7 +1,11 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture, createUserToken } from '@root/jest.setup';
+import {
+  appModuleFixture,
+  assertStatusCode,
+  createUserToken,
+} from '@root/jest.setup';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import {
@@ -68,12 +72,12 @@ describe('restaurant controller', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({
         excludeIds: [],
-        category: RestaurantCategory.ASIAN,
+        category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         price: 10_000,
       });
 
-    expect(res.statusCode).toEqual(204);
+    assertStatusCode(res, 204);
     expect(res.headers).toHaveProperty('no-content-reason');
   });
 
@@ -111,7 +115,7 @@ describe('restaurant controller', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({
         excludeIds: [],
-        category: RestaurantCategory.ASIAN,
+        category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         price: 10_000,
       });
