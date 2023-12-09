@@ -4,35 +4,37 @@ interface User {
   state: string;
 }
 
-interface AreaUser extends User {
+interface areaUser extends User {
   type: 'area';
   area: {
     id: number;
   };
 }
 
-interface AuthUser extends User {
+interface authUser extends User {
   type: 'auth';
   auth: {
     id: number;
   };
 }
 
-interface UserProfile extends User {
-  type: 'profile';
-  profile: {
-    gender: string;
-  };
+interface profile {
+  gender: 'MALE' | 'FEMALE';
 }
 
-export type UserEntity = User | AreaUser | AuthUser | UserProfile;
+interface profileUser extends User {
+  type: 'profile';
+  profile: profile;
+}
+
+export type UserEntity = User | areaUser | authUser | profileUser;
 
 type ExtractType<T extends { type: any }> = T['type'];
-type AllUserTypes = ExtractType<AreaUser | AuthUser | UserProfile>;
+type userEntityTypes = ExtractType<areaUser | authUser | profileUser>;
 
-export function transformer<T, typeWord extends AllUserTypes>(
-  user: T,
-  func: (user: T) => Extract<UserEntity, { type: typeWord }>,
-) {
+export function transformer<
+  T extends UserEntity,
+  typeWord extends userEntityTypes,
+>(user: T, func: (user: T) => Extract<UserEntity, { type: typeWord }>) {
   return func(user);
 }
