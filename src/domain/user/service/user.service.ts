@@ -68,7 +68,7 @@ function transformToUserEntity(
   };
 }
 
-export async function getUser(userId: number) {
+export async function getProfileLegacy(userId: number) {
   const user = await getUserById(userId);
   if (!user) {
     throw new CallerWrongUsageException(
@@ -79,6 +79,57 @@ export async function getUser(userId: number) {
   const areas = await getAreasByUserId(userId);
   const authList = await getAuthenticationsByUserId(userId);
   return transformToUserEntity({ ...user }, areas, authList);
+}
+
+export async function searchProfile(userId: number) {
+  const user = await searchUser(userId);
+  if (!user) {
+    throw new CallerWrongUsageException(
+      ErrorNameEnum.NO_DATA,
+      `user not found: ${userId}`,
+    );
+  }
+  const areas = await searchAreas(userId);
+  const authList = await searchAuthList(userId);
+  return {
+    user,
+    areas,
+    authList,
+  };
+}
+
+export type UserEntity = Awaited<ReturnType<typeof searchUser>>;
+async function searchUser(userId: number) {
+  const user = await getUserById(userId);
+  return {
+    ...user,
+  };
+}
+
+export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
+async function searchAreas(userId: number) {
+  const areas = await getAreasByUserId(userId);
+  return {
+    dinningArea: areas.find(
+      (area) => area.category == AreaCategory.DINING_AREA,
+    ),
+    activityArea: areas.find(
+      (area) => area.category == AreaCategory.ACTIVITY_AREA,
+    ),
+  };
+}
+
+export type AuthEntity = Awaited<ReturnType<typeof searchAuthList>>;
+async function searchAuthList(userId: number) {
+  const authList = await getAuthenticationsByUserId(userId);
+  return {
+    account: authList.find(
+      (auth) => auth.category == AuthenticationCategory.ACCOUNT,
+    ),
+    company: authList.find(
+      (auth) => auth.category == AuthenticationCategory.COMPANY,
+    ),
+  };
 }
 
 export async function registerUser(dto: RegisterUserDTO) {
