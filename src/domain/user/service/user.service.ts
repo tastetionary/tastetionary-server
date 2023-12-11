@@ -23,7 +23,10 @@ import {
   updateUserById,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
-import { getAuthenticationsByUserId } from '@domain/authentication/repository/authentication.repository';
+import {
+  AuthenticationRecord,
+  getAuthenticationsByUserId,
+} from '@domain/authentication/repository/authentication.repository';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
 import { createAuth } from '@domain/account/service/account.service';
 
@@ -35,7 +38,7 @@ export async function searchProfile(userId: number) {
       `user not found: ${userId}`,
     );
   }
-  const areas = await searchAreaEntity(userId);
+  const areas = await searchAreas(userId);
   const authList = await searchAuthList(userId);
   return {
     user,
@@ -52,9 +55,10 @@ async function searchUser(userId: number) {
   };
 }
 
-export type AreaEntity = Awaited<ReturnType<typeof searchAreaEntity>>;
-async function searchAreaEntity(userId: number) {
-  const transformer = (area: AreaRecord | undefined, target: AreaCategory) => {
+export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
+async function searchAreas(userId: number) {
+  const transformer = (areas: AreaRecord[], target: AreaCategory) => {
+    const area = areas.find((area) => area.category == target);
     if (!area) {
       return undefined;
     }
@@ -67,14 +71,8 @@ async function searchAreaEntity(userId: number) {
 
   const areas = await getAreasByUserId(userId);
   const data = {
-    dinningArea: transformer(
-      areas.find((area) => area.category == AreaCategory.DINING_AREA),
-      AreaCategory.DINING_AREA,
-    ),
-    activityArea: transformer(
-      areas.find((area) => area.category == AreaCategory.ACTIVITY_AREA),
-      AreaCategory.ACTIVITY_AREA,
-    ),
+    dinningArea: transformer(areas, AreaCategory.DINING_AREA),
+    activityArea: transformer(areas, AreaCategory.ACTIVITY_AREA),
   };
   return {
     ...data,
@@ -84,14 +82,29 @@ async function searchAreaEntity(userId: number) {
 
 export type AuthEntity = Awaited<ReturnType<typeof searchAuthList>>;
 async function searchAuthList(userId: number) {
+  const transformer = (
+    authList: AuthenticationRecord[],
+    target: AuthenticationCategory,
+  ) => {
+    const area = authList.find((auth) => auth.category == target);
+    if (!area) {
+      return undefined;
+    }
+    const { category, ...data } = area;
+    return {
+      ...data,
+      category: target,
+    };
+  };
+
   const authList = await getAuthenticationsByUserId(userId);
+  const data = {
+    company: transformer(authList, AuthenticationCategory.COMPANY),
+    account: transformer(authList, AuthenticationCategory.ACCOUNT),
+  };
   return {
-    account: authList.find(
-      (auth) => auth.category == AuthenticationCategory.ACCOUNT,
-    ),
-    company: authList.find(
-      (auth) => auth.category == AuthenticationCategory.COMPANY,
-    ),
+    ...data,
+    account: data.account as NonNullable<typeof data.account>,
   };
 }
 

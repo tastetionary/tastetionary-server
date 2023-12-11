@@ -21,6 +21,7 @@ describe('user service', () => {
   beforeEach(async () => {
     await truncateTables(prismaClient, [
       'users',
+      'user_areas',
       'accounts',
       'authentications',
       'authentication_histories',
