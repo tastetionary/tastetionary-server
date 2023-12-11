@@ -16,8 +16,22 @@ import {
   saveToken,
 } from '@domain/account/repository/user-token.repository';
 
-export async function register(userId: number, dto: AccountDTO) {
-  return '';
+export async function createAuth(userId: number, dto: AccountDTO) {
+  const accountRecord = await getIdentification(
+    dto.identification,
+    dto.category,
+  );
+
+  const account = new Account(accountRecord);
+  account.checkDuplicatedIdentification(dto.category, dto.identification);
+  const password = await account.encryptValue(dto.password);
+
+  await saveAccount({
+    userId,
+    category: dto.category,
+    identification: dto.identification,
+    password,
+  });
 }
 
 @Injectable()
