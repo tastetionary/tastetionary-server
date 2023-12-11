@@ -23,63 +23,9 @@ import {
   updateUserById,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
-import {
-  AuthenticationRecord,
-  getAuthenticationsByUserId,
-} from '@domain/authentication/repository/authentication.repository';
+import { getAuthenticationsByUserId } from '@domain/authentication/repository/authentication.repository';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
 import { createAuth } from '@domain/account/service/account.service';
-
-export type areaEntity = AreaRecord;
-export type authEntity = AuthenticationRecord;
-export type userEntity = {
-  readonly id: number;
-  readonly nickname: string;
-  readonly state: string;
-  readonly dinningArea: areaEntity;
-  readonly activityArea?: areaEntity;
-
-  readonly accountEmail: authEntity;
-  readonly companyEmail?: authEntity;
-};
-
-function transformToUserEntity(
-  user: {
-    id: number;
-    nickname: string;
-    state: string;
-  },
-  areas: AreaRecord[],
-  authList: AuthenticationRecord[],
-): userEntity {
-  const areaParser = (category) =>
-    areas?.find((area) => area.category === category);
-  const authParser = (category) =>
-    authList?.find((auth) => auth.category === category);
-
-  return {
-    id: user.id,
-    nickname: user.nickname,
-    state: user.state,
-    dinningArea: areaParser(AreaCategory.DINING_AREA) as areaEntity,
-    activityArea: areaParser(AreaCategory.ACTIVITY_AREA),
-    accountEmail: authParser(AuthenticationCategory.ACCOUNT) as authEntity,
-    companyEmail: authParser(AuthenticationCategory.COMPANY),
-  };
-}
-
-export async function getProfileLegacy(userId: number) {
-  const user = await getUserById(userId);
-  if (!user) {
-    throw new CallerWrongUsageException(
-      ErrorNameEnum.NO_DATA,
-      `user not found: ${userId}`,
-    );
-  }
-  const areas = await getAreasByUserId(userId);
-  const authList = await getAuthenticationsByUserId(userId);
-  return transformToUserEntity({ ...user }, areas, authList);
-}
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -89,7 +35,7 @@ export async function searchProfile(userId: number) {
       `user not found: ${userId}`,
     );
   }
-  const areas = await searchAreas(userId);
+  const areas = await searchAreaEntity(userId);
   const authList = await searchAuthList(userId);
   return {
     user,
@@ -106,16 +52,33 @@ async function searchUser(userId: number) {
   };
 }
 
-export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
-async function searchAreas(userId: number) {
+export type AreaEntity = Awaited<ReturnType<typeof searchAreaEntity>>;
+async function searchAreaEntity(userId: number) {
+  const transformer = (area: AreaRecord | undefined, target: AreaCategory) => {
+    if (!area) {
+      return undefined;
+    }
+    const { category, ...data } = area;
+    return {
+      ...data,
+      category: target,
+    };
+  };
+
   const areas = await getAreasByUserId(userId);
+  const data = {
+    dinningArea: transformer(
+      areas.find((area) => area.category == AreaCategory.DINING_AREA),
+      AreaCategory.DINING_AREA,
+    ),
+    activityArea: transformer(
+      areas.find((area) => area.category == AreaCategory.ACTIVITY_AREA),
+      AreaCategory.ACTIVITY_AREA,
+    ),
+  };
   return {
-    dinningArea: areas.find(
-      (area) => area.category == AreaCategory.DINING_AREA,
-    ),
-    activityArea: areas.find(
-      (area) => area.category == AreaCategory.ACTIVITY_AREA,
-    ),
+    ...data,
+    dinningArea: data.dinningArea as NonNullable<typeof data.dinningArea>,
   };
 }
 

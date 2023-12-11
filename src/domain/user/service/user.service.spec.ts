@@ -2,7 +2,6 @@ import { truncateTables } from '@root/jest.setup';
 import {
   changeArea,
   createUser,
-  getProfileLegacy,
   createProfile,
   _private,
   searchProfile,
@@ -66,8 +65,8 @@ describe('user service', () => {
       longitude: 1000,
     });
 
-    const updatedUser = await getProfileLegacy(user.id);
-    expect(updatedUser.activityArea?.address).toEqual('update activity');
+    const updatedUser = await searchProfile(user.id);
+    expect(updatedUser.areas.activityArea?.address).toEqual('update activity');
   });
 
   it('should return user entity and essential field', async () => {
