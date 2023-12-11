@@ -5,7 +5,6 @@ import {
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
-import { register as registerAuth } from '@domain/account/service/account.service';
 import { AreaCategory, UserState } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { syncAuthentication } from '@domain/authentication/service/authentication.service';
@@ -29,6 +28,7 @@ import {
   getAuthenticationsByUserId,
 } from '@domain/authentication/repository/authentication.repository';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
+import { createAuth } from '@domain/account/service/account.service';
 
 export type areaEntity = AreaRecord;
 export type authEntity = AuthenticationRecord;
@@ -132,20 +132,15 @@ async function searchAuthList(userId: number) {
   };
 }
 
-export async function registerUser(dto: RegisterUserDTO) {
+export async function createProfile(dto: RegisterUserDTO) {
   const user = await createUser(dto.userProperty);
-
   await createAgreements(user.id, dto.agreements);
   await createAreas(user.id, dto.areas);
-  await registerAuth(user.id, dto.account);
+  await createAuth(user.id, dto.account);
 
   return user;
 }
 
-export async function changeArea(userId: number, dto: AreaDto) {
-  await deleteAreas({ userId, category: dto.category });
-  await createAreas(userId, [dto]);
-}
 async function createAreas(userId: number, dtoList: AreaDto[]) {
   const areas = dtoList.map((dto) => {
     return {
@@ -166,7 +161,7 @@ async function createAgreements(userId: number, dtoList: AgreementDTO[]) {
   await saveAgreements(params);
 }
 
-async function createUser(dto: UserPropertyDto) {
+export async function createUser(dto: UserPropertyDto) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: createRandomNickname(),
@@ -185,6 +180,11 @@ async function changeCompany(userId: number, dto: CompanyDto) {
   return await updateUserById(userId, {
     property: { companyName: dto.companyName },
   });
+}
+
+export async function changeArea(userId: number, dto: AreaDto) {
+  await deleteAreas({ userId, category: dto.category });
+  await createAreas(userId, [dto]);
 }
 
 function createRandomNickname() {

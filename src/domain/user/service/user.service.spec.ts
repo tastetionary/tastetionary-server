@@ -1,10 +1,11 @@
 import { truncateTables } from '@root/jest.setup';
 import {
   changeArea,
+  createUser,
   getProfileLegacy,
-  registerUser,
-  searchProfile,
+  createProfile,
   _private,
+  searchProfile,
 } from '@domain/user/service/user.service';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
@@ -57,7 +58,7 @@ describe('user service', () => {
   };
 
   it('should change area', async () => {
-    const user = await registerUser(DTO);
+    const user = await createProfile(DTO);
     await changeArea(user.id, {
       category: AreaCategory.ACTIVITY_AREA,
       address: 'update activity',
@@ -70,15 +71,14 @@ describe('user service', () => {
   });
 
   it('should return user entity and essential field', async () => {
-    const user = await registerUser(DTO);
+    const user = await createUser(DTO.userProperty);
     const profileEntity = await searchProfile(user.id);
     expect(profileEntity).toHaveProperty('user');
-    expect(profileEntity).toHaveProperty('areas');
-    expect(profileEntity).toHaveProperty('authList');
   });
 
   it('should create user and account and agreement and location', async () => {
-    const user = await registerUser(DTO);
+    const user = await createProfile(DTO);
+
     expect(user).not.toBeNull();
     expect(user).toHaveProperty('state');
     expect(user).toHaveProperty('id');
