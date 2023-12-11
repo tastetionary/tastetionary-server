@@ -2,12 +2,7 @@ import { define, extend, random, sequence } from 'cooky-cutter';
 import { AreaRecord } from '@domain/user/repository/area.repository';
 import { AreaCategory, UserState } from '@domain/user/user.enum';
 import { UserRecord } from '@domain/user/repository/user.repository';
-import {
-  userEntity,
-  areaEntity,
-  authEntity,
-  AreaEntity,
-} from '@domain/user/service/user.service';
+import { AreaEntity, UserEntity } from '@domain/user/service/user.service';
 import {
   AuthenticationCategory,
   AuthenticationState,
@@ -19,45 +14,13 @@ const baseModel = define<model>({
   id: random,
 });
 
-export function userEntityFactory(param?: {
-  state?: UserState;
-  dinningArea?: areaEntity;
-  activityArea?: areaEntity;
-  accountAuth?: authEntity;
-  companyAuth?: authEntity;
-}) {
-  const user = userRecordFactory({ state: param?.state });
-  const diningArea = param?.dinningArea ?? dinningAreaFactory(user.id);
-
-  let activityArea: undefined | AreaRecord = undefined;
-  if (param && param?.activityArea == undefined) {
-    activityArea = undefined;
-  } else {
-    activityArea = activityAreaFactory(user.id);
-  }
-
-  const accountAuth = param?.accountAuth ?? accountAuthFactory(user.id);
-  let companyAuth: undefined | AuthenticationRecord = undefined;
-  if (param && param?.companyAuth == undefined) {
-    companyAuth = undefined;
-  } else {
-    companyAuth = companyAuthFactory(user.id);
-  }
-
-  return extend<model, userEntity>(baseModel, {
-    nickname: user.nickname,
-    state: user.state,
-    dinningArea: () => diningArea,
-    activityArea: () => activityArea,
-    accountEmail: () => accountAuth,
-    companyEmail: () => companyAuth,
-  })();
-}
-
-export function userRecordFactory(param?: { state?: UserState }) {
-  return extend<model, UserRecord>(baseModel, {
+export function userEntityFactory(param?: { state?: UserState }) {
+  return extend<model, UserEntity>(baseModel, {
     nickname: (i) => `${i}-nickname`,
     state: param?.state ?? UserState.ACTIVE,
+    property: {},
+    createdAt: new Date(),
+    updatedAt: new Date(),
   })();
 }
 
