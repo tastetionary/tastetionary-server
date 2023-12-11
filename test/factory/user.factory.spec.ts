@@ -1,5 +1,6 @@
 import {
   activityAreaFactory,
+  areaEntityFactory,
   dinningAreaFactory,
   userEntityFactory,
   userRecordFactory,
@@ -20,10 +21,8 @@ describe('user factory', () => {
   });
 
   it('area factory should return data', () => {
-    const diningArea = dinningAreaFactory(1);
-    expect(diningArea).not.toBeNull();
-
-    const activityArea = activityAreaFactory(1);
-    expect(activityArea).not.toBeNull();
+    const res = areaEntityFactory({ userId: 1 });
+    expect(res).toHaveProperty('dinningArea');
+    expect(res).toHaveProperty('activityArea');
   });
 });

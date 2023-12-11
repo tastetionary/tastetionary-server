@@ -6,6 +6,7 @@ import {
   userEntity,
   areaEntity,
   authEntity,
+  AreaEntity,
 } from '@domain/user/service/user.service';
 import {
   AuthenticationCategory,
@@ -95,6 +96,38 @@ const seoulLatLon = {
   lat: 37.56653329687443,
   lon: 126.97792364116825,
 };
+
+export function areaEntityFactory(param: {
+  userId: number;
+  location?: { address: string; lat: number; lon: number };
+}) {
+  const location = param.location ?? seoulLatLon;
+  // TODO order에 sequence 가 왜 안되는지 확인 필요
+  return define<AreaEntity>({
+    dinningArea: () => {
+      return {
+        id: random(),
+        userId: param.userId ?? random(),
+        category: AreaCategory.DINING_AREA,
+        order: 1,
+        address: `factory_${location.address}`,
+        latitude: location.lat,
+        longitude: location.lon,
+      };
+    },
+    activityArea: () => {
+      return {
+        id: random(),
+        userId: param.userId ?? random(),
+        category: AreaCategory.DINING_AREA,
+        order: 1,
+        address: `factory_${location.address}`,
+        latitude: location.lat,
+        longitude: location.lon,
+      };
+    },
+  })();
+}
 
 function areaRecordFactory(param: {
   userId?: number;
