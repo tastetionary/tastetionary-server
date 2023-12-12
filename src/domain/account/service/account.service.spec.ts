@@ -1,6 +1,10 @@
 import { TestingModule } from '@nestjs/testing';
 import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { AccountService } from '@domain/account/service/account.service';
+import {
+  createAuth,
+  createToken,
+  deleteTokens,
+} from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
 import { AccountModule } from '@domain/account/account.module';
@@ -9,16 +13,6 @@ import { getTokenByUserId } from '@domain/account/repository/user-token.reposito
 import prismaClient from '@root/src/common/database/prisma';
 
 describe('account service', () => {
-  let accountService: AccountService;
-  beforeAll(async () => {
-    const module = (await appModuleFixture(
-      [],
-      [],
-      [AccountModule],
-    )) as TestingModule;
-    accountService = module.get<AccountService>(AccountService);
-  });
-
   beforeEach(async () => {
     await truncateTables(prismaClient, ['accounts', 'user_tokens', 'users']);
   });
@@ -30,10 +24,10 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    await accountService.register(userId, dto);
+    await createAuth(userId, dto);
 
-    await accountService.createToken(dto);
-    await accountService.deleteTokens(userId);
+    await createToken(dto);
+    await deleteTokens(userId);
 
     const tokens = await getTokenByUserId(userId);
     expect(tokens).toBeNull();
@@ -46,9 +40,9 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 1;
-    await accountService.register(userId, dto);
+    await createAuth(userId, dto);
 
-    const token = await accountService.createToken(dto);
+    const token = await createToken(dto);
     expect(token).not.toBeNull();
     expect(token).toHaveProperty('accessToken');
     expect(token).toHaveProperty('refreshToken');
@@ -60,7 +54,7 @@ describe('account service', () => {
       password: 'pwd',
       category: AccountCategory.EMAIL,
     };
-    await accountService.register(1, dto);
+    await createAuth(1, dto);
 
     const res = await getIdentification(dto.identification, dto.category);
     expect(res).not.toBeNull();

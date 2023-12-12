@@ -3,13 +3,12 @@ import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { appModuleFixture, createUserToken } from '@root/jest.setup';
 import { AccountModule } from '@domain/account/account.module';
-import { AccountService } from '@domain/account/service/account.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
+import * as accountService from '@domain/account/service/account.service';
 
 describe('account controller', () => {
   let app: INestApplication;
-  let accountService: AccountService;
   let configService: ConfigurationService;
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -18,7 +17,6 @@ describe('account controller', () => {
       [AccountModule],
     )) as TestingModule;
     app = module.createNestApplication();
-    accountService = module.get<AccountService>(AccountService);
     configService = module.get<ConfigurationService>(ConfigurationService);
     await app.init();
   });

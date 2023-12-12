@@ -1,9 +1,8 @@
 import { AccountDTO } from '@domain/account/dto/account.dto';
-import { JwtService } from '@nestjs/jwt';
 import { add } from 'date-fns';
 import { Account } from '@domain/account/core/account';
-import { Injectable } from '@nestjs/common';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@root/src/common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
@@ -15,6 +14,7 @@ import {
   getTokenByUserId,
   saveToken,
 } from '@domain/account/repository/user-token.repository';
+import * as jwt from 'jsonwebtoken';
 
 export async function createAuth(userId: number, dto: AccountDTO) {
   const accountRecord = await getIdentification(
@@ -34,90 +34,68 @@ export async function createAuth(userId: number, dto: AccountDTO) {
   });
 }
 
-@Injectable()
-export class AccountService {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigurationService,
-  ) {}
-  async register(userId: number, dto: AccountDTO) {
-    const accountRecord = await getIdentification(
-      dto.identification,
-      dto.category,
+export async function createToken(dto: AccountDTO) {
+  const accountRecord = await getIdentification(
+    dto.identification,
+    dto.category,
+  );
+
+  if (!accountRecord) {
+    throw new CallerWrongUsageException(
+      ErrorNameEnum.NO_DATA,
+      'no account',
+      'check identification',
+      { category: dto.category, identification: dto.identification },
     );
-
-    const account = new Account(accountRecord);
-    account.checkDuplicatedIdentification(dto.category, dto.identification);
-    const password = await account.encryptValue(dto.password);
-
-    await saveAccount({
-      userId,
-      category: dto.category,
-      identification: dto.identification,
-      password,
-    });
   }
 
-  async createToken(dto: AccountDTO) {
-    const accountRecord = await getIdentification(
-      dto.identification,
-      dto.category,
-    );
+  const account = new Account(accountRecord);
+  await account.checkPassword(dto.password);
 
-    if (!accountRecord) {
-      throw new CallerWrongUsageException(
-        ErrorNameEnum.NO_DATA,
-        'no account',
-        'check identification',
-        { category: dto.category, identification: dto.identification },
-      );
-    }
+  const tokens = makeTokens({ userId: accountRecord.userId });
+  await saveToken({
+    userId: accountRecord.userId,
+    ...tokens,
+  });
 
-    const account = new Account(accountRecord);
-    await account.checkPassword(dto.password);
+  return tokens;
+}
 
-    const tokens = this.makeTokens({ userId: accountRecord.userId });
-    await saveToken({
-      userId: accountRecord.userId,
-      ...tokens,
-    });
+function makeTokens(payload: { userId: number }) {
+  // NOTE delete after arranging token
 
-    return tokens;
-  }
+  const cfgService = new ConfigurationService(new ConfigService());
+  const tempSeconds = 1000000;
+  const accessTokenExpiredAt =
+    parseInt(cfgService.getTokenData().accessTokenExpiredAt) + tempSeconds;
+  const refreshTokenExpiredAt =
+    parseInt(cfgService.getTokenData().refreshTokenExpiredAt) + tempSeconds;
 
-  private makeTokens(payload: { userId: number }) {
-    // NOTE delete after arranging token
-    const tempSeconds = 1000000;
-    const accessTokenExpiredAt =
-      parseInt(this.configService.getTokenData().accessTokenExpiredAt) +
-      tempSeconds;
-    const refreshTokenExpiredAt =
-      parseInt(this.configService.getTokenData().refreshTokenExpiredAt) +
-      tempSeconds;
+  const accessToken = jwt.sign(
+    payload,
+    cfgService.getTokenData().accessTokenSecret,
+    { expiresIn: accessTokenExpiredAt },
+  );
+  const refreshToken = jwt.sign(
+    payload,
+    cfgService.getTokenData().refreshTokenSecret,
+    { expiresIn: refreshTokenExpiredAt },
+  );
 
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.getTokenData().accessTokenSecret,
-      expiresIn: accessTokenExpiredAt,
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.getTokenData().refreshTokenSecret,
-      expiresIn: refreshTokenExpiredAt,
-    });
-    const data = {
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      accessTokenExpiredAt: add(new Date(), { seconds: accessTokenExpiredAt }),
-      refreshTokenExpiredAt: add(new Date(), {
-        seconds: refreshTokenExpiredAt,
-      }),
-    };
-    return data;
-  }
+  const data = {
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    accessTokenExpiredAt: add(new Date(), { seconds: accessTokenExpiredAt }),
+    refreshTokenExpiredAt: add(new Date(), {
+      seconds: refreshTokenExpiredAt,
+    }),
+  };
+  return data;
+}
 
-  async deleteTokens(userId: number) {
-    const token = await getTokenByUserId(userId);
-    if (!token) return;
+export async function deleteTokens(userId: number) {
+  const token = await getTokenByUserId(userId);
+  if (!token) return;
 
-    await deleteToken(token.id);
-  }
+  await deleteToken(token.id);
 }
