@@ -3,7 +3,7 @@ import { add } from 'date-fns';
 import { Account } from '@domain/account/core/account';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
-import { CallerWrongUsageException } from '@root/src/common/exception/internal.exception';
+import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
   getIdentification,
@@ -15,6 +15,35 @@ import {
   saveToken,
 } from '@domain/account/repository/user-token.repository';
 import * as jwt from 'jsonwebtoken';
+import { AccountCategory } from '@domain/account/account.enum';
+
+export type AccountEntity = Awaited<ReturnType<typeof getAuth>>;
+export async function getAuth(
+  identification: string,
+  paramCategory: AccountCategory,
+) {
+  const data = await getIdentification(identification, paramCategory);
+  if (!data) {
+    throw new CallerWrongUsageException(ErrorNameEnum.INVALID_INPUT, 'no data');
+  }
+  const { category, ...rest } = data;
+  return {
+    category: paramCategory,
+    ...rest,
+  };
+}
+
+export async function findAuth(
+  identification: string,
+  paramCategory: AccountCategory,
+) {
+  try {
+    const auth = await getAuth(identification, paramCategory);
+    return auth;
+  } catch (error) {
+    return null;
+  }
+}
 
 export async function createAuth(userId: number, dto: AccountDTO) {
   const accountRecord = await getIdentification(
@@ -62,14 +91,9 @@ export async function createToken(dto: AccountDTO) {
 }
 
 function makeTokens(payload: { userId: number }) {
-  // NOTE delete after arranging token
-
   const cfgService = new ConfigurationService(new ConfigService());
-  const tempSeconds = 1000000;
-  const accessTokenExpiredAt =
-    parseInt(cfgService.getTokenData().accessTokenExpiredAt) + tempSeconds;
-  const refreshTokenExpiredAt =
-    parseInt(cfgService.getTokenData().refreshTokenExpiredAt) + tempSeconds;
+  const accessTokenExpiredAt = cfgService.getTokenData().accessTokenExpiredAt;
+  const refreshTokenExpiredAt = cfgService.getTokenData().refreshTokenExpiredAt;
 
   const accessToken = jwt.sign(
     payload,
@@ -82,15 +106,14 @@ function makeTokens(payload: { userId: number }) {
     { expiresIn: refreshTokenExpiredAt },
   );
 
-  const data = {
-    accessToken: accessToken,
-    refreshToken: refreshToken,
+  return {
+    accessToken,
+    refreshToken,
     accessTokenExpiredAt: add(new Date(), { seconds: accessTokenExpiredAt }),
     refreshTokenExpiredAt: add(new Date(), {
       seconds: refreshTokenExpiredAt,
     }),
   };
-  return data;
 }
 
 export async function deleteTokens(userId: number) {
