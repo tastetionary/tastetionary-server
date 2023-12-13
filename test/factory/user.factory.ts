@@ -15,6 +15,18 @@ const baseModel = define<model>({
   id: random,
 });
 
+export function profileEntityFactory() {
+  const user = userEntityFactory();
+  const authList = authEntityFactory({ userId: user.id });
+  const areas = areaEntityFactory({ userId: user.id });
+
+  return {
+    user,
+    areas,
+    authList,
+  };
+}
+
 export function userEntityFactory(param?: { state?: UserState }) {
   return extend<model, UserEntity>(baseModel, {
     nickname: (i) => `${i}-nickname`,

@@ -12,10 +12,11 @@ import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import * as service from '@domain/user/service/user.service';
 import {
-  AuthenticationCategory,
-  AuthenticationState,
-  AuthenticationType,
-} from '@domain/authentication/authentication.enum';
+  userEntityFactory,
+  areaEntityFactory,
+  authEntityFactory,
+  profileEntityFactory,
+} from '@root/test/factory/user.factory';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -33,31 +34,10 @@ describe('user controller', () => {
   });
 
   it('getProfile should return data', async () => {
-    const userId = 122;
-    jest.spyOn(service, 'getUser').mockResolvedValueOnce({
-      id: userId,
-      nickname: 'nick',
-      state: 'state',
-      dinningArea: {
-        id: 1,
-        userId,
-        category: AreaCategory.DINING_AREA,
-        order: 0,
-        address: 'addr',
-        latitude: 123,
-        longitude: 123,
-      },
-      accountEmail: {
-        id: 1,
-        category: AuthenticationCategory.ACCOUNT,
-        type: AuthenticationType.EMAIL,
-        state: AuthenticationState.INPROGRESS,
-        userId,
-        identification: 'ide',
-      },
-    });
+    const user = profileEntityFactory();
+    jest.spyOn(service, 'searchProfile').mockResolvedValueOnce(user);
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(userId, key, {
+    const token = createUserToken(user.user.id, key, {
       expiresIn: '10h',
     });
 
@@ -95,7 +75,7 @@ describe('user controller', () => {
   });
 
   it('register should return success', async () => {
-    jest.spyOn(service, 'registerUser').mockImplementation();
+    jest.spyOn(service, 'createUser').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')
@@ -132,7 +112,7 @@ describe('user controller', () => {
   });
 
   it('wrong input should return bad request', async () => {
-    jest.spyOn(service, 'registerUser').mockImplementation();
+    jest.spyOn(service, 'createProfile').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')
