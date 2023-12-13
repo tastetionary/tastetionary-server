@@ -10,6 +10,7 @@ import { AccountCategory } from '@domain/account/account.enum';
 import { getIdentification } from '@domain/account/repository/account.repository';
 import { getTokenByUserId } from '@domain/account/repository/user-token.repository';
 import prismaClient from '@common/database/prisma';
+import { CallerWrongUsageException } from '@common/exception/internal.exception';
 
 describe('account service', () => {
   beforeEach(async () => {
@@ -43,6 +44,20 @@ describe('account service', () => {
 
     const tokens = await getTokenByUserId(userId);
     expect(tokens).toBeNull();
+  });
+
+  it('with duplicated, should return error', async () => {
+    const dto: AccountDTO = {
+      identification: 'test',
+      password: 'pwd',
+      category: AccountCategory.EMAIL,
+    };
+    const userId = 1;
+    await createAuth(userId, dto);
+
+    await expect(createAuth(userId, dto)).rejects.toThrowError(
+      CallerWrongUsageException,
+    );
   });
 
   it('should create token', async () => {

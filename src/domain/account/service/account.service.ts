@@ -1,6 +1,5 @@
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { add } from 'date-fns';
-import { Account } from '@domain/account/core/account';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
@@ -16,6 +15,7 @@ import {
 } from '@domain/account/repository/user-token.repository';
 import * as jwt from 'jsonwebtoken';
 import { AccountCategory } from '@domain/account/account.enum';
+import bcrypt from 'bcrypt';
 
 export type AccountEntity = Awaited<ReturnType<typeof getAuth>>;
 export async function getAuth(
@@ -46,14 +46,16 @@ export async function findAuth(
 }
 
 export async function createAuth(userId: number, dto: AccountDTO) {
-  const accountRecord = await getIdentification(
-    dto.identification,
-    dto.category,
-  );
+  const accountEntity = await findAuth(dto.identification, dto.category);
+  if (accountEntity) {
+    throw new CallerWrongUsageException(
+      ErrorNameEnum.INVALID_INPUT,
+      'duplicated identification',
+      'already registered identification, change other identification',
+    );
+  }
 
-  const account = new Account(accountRecord);
-  account.checkDuplicatedIdentification(dto.category, dto.identification);
-  const password = await account.encryptValue(dto.password);
+  const password = await encryptValue(dto.password);
 
   await saveAccount({
     userId,
@@ -63,31 +65,42 @@ export async function createAuth(userId: number, dto: AccountDTO) {
   });
 }
 
-export async function createToken(dto: AccountDTO) {
-  const accountRecord = await getIdentification(
-    dto.identification,
-    dto.category,
-  );
+async function encryptValue(value: string) {
+  return bcrypt.hash(value, 10);
+}
 
-  if (!accountRecord) {
+export async function createToken(dto: AccountDTO) {
+  const entity = await findAuth(dto.identification, dto.category);
+  if (!entity) {
     throw new CallerWrongUsageException(
-      ErrorNameEnum.NO_DATA,
+      ErrorNameEnum.INVALID_INPUT,
       'no account',
-      'check identification',
+      'can not process create token',
       { category: dto.category, identification: dto.identification },
     );
   }
 
-  const account = new Account(accountRecord);
-  await account.checkPassword(dto.password);
+  await checkPassword(entity, dto.password);
 
-  const tokens = makeTokens({ userId: accountRecord.userId });
+  const tokens = makeTokens({ userId: entity.userId });
   await saveToken({
-    userId: accountRecord.userId,
+    userId: entity.userId,
     ...tokens,
   });
 
   return tokens;
+}
+
+async function checkPassword(entity: AccountEntity, password: string) {
+  const isMatched = await bcrypt.compare(password, entity.password);
+  if (isMatched) {
+    return;
+  }
+
+  throw new CallerWrongUsageException(
+    ErrorNameEnum.INVALID_INPUT,
+    'identification or password is not matched',
+  );
 }
 
 function makeTokens(payload: { userId: number }) {
