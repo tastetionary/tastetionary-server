@@ -1,15 +1,15 @@
 import {
-  externalRestaurantInformationEntityFactory,
-  restaurantReviewEntityFactory,
+  externalRestaurantInformationRecordFactory,
+  restaurantReviewRecordFactory,
 } from './restaurant.factory';
 
 describe('restaurant', () => {
   it('should return data', () => {
-    const res = externalRestaurantInformationEntityFactory({});
+    const res = externalRestaurantInformationRecordFactory({});
     expect(res).not.toBeNull();
   });
   it('should return data', () => {
-    const res = restaurantReviewEntityFactory({ userId: 1 });
+    const res = restaurantReviewRecordFactory({ userId: 1 });
     expect(res).not.toBeNull();
   });
 });

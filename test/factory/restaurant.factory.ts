@@ -1,20 +1,20 @@
 import { define, extend, random } from 'cooky-cutter';
-import {
-  ExternalRestaurantInformationEntity,
-  RestaurantReviewEntity,
-} from '@domain/restaurant/service/restaurant.service';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  ExternalRestaurantInformationRecord,
+  RestaurantReviewRecord,
+} from '@domain/restaurant/repository/restaurant.repository';
 
 type model = { id: number };
 const baseModel = define<model>({
   id: random,
 });
 
-export function externalRestaurantInformationEntityFactory(param: {
+export function externalRestaurantInformationRecordFactory(param: {
   location?: { lat: number; lon: number };
   distanceMeter?: number;
 }) {
-  return define<ExternalRestaurantInformationEntity>({
+  return define<ExternalRestaurantInformationRecord>({
     id: BigInt(random()),
     name: 'name',
     externalUUID: BigInt(1),
@@ -27,7 +27,8 @@ export function externalRestaurantInformationEntityFactory(param: {
   })();
 }
 
-export function restaurantReviewEntityFactory(param: {
+export function restaurantReviewRecordFactory(param: {
+  id?: bigint;
   userId: number;
   category?: RestaurantCategory;
   keywords?: string[];
@@ -35,8 +36,8 @@ export function restaurantReviewEntityFactory(param: {
   summary?: string;
   opinion?: string;
 }) {
-  return extend<model, RestaurantReviewEntity>(baseModel, {
-    external_restaurant_information_id: BigInt(random()),
+  return extend<model, RestaurantReviewRecord>(baseModel, {
+    external_restaurant_information_id: param.id || BigInt(random()),
     userId: param.userId,
     category: param.category || RestaurantCategory.ASIAN,
     summary: param.summary || '',
