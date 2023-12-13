@@ -1,9 +1,9 @@
 import { truncateTables } from '@root/jest.setup';
 import {
-  createAuth,
+  createAccount,
   createToken,
   deleteTokens,
-  getAuth,
+  getAccount,
 } from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
@@ -24,9 +24,9 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    await createAuth(userId, dto);
+    await createAccount(userId, dto);
 
-    const entity = await getAuth(dto.identification, dto.category);
+    const entity = await getAccount(dto.identification, dto.category);
     expect(entity).not.toBeNull();
   });
 
@@ -37,7 +37,7 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    await createAuth(userId, dto);
+    await createAccount(userId, dto);
 
     await createToken(dto);
     await deleteTokens(userId);
@@ -53,9 +53,9 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 1;
-    await createAuth(userId, dto);
+    await createAccount(userId, dto);
 
-    await expect(createAuth(userId, dto)).rejects.toThrowError(
+    await expect(createAccount(userId, dto)).rejects.toThrowError(
       CallerWrongUsageException,
     );
   });
@@ -67,7 +67,7 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 1;
-    await createAuth(userId, dto);
+    await createAccount(userId, dto);
 
     const token = await createToken(dto);
     expect(token).not.toBeNull();
@@ -81,7 +81,7 @@ describe('account service', () => {
       password: 'pwd',
       category: AccountCategory.EMAIL,
     };
-    await createAuth(1, dto);
+    await createAccount(1, dto);
 
     const res = await getIdentification(dto.identification, dto.category);
     expect(res).not.toBeNull();

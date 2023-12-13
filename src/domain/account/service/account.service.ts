@@ -17,8 +17,8 @@ import * as jwt from 'jsonwebtoken';
 import { AccountCategory } from '@domain/account/account.enum';
 import bcrypt from 'bcrypt';
 
-export type AccountEntity = Awaited<ReturnType<typeof getAuth>>;
-export async function getAuth(
+export type AccountEntity = Awaited<ReturnType<typeof getAccount>>;
+export async function getAccount(
   identification: string,
   paramCategory: AccountCategory,
 ) {
@@ -33,20 +33,20 @@ export async function getAuth(
   };
 }
 
-export async function findAuth(
+export async function findAccount(
   identification: string,
   paramCategory: AccountCategory,
 ) {
   try {
-    const auth = await getAuth(identification, paramCategory);
+    const auth = await getAccount(identification, paramCategory);
     return auth;
   } catch (error) {
     return null;
   }
 }
 
-export async function createAuth(userId: number, dto: AccountDTO) {
-  const accountEntity = await findAuth(dto.identification, dto.category);
+export async function createAccount(userId: number, dto: AccountDTO) {
+  const accountEntity = await findAccount(dto.identification, dto.category);
   if (accountEntity) {
     throw new CallerWrongUsageException(
       ErrorNameEnum.INVALID_INPUT,
@@ -70,15 +70,7 @@ async function encryptValue(value: string) {
 }
 
 export async function createToken(dto: AccountDTO) {
-  const entity = await findAuth(dto.identification, dto.category);
-  if (!entity) {
-    throw new CallerWrongUsageException(
-      ErrorNameEnum.INVALID_INPUT,
-      'no account',
-      'can not process create token',
-      { category: dto.category, identification: dto.identification },
-    );
-  }
+  const entity = await getAccount(dto.identification, dto.category);
 
   await checkPassword(entity, dto.password);
 
