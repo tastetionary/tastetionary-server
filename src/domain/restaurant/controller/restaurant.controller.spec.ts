@@ -13,13 +13,12 @@ import {
   RestaurantKeyword,
   RestaurantPrice,
 } from '@domain/restaurant/restaurant.enum';
-import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
+import * as service from '@domain/restaurant/service/restaurant.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
 
 describe('restaurant controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
-  let service: RestaurantService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -29,7 +28,6 @@ describe('restaurant controller', () => {
     )) as TestingModule;
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
-    service = module.get(RestaurantService);
     await app.init();
   });
 
@@ -134,7 +132,7 @@ describe('restaurant controller', () => {
   });
 
   it('/review, should return 200', async () => {
-    jest.spyOn(service, 'registerReview').mockImplementation(async () => {});
+    jest.spyOn(service, 'createReview').mockImplementation(async () => {});
 
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
@@ -149,7 +147,7 @@ describe('restaurant controller', () => {
   });
 
   it('/option, should return 200', async () => {
-    jest.spyOn(service, 'getRestaurantOptions').mockImplementation(async () => {
+    jest.spyOn(service, 'getSearchOptions').mockImplementation(async () => {
       return {
         categories: [
           {

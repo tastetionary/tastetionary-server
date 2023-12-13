@@ -17,7 +17,11 @@ import {
   GetRestaurantFilterOption,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
+import {
+  createReview,
+  getRecommendedRestaurant,
+  getSearchOptions,
+} from '@domain/restaurant/service/restaurant.service';
 import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
@@ -67,8 +71,6 @@ export interface GetRestaurantsOutput
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class RestaurantController {
-  constructor(private service: RestaurantService) {}
-
   /**
    * @tag restaurant
    * @summary get restaurants by condition
@@ -85,7 +87,7 @@ export class RestaurantController {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
-    const data = await this.service.getRecommendedRestaurant({
+    const data = await getRecommendedRestaurant({
       userId,
       maxDistanceMeter: maxDistanceMeter,
       ltePrice: input.price,
@@ -117,7 +119,7 @@ export class RestaurantController {
     input: RegisterRestaurantReviewInput,
   ): Promise<BaseResponseDto<object>> {
     const userId = req.user.userId;
-    await this.service.registerReview({
+    await createReview({
       userId,
       externalDto: input.external,
       dto: input.review,
@@ -132,7 +134,7 @@ export class RestaurantController {
   @TypedRoute.Get('option')
   @HttpCode(200)
   async getOption(): Promise<BaseResponseDto<GetRestaurantFilterOption>> {
-    const res = await this.service.getRestaurantOptions();
+    const res = await getSearchOptions();
 
     return new BaseResponseDto({
       categories: res.categories,
