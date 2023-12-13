@@ -56,7 +56,7 @@ async function searchUser(userId: number) {
 }
 
 export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
-async function searchAreas(userId: number) {
+export async function searchAreas(userId: number) {
   const transformer = (areas: AreaRecord[], target: AreaCategory) => {
     const area = areas.find((area) => area.category == target);
     if (!area) {
