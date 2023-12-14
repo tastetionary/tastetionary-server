@@ -8,12 +8,11 @@ import {
   AuthenticationCategory,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import { AuthenticationService } from '@domain/authentication/service/authentication.service';
+import * as service from '@domain/authentication/service/authentication.service';
 
 describe('authentication controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
-  let service: AuthenticationService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -23,7 +22,6 @@ describe('authentication controller', () => {
     )) as TestingModule;
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
-    service = module.get(AuthenticationService);
     await app.init();
   });
 
