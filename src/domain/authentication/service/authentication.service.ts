@@ -25,6 +25,7 @@ import {
 } from '@domain/authentication/repository/authentication.repository';
 import { ConfigService } from '@nestjs/config';
 
+// facade 로 옮길 만한 사이즈
 export async function doneProgressAuthentication(
   historyId: number,
   code: string,
@@ -66,7 +67,7 @@ export async function doneProgressAuthentication(
   };
 }
 
-export async function getUserAuth(param: {
+async function getUserAuth(param: {
   identification: string;
   category: AuthenticationCategory;
   type: AuthenticationType;
@@ -81,6 +82,7 @@ export async function getUserAuth(param: {
   return new UserAuth(param.userId ?? null, data);
 }
 
+// facade 로 갈만함
 export async function resetAuthentication(
   identification: string,
   category: AuthenticationCategory,
@@ -184,11 +186,6 @@ export async function createProgressAuthentication(param: {
     expiredAt: history.expiredAt,
   };
 }
-@Injectable()
-export class AuthenticationService {
-  @Inject(ConfigurationService)
-  private readonly cfgService: ConfigurationService;
-}
 
 async function sendAuthenticationCode(
   category: AuthenticationCategory,
@@ -235,6 +232,7 @@ async function sendAuthenticationCode(
   const config = new ConfigurationService(new ConfigService()).getBrevoConfig();
   return sendEmail(contents, config);
 }
+
 function createExpiredAt(seconds = 180) {
   const currentDate = new Date();
   currentDate.setSeconds(currentDate.getSeconds() + seconds);
@@ -271,3 +269,7 @@ function isGeneralEmailDomain(
   const domain = identification.split('@')[1].split('.')[0];
   return generalDomainList.includes(domain);
 }
+
+export const _private = {
+  getUserAuth,
+};

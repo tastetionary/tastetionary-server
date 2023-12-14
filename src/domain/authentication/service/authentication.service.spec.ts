@@ -2,8 +2,8 @@ import { truncateTables } from '@root/jest.setup';
 import {
   createProgressAuthentication,
   doneProgressAuthentication,
-  getUserAuth,
   resetAuthentication,
+  _private,
 } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
@@ -46,7 +46,7 @@ describe('authentication service', () => {
 
       await doneProgressAuthentication(history.id, history.code);
 
-      let userAuth = await getUserAuth(data);
+      let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
 
       await resetAuthentication(
@@ -56,7 +56,7 @@ describe('authentication service', () => {
         userId,
       );
 
-      userAuth = await getUserAuth(data);
+      userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(false);
     });
   });
@@ -138,7 +138,7 @@ describe('authentication service', () => {
         type: AuthenticationType.EMAIL,
       };
       await createProgressAuthentication(data);
-      const userAuth = await getUserAuth(data);
+      const userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
     });
   });
@@ -160,7 +160,7 @@ describe('authentication service', () => {
       };
       const res = await createProgressAuthentication(data);
 
-      let userAuth = await getUserAuth(data);
+      let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
 
       const history = (await getHistoryById(
@@ -169,7 +169,7 @@ describe('authentication service', () => {
 
       await doneProgressAuthentication(history.id, history.code);
 
-      userAuth = await getUserAuth(data);
+      userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(false);
     });
   });

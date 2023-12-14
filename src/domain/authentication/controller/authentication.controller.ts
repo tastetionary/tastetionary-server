@@ -17,7 +17,6 @@ import {
   DoneAuthenticationResponse,
 } from '@domain/authentication/dto/authentication.dto';
 import {
-  AuthenticationService,
   createProgressAuthentication,
   doneProgressAuthentication,
 } from '@domain/authentication/service/authentication.service';
@@ -28,8 +27,6 @@ import { AuthGuard } from '@common/auth/auth.guard';
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class AuthenticationController {
-  constructor(private readonly service: AuthenticationService) {}
-
   /**
    * @tag authentication
    * @summary create authentication in progress, return progress id, it need when check. it can be used for account, company
