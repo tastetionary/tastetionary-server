@@ -11,12 +11,7 @@ import { AccountCategory } from '@domain/account/account.enum';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import * as service from '@domain/user/service/user.service';
-import {
-  userEntityFactory,
-  areaEntityFactory,
-  authEntityFactory,
-  profileEntityFactory,
-} from '@root/test/factory/user.factory';
+import { profileEntityFactory } from '@root/test/factory/user.factory';
 
 describe('user controller', () => {
   let app: INestApplication;

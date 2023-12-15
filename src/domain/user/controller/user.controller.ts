@@ -16,7 +16,7 @@ import {
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { changeArea } from '@domain/user/service/user.service';
-import { getProfile, registerProfile } from '../facade/user.facade';
+import { getProfile, registerProfile } from '@domain/user/facade/user.facade';
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
