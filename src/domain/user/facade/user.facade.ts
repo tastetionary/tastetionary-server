@@ -9,5 +9,5 @@ export async function getProfile(userId: number) {
 }
 
 export async function registerProfile(dto: RegisterUserDTO) {
-  await createProfile(dto);
+  return createProfile(dto);
 }
