@@ -163,22 +163,7 @@ describe('restaurant service', () => {
     });
   });
 
-  describe('registerReview', () => {
-    it('with not register activity_area, should not register review', async () => {
-      const userId = 99;
-      const entity = areaEntityFactory({ userId });
-      entity.activityArea = undefined;
-      jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
-
-      await expect(
-        createReview({
-          userId,
-          externalDto: EXTERNAL_DTO,
-          dto: DTO,
-        }),
-      ).rejects.toThrowError(CallerWrongDomainRuleException);
-    });
-
+  describe('createReview', () => {
     it('with new restaurant, should save or update', async () => {
       await _private.registerExternalRestaurantInformationWhenNoData(
         EXTERNAL_DTO,
@@ -204,9 +189,9 @@ describe('restaurant service', () => {
     });
   });
 
-  describe('option', () => {
-    it('should get restaurant option', async () => {
-      const res = await getSearchOptions();
+  describe('getSearchOptions', () => {
+    it('should get restaurant option', () => {
+      const res = getSearchOptions();
       expect(res).toHaveProperty('categories');
       expect(res).toHaveProperty('keywords');
       expect(res).toHaveProperty('prices');

@@ -182,7 +182,7 @@ export async function getExternalRestaurantIdsByDistance(param: {
   return await prismaClient.$queryRaw(queryRaw);
 }
 
-export async function getRestaurantOptionsRecord() {
+export function getRestaurantOptionsRecord() {
   const categories = Object.values(RestaurantCategory).map(
     (category, index) => {
       return {

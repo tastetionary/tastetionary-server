@@ -200,7 +200,7 @@ export async function getReviews(userId: number) {
   return getReviewsByUserId(userId);
 }
 
-export async function getSearchOptions() {
+export function getSearchOptions() {
   return getRestaurantOptionsRecord();
 }
 
