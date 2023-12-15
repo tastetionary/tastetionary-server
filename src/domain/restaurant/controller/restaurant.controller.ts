@@ -5,7 +5,6 @@ import {
   UseFilters,
   UseGuards,
   Request,
-  Res,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -17,13 +16,13 @@ import {
   GetRestaurantFilterOption,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import {
-  createReview,
-  getRecommendedRestaurant,
-  getSearchOptions,
-} from '@domain/restaurant/service/restaurant.service';
+import { getRecommendedRestaurant } from '@domain/restaurant/service/restaurant.service';
 import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  getFilterOptions,
+  registerReview,
+} from '@root/src/domain/restaurant/facade/restaurant.facade';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -119,7 +118,7 @@ export class RestaurantController {
     input: RegisterRestaurantReviewInput,
   ): Promise<BaseResponseDto<object>> {
     const userId = req.user.userId;
-    await createReview({
+    await registerReview({
       userId,
       externalDto: input.external,
       dto: input.review,
@@ -133,8 +132,8 @@ export class RestaurantController {
    */
   @TypedRoute.Get('option')
   @HttpCode(200)
-  async getOption(): Promise<BaseResponseDto<GetRestaurantFilterOption>> {
-    const res = await getSearchOptions();
+  getOptions(): BaseResponseDto<GetRestaurantFilterOption> {
+    const res = getFilterOptions();
 
     return new BaseResponseDto({
       categories: res.categories,
