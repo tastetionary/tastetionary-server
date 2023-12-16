@@ -51,8 +51,8 @@ export class UserController {
       nickname: profile.user.nickname,
       area: profile.areas,
       account: {
-        accountEmail: profile.authList.account.identification ?? '',
-        companyEmail: profile.authList.company?.identification ?? '',
+        accountEmail: profile.authList.account.identification,
+        companyEmail: profile.authList.company?.identification,
       },
     });
   }
