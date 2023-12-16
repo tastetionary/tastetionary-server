@@ -52,8 +52,8 @@ export class UserController {
       activity_area: profile.areas.activityArea ?? {},
       dining_area: profile.areas.dinningArea ?? {},
       authentication: {
-        account_email: profile.authList.account ?? '',
-        company_email: profile.authList.company ?? '',
+        account_email: profile.authList.account.identification ?? '',
+        company_email: profile.authList.company?.identification ?? '',
       },
     });
 
