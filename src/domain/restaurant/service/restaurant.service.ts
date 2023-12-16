@@ -64,23 +64,16 @@ export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
 }
 
 export async function getRecommendedRestaurant(param: {
-  userId: number;
+  userAreas: AreaEntity;
   maxDistanceMeter: number;
   keywords: string[];
   ltePrice: number;
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
 }) {
-  const userAreas = await searchAreas(param.userId);
-  if (!userAreas.dinningArea) {
-    throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.NO_DATA,
-      'no dinning area',
-      'should register first',
-    );
-  }
-
-  const restaurants = await getRestaurantsByDistance({ userAreas, ...param });
+  const restaurants = await getRestaurantsByDistance({
+    ...param,
+  });
   if (restaurants.length == 0) {
     throw new EmptyContentException('식사 지역 내 식당이 존재하지 않음');
   }

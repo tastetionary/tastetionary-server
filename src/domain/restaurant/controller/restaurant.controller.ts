@@ -16,13 +16,13 @@ import {
   GetRestaurantFilterOption,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import { getRecommendedRestaurant } from '@domain/restaurant/service/restaurant.service';
 import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import {
   getFilterOptions,
+  getRecommendations,
   registerReview,
-} from '@root/src/domain/restaurant/facade/restaurant.facade';
+} from '@domain/restaurant/facade/restaurant.facade';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -86,7 +86,7 @@ export class RestaurantController {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
-    const data = await getRecommendedRestaurant({
+    const data = await getRecommendations({
       userId,
       maxDistanceMeter: maxDistanceMeter,
       ltePrice: input.price,

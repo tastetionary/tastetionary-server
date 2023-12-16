@@ -10,10 +10,7 @@ import {
   getSearchOptions,
   _private,
 } from '@domain/restaurant/service/restaurant.service';
-import {
-  CallerWrongDomainRuleException,
-  EmptyContentException,
-} from '@common/exception/internal.exception';
+import { EmptyContentException } from '@common/exception/internal.exception';
 import prismaClient from '@root/src/common/database/prisma';
 import * as repo from '@domain/restaurant/repository/restaurant.repository';
 import { areaEntityFactory } from '@root/test/factory/user.factory';
@@ -104,9 +101,6 @@ describe('restaurant service', () => {
   describe('getRecommendedRestaurant', () => {
     it('should return proper restaurant', async () => {
       const userId = 999;
-      jest
-        .spyOn(userService, 'searchAreas')
-        .mockResolvedValueOnce(areaEntityFactory({ userId }));
       const external = externalRestaurantInformationRecordFactory({});
       jest
         .spyOn(repo, 'getExternalRestaurantIdsByDistance')
@@ -116,7 +110,7 @@ describe('restaurant service', () => {
 
       const maxDistance = 1000;
       const res = await getRecommendedRestaurant({
-        userId,
+        userAreas: areaEntityFactory({ userId }),
         maxDistanceMeter: maxDistance,
         keywords: ['clean'],
         ltePrice: 10_000,
@@ -129,12 +123,10 @@ describe('restaurant service', () => {
     it('with not restaurant within distance, should return null', async () => {
       const userId = 1000;
       const maxDistance = 1000;
-      const entity = areaEntityFactory({ userId });
-      jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
 
       await expect(
         getRecommendedRestaurant({
-          userId,
+          userAreas: areaEntityFactory({ userId }),
           maxDistanceMeter: maxDistance,
           keywords: [],
           ltePrice: 10_000,
@@ -148,18 +140,17 @@ describe('restaurant service', () => {
       const userId = 99;
       const entity = areaEntityFactory({ userId });
       entity.dinningArea = undefined as any;
-      jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
 
       await expect(
         getRecommendedRestaurant({
+          userAreas: entity,
           maxDistanceMeter: 1000,
-          userId: 129292929,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),
-      ).rejects.toThrowError(CallerWrongDomainRuleException);
+      ).rejects.toThrowError(EmptyContentException);
     });
   });
 

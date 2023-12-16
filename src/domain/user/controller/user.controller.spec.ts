@@ -91,7 +91,7 @@ describe('user controller', () => {
           },
         ],
         account: {
-          identification: 'test',
+          identification: `test-${new Date().getMilliseconds}`,
           password: 'pwd',
           category: AccountCategory.EMAIL,
         },
@@ -103,7 +103,7 @@ describe('user controller', () => {
         ],
       });
 
-    expect(res.statusCode).toEqual(200);
+    assertStatusCode(res, 200);
   });
 
   it('wrong input should return bad request', async () => {

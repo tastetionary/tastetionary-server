@@ -32,8 +32,8 @@ export function userEntityFactory(param?: { state?: UserState }) {
     nickname: (i) => `${i}-nickname`,
     state: param?.state ?? UserState.ACTIVE,
     property: {},
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: () => new Date(),
+    updatedAt: () => new Date(),
   })();
 }
 

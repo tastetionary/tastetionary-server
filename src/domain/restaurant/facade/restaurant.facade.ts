@@ -1,5 +1,6 @@
 import {
   createReview,
+  getRecommendedRestaurant,
   getSearchOptions,
 } from '@domain/restaurant/service/restaurant.service';
 import { ErrorNameEnum } from '@common/exception/enum';
@@ -9,9 +10,26 @@ import {
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 
-export function getFilterOptions() {
-  return getSearchOptions();
+export async function getRecommendations(param: {
+  userId: number;
+  maxDistanceMeter: number;
+  keywords: string[];
+  ltePrice: number;
+  categories: RestaurantCategory[];
+  excludeRestaurantIds: bigint[];
+}) {
+  const userAreas = await searchAreas(param.userId);
+  if (!userAreas.dinningArea) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.NO_DATA,
+      'no dinning area',
+      'should register first',
+    );
+  }
+
+  return getRecommendedRestaurant({ userAreas, ...param });
 }
 
 export async function registerReview(param: {
@@ -28,4 +46,8 @@ export async function registerReview(param: {
   }
 
   await createReview(param);
+}
+
+export function getFilterOptions() {
+  return getSearchOptions();
 }
