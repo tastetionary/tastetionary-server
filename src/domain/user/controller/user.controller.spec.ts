@@ -28,11 +28,11 @@ describe('user controller', () => {
     await app.init();
   });
 
-  it('getProfile should return data', async () => {
-    const user = profileEntityFactory();
-    jest.spyOn(service, 'searchProfile').mockResolvedValueOnce(user);
+  it('myPage profile should return data', async () => {
+    const profile = profileEntityFactory();
+    jest.spyOn(service, 'searchProfile').mockResolvedValueOnce(profile);
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(user.user.id, key, {
+    const token = createUserToken(profile.user.id, key, {
       expiresIn: '10h',
     });
 
@@ -44,9 +44,10 @@ describe('user controller', () => {
 
     expect(res.body.data).toHaveProperty('id');
     expect(res.body.data).toHaveProperty('nickname');
-    expect(res.body.data).toHaveProperty('activity_area');
-    expect(res.body.data).toHaveProperty('dining_area');
-    expect(res.body.data).toHaveProperty('authentication');
+    expect(res.body.data).toHaveProperty('area');
+    expect(res.body.data).toHaveProperty('account');
+    expect(res.body.data.area).toHaveProperty('dining_area');
+    expect(res.body.data.area).toHaveProperty('activity_area');
   });
 
   it('updateArea should return success', async () => {

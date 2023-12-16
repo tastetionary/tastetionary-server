@@ -136,10 +136,10 @@ describe('restaurant service', () => {
       ).rejects.toThrow(EmptyContentException);
     });
 
-    it('with no dinning area user, should throw error', async () => {
+    it('with no dining area user, should throw error', async () => {
       const userId = 99;
       const entity = areaEntityFactory({ userId });
-      entity.dinningArea = undefined as any;
+      entity.diningArea = undefined as any;
 
       await expect(
         getRecommendedRestaurant({

@@ -107,11 +107,11 @@ async function getRestaurantsByDistance(param: {
   maxDistanceMeter: number;
   excludeRestaurantIds: bigint[];
 }) {
-  if (!param.userAreas.dinningArea) return [];
+  if (!param.userAreas.diningArea) return [];
 
   return await getExternalRestaurantIdsByDistance({
-    latitude: param.userAreas.dinningArea?.latitude,
-    longitude: param.userAreas.dinningArea?.longitude,
+    latitude: param.userAreas.diningArea?.latitude,
+    longitude: param.userAreas.diningArea?.longitude,
     maxDistanceMeter: param.maxDistanceMeter,
     excludedIds: param.excludeRestaurantIds,
   });

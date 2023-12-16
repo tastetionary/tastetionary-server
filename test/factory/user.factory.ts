@@ -79,7 +79,7 @@ export function areaEntityFactory(param: {
   const location = param.location ?? seoulLatLon;
   // TODO order에 sequence 가 왜 안되는지 확인 필요
   return define<AreaEntity>({
-    dinningArea: () => {
+    diningArea: () => {
       return {
         id: random(),
         userId: param.userId ?? random(),

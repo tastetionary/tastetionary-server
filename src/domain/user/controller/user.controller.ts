@@ -42,16 +42,18 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard)
   @TypedRoute.Get('/')
-  async inquireMtyPage(
+  async inquireMyPageProfile(
     @Request() req,
   ): Promise<BaseResponseDto<ProfileResponse>> {
     const profile = await getProfile(req.user.userId);
     const res = new BaseResponseDto({
       id: profile.user.id,
       nickname: profile.user.nickname,
-      activity_area: profile.areas.activityArea ?? {},
-      dining_area: profile.areas.dinningArea ?? {},
-      authentication: {
+      area: {
+        activity_area: profile.areas.activityArea ?? {},
+        dining_area: profile.areas.diningArea ?? {},
+      },
+      account: {
         account_email: profile.authList.account.identification ?? '',
         company_email: profile.authList.company?.identification ?? '',
       },
