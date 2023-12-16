@@ -1,6 +1,7 @@
 import typia from 'typia';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { AccountDTO } from '@domain/account/dto/account.dto';
+import { AreaEntity } from '@domain/user/service/user.service';
 
 export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
 
@@ -111,26 +112,17 @@ export interface ProfileResponse {
    */
   nickname: string;
 
-  area: {
-    /**
-     * user dining_area, it should be
-     * @type AreaDto
-     */
-    dining_area: AreaDto | object;
-
-    /**
-     * user activity_area, if is optional
-     * @type AreaDto
-     */
-    activity_area?: AreaDto | object;
-  };
+  /**
+   * user area entity, two entity but activity area is optional
+   * @type AreaEntity
+   */
+  area: AreaEntity;
 
   /**
-   * user authentication data, only return email,
-   * @type AreaDto
+   * user account email, company is optional, only return email,
    */
   account: {
-    account_email: string;
-    company_email?: string;
+    accountEmail: string;
+    companyEmail?: string;
   };
 }

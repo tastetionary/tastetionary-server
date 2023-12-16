@@ -49,13 +49,10 @@ export class UserController {
     return new BaseResponseDto({
       id: profile.user.id,
       nickname: profile.user.nickname,
-      area: {
-        activity_area: profile.areas.activityArea ?? {},
-        dining_area: profile.areas.diningArea ?? {},
-      },
+      area: profile.areas,
       account: {
-        account_email: profile.authList.account.identification ?? '',
-        company_email: profile.authList.company?.identification ?? '',
+        accountEmail: profile.authList.account.identification ?? '',
+        companyEmail: profile.authList.company?.identification ?? '',
       },
     });
   }

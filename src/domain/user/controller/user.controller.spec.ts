@@ -46,8 +46,8 @@ describe('user controller', () => {
     expect(res.body.data).toHaveProperty('nickname');
     expect(res.body.data).toHaveProperty('area');
     expect(res.body.data).toHaveProperty('account');
-    expect(res.body.data.area).toHaveProperty('dining_area');
-    expect(res.body.data.area).toHaveProperty('activity_area');
+    expect(res.body.data.area).toHaveProperty('diningArea');
+    expect(res.body.data.area).toHaveProperty('activityArea');
   });
 
   it('updateArea should return success', async () => {
