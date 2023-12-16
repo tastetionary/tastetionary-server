@@ -46,7 +46,7 @@ export class UserController {
     @Request() req,
   ): Promise<BaseResponseDto<ProfileResponse>> {
     const profile = await getProfile(req.user.userId);
-    const res = new BaseResponseDto({
+    return new BaseResponseDto({
       id: profile.user.id,
       nickname: profile.user.nickname,
       area: {
@@ -58,8 +58,6 @@ export class UserController {
         company_email: profile.authList.company?.identification ?? '',
       },
     });
-
-    return res;
   }
 
   /**
