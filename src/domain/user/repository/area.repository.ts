@@ -50,7 +50,7 @@ export async function getAreasByUserId(userId: number) {
   const areas: AreaRecord[] = await prismaClient.$queryRaw`
       SELECT
           id,
-          user_id,
+          user_id as "userId",
           category,
           "order",
           address,

@@ -70,5 +70,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
       // TODO modify detail property on env, when dev, return full response, but prod no
       response.status(status).json(detailResponse);
     }
+
+    Sentry.captureException(exception, { extra: request.body });
+    console.error(exception);
+    response.status(400).json({
+      statusCode: 400,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      originMessage: exception.message,
+      input: request.body,
+    });
   }
 }
