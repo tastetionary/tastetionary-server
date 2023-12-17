@@ -34,6 +34,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (!(exception instanceof HttpException)) {
       // un handled error case
       Sentry.captureException(exception, { extra: request.body });
+      response.status(400).json({ message: 'internal error occur' });
     }
 
     if (exception instanceof EmptyContentException) {
