@@ -29,12 +29,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         originMessage: exception.message,
         input: request.body,
       });
-    }
-
-    if (!(exception instanceof HttpException)) {
-      // un handled error case
-      Sentry.captureException(exception, { extra: request.body });
-      response.status(400).json({ message: 'internal error occur' });
+      return;
     }
 
     if (exception instanceof EmptyContentException) {
@@ -49,6 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         console.error(e, `data: ${noContentReason}`);
         response.status(204).send();
       }
+      return;
     }
 
     if (exception instanceof BaseException) {
@@ -69,10 +65,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       // TODO modify detail property on env, when dev, return full response, but prod no
       response.status(status).json(detailResponse);
+      return;
     }
 
-    Sentry.captureException(exception, { extra: request.body });
     console.error(exception);
+    Sentry.captureException(exception, { extra: request.body });
     response.status(400).json({
       statusCode: 400,
       timestamp: new Date().toISOString(),
