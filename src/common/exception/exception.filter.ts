@@ -3,6 +3,7 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as Sentry from '@sentry/node';
@@ -12,13 +13,28 @@ import {
   EmptyContentException,
 } from '@common/exception/internal.exception';
 
-@Catch(HttpException)
+@Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: BaseException, host: ArgumentsHost) {
+  catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status = exception.getStatus();
+
+    if (exception instanceof BadRequestException) {
+      response.status(400).json({
+        statusCode: 400,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        additionalData: exception.getResponse(),
+        originMessage: exception.message,
+        input: request.body,
+      });
+    }
+
+    if (!(exception instanceof HttpException)) {
+      // un handled error case
+      Sentry.captureException(exception, { extra: request.body });
+    }
 
     if (exception instanceof EmptyContentException) {
       const noContentReason =
@@ -32,8 +48,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         console.error(e, `data: ${noContentReason}`);
         response.status(204).send();
       }
-      return;
-    } else {
+    }
+
+    if (exception instanceof BaseException) {
+      const status = exception.getStatus();
+
       const detailResponse = {
         statusCode: status,
         timestamp: new Date().toISOString(),
