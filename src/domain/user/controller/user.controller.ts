@@ -41,7 +41,7 @@ export class UserController {
    */
   @HttpCode(200)
   @UseGuards(AuthGuard)
-  @TypedRoute.Get('/')
+  @TypedRoute.Get('/profile')
   async inquireMyPageProfile(
     @Request() req,
   ): Promise<BaseResponseDto<ProfileResponse>> {
@@ -52,7 +52,7 @@ export class UserController {
       area: profile.areas,
       account: {
         accountEmail: profile.authList.account.identification,
-        companyEmail: profile.authList.company?.identification,
+        companyEmail: profile.authList.company?.identification || null,
       },
     });
   }
