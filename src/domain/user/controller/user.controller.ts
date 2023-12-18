@@ -41,6 +41,27 @@ export class UserController {
    */
   @HttpCode(200)
   @UseGuards(AuthGuard)
+  @TypedRoute.Get('/')
+  async getProfile(@Request() req): Promise<BaseResponseDto<any>> {
+    const profile = await getProfile(req.user.userId);
+    return new BaseResponseDto({
+      id: profile.user.id,
+      nickname: profile.user.nickname,
+      activity_area: profile.areas.activityArea ?? {},
+      dining_area: profile.areas.diningArea ?? {},
+      authentication: {
+        account_email: profile.authList.account.identification,
+        company_email: profile.authList.company?.identification || '',
+      },
+    });
+  }
+
+  /**
+   * @tag user
+   * @summary get profile
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
   @TypedRoute.Get('/profile')
   async inquireMyPageProfile(
     @Request() req,
