@@ -123,6 +123,6 @@ export interface ProfileResponse {
    */
   account: {
     accountEmail: string;
-    companyEmail?: string;
+    companyEmail: string | null;
   };
 }
