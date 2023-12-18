@@ -103,12 +103,13 @@ function makeTokens(payload: { userId: number }) {
   const accessToken = jwt.sign(
     payload,
     cfgService.getTokenData().accessTokenSecret,
-    { expiresIn: accessTokenExpiredAt },
+    { expiresIn: `${accessTokenExpiredAt}s` },
   );
+
   const refreshToken = jwt.sign(
     payload,
     cfgService.getTokenData().refreshTokenSecret,
-    { expiresIn: refreshTokenExpiredAt },
+    { expiresIn: `${refreshTokenExpiredAt}` },
   );
 
   return {
