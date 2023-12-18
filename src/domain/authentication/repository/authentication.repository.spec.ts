@@ -6,7 +6,7 @@ import {
 } from '@domain/authentication/authentication.enum';
 import prismaClient from '@root/src/common/database/prisma';
 import {
-  getAuthenticationByUserId,
+  getAuthenticationsByUserId,
   getHistoryById,
   saveAuthentication,
   saveAuthenticationHistory,
@@ -35,7 +35,7 @@ describe('authentication', () => {
       userId,
     });
 
-    const records = await getAuthenticationByUserId(userId);
+    const records = await getAuthenticationsByUserId(userId);
     expect(records[0].id).toEqual(res.id);
   });
 
@@ -65,7 +65,7 @@ describe('authentication', () => {
       state: AuthenticationState.INPROGRESS,
     };
     await saveAuthentication(data);
-    const res = await getAuthenticationByUserId(data.userId);
+    const res = await getAuthenticationsByUserId(data.userId);
     expect(res.length).toEqual(1);
   });
 });

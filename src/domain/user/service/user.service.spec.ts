@@ -1,9 +1,10 @@
 import { truncateTables } from '@root/jest.setup';
 import {
   changeArea,
-  getUser,
-  registerUser,
+  createUser,
+  createProfile,
   _private,
+  searchProfile,
 } from '@domain/user/service/user.service';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
@@ -20,6 +21,7 @@ describe('user service', () => {
   beforeEach(async () => {
     await truncateTables(prismaClient, [
       'users',
+      'user_areas',
       'accounts',
       'authentications',
       'authentication_histories',
@@ -56,7 +58,7 @@ describe('user service', () => {
   };
 
   it('should change area', async () => {
-    const user = await registerUser(DTO);
+    const user = await createProfile(DTO);
     await changeArea(user.id, {
       category: AreaCategory.ACTIVITY_AREA,
       address: 'update activity',
@@ -64,19 +66,19 @@ describe('user service', () => {
       longitude: 1000,
     });
 
-    const updatedUser = await getUser(user.id);
-    expect(updatedUser.activityArea?.address).toEqual('update activity');
+    const updatedUser = await searchProfile(user.id);
+    expect(updatedUser.areas.activityArea?.address).toEqual('update activity');
   });
 
   it('should return user entity and essential field', async () => {
-    const user = await registerUser(DTO);
-    const userEntity = await getUser(user.id);
-    expect(userEntity).not.toBeNull();
-    expect(userEntity.dinningArea).not.toBeNull();
+    const user = await createUser(DTO.userProperty);
+    const profileEntity = await searchProfile(user.id);
+    expect(profileEntity).toHaveProperty('user');
   });
 
   it('should create user and account and agreement and location', async () => {
-    const user = await registerUser(DTO);
+    const user = await createProfile(DTO);
+
     expect(user).not.toBeNull();
     expect(user).toHaveProperty('state');
     expect(user).toHaveProperty('id');

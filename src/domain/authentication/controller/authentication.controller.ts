@@ -16,7 +16,10 @@ import {
   CreateAccountProgressRequest,
   DoneAuthenticationResponse,
 } from '@domain/authentication/dto/authentication.dto';
-import { AuthenticationService } from '@domain/authentication/service/authentication.service';
+import {
+  createProgressAuthentication,
+  doneProgressAuthentication,
+} from '@domain/authentication/service/authentication.service';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
 import { AuthGuard } from '@common/auth/auth.guard';
 
@@ -24,8 +27,6 @@ import { AuthGuard } from '@common/auth/auth.guard';
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class AuthenticationController {
-  constructor(private readonly service: AuthenticationService) {}
-
   /**
    * @tag authentication
    * @summary create authentication in progress, return progress id, it need when check. it can be used for account, company
@@ -36,7 +37,7 @@ export class AuthenticationController {
     @TypedBody() dto: CreateAccountProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
     // TODO add limit logic
-    const res = await this.service.createProgressAuthentication({
+    const res = await createProgressAuthentication({
       identification: dto.identification,
       category: dto.category,
       type: dto.type,
@@ -56,7 +57,7 @@ export class AuthenticationController {
     @Request() req,
     @TypedBody() dto: CreateProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
-    const res = await this.service.createProgressAuthentication({
+    const res = await createProgressAuthentication({
       userId: req.user.userId,
       identification: dto.identification,
       category: AuthenticationCategory.COMPANY,
@@ -74,8 +75,10 @@ export class AuthenticationController {
   async doneProgress(
     @TypedBody() dto: DoneProgressRequest,
   ): Promise<BaseResponseDto<DoneAuthenticationResponse>> {
-    const { id: authenticationId } =
-      await this.service.doneProgressAuthentication(dto.historyId, dto.code);
+    const { id: authenticationId } = await doneProgressAuthentication(
+      dto.historyId,
+      dto.code,
+    );
     return new BaseResponseDto({ authenticationId });
   }
 }

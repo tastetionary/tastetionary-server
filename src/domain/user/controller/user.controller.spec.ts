@@ -1,12 +1,17 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture, createUserToken } from '@root/jest.setup';
+import {
+  appModuleFixture,
+  assertStatusCode,
+  createUserToken,
+} from '@root/jest.setup';
 import { UserModule } from '@domain/user/user.module';
 import { AccountCategory } from '@domain/account/account.enum';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import * as service from '@domain/user/service/user.service';
+import { profileEntityFactory } from '@root/test/factory/user.factory';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -22,36 +27,26 @@ describe('user controller', () => {
     configService = module.get<ConfigurationService>(ConfigurationService);
     await app.init();
   });
+
   it('getProfile should return data', async () => {
-    const userId = 122;
-    jest.spyOn(service, 'getUser').mockResolvedValueOnce({
-      id: userId,
-      nickname: 'nick',
-      state: 'state',
-      dinningArea: {
-        id: 1,
-        userId,
-        category: AreaCategory.DINING_AREA,
-        order: 0,
-        address: 'addr',
-        latitude: 123,
-        longitude: 123,
-      },
-    });
+    const user = profileEntityFactory();
+    jest.spyOn(service, 'searchProfile').mockResolvedValueOnce(user);
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(userId, key, {
+    const token = createUserToken(user.user.id, key, {
       expiresIn: '10h',
     });
 
     const res = await request(app.getHttpServer())
       .get('/v1/user')
       .set('Authorization', `Bearer ${token}`);
-    expect(res.statusCode).toEqual(200);
+
+    assertStatusCode(res, 200);
 
     expect(res.body.data).toHaveProperty('id');
     expect(res.body.data).toHaveProperty('nickname');
     expect(res.body.data).toHaveProperty('activity_area');
     expect(res.body.data).toHaveProperty('dining_area');
+    expect(res.body.data).toHaveProperty('authentication');
   });
 
   it('updateArea should return success', async () => {
@@ -75,7 +70,7 @@ describe('user controller', () => {
   });
 
   it('register should return success', async () => {
-    jest.spyOn(service, 'registerUser').mockImplementation();
+    jest.spyOn(service, 'createUser').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')
@@ -96,7 +91,7 @@ describe('user controller', () => {
           },
         ],
         account: {
-          identification: 'test',
+          identification: `test-${new Date().getMilliseconds}`,
           password: 'pwd',
           category: AccountCategory.EMAIL,
         },
@@ -108,11 +103,11 @@ describe('user controller', () => {
         ],
       });
 
-    expect(res.statusCode).toEqual(200);
+    assertStatusCode(res, 200);
   });
 
   it('wrong input should return bad request', async () => {
-    jest.spyOn(service, 'registerUser').mockImplementation();
+    jest.spyOn(service, 'createProfile').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')

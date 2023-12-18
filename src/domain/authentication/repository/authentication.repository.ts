@@ -17,10 +17,10 @@ export interface AuthenticationHistoryRecord {
 }
 
 export interface AuthenticationRecord {
+  id: number;
   category: AuthenticationCategory;
   type: AuthenticationType;
   state: AuthenticationState;
-  id: number;
   userId: number | null;
   identification: string;
   createdAt?: Date;
@@ -101,11 +101,21 @@ export async function getAuthenticationByIdentification(
   return transformAuthentications([record])[0];
 }
 
-export async function getAuthenticationByUserId(
-  userId: number,
+export async function getAuthenticationsByUserId(
+  userId,
 ): Promise<AuthenticationRecord[]> {
   const records = await prismaClient.authentications.findMany({
     where: { userId },
+  });
+  return transformAuthentications(records);
+}
+
+export async function getAuthentications(param: {
+  userId: number;
+  type: AuthenticationType;
+}): Promise<AuthenticationRecord[]> {
+  const records = await prismaClient.authentications.findMany({
+    where: { userId: param.userId, type: param.type },
   });
   return transformAuthentications(records);
 }

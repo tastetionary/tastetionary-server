@@ -5,7 +5,6 @@ import {
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
-import { register as registerAuth } from '@domain/account/service/account.service';
 import { AreaCategory, UserState } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { syncAuthentication } from '@domain/authentication/service/authentication.service';
@@ -24,62 +23,100 @@ import {
   updateUserById,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
+import {
+  AuthenticationRecord,
+  getAuthenticationsByUserId,
+} from '@domain/authentication/repository/authentication.repository';
+import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
+import { createAccount } from '@domain/account/service/account.service';
 
-export type areaEntity = AreaRecord;
-export type userEntity = {
-  readonly id: number;
-  readonly nickname: string;
-  readonly state: string;
-  readonly dinningArea: areaEntity;
-  readonly activityArea?: areaEntity;
-};
-
-function transformToUserEntity(
-  user: {
-    id: number;
-    nickname: string;
-    state: string;
-  },
-  areas: AreaRecord[],
-): userEntity {
-  const areaParser = (category) =>
-    areas?.find((area) => area.category === category);
-
-  return {
-    id: user.id,
-    nickname: user.nickname,
-    state: user.state,
-    dinningArea: areaParser(AreaCategory.DINING_AREA) as areaEntity,
-    activityArea: areaParser(AreaCategory.ACTIVITY_AREA),
-  };
-}
-
-export async function getUser(userId: number) {
-  const user = await getUserById(userId);
+export async function searchProfile(userId: number) {
+  const user = await searchUser(userId);
   if (!user) {
     throw new CallerWrongUsageException(
       ErrorNameEnum.NO_DATA,
       `user not found: ${userId}`,
     );
   }
-  const areas = await getAreasByUserId(userId);
-  return transformToUserEntity({ ...user }, areas);
+  const areas = await searchAreas(userId);
+  const authList = await searchAuthList(userId);
+  return {
+    user,
+    areas,
+    authList,
+  };
 }
 
-export async function registerUser(dto: RegisterUserDTO) {
-  const user = await createUser(dto.userProperty);
+export type UserEntity = Awaited<ReturnType<typeof searchUser>>;
+async function searchUser(userId: number) {
+  const user = await getUserById(userId);
+  return {
+    ...user,
+  };
+}
 
+export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
+export async function searchAreas(userId: number) {
+  const transformer = (areas: AreaRecord[], target: AreaCategory) => {
+    const area = areas.find((area) => area.category == target);
+    if (!area) {
+      return undefined;
+    }
+    const { category, ...data } = area;
+    return {
+      ...data,
+      category: target,
+    };
+  };
+
+  const areas = await getAreasByUserId(userId);
+  const data = {
+    dinningArea: transformer(areas, AreaCategory.DINING_AREA),
+    activityArea: transformer(areas, AreaCategory.ACTIVITY_AREA),
+  };
+  return {
+    ...data,
+    dinningArea: data.dinningArea as NonNullable<typeof data.dinningArea>,
+  };
+}
+
+export type AuthEntity = Awaited<ReturnType<typeof searchAuthList>>;
+async function searchAuthList(userId: number) {
+  const transformer = (
+    authList: AuthenticationRecord[],
+    target: AuthenticationCategory,
+  ) => {
+    const area = authList.find((auth) => auth.category == target);
+    if (!area) {
+      return undefined;
+    }
+    const { category, ...data } = area;
+    return {
+      ...data,
+      category: target,
+    };
+  };
+
+  const authList = await getAuthenticationsByUserId(userId);
+  const data = {
+    company: transformer(authList, AuthenticationCategory.COMPANY),
+    account: transformer(authList, AuthenticationCategory.ACCOUNT),
+  };
+  return {
+    ...data,
+    account: data.account as NonNullable<typeof data.account>,
+  };
+}
+
+export async function createProfile(dto: RegisterUserDTO) {
+  const user = await createUser(dto.userProperty);
   await createAgreements(user.id, dto.agreements);
   await createAreas(user.id, dto.areas);
-  await registerAuth(user.id, dto.account);
+  await createAccount(user.id, dto.account);
 
   return user;
 }
 
-export async function changeArea(userId: number, dto: AreaDto) {
-  await deleteAreas({ userId, category: dto.category });
-  await createAreas(userId, [dto]);
-}
 async function createAreas(userId: number, dtoList: AreaDto[]) {
   const areas = dtoList.map((dto) => {
     return {
@@ -100,7 +137,7 @@ async function createAgreements(userId: number, dtoList: AgreementDTO[]) {
   await saveAgreements(params);
 }
 
-async function createUser(dto: UserPropertyDto) {
+export async function createUser(dto: UserPropertyDto) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: createRandomNickname(),
@@ -119,6 +156,11 @@ async function changeCompany(userId: number, dto: CompanyDto) {
   return await updateUserById(userId, {
     property: { companyName: dto.companyName },
   });
+}
+
+export async function changeArea(userId: number, dto: AreaDto) {
+  await deleteAreas({ userId, category: dto.category });
+  await createAreas(userId, [dto]);
 }
 
 function createRandomNickname() {

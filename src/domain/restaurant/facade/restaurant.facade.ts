@@ -1,0 +1,53 @@
+import {
+  createReview,
+  getRecommendedRestaurant,
+  getSearchOptions,
+} from '@domain/restaurant/service/restaurant.service';
+import { ErrorNameEnum } from '@common/exception/enum';
+import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
+import { searchAreas } from '@domain/user/service/user.service';
+import {
+  ExternalRestaurantInformationDTO,
+  RestaurantReviewDTO,
+} from '@domain/restaurant/dto/restaurant.dto';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+
+export async function getRecommendations(param: {
+  userId: number;
+  maxDistanceMeter: number;
+  keywords: string[];
+  ltePrice: number;
+  categories: RestaurantCategory[];
+  excludeRestaurantIds: bigint[];
+}) {
+  const userAreas = await searchAreas(param.userId);
+  if (!userAreas.dinningArea) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.NO_DATA,
+      'no dinning area',
+      'should register first',
+    );
+  }
+
+  return getRecommendedRestaurant({ userAreas, ...param });
+}
+
+export async function registerReview(param: {
+  userId: number;
+  externalDto: ExternalRestaurantInformationDTO;
+  dto: RestaurantReviewDTO;
+}) {
+  const userAreas = await searchAreas(param.userId);
+  if (!userAreas.activityArea) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.NO_DATA,
+      'can not register review, should register activity area',
+    );
+  }
+
+  await createReview(param);
+}
+
+export function getFilterOptions() {
+  return getSearchOptions();
+}

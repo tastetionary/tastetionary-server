@@ -15,11 +15,8 @@ import {
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
-import {
-  changeArea,
-  getUser,
-  registerUser,
-} from '@domain/user/service/user.service';
+import { changeArea } from '@domain/user/service/user.service';
+import { getProfile, registerProfile } from '@domain/user/facade/user.facade';
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
@@ -34,7 +31,7 @@ export class UserController {
   async registerAccount(
     @TypedBody() dto: RegisterUserDTO,
   ): Promise<BaseResponseDto<object>> {
-    await registerUser(dto);
+    await registerProfile(dto);
     return new BaseResponseDto({ state: 'success' });
   }
 
@@ -45,14 +42,22 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard)
   @TypedRoute.Get('/')
-  async getProfile(@Request() req): Promise<BaseResponseDto<ProfileResponse>> {
-    const user = await getUser(req.user.userId);
-    return new BaseResponseDto({
-      id: user.id,
-      nickname: user.nickname,
-      activity_area: user.activityArea ?? {},
-      dining_area: user.dinningArea ?? {},
+  async inquireMtyPage(
+    @Request() req,
+  ): Promise<BaseResponseDto<ProfileResponse>> {
+    const profile = await getProfile(req.user.userId);
+    const res = new BaseResponseDto({
+      id: profile.user.id,
+      nickname: profile.user.nickname,
+      activity_area: profile.areas.activityArea ?? {},
+      dining_area: profile.areas.dinningArea ?? {},
+      authentication: {
+        account_email: profile.authList.account.identification ?? '',
+        company_email: profile.authList.company?.identification ?? '',
+      },
     });
+
+    return res;
   }
 
   /**
