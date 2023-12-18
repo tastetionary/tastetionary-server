@@ -37,7 +37,7 @@ describe('user controller', () => {
     });
 
     const res = await request(app.getHttpServer())
-      .get('/v1/user')
+      .get('/v1/user/profile')
       .set('Authorization', `Bearer ${token}`);
 
     assertStatusCode(res, 200);
@@ -92,7 +92,7 @@ describe('user controller', () => {
           },
         ],
         account: {
-          identification: `test-${new Date().getMilliseconds}`,
+          identification: `test-${new Date().getMilliseconds()}`,
           password: 'pwd',
           category: AccountCategory.EMAIL,
         },
