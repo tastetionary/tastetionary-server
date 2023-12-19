@@ -8,19 +8,14 @@ import {
 } from '@root/jest.setup';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import {
-  RestaurantCategory,
-  RestaurantKeyword,
-  RestaurantPrice,
-} from '@domain/restaurant/restaurant.enum';
-import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
-import { UserService } from '@domain/user/service/user.service';
-import { EmptyContentException } from '@common/exception/internal.exception';
+import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import * as restaurantService from '@domain/restaurant/service/restaurant.service';
+import * as userService from '@domain/user/service/user.service';
+import { areaEntityFactory } from '@root/test/factory/user.factory';
+
 describe('restaurant controller', () => {
   let app: INestApplication;
   let configService: ConfigurationService;
-  let service: RestaurantService;
-  let userService: UserService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -30,8 +25,6 @@ describe('restaurant controller', () => {
     )) as TestingModule;
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
-    service = module.get(RestaurantService);
-    userService = module.get(UserService);
     await app.init();
   });
 
@@ -57,11 +50,12 @@ describe('restaurant controller', () => {
   };
 
   it('/recommendation, with empty should return 204', async () => {
-    jest
-      .spyOn(service, 'getRecommendedRestaurant')
-      .mockRejectedValue(new EmptyContentException('no data'));
-
     const userId = 999;
+    const entity = areaEntityFactory({ userId });
+    jest
+      .spyOn(userService, 'searchAreas')
+      .mockReturnValueOnce(Promise.resolve(entity));
+
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(userId, key, {
       expiresIn: '10h',
@@ -78,32 +72,37 @@ describe('restaurant controller', () => {
       });
 
     assertStatusCode(res, 204);
-    expect(res.headers).toHaveProperty('no-content-reason');
   });
 
   it('/recommendation, should return 200', async () => {
     const userId = 123;
-    jest.spyOn(service, 'getRecommendedRestaurant').mockResolvedValueOnce({
-      restaurant: {
-        id: 1n,
-        name: 'name',
-        externalUUID: 123n,
-        referenceLink: null,
-        latitude: 12,
-        longitude: 12,
-        distance: 10,
-      },
-      aggregateReviews: {
-        categories: [RestaurantCategory.ALL],
-        summaries: [''],
-        opinions: [''],
-        keywords: [''],
-        prices: [10],
-        aggregatePrice: { '10': 10 },
-        revisitRatio: 10,
-        totalCount: 10,
-      },
-    });
+    const entity = areaEntityFactory({ userId });
+    jest
+      .spyOn(userService, 'searchAreas')
+      .mockReturnValueOnce(Promise.resolve(entity));
+    jest
+      .spyOn(restaurantService, 'getRecommendedRestaurant')
+      .mockResolvedValueOnce({
+        restaurant: {
+          id: 1n,
+          name: 'name',
+          externalUUID: 123n,
+          referenceLink: null,
+          latitude: 12,
+          longitude: 12,
+          distance: 10,
+        },
+        aggregateReviews: {
+          categories: [RestaurantCategory.ALL],
+          summaries: [''],
+          opinions: [''],
+          keywords: [''],
+          prices: [10],
+          aggregatePrice: { '10': 10 },
+          revisitRatio: 10,
+          totalCount: 10,
+        },
+      });
 
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(userId, key, {
@@ -119,12 +118,18 @@ describe('restaurant controller', () => {
         keywords: ['key'],
         price: 10_000,
       });
-    expect(res.statusCode).toEqual(200);
+
+    assertStatusCode(res, 200);
   });
 
   it('/review, not activity user, should return 400', async () => {
+    const userId = 123;
+    const entity = areaEntityFactory({ userId });
+    jest
+      .spyOn(userService, 'searchAreas')
+      .mockReturnValueOnce(Promise.resolve(entity));
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(123, key, {
+    const token = createUserToken(userId, key, {
       expiresIn: '10h',
     });
     const res = await request(app.getHttpServer())
@@ -136,10 +141,17 @@ describe('restaurant controller', () => {
   });
 
   it('/review, should return 200', async () => {
-    jest.spyOn(service, 'registerReview').mockImplementation(async () => {});
+    const userId = 123;
+    const entity = areaEntityFactory({ userId });
+    jest
+      .spyOn(userService, 'searchAreas')
+      .mockReturnValueOnce(Promise.resolve(entity));
+    jest
+      .spyOn(restaurantService, 'createReview')
+      .mockImplementation(async () => {});
 
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(123, key, {
+    const token = createUserToken(userId, key, {
       expiresIn: '10h',
     });
     const res = await request(app.getHttpServer())
@@ -147,33 +159,10 @@ describe('restaurant controller', () => {
       .set('Authorization', `Bearer ${token}`)
       .send(REVIEW_INPUT);
 
-    expect(res.statusCode).toEqual(200);
+    assertStatusCode(res, 200);
   });
 
   it('/option, should return 200', async () => {
-    jest.spyOn(service, 'getRestaurantOptions').mockImplementation(async () => {
-      return {
-        categories: [
-          {
-            id: 1,
-            name: RestaurantCategory.ASIAN,
-            icon: 'icon',
-          },
-        ],
-        keywords: [
-          {
-            id: 1,
-            name: RestaurantKeyword.ATMOSPHERE,
-          },
-        ],
-        prices: [
-          {
-            id: 1,
-            name: RestaurantPrice.OVER_13000,
-          },
-        ],
-      };
-    });
     const res = await request(app.getHttpServer())
       .get('/v1/restaurant/option')
       .send();

@@ -1,24 +1,16 @@
-import { AccountRepository } from '@domain/account/repository/account.repository';
-import { TestingModule } from '@nestjs/testing';
-import { PrismaService } from '@common/database/prisma.service';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { truncateTables } from '@root/jest.setup';
 import { AccountCategory } from '@domain/account/account.enum';
+import prismaClient from '@root/src/common/database/prisma';
+import {
+  getAccount,
+  saveAccount,
+  saveAccounts,
+  updateAccountById,
+} from '@domain/account/repository/account.repository';
 
 describe('account repository', () => {
-  let repo: AccountRepository;
-  let prisma: PrismaService;
-  beforeAll(async () => {
-    const module = (await appModuleFixture(
-      [],
-      [ConfigurationService, PrismaService, AccountRepository],
-    )) as TestingModule;
-    repo = module.get(AccountRepository);
-    prisma = module.get(PrismaService);
-  });
-
   beforeEach(async () => {
-    await truncateTables(prisma, ['accounts']);
+    await truncateTables(prismaClient, ['accounts']);
   });
 
   it('should update account', async () => {
@@ -28,8 +20,8 @@ describe('account repository', () => {
       identification: 'some@email.com',
       password: 'one-way-decoded-password',
     };
-    await repo.saveAccount(data);
-    const account = (await repo.getAccount({
+    await saveAccount(data);
+    const account = (await getAccount({
       identification: data.identification,
       password: data.password,
     })) as { id: number };
@@ -39,7 +31,7 @@ describe('account repository', () => {
       password: 'new-password',
     };
 
-    const updatedAccount = await repo.updateAccountById(account.id, updateData);
+    const updatedAccount = await updateAccountById(account.id, updateData);
     expect(updatedAccount.identification).toBe(updateData.identification);
     expect(updatedAccount.password).toBe(updateData.password);
   });
@@ -51,8 +43,8 @@ describe('account repository', () => {
       identification: 'some@email.com',
       password: 'one-way-decoded-password',
     };
-    await repo.saveAccount(data);
-    const account = await repo.getAccount({
+    await saveAccount(data);
+    const account = await getAccount({
       identification: data.identification,
       password: data.password,
     });
@@ -68,8 +60,8 @@ describe('account repository', () => {
         password: 'one-way-decoded-password',
       },
     ];
-    await repo.saveAccounts(data);
-    const account = await repo.getAccount({
+    await saveAccounts(data);
+    const account = await getAccount({
       identification: data[0].identification,
       password: data[0].password,
     });

@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/database/prisma.service';
 import {
   AuthenticationCategory,
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
+import prismaClient from '@root/src/common/database/prisma';
 
-export interface AuthenticationHistoryEntity {
+export interface AuthenticationHistoryRecord {
   id: number;
   identification: string;
   type: AuthenticationType;
@@ -17,158 +16,150 @@ export interface AuthenticationHistoryEntity {
   updatedAt?: Date;
 }
 
-export interface AuthenticationEntity {
+export interface AuthenticationRecord {
+  id: number;
   category: AuthenticationCategory;
   type: AuthenticationType;
   state: AuthenticationState;
-  id: number;
   userId: number | null;
   identification: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-type UpdateParam =
-  | { id: number; userId: number }
-  | { id: number; state: string };
+export async function saveAuthentication(param: {
+  userId?: number;
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+  state: AuthenticationState;
+}) {
+  return await prismaClient.authentications.create({
+    data: {
+      userId: param.userId,
+      identification: param.identification,
+      category: param.category,
+      type: param.type,
+      state: param.state,
+    },
+  });
+}
 
-@Injectable()
-export class AuthenticationRepository {
-  constructor(private prisma: PrismaService) {}
+export async function saveAuthenticationHistory(param: {
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+  code: string;
+  expiredAt: Date;
+}) {
+  return await prismaClient.authenticationHistories.create({
+    data: {
+      identification: param.identification,
+      category: param.category,
+      type: param.type,
+      code: param.code,
+      expiredAt: param.expiredAt,
+    },
+  });
+}
 
-  async saveAuthentication(param: {
-    userId?: number;
+export function transformAuthentications(
+  records: {
+    id: number;
+    userId: number | null;
     identification: string;
-    category: AuthenticationCategory;
-    type: AuthenticationType;
-    state: AuthenticationState;
-  }) {
-    return await this.prisma.authentications.create({
-      data: {
-        userId: param.userId,
-        identification: param.identification,
-        category: param.category,
-        type: param.type,
-        state: param.state,
-      },
-    });
-  }
-
-  async saveAuthenticationHistory(param: {
-    identification: string;
-    category: AuthenticationCategory;
-    type: AuthenticationType;
-    code: string;
-    expiredAt: Date;
-  }) {
-    return await this.prisma.authenticationHistories.create({
-      data: {
-        identification: param.identification,
-        category: param.category,
-        type: param.type,
-        code: param.code,
-        expiredAt: param.expiredAt,
-      },
-    });
-  }
-
-  transformAuthentications(
-    records: {
-      id: number;
-      userId: number | null;
-      identification: string;
-      category: string;
-      type: string;
-      state: string;
-      createdAt: Date;
-      updatedAt: Date;
-    }[],
-  ): AuthenticationEntity[] {
-    return records.map((record) => {
-      const { category, type, state, ...rest } = record;
-      return {
-        ...rest,
-        category: AuthenticationCategory[
-          category.toUpperCase()
-        ] as AuthenticationCategory,
-        type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
-        state: AuthenticationState[state.toUpperCase()] as AuthenticationState,
-      };
-    });
-  }
-
-  async getAuthenticationByIdentification(
-    identification: string,
-    category: AuthenticationCategory,
-    type: AuthenticationType,
-  ): Promise<AuthenticationEntity | null> {
-    const record = await this.prisma.authentications.findFirst({
-      where: { category, type, identification },
-    });
-    if (!record) return null;
-
-    return this.transformAuthentications([record])[0];
-  }
-
-  async getAuthenticationsByUserId(param: {
-    userId: number;
-    type: AuthenticationType;
-  }): Promise<AuthenticationEntity[]> {
-    const records = await this.prisma.authentications.findMany({
-      where: {
-        userId: param.userId,
-        type: param.type,
-      },
-    });
-    return this.transformAuthentications(records);
-  }
-
-  async getAuthenticationByUserId(
-    userId: number,
-  ): Promise<AuthenticationEntity[]> {
-    const records = await this.prisma.authentications.findMany({
-      where: { userId },
-    });
-    return this.transformAuthentications(records);
-  }
-
-  async getHistoryById(
-    id: number,
-  ): Promise<AuthenticationHistoryEntity | null> {
-    const record = await this.prisma.authenticationHistories.findUnique({
-      where: { id },
-    });
-    if (!record) {
-      return null;
-    }
-    const { category, type, ...rest } = record;
+    category: string;
+    type: string;
+    state: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[],
+): AuthenticationRecord[] {
+  return records.map((record) => {
+    const { category, type, state, ...rest } = record;
     return {
       ...rest,
       category: AuthenticationCategory[
         category.toUpperCase()
       ] as AuthenticationCategory,
       type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
+      state: AuthenticationState[state.toUpperCase()] as AuthenticationState,
     };
-  }
-
-  // @NOTE add params when needed
-  async updateAuthentication(param: UpdateParam) {
-    const data = {};
-    if ('userId' in param) {
-      data['userId'] = param.userId;
-    }
-    if ('state' in param) {
-      data['state'] = param.state;
-    }
-    await this.prisma.authentications.update({
-      where: { id: param.id },
-      data,
-    });
-  }
-
-  async deleteAuthentications(ids: number[]) {
-    await this.prisma.authentications.deleteMany({
-      where: { id: { in: ids } },
-    });
-  }
+  });
 }
+
+export async function getAuthenticationByIdentification(
+  identification: string,
+  category: AuthenticationCategory,
+  type: AuthenticationType,
+): Promise<AuthenticationRecord | null> {
+  const record = await prismaClient.authentications.findFirst({
+    where: { category, type, identification },
+  });
+  if (!record) return null;
+
+  return transformAuthentications([record])[0];
+}
+
+export async function getAuthenticationsByUserId(
+  userId,
+): Promise<AuthenticationRecord[]> {
+  const records = await prismaClient.authentications.findMany({
+    where: { userId },
+  });
+  return transformAuthentications(records);
+}
+
+export async function getAuthentications(param: {
+  userId: number;
+  type: AuthenticationType;
+}): Promise<AuthenticationRecord[]> {
+  const records = await prismaClient.authentications.findMany({
+    where: { userId: param.userId, type: param.type },
+  });
+  return transformAuthentications(records);
+}
+
+export async function getHistoryById(
+  id: number,
+): Promise<AuthenticationHistoryRecord | null> {
+  const record = await prismaClient.authenticationHistories.findUnique({
+    where: { id },
+  });
+  if (!record) {
+    return null;
+  }
+  const { category, type, ...rest } = record;
+  return {
+    ...rest,
+    category: AuthenticationCategory[
+      category.toUpperCase()
+    ] as AuthenticationCategory,
+    type: AuthenticationType[type.toUpperCase()] as AuthenticationType,
+  };
+}
+
+// @NOTE add params when needed
+export async function updateAuthentication(param: UpdateParam) {
+  const data = {};
+  if ('userId' in param) {
+    data['userId'] = param.userId;
+  }
+  if ('state' in param) {
+    data['state'] = param.state;
+  }
+  await prismaClient.authentications.update({
+    where: { id: param.id },
+    data,
+  });
+}
+
+export async function deleteAuthentications(ids: number[]) {
+  await prismaClient.authentications.deleteMany({
+    where: { id: { in: ids } },
+  });
+}
+
+type UpdateParam =
+  | { id: number; userId: number }
+  | { id: number; state: string };

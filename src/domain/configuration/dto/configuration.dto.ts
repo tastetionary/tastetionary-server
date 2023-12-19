@@ -1,7 +1,7 @@
-import { Environment } from '@root/src/env.validation';
+import { EnvironmentEnum } from '@root/src/env.validation';
 
 export interface ServerConfig {
-  env: Environment;
+  env: EnvironmentEnum;
 }
 
 export interface ServerMetaData {

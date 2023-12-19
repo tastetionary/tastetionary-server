@@ -1,24 +1,17 @@
-import { AgreementRepository } from '@domain/user/repository/agreements.repository';
-import { TestingModule } from '@nestjs/testing';
-import { PrismaService } from '@common/database/prisma.service';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { truncateTables } from '@root/jest.setup';
 import { AgreementCategory } from '@domain/user/user.enum';
+import prismaClient from '@root/src/common/database/prisma';
+import {
+  getAgreementById,
+  getAgreementsByUserId,
+  saveAgreement,
+  saveAgreements,
+  updateAgreementById,
+} from '@domain/user/repository/agreements.repository';
 
 describe('agreement repository', () => {
-  let repo: AgreementRepository;
-  let prisma: PrismaService;
-  beforeAll(async () => {
-    const module = (await appModuleFixture(
-      [],
-      [ConfigurationService, PrismaService, AgreementRepository],
-    )) as TestingModule;
-    repo = module.get(AgreementRepository);
-    prisma = module.get(PrismaService);
-  });
-
   beforeEach(async () => {
-    await truncateTables(prisma, ['agreements']);
+    await truncateTables(prismaClient, ['agreements']);
   });
 
   it('should update agreement', async () => {
@@ -27,15 +20,15 @@ describe('agreement repository', () => {
       category: AgreementCategory.PERSONAL_INFORMATION,
       is_agree: true,
     };
-    await repo.saveAgreement(data);
+    await saveAgreement(data);
 
-    const agreements = await repo.getAgreementsByUserId(data.userId);
+    const agreements = await getAgreementsByUserId(data.userId);
 
     const updateData = {
       is_agree: false,
     };
 
-    const updatedAgreement = await repo.updateAgreementById(
+    const updatedAgreement = await updateAgreementById(
       agreements[0].id,
       updateData,
     );
@@ -48,9 +41,9 @@ describe('agreement repository', () => {
       category: AgreementCategory.PERSONAL_INFORMATION,
       is_agree: true,
     };
-    await repo.saveAgreement(data);
-    const agreement = await repo.getAgreementsByUserId(data.userId);
-    const res = await repo.getAgreementById(agreement[0].id);
+    await saveAgreement(data);
+    const agreement = await getAgreementsByUserId(data.userId);
+    const res = await getAgreementById(agreement[0].id);
     expect(res).not.toBeNull();
   });
 
@@ -62,8 +55,8 @@ describe('agreement repository', () => {
         is_agree: true,
       },
     ];
-    await repo.saveAgreements(data);
-    const agreement = await repo.getAgreementsByUserId(data[0].userId);
+    await saveAgreements(data);
+    const agreement = await getAgreementsByUserId(data[0].userId);
     expect(agreement).not.toEqual([]);
   });
 });

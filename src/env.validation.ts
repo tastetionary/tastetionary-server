@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { IsEnum, validateSync, IsNumber } from 'class-validator';
 
-export enum Environment {
+export enum EnvironmentEnum {
   LOCAL = 'local',
   TEST = 'test',
   DEVELOPMENT = 'dev',
@@ -9,8 +9,8 @@ export enum Environment {
 }
 
 class EnvironmentVariables {
-  @IsEnum(Environment)
-  ENV: Environment;
+  @IsEnum(EnvironmentEnum)
+  ENV: EnvironmentEnum;
 
   @IsNumber()
   API_SERVER_PORT: number;

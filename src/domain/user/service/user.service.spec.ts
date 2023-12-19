@@ -1,39 +1,27 @@
-import { TestingModule } from '@nestjs/testing';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
-import { UserService } from '@domain/user/service/user.service';
+import { truncateTables } from '@root/jest.setup';
+import {
+  changeArea,
+  createUser,
+  createProfile,
+  _private,
+  searchProfile,
+} from '@domain/user/service/user.service';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
-import { UserModule } from '@domain/user/user.module';
-import { AccountModule } from '@domain/account/account.module';
 import { AccountCategory } from '@domain/account/account.enum';
-import { AuthenticationService } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
+  AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import * as brevo from '@thirdParty/brevo/brevo';
+import prismaClient from '@root/src/common/database/prisma';
+import { saveAuthentication } from '@domain/authentication/repository/authentication.repository';
 
 describe('user service', () => {
-  let service: UserService;
-  let prisma: PrismaService;
-  let module: TestingModule;
-  let authenticationService: AuthenticationService;
-
-  beforeAll(async () => {
-    module = (await appModuleFixture(
-      [],
-      [],
-      [UserModule, AccountModule],
-    )) as TestingModule;
-    service = module.get(UserService);
-    prisma = module.get(PrismaService);
-    authenticationService = module.get(AuthenticationService);
-  });
-
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(prismaClient, [
       'users',
+      'user_areas',
       'accounts',
       'authentications',
       'authentication_histories',
@@ -69,57 +57,63 @@ describe('user service', () => {
     ],
   };
 
-  it('update area should update', async () => {
-    const user = await service.register(DTO);
-    await service.updateArea(user.id, {
+  it('should change area', async () => {
+    const user = await createProfile(DTO);
+    await changeArea(user.id, {
       category: AreaCategory.ACTIVITY_AREA,
       address: 'update activity',
       latitude: 100,
       longitude: 1000,
     });
 
-    const updatedUser = await service.getEndUser(user.id);
-    expect(updatedUser.activityArea?.address).toEqual('update activity');
+    const updatedUser = await searchProfile(user.id);
+    expect(updatedUser.areas.activityArea?.address).toEqual('update activity');
   });
 
-  it('with company data should update company authentication', async () => {
-    const tempMock = jest.spyOn(brevo, 'sendEmail');
-    tempMock.mockResolvedValue(Promise.resolve(true));
-    const authData = {
-      category: AuthenticationCategory.COMPANY,
-      identification: 'user-service@crud.com',
-      type: AuthenticationType.EMAIL,
-    };
-    const res = await authenticationService.createProgressAuthentication(
-      authData,
-    );
-    const { id: authId } =
-      await authenticationService.doneProgressAuthentication(res.id, '000000');
-
-    const deepCopiedData = JSON.parse(JSON.stringify(DTO));
-    deepCopiedData.userProperty.companyData = {
-      companyName: 'test',
-      authenticationId: authId,
-    };
-    const user = await service.register(deepCopiedData);
-
-    const userAuth = await authenticationService.getUserAuth(authData);
-    const auth = userAuth.getAuth(authData.identification, authData.category);
-    expect(auth?.userId).toEqual(user.id);
-  });
-
-  it('should return end-user', async () => {
-    const user = await service.register(DTO);
-    const endUser = await service.getEndUser(user.id);
-
-    expect(endUser).not.toBeNull();
-    expect(endUser.activityArea).not.toBeNull();
-    expect(endUser.activityArea).not.toBeNull();
-    expect(endUser.authentications).not.toBeNull();
+  it('should return user entity and essential field', async () => {
+    const user = await createUser(DTO.userProperty);
+    const profileEntity = await searchProfile(user.id);
+    expect(profileEntity).toHaveProperty('user');
   });
 
   it('should create user and account and agreement and location', async () => {
-    const user = await service.register(DTO);
+    const user = await createProfile(DTO);
+
     expect(user).not.toBeNull();
+    expect(user).toHaveProperty('state');
+    expect(user).toHaveProperty('id');
+  });
+
+  describe('[private] ', () => {
+    it('changeCompany should update auth and user property', async () => {
+      const user = await _private.createUser({});
+      const auth = await saveAuthentication({
+        identification: '',
+        category: AuthenticationCategory.COMPANY,
+        type: AuthenticationType.EMAIL,
+        state: AuthenticationState.INPROGRESS,
+      });
+      const dto = {
+        companyData: { authenticationId: auth.id, companyName: 'name' },
+      };
+      const updatedUser = await _private.changeCompany(
+        user.id,
+        dto.companyData,
+      );
+      expect(updatedUser).toHaveProperty('property');
+      const company = updatedUser.property;
+      expect(company).toEqual({ companyName: dto.companyData.companyName });
+    });
+
+    it('createUser should create user', async () => {
+      const dto = {};
+      const res = await _private.createUser(dto);
+      expect(res).toHaveProperty('id');
+    });
+
+    it('createRandomNickname should return random nickname', () => {
+      const nick = _private.createRandomNickname();
+      expect(nick).not.toBeNull();
+    });
   });
 });

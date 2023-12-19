@@ -1,41 +1,26 @@
-import { TestingModule } from '@nestjs/testing';
-import { appModuleFixture, truncateTables } from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
-import { AuthenticationModule } from '@domain/authentication/authentication.module';
-import { AuthenticationService } from '@domain/authentication/service/authentication.service';
+import { truncateTables } from '@root/jest.setup';
+import {
+  createProgressAuthentication,
+  doneProgressAuthentication,
+  resetAuthentication,
+  _private,
+} from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import {
-  AuthenticationHistoryEntity,
-  AuthenticationRepository,
+  AuthenticationHistoryRecord,
+  getHistoryById,
 } from '@domain/authentication/repository/authentication.repository';
 import * as brevo from '@thirdParty/brevo/brevo';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { Environment } from '@root/src/env.validation';
+import { EnvironmentEnum } from '@root/src/env.validation';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
+import prismaClient from '@common/database/prisma';
 
 describe('authentication service', () => {
-  let module: TestingModule;
-  let service: AuthenticationService;
-  let prisma: PrismaService;
-  let repo: AuthenticationRepository;
-  let cfgService: ConfigurationService;
-  beforeAll(async () => {
-    module = (await appModuleFixture(
-      [],
-      [],
-      [AuthenticationModule],
-    )) as TestingModule;
-    service = module.get<AuthenticationService>(AuthenticationService);
-    prisma = module.get(PrismaService);
-    repo = module.get(AuthenticationRepository);
-    cfgService = module.get(ConfigurationService);
-  });
-
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(prismaClient, [
       'authentications',
       'authentication_histories',
     ]);
@@ -53,25 +38,25 @@ describe('authentication service', () => {
         identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       };
-      const res = await service.createProgressAuthentication(data);
+      const res = await createProgressAuthentication(data);
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
-      await service.doneProgressAuthentication(history.id, history.code);
+      await doneProgressAuthentication(history.id, history.code);
 
-      let userAuth = await service.getUserAuth(data);
+      let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
 
-      await service.resetAuthentication(
+      await resetAuthentication(
         data.identification,
         data.category,
         data.type,
         userId,
       );
 
-      userAuth = await service.getUserAuth(data);
+      userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(false);
     });
   });
@@ -83,15 +68,14 @@ describe('authentication service', () => {
     it.each([['test'], ['daum'], ['naver'], ['gmail'], ['hanmail']])(
       'with not valid company domain should raise error',
       async (domain) => {
-        const tempCfg = jest.spyOn(cfgService, 'getServerConfig');
-        tempCfg.mockReturnValue({ env: Environment.PRODUCTION });
         const userId = 999;
         await expect(
-          service.createProgressAuthentication({
+          createProgressAuthentication({
             userId,
             category: AuthenticationCategory.COMPANY,
             identification: `some@${domain}.com`,
             type: AuthenticationType.EMAIL,
+            env: EnvironmentEnum.PRODUCTION,
           }),
         ).rejects.toThrowError(CallerWrongDomainRuleException);
       },
@@ -99,43 +83,43 @@ describe('authentication service', () => {
 
     it('duplicated should progress', async () => {
       const userId = 999;
-      await service.createProgressAuthentication({
+      await createProgressAuthentication({
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       });
 
-      const res = await service.createProgressAuthentication({
+      const res = await createProgressAuthentication({
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       });
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
       expect(history).toBeDefined();
     });
 
     it('already exist email should return code', async () => {
       const userId = 999;
-      let res = await service.createProgressAuthentication({
+      let res = await createProgressAuthentication({
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       });
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
-      await service.doneProgressAuthentication(history.id, history.code);
+      await doneProgressAuthentication(history.id, history.code);
 
-      res = await service.createProgressAuthentication({
+      res = await createProgressAuthentication({
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
@@ -153,8 +137,8 @@ describe('authentication service', () => {
         identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       };
-      await service.createProgressAuthentication(data);
-      const userAuth = await service.getUserAuth(data);
+      await createProgressAuthentication(data);
+      const userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
     });
   });
@@ -162,7 +146,7 @@ describe('authentication service', () => {
   describe('doneProgressAuthentication', () => {
     it('not history should raise error', async () => {
       await expect(
-        service.doneProgressAuthentication(999, '1234'),
+        doneProgressAuthentication(999, '1234'),
       ).rejects.toThrowError();
     });
 
@@ -174,18 +158,18 @@ describe('authentication service', () => {
         identification: 'some@crud.com',
         type: AuthenticationType.EMAIL,
       };
-      const res = await service.createProgressAuthentication(data);
+      const res = await createProgressAuthentication(data);
 
-      let userAuth = await service.getUserAuth(data);
+      let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
 
-      const history = (await repo.getHistoryById(
+      const history = (await getHistoryById(
         res.id,
-      )) as AuthenticationHistoryEntity;
+      )) as AuthenticationHistoryRecord;
 
-      await service.doneProgressAuthentication(history.id, history.code);
+      await doneProgressAuthentication(history.id, history.code);
 
-      userAuth = await service.getUserAuth(data);
+      userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(false);
     });
   });

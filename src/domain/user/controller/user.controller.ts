@@ -14,15 +14,14 @@ import {
   RegisterUserDTO,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
-import { UserService } from '@domain/user/service/user.service';
 import { AuthGuard } from '@common/auth/auth.guard';
+import { changeArea } from '@domain/user/service/user.service';
+import { getProfile, registerProfile } from '@domain/user/facade/user.facade';
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class UserController {
-  constructor(private service: UserService) {}
-
   /**
    * @tag user
    * @summary register user
@@ -32,7 +31,7 @@ export class UserController {
   async registerAccount(
     @TypedBody() dto: RegisterUserDTO,
   ): Promise<BaseResponseDto<object>> {
-    await this.service.register(dto);
+    await registerProfile(dto);
     return new BaseResponseDto({ state: 'success' });
   }
 
@@ -43,16 +42,38 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard)
   @TypedRoute.Get('/')
-  async getProfile(@Request() req): Promise<BaseResponseDto<ProfileResponse>> {
-    const user = await this.service.getEndUser(req.user.userId);
+  async getProfile(@Request() req): Promise<BaseResponseDto<any>> {
+    const profile = await getProfile(req.user.userId);
     return new BaseResponseDto({
-      id: user.id,
-      nickname: user.nickname,
-      activity_area: user.activityArea ?? {},
-      dining_area: user.dinningArea ?? {},
+      id: profile.user.id,
+      nickname: profile.user.nickname,
+      activity_area: profile.areas.activityArea ?? {},
+      dining_area: profile.areas.diningArea ?? {},
       authentication: {
-        account_email: user.accountEmail ?? '',
-        company_email: user.companyEmail ?? '',
+        account_email: profile.authList.account.identification,
+        company_email: profile.authList.company?.identification || '',
+      },
+    });
+  }
+
+  /**
+   * @tag user
+   * @summary get profile
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Get('/profile')
+  async inquireMyPageProfile(
+    @Request() req,
+  ): Promise<BaseResponseDto<ProfileResponse>> {
+    const profile = await getProfile(req.user.userId);
+    return new BaseResponseDto({
+      id: profile.user.id,
+      nickname: profile.user.nickname,
+      area: profile.areas,
+      account: {
+        accountEmail: profile.authList.account.identification,
+        companyEmail: profile.authList.company?.identification || null,
       },
     });
   }
@@ -68,7 +89,7 @@ export class UserController {
     @Request() req,
     @TypedBody() dto: AreaDto,
   ): Promise<BaseResponseDto<object>> {
-    await this.service.updateArea(req.user.userId, dto);
+    await changeArea(req.user.userId, dto);
     return new BaseResponseDto({ state: 'success' });
   }
 }

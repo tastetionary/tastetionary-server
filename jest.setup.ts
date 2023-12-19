@@ -3,8 +3,8 @@ import { Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { validate } from '@src/env.validation';
-import { PrismaService } from '@common/database/prisma.service';
 import * as jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
 import SuperTest from 'supertest';
 
 export const assertStatusCode = (
@@ -74,7 +74,7 @@ type tableNames =
   | 'authentications'
   | 'authentication_histories'
   | 'external_restaurant_informations';
-async function truncateTables(prisma: PrismaService, tableNames: tableNames[]) {
+async function truncateTables(prisma: PrismaClient, tableNames: tableNames[]) {
   for (const name of tableNames) {
     await prisma.$queryRawUnsafe(
       `TRUNCATE "${name}" RESTART IDENTITY CASCADE;`,
@@ -90,18 +90,4 @@ function createUserToken(
   return jwt.sign({ userId }, secretKey, options);
 }
 
-function userEntityFactory(userId: number) {
-  return {
-    id: userId,
-    nickname: 'nickname',
-    state: 'state',
-  };
-}
-
-export {
-  appServiceFixture,
-  appModuleFixture,
-  truncateTables,
-  createUserToken,
-  userEntityFactory,
-};
+export { appServiceFixture, appModuleFixture, truncateTables, createUserToken };

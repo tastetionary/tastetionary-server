@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/database/prisma.service';
 import { UserState } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
+import prismaClient from '@root/src/common/database/prisma';
+import * as nicknameSource from '@domain/user/resource/nickname.json';
 
-export interface UserEntity {
+export interface UserRecord {
   id: number;
   nickname: string;
   state: string;
@@ -12,71 +12,73 @@ export interface UserEntity {
   updatedAt?: Date;
 }
 
-@Injectable()
-export class UserRepository {
-  constructor(private prisma: PrismaService) {}
+export async function saveUser(param: {
+  nickname: string;
+  state: UserState;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  property: Record<string, any>;
+}) {
+  return prismaClient.users.create({ data: param });
+}
 
-  async saveUser(param: {
+export async function saveUsers(
+  params: {
     nickname: string;
     state: UserState;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     property: Record<string, any>;
-  }) {
-    return this.prisma.users.create({ data: param });
-  }
+  }[],
+) {
+  return prismaClient.users.createMany({ data: params });
+}
 
-  async saveUsers(
-    params: {
-      nickname: string;
-      state: UserState;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      property: Record<string, any>;
-    }[],
-  ) {
-    return this.prisma.users.createMany({ data: params });
-  }
+export async function getUserById(id: number) {
+  const user = await getUsers({ ids: [id] }, 1);
+  return user[0];
+}
 
-  async getUserById(id: number) {
-    const user = await this.getUsers({ ids: [id] }, 1);
-    return user[0];
-  }
-
-  async getUsers(
-    param: { ids?: number[]; nicknames?: string[]; states?: UserState[] },
-    take = 100,
-  ) {
-    return this.prisma.users.findMany({
-      where: {
-        id: {
-          in: param.ids,
-        },
-        nickname: {
-          in: param.nicknames,
-        },
-        state: {
-          in: param.states,
-        },
+export async function getUsers(
+  param: { ids?: number[]; nicknames?: string[]; states?: UserState[] },
+  take = 100,
+) {
+  return prismaClient.users.findMany({
+    where: {
+      id: {
+        in: param.ids,
       },
-      take,
-    });
-  }
-
-  async updateUserById(
-    id: number,
-    param: {
-      nickname?: string;
-      state?: string;
-      property?: Record<string, any>;
+      nickname: {
+        in: param.nicknames,
+      },
+      state: {
+        in: param.states,
+      },
     },
-  ) {
-    return this.prisma.users.update({
-      where: { id },
-      data: param,
-    });
-  }
+    take,
+  });
+}
 
-  // TODO for testing mock, it will be removed after merge service/core PR
-  async tempMethod() {
-    return ['origin'];
-  }
+export async function updateUserById(
+  id: number,
+  param: {
+    nickname?: string;
+    state?: string;
+    property?: Record<string, any>;
+  },
+) {
+  return prismaClient.users.update({
+    where: { id },
+    data: param,
+  });
+}
+interface nicknamePartsRecord {
+  adj: string[];
+  name: {
+    animal: string[];
+    food: string[];
+    cooking: string[];
+  };
+}
+
+export function getNicknamePartRecord(): nicknamePartsRecord {
+  return nicknameSource;
 }

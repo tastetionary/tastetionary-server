@@ -1,42 +1,28 @@
-import { TestingModule } from '@nestjs/testing';
-import {
-  appModuleFixture,
-  truncateTables,
-  userEntityFactory,
-} from '@root/jest.setup';
-import { PrismaService } from '@common/database/prisma.service';
+import { truncateTables } from '@root/jest.setup';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
-import { RestaurantService } from '@domain/restaurant/service/restaurant.service';
-import { RestaurantModule } from '@domain/restaurant/restaurant.module';
-import { UserModule } from '@domain/user/user.module';
-import { EndUser } from '@domain/user/core/end-user';
-import { AreaCategory } from '@domain/user/user.enum';
 import {
-  CallerWrongDomainRuleException,
-  CallerWrongUsageException,
-  EmptyContentException,
-} from '@common/exception/internal.exception';
-import { RestaurantRepository } from '@domain/restaurant/repository/restaurant.repository';
+  aggregateRestaurantReview,
+  createReview,
+  findExternalRestaurant,
+  getRecommendedRestaurant,
+  getReviews,
+  getSearchOptions,
+  _private,
+} from '@domain/restaurant/service/restaurant.service';
+import { EmptyContentException } from '@common/exception/internal.exception';
+import prismaClient from '@root/src/common/database/prisma';
+import * as repo from '@domain/restaurant/repository/restaurant.repository';
+import { areaEntityFactory } from '@root/test/factory/user.factory';
+import * as userService from '@domain/user/service/user.service';
+import {
+  externalRestaurantInformationRecordFactory,
+  restaurantReviewRecordFactory,
+} from '@root/test/factory/restaurant.factory';
 
 describe('restaurant service', () => {
-  let prisma: PrismaService;
-  let module: TestingModule;
-  let service: RestaurantService;
-  let repo: RestaurantRepository;
-  beforeAll(async () => {
-    module = (await appModuleFixture(
-      [],
-      [],
-      [UserModule, RestaurantModule],
-    )) as TestingModule;
-    prisma = module.get(PrismaService);
-    service = module.get(RestaurantService);
-    repo = module.get(RestaurantRepository);
-  });
-
   beforeEach(async () => {
-    await truncateTables(prisma, [
+    await truncateTables(prismaClient, [
       'user_areas',
       'restaurant_reviews',
       'external_restaurant_informations',
@@ -60,6 +46,7 @@ describe('restaurant service', () => {
     longitude: LONGITUDE,
     referenceLink: 'https://www.naver.com',
   };
+
   describe('aggregateRestaurant', () => {
     it('should calc average price and filter duplicated keywords', () => {
       const reviews = [
@@ -95,7 +82,7 @@ describe('restaurant service', () => {
         },
       ];
 
-      const res = service.aggregateRestaurantReview(reviews);
+      const res = aggregateRestaurantReview(reviews);
       expect(res.data.aggregatePrice.avg).toBe(12_500);
       expect(res.data.revisitRatio).toBe(33.3);
 
@@ -103,178 +90,99 @@ describe('restaurant service', () => {
     });
 
     it('aggregatePrice, should return expected', () => {
-      const res = service.aggregatePrice([10000, 15000]);
+      const res = _private.aggregatePrice([10000, 15000]);
       expect(res).toEqual({ 10000: 1, 15000: 1, avg: 12500 });
 
-      const resTwo = service.aggregatePrice([10000, 10000, 15000]);
+      const resTwo = _private.aggregatePrice([10000, 10000, 15000]);
       expect(resTwo).toEqual({ 10000: 2, 15000: 1, avg: 12500 });
     });
   });
 
   describe('getRecommendedRestaurant', () => {
-    const createRestaurant = async (
-      userId: number,
-      diningLocation: {
-        latitude: number;
-        longitude: number;
-      },
-    ) => {
-      const diningArea = {
-        id: 1,
-        userId,
-        category: AreaCategory.DINING_AREA,
-        order: 1,
-        address: 'address',
-        latitude: diningLocation.latitude,
-        longitude: diningLocation.longitude,
-      };
-
-      const activityArea = {
-        id: 1,
-        userId,
-        category: AreaCategory.ACTIVITY_AREA,
-        order: 1,
-        address: 'address',
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-      };
-      const tempUser = userEntityFactory(userId);
-      const user = new EndUser(tempUser, { areas: [diningArea, activityArea] });
-      await service.registerReview(
-        {
-          userId,
-          externalDto: EXTERNAL_DTO,
-          dto: DTO,
-        },
-        user,
-      );
-      return user;
-    };
     it('should return proper restaurant', async () => {
-      jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValue([
-        {
-          id: 1,
-          external_restaurant_information_id: 1n,
-          userId: 1,
-          category: RestaurantCategory.ASIAN,
-          summary: 'summary',
-          opinion: null,
-          keywords: ['clean'],
-          price: 100,
-        },
-      ]);
-      const userId = 1;
-      const user = await createRestaurant(1, {
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-      });
+      const userId = 999;
+      const external = externalRestaurantInformationRecordFactory({});
+      jest
+        .spyOn(repo, 'getExternalRestaurantIdsByDistance')
+        .mockResolvedValueOnce([external]);
+      const review = restaurantReviewRecordFactory({ id: external.id, userId });
+      jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValue([review]);
+
       const maxDistance = 1000;
-      const res = (await service.getRecommendedRestaurant(
-        {
-          userId,
-          maxDistanceMeter: maxDistance,
-          keywords: ['clean'],
-          ltePrice: 10_000,
-          categories: [RestaurantCategory.ASIAN],
-          excludeRestaurantIds: [],
-        },
-        user,
-      )) as any;
+      const res = await getRecommendedRestaurant({
+        userAreas: areaEntityFactory({ userId }),
+        maxDistanceMeter: maxDistance,
+        keywords: ['clean'],
+        ltePrice: 10_000,
+        categories: [RestaurantCategory.ASIAN],
+        excludeRestaurantIds: [],
+      });
       expect(res).not.toBeNull();
     });
 
     it('with not restaurant within distance, should return null', async () => {
-      const userId = 1;
-      const user = await createRestaurant(1, {
-        latitude: 1,
-        longitude: 1,
-      });
+      const userId = 1000;
       const maxDistance = 1000;
-      await expect(
-        service.getRecommendedRestaurant(
-          {
-            userId,
-            maxDistanceMeter: maxDistance,
-            keywords: [],
-            ltePrice: 10_000,
-            categories: [RestaurantCategory.ASIAN],
-            excludeRestaurantIds: [],
-          },
-          user,
-        ),
-      ).rejects.toThrow(EmptyContentException);
-    });
 
-    it('with un dinning area user, should throw error', async () => {
       await expect(
-        service.getRecommendedRestaurant({
-          maxDistanceMeter: 1000,
-          userId: 129292929,
+        getRecommendedRestaurant({
+          userAreas: areaEntityFactory({ userId }),
+          maxDistanceMeter: maxDistance,
           keywords: [],
           ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),
-      ).rejects.toThrowError(CallerWrongUsageException);
+      ).rejects.toThrow(EmptyContentException);
+    });
+
+    it('with no dining area user, should throw error', async () => {
+      const userId = 99;
+      const entity = areaEntityFactory({ userId });
+      entity.diningArea = undefined as any;
+
+      await expect(
+        getRecommendedRestaurant({
+          userAreas: entity,
+          maxDistanceMeter: 1000,
+          keywords: [],
+          ltePrice: 10_000,
+          categories: [RestaurantCategory.ASIAN],
+          excludeRestaurantIds: [],
+        }),
+      ).rejects.toThrowError(EmptyContentException);
     });
   });
 
-  describe('registerReview', () => {
-    it('with not register activity_area, should not register review', async () => {
-      const endUser = new EndUser(userEntityFactory(1));
-      await expect(
-        service.registerReview(
-          {
-            userId: 1,
-            externalDto: EXTERNAL_DTO,
-            dto: DTO,
-          },
-          endUser,
-        ),
-      ).rejects.toThrowError(CallerWrongDomainRuleException);
-    });
-
+  describe('createReview', () => {
     it('with new restaurant, should save or update', async () => {
-      await service.registerExternalRestaurantInformationWhenNoData(
+      await _private.registerExternalRestaurantInformationWhenNoData(
         EXTERNAL_DTO,
       );
-      const res = await service.getExternalRestaurant(
-        EXTERNAL_DTO.externalUUID,
-      );
+      const res = await findExternalRestaurant(EXTERNAL_DTO.externalUUID);
       expect(res).not.toBeNull();
     });
 
-    it('should create review data and external data', async () => {
-      const userId = 999;
-      const area = {
-        id: 1,
+    it('should create review and detach emoji', async () => {
+      const userId = 99;
+      const entity = areaEntityFactory({ userId });
+      jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
+
+      await createReview({
         userId,
-        category: AreaCategory.ACTIVITY_AREA,
-        order: 1,
-        address: 'address',
-        latitude: 1,
-        longitude: 1,
-      };
-      const tempUser = userEntityFactory(userId);
-      const user = new EndUser(tempUser, { areas: [area] });
-      await service.registerReview(
-        {
-          userId,
-          externalDto: EXTERNAL_DTO,
-          dto: DTO,
-        },
-        user,
-      );
-      const res = await service.getReviews(userId);
+        externalDto: EXTERNAL_DTO,
+        dto: DTO,
+      });
+      const res = await getReviews(userId);
 
       expect(res).toHaveLength(1);
       expect(res[0].keywords).toEqual(['clean']);
     });
   });
 
-  describe('option', () => {
-    it('should get restaurant option', async () => {
-      const res = await service.getRestaurantOptions();
+  describe('getSearchOptions', () => {
+    it('should get restaurant option', () => {
+      const res = getSearchOptions();
       expect(res).toHaveProperty('categories');
       expect(res).toHaveProperty('keywords');
       expect(res).toHaveProperty('prices');
