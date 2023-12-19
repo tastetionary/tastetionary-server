@@ -22,7 +22,7 @@ describe('user facade', () => {
         },
       ],
       account: {
-        identification: 'test',
+        identification: `test_${new Date().getMilliseconds()}`,
         password: 'pwd',
         category: AccountCategory.EMAIL,
       },

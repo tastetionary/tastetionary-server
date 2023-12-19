@@ -21,10 +21,10 @@ export async function getRecommendations(param: {
   excludeRestaurantIds: bigint[];
 }) {
   const userAreas = await searchAreas(param.userId);
-  if (!userAreas.dinningArea) {
+  if (!userAreas.diningArea) {
     throw new CallerWrongDomainRuleException(
       ErrorNameEnum.NO_DATA,
-      'no dinning area',
+      'no dining area',
       'should register first',
     );
   }

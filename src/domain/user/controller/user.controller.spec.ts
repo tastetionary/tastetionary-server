@@ -28,25 +28,26 @@ describe('user controller', () => {
     await app.init();
   });
 
-  it('getProfile should return data', async () => {
-    const user = profileEntityFactory();
-    jest.spyOn(service, 'searchProfile').mockResolvedValueOnce(user);
+  it('myPage profile should return data', async () => {
+    const profile = profileEntityFactory();
+    jest.spyOn(service, 'searchProfile').mockResolvedValueOnce(profile);
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(user.user.id, key, {
+    const token = createUserToken(profile.user.id, key, {
       expiresIn: '10h',
     });
 
     const res = await request(app.getHttpServer())
-      .get('/v1/user')
+      .get('/v1/user/profile')
       .set('Authorization', `Bearer ${token}`);
 
     assertStatusCode(res, 200);
 
     expect(res.body.data).toHaveProperty('id');
     expect(res.body.data).toHaveProperty('nickname');
-    expect(res.body.data).toHaveProperty('activity_area');
-    expect(res.body.data).toHaveProperty('dining_area');
-    expect(res.body.data).toHaveProperty('authentication');
+    expect(res.body.data).toHaveProperty('area');
+    expect(res.body.data).toHaveProperty('account');
+    expect(res.body.data.area).toHaveProperty('diningArea');
+    expect(res.body.data.area).toHaveProperty('activityArea');
   });
 
   it('updateArea should return success', async () => {
@@ -91,7 +92,7 @@ describe('user controller', () => {
           },
         ],
         account: {
-          identification: `test-${new Date().getMilliseconds}`,
+          identification: `test-${new Date().getMilliseconds()}`,
           password: 'pwd',
           category: AccountCategory.EMAIL,
         },

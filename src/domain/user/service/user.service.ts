@@ -71,12 +71,12 @@ export async function searchAreas(userId: number) {
 
   const areas = await getAreasByUserId(userId);
   const data = {
-    dinningArea: transformer(areas, AreaCategory.DINING_AREA),
+    diningArea: transformer(areas, AreaCategory.DINING_AREA),
     activityArea: transformer(areas, AreaCategory.ACTIVITY_AREA),
   };
   return {
     ...data,
-    dinningArea: data.dinningArea as NonNullable<typeof data.dinningArea>,
+    diningArea: data.diningArea as NonNullable<typeof data.diningArea>,
   };
 }
 

@@ -42,22 +42,40 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard)
   @TypedRoute.Get('/')
-  async inquireMtyPage(
-    @Request() req,
-  ): Promise<BaseResponseDto<ProfileResponse>> {
+  async getProfile(@Request() req): Promise<BaseResponseDto<any>> {
     const profile = await getProfile(req.user.userId);
-    const res = new BaseResponseDto({
+    return new BaseResponseDto({
       id: profile.user.id,
       nickname: profile.user.nickname,
       activity_area: profile.areas.activityArea ?? {},
-      dining_area: profile.areas.dinningArea ?? {},
+      dining_area: profile.areas.diningArea ?? {},
       authentication: {
-        account_email: profile.authList.account.identification ?? '',
-        company_email: profile.authList.company?.identification ?? '',
+        account_email: profile.authList.account.identification,
+        company_email: profile.authList.company?.identification || '',
       },
     });
+  }
 
-    return res;
+  /**
+   * @tag user
+   * @summary get profile
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Get('/profile')
+  async inquireMyPageProfile(
+    @Request() req,
+  ): Promise<BaseResponseDto<ProfileResponse>> {
+    const profile = await getProfile(req.user.userId);
+    return new BaseResponseDto({
+      id: profile.user.id,
+      nickname: profile.user.nickname,
+      area: profile.areas,
+      account: {
+        accountEmail: profile.authList.account.identification,
+        companyEmail: profile.authList.company?.identification || null,
+      },
+    });
   }
 
   /**
