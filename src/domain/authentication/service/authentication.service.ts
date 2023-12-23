@@ -35,7 +35,7 @@ export async function changeAuthenticationAsDone(
   };
 }
 
-async function findValidAuth(historyId: number, code: string) {
+export async function findValidAuth(historyId: number, code: string) {
   const historyRecord = await getHistoryById(historyId);
   if (!historyRecord) {
     throw new InternalDomainException(
@@ -194,5 +194,4 @@ function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
 
 export const _private = {
   getUserAuth,
-  findValidAuth,
 };

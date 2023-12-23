@@ -7,6 +7,7 @@ import { ErrorNameEnum } from '@common/exception/enum';
 import {
   getIdentification,
   saveAccount,
+  updateAccountById,
 } from '@domain/account/repository/account.repository';
 import {
   deleteToken,
@@ -56,11 +57,22 @@ export async function createAccount(userId: number, dto: AccountDTO) {
   }
 
   const password = await encryptValue(dto.password);
-
   await saveAccount({
     userId,
     category: dto.category,
     identification: dto.identification,
+    password,
+  });
+}
+
+export async function updatePassword(param: {
+  accountId: number;
+  identification: string;
+  password: string;
+}) {
+  const password = await encryptValue(param.password);
+  await updateAccountById(param.accountId, {
+    identification: param.identification,
     password,
   });
 }
