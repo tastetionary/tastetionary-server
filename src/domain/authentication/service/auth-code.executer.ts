@@ -11,22 +11,11 @@ import { CallerWrongDomainRuleException } from '@common/exception/internal.excep
 import { ErrorNameEnum } from '@common/exception/enum';
 import { ConfigService } from '@nestjs/config';
 
-function createSixDigitCode(env?: EnvironmentEnum) {
-  if (env == EnvironmentEnum.TEST || env == EnvironmentEnum.LOCAL) {
-    return '000000';
-  }
-
-  const min = 100000;
-  const max = 999999;
-  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-  return randomNumber.toString().padStart(6, '0');
-}
-
-async function sendAuthenticationCode(
+export async function sendAuthenticationCode(
   category: AuthenticationCategory,
   type: AuthenticationType,
-  code: string,
   identification: string,
+  env?: EnvironmentEnum,
 ) {
   if (type != AuthenticationType.EMAIL) {
     throw new CallerWrongDomainRuleException(
@@ -35,41 +24,45 @@ async function sendAuthenticationCode(
     );
   }
 
-  const contents = getContents(category, code, identification);
+  const code = createDigitCode(6, env);
+  const contents = getEmailContentsForm(category, code, identification);
 
   const config = new ConfigurationService(new ConfigService()).getBrevoConfig();
   return sendEmail(contents, config);
 }
-function getContents(
+
+function createDigitCode(size: number, env?: EnvironmentEnum) {
+  const min = Number('0'.repeat(size));
+  if (env == EnvironmentEnum.TEST || env == EnvironmentEnum.LOCAL) {
+    return min.toString();
+  }
+
+  const max = Number('9'.repeat(size));
+  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
+  return randomNumber.toString().padStart(size, '0');
+}
+
+function getEmailContentsForm(
   category: AuthenticationCategory,
   code: string,
   identification: string,
 ) {
-  let subject = '';
-  let htmlContentFile = '';
-  if (category == AuthenticationCategory.ACCOUNT) {
-    subject = '계정인증';
-    htmlContentFile = path.resolve(
-      __dirname,
-      process.cwd() +
-        '/src/domain/authentication/resource/verify-register/index.html',
-    );
-  }
+  const subjects = {
+    [AuthenticationCategory.ACCOUNT]: '계정인증',
+    [AuthenticationCategory.COMPANY]: '회사인증',
+  };
 
-  if (category == AuthenticationCategory.COMPANY) {
-    subject = '회사인증';
-    htmlContentFile = path.resolve(
-      __dirname,
-      process.cwd() +
-        '/src/domain/authentication/resource/verify-company/index.html',
-    );
-  }
-
+  const htmlContentFile = path.resolve(
+    __dirname,
+    process.cwd() +
+      `/src/domain/authentication/resource/${category}/index.html`,
+  );
   let htmlContent = fs.readFileSync(htmlContentFile, 'utf8');
   htmlContent = htmlContent.replace('{{verificationCode}}', code);
 
   const contents = {
-    subject: subject,
+    subject: subjects[category],
     htmlContent: htmlContent,
     to: [{ email: identification }],
   };
@@ -77,5 +70,6 @@ function getContents(
 }
 
 export const _private = {
-  getContents,
+  getEmailContentsForm,
+  createDigitCode,
 };
