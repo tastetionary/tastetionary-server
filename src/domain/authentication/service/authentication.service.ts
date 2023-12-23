@@ -4,11 +4,7 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import { UserAuth } from '@domain/authentication/core/user-auth';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { sendEmail } from '@thirdParty/brevo/brevo';
 import { EnvironmentEnum } from '@root/src/env.validation';
-import * as fs from 'fs';
-import path from 'path';
 import {
   CallerWrongDomainRuleException,
   InternalDomainException,
@@ -22,7 +18,6 @@ import {
   saveAuthenticationHistory,
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
-import { ConfigService } from '@nestjs/config';
 
 // facade 로 옮길 만한 사이즈
 export async function doneProgressAuthentication(
@@ -153,6 +148,12 @@ export async function createProgressAuthentication(param: {
   };
 }
 
+function createExpiredAt(seconds = 180) {
+  const currentDate = new Date();
+  currentDate.setSeconds(currentDate.getSeconds() + seconds);
+  return currentDate;
+}
+
 export function validateDomainWhenCompanyCase(param: {
   userId?: number | undefined;
   identification: string;
@@ -172,67 +173,6 @@ export function validateDomainWhenCompanyCase(param: {
       { identification: param.identification },
     );
   }
-}
-
-async function sendAuthenticationCode(
-  category: AuthenticationCategory,
-  type: AuthenticationType,
-  code: string,
-  identification: string,
-) {
-  if (type != AuthenticationType.EMAIL) {
-    throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
-      'not supported type check AuthenticationType',
-    );
-  }
-
-  let subject = '';
-  let htmlContentFile = '';
-  if (category == AuthenticationCategory.ACCOUNT) {
-    subject = '계정인증';
-    htmlContentFile = path.resolve(
-      __dirname,
-      process.cwd() +
-        '/src/domain/authentication/resource/verify-register/index.html',
-    );
-  }
-
-  if (category == AuthenticationCategory.COMPANY) {
-    subject = '회사인증';
-    htmlContentFile = path.resolve(
-      __dirname,
-      process.cwd() +
-        '/src/domain/authentication/resource/verify-company/index.html',
-    );
-  }
-
-  let htmlContent = fs.readFileSync(htmlContentFile, 'utf8');
-  htmlContent = htmlContent.replace('{{verificationCode}}', code);
-
-  const contents = {
-    subject: subject,
-    htmlContent: htmlContent,
-    to: [{ email: identification }],
-  };
-
-  const config = new ConfigurationService(new ConfigService()).getBrevoConfig();
-  return sendEmail(contents, config);
-}
-
-function createExpiredAt(seconds = 180) {
-  const currentDate = new Date();
-  currentDate.setSeconds(currentDate.getSeconds() + seconds);
-  return currentDate;
-}
-function createSixDigitCode(env?: EnvironmentEnum) {
-  if (env == EnvironmentEnum.TEST || env == EnvironmentEnum.LOCAL) {
-    return '000000';
-  }
-  const min = 100000;
-  const max = 999999;
-  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-  return randomNumber.toString().padStart(6, '0');
 }
 
 function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {

@@ -9,6 +9,7 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import * as service from '@domain/authentication/service/authentication.service';
+import * as facade from '@domain/authentication/facade/authentication.facade';
 
 describe('authentication controller', () => {
   let app: INestApplication;
@@ -52,7 +53,7 @@ describe('authentication controller', () => {
     });
 
     jest
-      .spyOn(service, 'createProgressAuthentication')
+      .spyOn(facade, 'beginAuthProgress')
       .mockResolvedValue({ id: 1, expiredAt: new Date() });
 
     const res = await request(app.getHttpServer())

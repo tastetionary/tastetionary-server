@@ -24,11 +24,13 @@ export async function sendAuthenticationCodeToEmail(
     );
   }
 
-  const code = createDigitCode(6, env);
-  const contents = getEmailContentsForm(category, code, identification);
+  const authCode = createDigitCode(6, env);
+  const contents = getEmailContentsForm(category, authCode, identification);
 
   const config = new ConfigurationService(new ConfigService()).getBrevoConfig();
-  return sendEmail(contents, config);
+  const res = await sendEmail(contents, config);
+
+  return { authCode, isSendingSuccess: res };
 }
 
 function createDigitCode(size: number, env?: EnvironmentEnum) {
