@@ -44,7 +44,7 @@ describe('facade', () => {
       const history = await createProgressAuthentication(data);
 
       const newPassword = 'updatedPassword';
-      await resetEmailPassword(history.id, code, identification, newPassword);
+      await resetEmailPassword(history.id, code, newPassword);
 
       const token = await createToken({
         identification: dto.identification,

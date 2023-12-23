@@ -8,16 +8,15 @@ import {
 export async function resetEmailPassword(
   historyId: number,
   code: string,
-  identification: string,
-  password: string,
+  newPassword: string,
 ) {
-  await findValidAuth(historyId, code);
+  const auth = await findValidAuth(historyId, code);
+  const account = await getAccount(auth.identification, AccountCategory.EMAIL);
 
-  const account = await getAccount(identification, AccountCategory.EMAIL);
   await updatePassword({
     accountId: account.id,
     identification: account.identification,
-    password,
+    password: newPassword,
   });
 
   return account.id;
