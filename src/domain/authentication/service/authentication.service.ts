@@ -1,4 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
 import {
   AuthenticationCategory,
   AuthenticationState,
@@ -129,42 +128,9 @@ export async function createProgressAuthentication(param: {
   identification: string;
   category: AuthenticationCategory;
   type: AuthenticationType;
+  code: string;
   env?: EnvironmentEnum;
 }) {
-  if (param.category == AuthenticationCategory.COMPANY) {
-    if (isGeneralEmailDomain(param.type, param.identification, param.env)) {
-      throw new CallerWrongDomainRuleException(
-        ErrorNameEnum.INVALID_INPUT,
-        'only company email can be used',
-        'change email domain',
-        { identification: param.identification },
-      );
-    }
-  }
-
-  await resetAuthentication(
-    param.identification,
-    param.category,
-    param.type,
-    param.userId,
-  );
-
-  const code = createSixDigitCode(param.env);
-
-  const res = await sendAuthenticationCode(
-    param.category,
-    param.type,
-    code,
-    param.identification,
-  );
-  if (!res) {
-    throw new InternalDomainException(
-      ErrorNameEnum.UNEXPECTED_STATUS,
-      'can not send authentication code',
-      'check brevo status and log',
-    );
-  }
-
   await saveAuthentication({
     userId: param.userId,
     identification: param.identification,
@@ -177,7 +143,7 @@ export async function createProgressAuthentication(param: {
     identification: param.identification,
     category: param.category,
     type: param.type,
-    code,
+    code: param.code,
     expiredAt: createExpiredAt(),
   });
 
@@ -185,6 +151,27 @@ export async function createProgressAuthentication(param: {
     id: history.id,
     expiredAt: history.expiredAt,
   };
+}
+
+export function validateDomainWhenCompanyCase(param: {
+  userId?: number | undefined;
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+  env?: EnvironmentEnum | undefined;
+}) {
+  if (param.category !== AuthenticationCategory.COMPANY) {
+    return;
+  }
+
+  if (isGeneralEmailDomain(param.identification, param.env)) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'only company email can be used',
+      'change email domain',
+      { identification: param.identification },
+    );
+  }
 }
 
 async function sendAuthenticationCode(
@@ -248,16 +235,8 @@ function createSixDigitCode(env?: EnvironmentEnum) {
   return randomNumber.toString().padStart(6, '0');
 }
 
-function isGeneralEmailDomain(
-  type: AuthenticationType,
-  identification: string,
-  env?: EnvironmentEnum,
-) {
+function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
   if (env != EnvironmentEnum.PRODUCTION) {
-    return false;
-  }
-
-  if (type != AuthenticationType.EMAIL) {
     return false;
   }
 
