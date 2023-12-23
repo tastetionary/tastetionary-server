@@ -11,7 +11,7 @@ import { CallerWrongDomainRuleException } from '@common/exception/internal.excep
 import { ErrorNameEnum } from '@common/exception/enum';
 import { ConfigService } from '@nestjs/config';
 
-export async function sendAuthenticationCode(
+export async function sendAuthenticationCodeToEmail(
   category: AuthenticationCategory,
   type: AuthenticationType,
   identification: string,
@@ -20,7 +20,7 @@ export async function sendAuthenticationCode(
   if (type != AuthenticationType.EMAIL) {
     throw new CallerWrongDomainRuleException(
       ErrorNameEnum.INVALID_INPUT,
-      'not supported type check AuthenticationType',
+      'not supported type, only support email type',
     );
   }
 
