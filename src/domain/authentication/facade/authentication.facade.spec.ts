@@ -9,7 +9,7 @@ import {
 } from '@domain/authentication/authentication.enum';
 import {
   createProgressAuthentication,
-  doneProgressAuthentication,
+  changeAuthenticationAsDone,
 } from '@domain/authentication/service/authentication.service';
 import { beginAuthProgress } from '@domain/authentication/facade/authentication.facade';
 
@@ -52,7 +52,7 @@ describe('facade', () => {
         type: AuthenticationType.EMAIL,
       });
 
-      await doneProgressAuthentication(res.id, mockCode);
+      await changeAuthenticationAsDone(res.id, mockCode);
 
       const afterRes = await beginAuthProgress({
         userId,

@@ -1,7 +1,7 @@
 import { truncateTables } from '@root/jest.setup';
 import {
   createProgressAuthentication,
-  doneProgressAuthentication,
+  changeAuthenticationAsDone,
   resetAuthentication,
   _private,
 } from '@domain/authentication/service/authentication.service';
@@ -43,7 +43,7 @@ describe('authentication service', () => {
         res.id,
       )) as AuthenticationHistoryRecord;
 
-      await doneProgressAuthentication(history.id, history.code);
+      await changeAuthenticationAsDone(history.id, history.code);
 
       let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
@@ -78,10 +78,10 @@ describe('authentication service', () => {
     });
   });
 
-  describe('doneProgressAuthentication', () => {
+  describe('changeAuthenticationAsDone', () => {
     it('not history should raise error', async () => {
       await expect(
-        doneProgressAuthentication(999, '1234'),
+        changeAuthenticationAsDone(999, '1234'),
       ).rejects.toThrowError();
     });
 
@@ -103,7 +103,7 @@ describe('authentication service', () => {
         res.id,
       )) as AuthenticationHistoryRecord;
 
-      await doneProgressAuthentication(history.id, history.code);
+      await changeAuthenticationAsDone(history.id, history.code);
 
       userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(false);

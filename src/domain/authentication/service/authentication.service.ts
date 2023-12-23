@@ -19,8 +19,7 @@ import {
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
 
-// facade 로 옮길 만한 사이즈
-export async function doneProgressAuthentication(
+export async function changeAuthenticationAsDone(
   historyId: number,
   code: string,
 ) {
@@ -76,7 +75,6 @@ async function getUserAuth(param: {
   return new UserAuth(param.userId ?? null, data);
 }
 
-// facade 로 갈만함
 export async function resetAuthentication(
   identification: string,
   category: AuthenticationCategory,

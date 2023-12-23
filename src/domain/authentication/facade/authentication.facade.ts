@@ -5,6 +5,7 @@ import {
 import { EnvironmentEnum } from '@root/src/env.validation';
 import {
   createProgressAuthentication,
+  changeAuthenticationAsDone,
   resetAuthentication,
   validateDomainWhenCompanyCase,
 } from '@domain/authentication/service/authentication.service';
@@ -39,4 +40,8 @@ export async function beginAuthProgress(param: {
   );
 
   return createProgressAuthentication({ ...param, code: authCode });
+}
+
+export async function finishAuthProgress(historyId: number, code: string) {
+  return changeAuthenticationAsDone(historyId, code);
 }

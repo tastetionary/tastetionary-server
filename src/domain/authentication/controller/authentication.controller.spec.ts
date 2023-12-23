@@ -8,7 +8,6 @@ import {
   AuthenticationCategory,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import * as service from '@domain/authentication/service/authentication.service';
 import * as facade from '@domain/authentication/facade/authentication.facade';
 
 describe('authentication controller', () => {
@@ -26,15 +25,13 @@ describe('authentication controller', () => {
     await app.init();
   });
 
-  it('doneProgress should return 200', async () => {
+  it('should return 200', async () => {
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
       expiresIn: '10h',
     });
 
-    jest
-      .spyOn(service, 'doneProgressAuthentication')
-      .mockResolvedValue({ id: 1 });
+    jest.spyOn(facade, 'finishAuthProgress').mockResolvedValue({ id: 1 });
 
     const res = await request(app.getHttpServer())
       .post('/v1/authentication/status/done')
@@ -46,7 +43,7 @@ describe('authentication controller', () => {
     expect(res.statusCode).toEqual(200);
   });
 
-  it('progress should return 200', async () => {
+  it('should return 200', async () => {
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
       expiresIn: '10h',
