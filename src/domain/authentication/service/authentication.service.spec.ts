@@ -43,7 +43,7 @@ describe('authentication service', () => {
     });
 
     it('with no history, should return error', async () => {
-      expect(findValidAuth(1, '123')).rejects.toThrowError(
+      expect(findValidAuth(191919, '123')).rejects.toThrowError(
         InternalDomainException,
       );
     });
