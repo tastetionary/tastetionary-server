@@ -3,21 +3,18 @@ import {
   HttpCode,
   Injectable,
   UseFilters,
-  UseGuards,
-  Request,
+  Param,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
-  CreateProgressRequest,
   CreateAuthenticationResponse,
   DoneProgressRequest,
-  CreateAccountProgressRequest,
   DoneAuthenticationResponse,
+  CreateProgressRequest,
 } from '@domain/authentication/dto/authentication.dto';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
-import { AuthGuard } from '@common/auth/auth.guard';
 import {
   beginAuthProgress,
   finishAuthProgress,
@@ -31,39 +28,19 @@ export class AuthenticationController {
    * @tag authentication
    * @summary create authentication in progress, return progress id, it need when check. it can be used for account, company
    */
-  @TypedRoute.Post('/account')
+  @TypedRoute.Post('/:category')
   @HttpCode(200)
   async createProgressAboutAccount(
-    @TypedBody() dto: CreateAccountProgressRequest,
+    @Param('category') category: AuthenticationCategory,
+    @TypedBody() dto: CreateProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
     // TODO add limit logic
     const res = await beginAuthProgress({
       identification: dto.identification,
-      category: dto.category,
+      category,
       type: dto.type,
     });
 
-    return new BaseResponseDto(res);
-  }
-
-  /**
-   * @tag authentication
-   * @summary create company authentication in progress, return progress id, it need when check
-   * @security bearer
-   */
-  @UseGuards(AuthGuard)
-  @TypedRoute.Post('/company')
-  @HttpCode(200)
-  async createProgressAboutCompany(
-    @Request() req,
-    @TypedBody() dto: CreateProgressRequest,
-  ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
-    const res = await beginAuthProgress({
-      userId: req.user.userId,
-      identification: dto.identification,
-      category: AuthenticationCategory.COMPANY,
-      type: dto.type,
-    });
     return new BaseResponseDto(res);
   }
 

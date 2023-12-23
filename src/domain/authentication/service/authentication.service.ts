@@ -33,7 +33,7 @@ export async function changeAuthenticationAsDone(
   if (historyRecord.code != code) {
     throw new CallerWrongDomainRuleException(
       ErrorNameEnum.INVALID_INPUT,
-      `given six digit code: ${code} not matched with database code: ${historyRecord.code}, check code`,
+      `given digit code: ${code} not matched with database code, check code`,
     );
   }
 
