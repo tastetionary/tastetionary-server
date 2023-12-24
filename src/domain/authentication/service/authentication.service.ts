@@ -18,6 +18,7 @@ import {
   saveAuthenticationHistory,
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
+import { isExpired } from '@root/src/common/util';
 
 export async function changeAuthenticationAsDone(
   historyId: number,
@@ -43,10 +44,18 @@ export async function findValidAuth(historyId: number, code: string) {
       `history: ${historyId} not found, check history id`,
     );
   }
+
   if (historyRecord.code != code) {
     throw new CallerWrongDomainRuleException(
       ErrorNameEnum.INVALID_INPUT,
       `given digit code: ${code} not matched with database code, check code`,
+    );
+  }
+
+  if (isExpired(historyRecord.expiredAt)) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'expired auth, start new process',
     );
   }
 
