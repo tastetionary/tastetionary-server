@@ -1,9 +1,16 @@
-import { findValidAuth } from '@domain/authentication/service/authentication.service';
+import {
+  findValidAuth,
+  resetAuthentication,
+} from '@domain/authentication/service/authentication.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import {
   getAccount,
   updatePassword,
 } from '@domain/account/service/account.service';
+import {
+  AuthenticationCategory,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
 
 export async function resetEmailPassword(
   historyId: number,
@@ -18,6 +25,12 @@ export async function resetEmailPassword(
     identification: account.identification,
     password: newPassword,
   });
+
+  await resetAuthentication(
+    account.identification,
+    AuthenticationCategory.PASSWORD,
+    AuthenticationType.EMAIL,
+  );
 
   return account.id;
 }
