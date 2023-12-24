@@ -50,7 +50,7 @@ export async function findValidAuth(historyId: number, code: string) {
     );
   }
 
-  const authRecord = await getAuthenticationByIdentification(
+  const authRecord = await getAuthentication(
     historyRecord.identification,
     historyRecord.category,
     historyRecord.type,
@@ -63,6 +63,14 @@ export async function findValidAuth(historyId: number, code: string) {
     );
   }
   return authRecord;
+}
+
+export async function getAuthentication(
+  identification: string,
+  category: AuthenticationCategory,
+  type: AuthenticationType,
+) {
+  return getAuthenticationByIdentification(identification, category, type);
 }
 
 async function getUserAuth(param: {
@@ -86,11 +94,7 @@ export async function resetAuthentication(
   type: AuthenticationType,
   userId?: number,
 ) {
-  const auth = await getAuthenticationByIdentification(
-    identification,
-    category,
-    type,
-  );
+  const auth = await getAuthentication(identification, category, type);
 
   if (!auth) {
     return;
