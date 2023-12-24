@@ -9,6 +9,16 @@ Content-Type: {{content_type_json}}
   "type":"email"
 }
 
+### create progress
+POST {{base_url}}/v1/authentication/password
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "wkdgndldi@naver.com",
+  "category":"password",
+  "type":"email"
+}
+
 
 ### donw progress
 POST {{base_url}}/v1/authentication/status/done

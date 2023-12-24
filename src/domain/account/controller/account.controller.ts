@@ -59,7 +59,7 @@ export class AccountController {
   @TypedRoute.Put('/password')
   @HttpCode(200)
   async resetPassword(
-    @Request() req: ResetPasswordRequest,
+    @TypedBody() req: ResetPasswordRequest,
   ): Promise<BaseResponseDto<object>> {
     await resetEmailPassword(req.historyId, req.code, req.password);
     return new BaseResponseDto({ state: 'success' });
