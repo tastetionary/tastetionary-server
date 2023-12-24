@@ -97,6 +97,7 @@ export async function resetAuthentication(
   }
 
   if (!userId) {
+    await deleteAuthentications([auth.id]);
     return;
   }
 
@@ -104,7 +105,7 @@ export async function resetAuthentication(
     throw new InternalDomainException(
       ErrorNameEnum.INVALID_INPUT,
       'user and auth user is not matched',
-      'check identification or someone steel others auth',
+      'check identification or someone steal others auth',
       { userId, targetAuthId: auth.id },
     );
   }

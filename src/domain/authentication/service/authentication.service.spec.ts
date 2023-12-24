@@ -53,7 +53,22 @@ describe('authentication service', () => {
     const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
 
-    it('should reset authentication', async () => {
+    it('with password, should reset authentication', async () => {
+      const data = {
+        category: AuthenticationCategory.PASSWORD,
+        identification: 'some@crud.com',
+        code: '1',
+        type: AuthenticationType.EMAIL,
+      };
+      await createProgressAuthentication(data);
+
+      await resetAuthentication(data.identification, data.category, data.type);
+
+      const res = await createProgressAuthentication(data);
+      expect(res).not.toBeNull();
+    });
+
+    it('with company, should reset authentication', async () => {
       const userId = 999;
       const data = {
         userId,
