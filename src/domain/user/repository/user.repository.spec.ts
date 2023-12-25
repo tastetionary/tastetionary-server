@@ -2,7 +2,9 @@ import { truncateTables } from '@root/jest.setup';
 import { UserState } from '@domain/user/user.enum';
 import prismaClient from '@root/src/common/database/prisma';
 import {
+  getOpinionsByUserId,
   getUsers,
+  saveOpinion,
   saveUser,
   saveUsers,
   updateUserById,
@@ -11,6 +13,20 @@ import {
 describe('user repository', () => {
   beforeEach(async () => {
     await truncateTables(prismaClient, ['users']);
+  });
+
+  it('should save opinions', async () => {
+    const data = {
+      userId: 99,
+      category: 'cate',
+      type: 'type',
+      opinion: 'kk',
+    };
+
+    await saveOpinion(data);
+
+    const res = await getOpinionsByUserId({ userIds: [data.userId] });
+    expect(res.length).toEqual(1);
   });
 
   it('should update user', async () => {
