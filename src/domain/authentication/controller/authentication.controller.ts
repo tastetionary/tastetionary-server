@@ -16,12 +16,12 @@ import {
   CreateAccountProgressRequest,
   DoneAuthenticationResponse,
 } from '@domain/authentication/dto/authentication.dto';
-import {
-  createProgressAuthentication,
-  doneProgressAuthentication,
-} from '@domain/authentication/service/authentication.service';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
 import { AuthGuard } from '@common/auth/auth.guard';
+import {
+  beginAuthProgress,
+  finishAuthProgress,
+} from '@domain/authentication/facade/authentication.facade';
 
 @Controller('v1/authentication')
 @UseFilters(new HttpExceptionFilter())
@@ -37,11 +37,12 @@ export class AuthenticationController {
     @TypedBody() dto: CreateAccountProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
     // TODO add limit logic
-    const res = await createProgressAuthentication({
+    const res = await beginAuthProgress({
       identification: dto.identification,
       category: dto.category,
       type: dto.type,
     });
+
     return new BaseResponseDto(res);
   }
 
@@ -57,7 +58,7 @@ export class AuthenticationController {
     @Request() req,
     @TypedBody() dto: CreateProgressRequest,
   ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
-    const res = await createProgressAuthentication({
+    const res = await beginAuthProgress({
       userId: req.user.userId,
       identification: dto.identification,
       category: AuthenticationCategory.COMPANY,
@@ -75,7 +76,7 @@ export class AuthenticationController {
   async doneProgress(
     @TypedBody() dto: DoneProgressRequest,
   ): Promise<BaseResponseDto<DoneAuthenticationResponse>> {
-    const { id: authenticationId } = await doneProgressAuthentication(
+    const { id: authenticationId } = await finishAuthProgress(
       dto.historyId,
       dto.code,
     );
