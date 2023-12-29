@@ -53,3 +53,7 @@ export async function updateAccountById(
     data: param,
   });
 }
+
+export async function deleteAccountByUserId(userId: number) {
+  await prismaClient.accounts.deleteMany({ where: { userId } });
+}
