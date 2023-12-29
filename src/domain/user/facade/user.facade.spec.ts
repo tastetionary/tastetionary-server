@@ -9,7 +9,7 @@ import {
 import {
   getProfile,
   registerProfile,
-  withdrawFrom,
+  withdrawProfile,
 } from '@domain/user/facade/user.facade';
 
 describe('user facade', () => {
@@ -45,7 +45,7 @@ describe('user facade', () => {
 
     const user = await registerProfile(dto);
 
-    await withdrawFrom(
+    await withdrawProfile(
       user.id,
       WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
       'bye',

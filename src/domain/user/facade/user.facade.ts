@@ -19,12 +19,11 @@ export async function registerProfile(dto: RegisterUserDTO) {
   return createProfile(dto);
 }
 
-export async function withdrawFrom(
+export async function withdrawProfile(
   userId: number,
   type: WithdrawalTypeEnum,
-  opinion?: string,
 ) {
-  await createUserOpinion({ userId, category: 'withdrawal', type, opinion });
+  await createUserOpinion({ userId, category: 'withdrawal', type });
   await changeUserState(userId, UserState.WITHDRAWAL);
   await removeAllAccount(userId);
   await removeAllToken(userId);
