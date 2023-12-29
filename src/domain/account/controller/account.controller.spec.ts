@@ -28,7 +28,7 @@ describe('account controller', () => {
     });
 
     jest
-      .spyOn(accountService, 'deleteTokens')
+      .spyOn(accountService, 'removeAllToken')
       .mockImplementation(async () => {});
 
     const res = await request(app.getHttpServer())

@@ -17,5 +17,5 @@ export async function getTokenByUserId(userId: number) {
 }
 
 export async function deleteTokensByUserId(userId: number) {
-  return prismaClient.userTokens.deleteMany({ where: { id: userId } });
+  return prismaClient.userTokens.deleteMany({ where: { userId } });
 }
