@@ -1,6 +1,6 @@
 export enum UserState {
   ACTIVE = 'active',
-  CANCELLATION = 'cancellation',
+  WITHDRAWAL = 'withdrawal',
 }
 
 export enum AgreementCategory {
@@ -15,7 +15,7 @@ export enum AreaCategory {
 /**
  * enum 대신할 type literal 시험 삼아 사용
  */
-export type OpinionCategory = 'account_cancellation';
+export type OpinionCategory = 'withdrawal';
 
 export enum AccountCancellationTypeEnum {
   /**
