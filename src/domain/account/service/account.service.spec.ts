@@ -2,9 +2,9 @@ import { truncateTables } from '@root/jest.setup';
 import {
   createAccount,
   createToken,
-  removeTokens,
+  removeAllToken,
   getAccount,
-  removeAccountAll,
+  removeAllAccount,
 } from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
@@ -27,7 +27,7 @@ describe('account service', () => {
     const userId = 99;
     await createAccount(userId, dto);
 
-    await removeAccountAll(userId);
+    await removeAllAccount(userId);
 
     const res = await getIdentification(dto.identification, dto.category);
     expect(res).toBeNull();
@@ -56,7 +56,7 @@ describe('account service', () => {
     await createAccount(userId, dto);
 
     await createToken(dto);
-    await removeTokens(userId);
+    await removeAllToken(userId);
 
     const tokens = await getTokenByUserId(userId);
     expect(tokens).toBeNull();

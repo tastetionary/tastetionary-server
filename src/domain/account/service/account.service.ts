@@ -10,7 +10,7 @@ import {
   saveAccount,
 } from '@domain/account/repository/account.repository';
 import {
-  deleteToken,
+  deleteTokensByUserId,
   getTokenByUserId,
   saveToken,
 } from '@domain/account/repository/user-token.repository';
@@ -123,13 +123,10 @@ function makeTokens(payload: { userId: number }) {
   };
 }
 
-export async function removeTokens(userId: number) {
-  const token = await getTokenByUserId(userId);
-  if (!token) return;
-
-  await deleteToken(token.id);
+export async function removeAllToken(userId: number) {
+  await deleteTokensByUserId(userId);
 }
 
-export async function removeAccountAll(userId: number) {
+export async function removeAllAccount(userId: number) {
   await deleteAccountByUserId(userId);
 }
