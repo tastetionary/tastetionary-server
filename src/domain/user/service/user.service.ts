@@ -6,7 +6,7 @@ import {
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
 import {
-  AccountCancellationTypeEnum,
+  WithdrawalTypeEnum,
   AreaCategory,
   OpinionCategory,
   UserState,
@@ -185,7 +185,7 @@ export async function changeUserState(userId: number, state: UserState) {
 export async function createUserOpinion(params: {
   userId: number;
   category: OpinionCategory;
-  type: AccountCancellationTypeEnum;
+  type: WithdrawalTypeEnum;
   opinion?: string;
 }) {
   await saveOpinion(params);

@@ -1,5 +1,5 @@
 import {
-  AccountCancellationTypeEnum,
+  WithdrawalTypeEnum,
   OpinionCategory,
   UserState,
 } from '@domain/user/user.enum';
@@ -74,7 +74,7 @@ export interface UserOpinion {
 export async function saveOpinion(param: {
   userId: number;
   category: OpinionCategory;
-  type: AccountCancellationTypeEnum;
+  type: WithdrawalTypeEnum;
   opinion?: string;
 }): Promise<UserOpinion> {
   return prismaClient.userOpinions.create({ data: param });

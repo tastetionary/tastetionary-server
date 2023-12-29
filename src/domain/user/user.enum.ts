@@ -17,7 +17,7 @@ export enum AreaCategory {
  */
 export type OpinionCategory = 'withdrawal';
 
-export enum AccountCancellationTypeEnum {
+export enum WithdrawalTypeEnum {
   /**
    * 사용성이 불편해요
    */

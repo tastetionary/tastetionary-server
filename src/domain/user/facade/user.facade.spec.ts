@@ -1,7 +1,7 @@
 import { AccountCategory } from '@domain/account/account.enum';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
 import {
-  AccountCancellationTypeEnum,
+  WithdrawalTypeEnum,
   AgreementCategory,
   AreaCategory,
   UserState,
@@ -47,7 +47,7 @@ describe('user facade', () => {
 
     await withdrawFrom(
       user.id,
-      AccountCancellationTypeEnum.FOUND_SIMILAR_SERVICE,
+      WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
       'bye',
     );
 

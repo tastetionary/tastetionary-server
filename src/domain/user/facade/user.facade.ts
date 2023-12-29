@@ -9,10 +9,7 @@ import {
   removeAllAccount,
   removeAllToken,
 } from '@domain/account/service/account.service';
-import {
-  AccountCancellationTypeEnum as WithdrawalTypeEnum,
-  UserState,
-} from '@domain/user/user.enum';
+import { WithdrawalTypeEnum, UserState } from '@domain/user/user.enum';
 
 export async function getProfile(userId: number) {
   return searchProfile(userId);
