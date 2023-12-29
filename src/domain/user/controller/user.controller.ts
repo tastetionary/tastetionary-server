@@ -12,11 +12,16 @@ import {
   AreaDto,
   ProfileResponse,
   RegisterUserDTO,
+  WithdrawUserDto,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { changeArea } from '@domain/user/service/user.service';
-import { getProfile, registerProfile } from '@domain/user/facade/user.facade';
+import {
+  getProfile,
+  registerProfile,
+  withdrawProfile,
+} from '@domain/user/facade/user.facade';
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
@@ -90,6 +95,21 @@ export class UserController {
     @TypedBody() dto: AreaDto,
   ): Promise<BaseResponseDto<object>> {
     await changeArea(req.user.userId, dto);
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag user
+   * @summary withdraw user, delete account, token and update state
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Delete('/')
+  async withdrawUser(
+    @Request() req,
+    @TypedBody() dto: WithdrawUserDto,
+  ): Promise<BaseResponseDto<object>> {
+    await withdrawProfile(req.user.id, dto.type);
     return new BaseResponseDto({ state: 'success' });
   }
 }
