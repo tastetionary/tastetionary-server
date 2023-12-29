@@ -13,7 +13,7 @@ import { AccountDTO, TokenDTO } from '@domain/account/dto/account.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
   createToken,
-  deleteTokens,
+  removeTokens,
 } from '@domain/account/service/account.service';
 
 @Controller('v1/account')
@@ -43,7 +43,7 @@ export class AccountController {
   @TypedRoute.Delete('/tokens')
   @HttpCode(200)
   async deleteToken(@Request() req): Promise<BaseResponseDto<object>> {
-    await deleteTokens(req.user.userId);
+    await removeTokens(req.user.userId);
     return new BaseResponseDto({ state: 'success' });
   }
 }
