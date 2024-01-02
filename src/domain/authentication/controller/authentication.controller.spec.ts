@@ -1,6 +1,10 @@
 import { TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture, createUserToken } from '@root/jest.setup';
+import {
+  appModuleFixture,
+  assertStatusCode,
+  createUserToken,
+} from '@root/jest.setup';
 import { AuthenticationModule } from '@domain/authentication/authentication.module';
 import request from 'supertest';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
@@ -25,7 +29,7 @@ describe('authentication controller', () => {
     await app.init();
   });
 
-  it('should return 200', async () => {
+  it('/status/done should return 200', async () => {
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
       expiresIn: '10h',
@@ -43,7 +47,11 @@ describe('authentication controller', () => {
     expect(res.statusCode).toEqual(200);
   });
 
-  it('should return 200', async () => {
+  it.each([
+    [AuthenticationCategory.ACCOUNT],
+    [AuthenticationCategory.COMPANY],
+    [AuthenticationCategory.PASSWORD],
+  ])('/authentication/{$category} should return 200', async (category) => {
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(123, key, {
       expiresIn: '10h',
@@ -54,13 +62,13 @@ describe('authentication controller', () => {
       .mockResolvedValue({ id: 1, expiredAt: new Date() });
 
     const res = await request(app.getHttpServer())
-      .post(`/v1/authentication/${AuthenticationCategory.COMPANY}`)
+      .post(`/v1/authentication/${category}`)
       .set('Authorization', `Bearer ${token}`)
       .send({
         identification: 'test@email.com',
         type: AuthenticationType.EMAIL,
       });
 
-    expect(res.statusCode).toEqual(200);
+    assertStatusCode(res, 200);
   });
 });

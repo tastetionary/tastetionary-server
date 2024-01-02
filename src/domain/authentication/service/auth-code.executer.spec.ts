@@ -11,6 +11,7 @@ describe('executer', () => {
     it.each([
       [AuthenticationCategory.ACCOUNT, '계정인증'],
       [AuthenticationCategory.COMPANY, '회사인증'],
+      [AuthenticationCategory.PASSWORD, '비밀번호변경'],
     ])('should return expected content', (category, expectedSubject) => {
       const res = _private.getEmailContentsForm(category, '123', 'ide');
       expect(res.subject).toEqual(expectedSubject);

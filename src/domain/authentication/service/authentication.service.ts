@@ -23,6 +23,19 @@ export async function changeAuthenticationAsDone(
   historyId: number,
   code: string,
 ) {
+  const auth = await findValidAuth(historyId, code);
+
+  await updateAuthentication({
+    id: auth.id,
+    state: AuthenticationState.DONE,
+  });
+
+  return {
+    id: auth.id,
+  };
+}
+
+export async function findValidAuth(historyId: number, code: string) {
   const historyRecord = await getHistoryById(historyId);
   if (!historyRecord) {
     throw new InternalDomainException(
@@ -33,7 +46,7 @@ export async function changeAuthenticationAsDone(
   if (historyRecord.code != code) {
     throw new CallerWrongDomainRuleException(
       ErrorNameEnum.INVALID_INPUT,
-      `given six digit code: ${code} not matched with database code: ${historyRecord.code}, check code`,
+      `given digit code: ${code} not matched with database code, check code`,
     );
   }
 
@@ -49,15 +62,7 @@ export async function changeAuthenticationAsDone(
       `auth not found from given history id, ${historyId}, check authentication on history`,
     );
   }
-
-  await updateAuthentication({
-    id: authRecord.id,
-    state: AuthenticationState.DONE,
-  });
-
-  return {
-    id: authRecord.id,
-  };
+  return authRecord;
 }
 
 async function getUserAuth(param: {

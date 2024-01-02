@@ -4,6 +4,7 @@ import {
   changeAuthenticationAsDone,
   resetAuthentication,
   _private,
+  findValidAuth,
 } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
@@ -15,6 +16,7 @@ import {
 } from '@domain/authentication/repository/authentication.repository';
 import * as brevo from '@thirdParty/brevo/brevo';
 import prismaClient from '@common/database/prisma';
+import { InternalDomainException } from '@common/exception/internal.exception';
 
 describe('authentication service', () => {
   beforeEach(async () => {
@@ -22,6 +24,29 @@ describe('authentication service', () => {
       'authentications',
       'authentication_histories',
     ]);
+  });
+  describe('private', () => {
+    it('should return data', async () => {
+      const userId = 999;
+      const code = '1'.repeat(6);
+      const data = {
+        userId,
+        category: AuthenticationCategory.COMPANY,
+        identification: 'some@crud.com',
+        code,
+        type: AuthenticationType.EMAIL,
+      };
+      const auth = await createProgressAuthentication(data);
+
+      const res = await findValidAuth(auth.id, code);
+      expect(res.id).not.toBeNull();
+    });
+
+    it('with no history, should return error', async () => {
+      expect(findValidAuth(191919, '123')).rejects.toThrowError(
+        InternalDomainException,
+      );
+    });
   });
 
   describe('resetAuthentication', () => {

@@ -9,12 +9,17 @@ import {
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
-import { AccountDTO, TokenDTO } from '@domain/account/dto/account.dto';
+import {
+  AccountDTO,
+  ResetPasswordRequest,
+  TokenDTO,
+} from '@domain/account/dto/account.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
   createToken,
   deleteTokens,
 } from '@domain/account/service/account.service';
+import { resetEmailPassword } from '@domain/account/facade/account.facade';
 
 @Controller('v1/account')
 @UseFilters(new HttpExceptionFilter())
@@ -44,6 +49,19 @@ export class AccountController {
   @HttpCode(200)
   async deleteToken(@Request() req): Promise<BaseResponseDto<object>> {
     await deleteTokens(req.user.userId);
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag account
+   * @summary update password, need authentication code and id and identification
+   */
+  @TypedRoute.Put('/password')
+  @HttpCode(200)
+  async resetPassword(
+    @TypedBody() req: ResetPasswordRequest,
+  ): Promise<BaseResponseDto<object>> {
+    await resetEmailPassword(req.historyId, req.code, req.password);
     return new BaseResponseDto({ state: 'success' });
   }
 }

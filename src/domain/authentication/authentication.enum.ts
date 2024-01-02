@@ -1,6 +1,7 @@
 export enum AuthenticationCategory {
   ACCOUNT = 'account',
   COMPANY = 'company',
+  PASSWORD = 'password',
 }
 
 export enum AuthenticationType {
