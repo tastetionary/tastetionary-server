@@ -45,11 +45,7 @@ describe('user facade', () => {
 
     const user = await registerProfile(dto);
 
-    await withdrawProfile(
-      user.id,
-      WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
-      'bye',
-    );
+    await withdrawProfile(user.id, WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE);
 
     const profile = await getProfile(user.id);
     expect(profile.user.state).toEqual(UserState.WITHDRAWAL);

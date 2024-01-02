@@ -12,7 +12,7 @@ import {
 
 describe('user repository', () => {
   beforeEach(async () => {
-    await truncateTables(prismaClient, ['users']);
+    await truncateTables(prismaClient, ['users', 'user_opinions']);
   });
 
   it('should save opinions', async () => {
