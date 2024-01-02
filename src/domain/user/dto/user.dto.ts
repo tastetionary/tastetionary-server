@@ -1,9 +1,21 @@
 import typia from 'typia';
-import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
+import {
+  AgreementCategory,
+  AreaCategory,
+  WithdrawalTypeEnum,
+} from '@domain/user/user.enum';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AreaEntity } from '@domain/user/service/user.service';
 
 export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
+
+export interface WithdrawUserDto {
+  /**
+   * user data, not essential
+   * @type WithdrawalTypeEnum
+   */
+  type: WithdrawalTypeEnum;
+}
 
 export interface RegisterUserDTO {
   /**

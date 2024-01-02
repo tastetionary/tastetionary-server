@@ -5,12 +5,13 @@ import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  deleteAccountByUserId,
   getIdentification,
   saveAccount,
   updateAccountById,
 } from '@domain/account/repository/account.repository';
 import {
-  deleteToken,
+  deleteTokensByUserId,
   getTokenByUserId,
   saveToken,
 } from '@domain/account/repository/user-token.repository';
@@ -134,9 +135,10 @@ function makeTokens(payload: { userId: number }) {
   };
 }
 
-export async function deleteTokens(userId: number) {
-  const token = await getTokenByUserId(userId);
-  if (!token) return;
+export async function removeAllToken(userId: number) {
+  await deleteTokensByUserId(userId);
+}
 
-  await deleteToken(token.id);
+export async function removeAllAccount(userId: number) {
+  await deleteAccountByUserId(userId);
 }

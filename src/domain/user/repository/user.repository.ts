@@ -1,4 +1,8 @@
-import { UserState } from '@domain/user/user.enum';
+import {
+  WithdrawalTypeEnum,
+  OpinionCategory,
+  UserState,
+} from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
@@ -69,8 +73,8 @@ export interface UserOpinion {
 
 export async function saveOpinion(param: {
   userId: number;
-  category: string;
-  type: string;
+  category: OpinionCategory;
+  type: WithdrawalTypeEnum;
   opinion?: string;
 }): Promise<UserOpinion> {
   return prismaClient.userOpinions.create({ data: param });

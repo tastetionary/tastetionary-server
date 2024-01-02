@@ -5,9 +5,14 @@ import {
   createProfile,
   _private,
   searchProfile,
+  changeUserState,
 } from '@domain/user/service/user.service';
 import { RegisterUserDTO } from '@domain/user/dto/user.dto';
-import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
+import {
+  AgreementCategory,
+  AreaCategory,
+  UserState,
+} from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
 import {
   AuthenticationCategory,
@@ -16,6 +21,7 @@ import {
 } from '@domain/authentication/authentication.enum';
 import prismaClient from '@root/src/common/database/prisma';
 import { saveAuthentication } from '@domain/authentication/repository/authentication.repository';
+import { getProfile } from '../facade/user.facade';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -56,6 +62,15 @@ describe('user service', () => {
       },
     ],
   };
+
+  it('should change user state', async () => {
+    const user = await createProfile(DTO);
+    const expected = UserState.WITHDRAWAL;
+    await changeUserState(user.id, expected);
+
+    const profile = await getProfile(user.id);
+    expect(profile.user.state).toEqual(expected);
+  });
 
   it('should change area', async () => {
     const user = await createProfile(DTO);

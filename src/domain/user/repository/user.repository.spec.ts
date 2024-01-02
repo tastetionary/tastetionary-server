@@ -1,5 +1,5 @@
 import { truncateTables } from '@root/jest.setup';
-import { UserState } from '@domain/user/user.enum';
+import { UserState, WithdrawalTypeEnum } from '@domain/user/user.enum';
 import prismaClient from '@root/src/common/database/prisma';
 import {
   getOpinionsByUserId,
@@ -18,8 +18,8 @@ describe('user repository', () => {
   it('should save opinions', async () => {
     const data = {
       userId: 99,
-      category: 'cate',
-      type: 'type',
+      category: 'withdrawal' as const,
+      type: WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
       opinion: 'kk',
     };
 

@@ -8,9 +8,14 @@ import {
 } from '@root/jest.setup';
 import { UserModule } from '@domain/user/user.module';
 import { AccountCategory } from '@domain/account/account.enum';
-import { AgreementCategory, AreaCategory } from '@domain/user/user.enum';
+import {
+  AgreementCategory,
+  AreaCategory,
+  WithdrawalTypeEnum,
+} from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import * as service from '@domain/user/service/user.service';
+import * as facade from '@domain/user/facade/user.facade';
 import { profileEntityFactory } from '@root/test/factory/user.factory';
 
 describe('user controller', () => {
@@ -26,6 +31,26 @@ describe('user controller', () => {
     app = module.createNestApplication();
     configService = module.get<ConfigurationService>(ConfigurationService);
     await app.init();
+  });
+
+  it('withdrawal should return success', async () => {
+    jest.spyOn(facade, 'withdrawProfile').mockResolvedValue();
+
+    const userId = 123;
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .delete('/v1/user')
+      .send({
+        type: WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
+        opinion: 'good bye',
+      })
+      .set('Authorization', `Bearer ${token}`);
+
+    assertStatusCode(res, 200);
   });
 
   it('myPage profile should return data', async () => {

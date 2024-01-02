@@ -17,7 +17,7 @@ import {
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
   createToken,
-  deleteTokens,
+  removeAllToken,
 } from '@domain/account/service/account.service';
 import { resetEmailPassword } from '@domain/account/facade/account.facade';
 
@@ -48,7 +48,7 @@ export class AccountController {
   @TypedRoute.Delete('/tokens')
   @HttpCode(200)
   async deleteToken(@Request() req): Promise<BaseResponseDto<object>> {
-    await deleteTokens(req.user.userId);
+    await removeAllToken(req.user.userId);
     return new BaseResponseDto({ state: 'success' });
   }
 
