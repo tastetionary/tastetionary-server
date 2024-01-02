@@ -2,7 +2,10 @@ import {
   AuthenticationCategory,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import { createProgressAuthentication } from '@domain/authentication/service/authentication.service';
+import {
+  createProgressAuthentication,
+  getAuthentication,
+} from '@domain/authentication/service/authentication.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import {
   createAccount,
@@ -22,7 +25,7 @@ describe('facade', () => {
       ]);
     });
 
-    it('should change password', async () => {
+    it('should change password and delete auth for history', async () => {
       const userId = 666;
       const identification = 'some@crud.com';
       const dto = {
@@ -36,7 +39,7 @@ describe('facade', () => {
 
       const data = {
         userId,
-        category: AuthenticationCategory.COMPANY,
+        category: AuthenticationCategory.PASSWORD,
         code,
         identification,
         type: AuthenticationType.EMAIL,
@@ -53,6 +56,13 @@ describe('facade', () => {
       });
 
       expect(token).not.toBeNull();
+      const auth = await getAuthentication(
+        identification,
+        AuthenticationCategory.PASSWORD,
+        AuthenticationType.EMAIL,
+      );
+
+      expect(auth).toBeNull();
     });
   });
 });

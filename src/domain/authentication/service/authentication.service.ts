@@ -18,6 +18,7 @@ import {
   saveAuthenticationHistory,
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
+import { isExpired } from '@root/src/common/util';
 
 export async function changeAuthenticationAsDone(
   historyId: number,
@@ -43,6 +44,7 @@ export async function findValidAuth(historyId: number, code: string) {
       `history: ${historyId} not found, check history id`,
     );
   }
+
   if (historyRecord.code != code) {
     throw new CallerWrongDomainRuleException(
       ErrorNameEnum.INVALID_INPUT,
@@ -50,7 +52,14 @@ export async function findValidAuth(historyId: number, code: string) {
     );
   }
 
-  const authRecord = await getAuthenticationByIdentification(
+  if (isExpired(historyRecord.expiredAt)) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'expired auth, start new process',
+    );
+  }
+
+  const authRecord = await getAuthentication(
     historyRecord.identification,
     historyRecord.category,
     historyRecord.type,
@@ -63,6 +72,14 @@ export async function findValidAuth(historyId: number, code: string) {
     );
   }
   return authRecord;
+}
+
+export async function getAuthentication(
+  identification: string,
+  category: AuthenticationCategory,
+  type: AuthenticationType,
+) {
+  return getAuthenticationByIdentification(identification, category, type);
 }
 
 async function getUserAuth(param: {
@@ -86,17 +103,14 @@ export async function resetAuthentication(
   type: AuthenticationType,
   userId?: number,
 ) {
-  const auth = await getAuthenticationByIdentification(
-    identification,
-    category,
-    type,
-  );
+  const auth = await getAuthentication(identification, category, type);
 
   if (!auth) {
     return;
   }
 
   if (!userId) {
+    await deleteAuthentications([auth.id]);
     return;
   }
 
@@ -104,7 +118,7 @@ export async function resetAuthentication(
     throw new InternalDomainException(
       ErrorNameEnum.INVALID_INPUT,
       'user and auth user is not matched',
-      'check identification or someone steel others auth',
+      'check identification or someone steal others auth',
       { userId, targetAuthId: auth.id },
     );
   }
