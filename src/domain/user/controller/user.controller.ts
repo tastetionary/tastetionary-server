@@ -109,7 +109,7 @@ export class UserController {
     @Request() req,
     @TypedBody() dto: WithdrawUserDto,
   ): Promise<BaseResponseDto<object>> {
-    await withdrawProfile(req.user.id, dto.type);
+    await withdrawProfile(req.user.userId, dto.type);
     return new BaseResponseDto({ state: 'success' });
   }
 }

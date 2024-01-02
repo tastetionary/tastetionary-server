@@ -42,7 +42,7 @@ post {{base_url}}/v1/account/tokens
 content-type: {{content_type_json}}
 
 {
-  "identification": "matthew-1022",
+  "identification": "matthew-0917",
   "password": "pwd",
   "category": "email"
 }
@@ -52,7 +52,7 @@ content-type: {{content_type_json}}
 
 
 ### get profile 
-GET {{base_url}}/v1/user
+GET {{base_url}}/v1/user/profile
 Authorization: Bearer {{access_token}}
 Content-Type: {{content_type_json}}
 
@@ -66,4 +66,13 @@ Content-Type: {{content_type_json}}
       "longitude": 100,
       "category": "activity_area",
       "address":"activity-update"
+}
+
+### delete user
+DELETE  {{base_url}}/v1/user
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+  "type":"inconvenient_usage"
 }
