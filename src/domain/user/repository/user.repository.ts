@@ -57,6 +57,33 @@ export async function getUsers(
   });
 }
 
+export interface UserOpinion {
+  id: number;
+  userId: number;
+  category: string;
+  type: string;
+  opinion: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export async function saveOpinion(param: {
+  userId: number;
+  category: string;
+  type: string;
+  opinion?: string;
+}): Promise<UserOpinion> {
+  return prismaClient.userOpinions.create({ data: param });
+}
+
+export async function getOpinionsByUserId(param: {
+  userIds: number[];
+}): Promise<UserOpinion[]> {
+  return prismaClient.userOpinions.findMany({
+    where: { userId: { in: param.userIds } },
+  });
+}
+
 export async function updateUserById(
   id: number,
   param: {
