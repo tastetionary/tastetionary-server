@@ -172,3 +172,24 @@ jobs:
             ${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
           cache-to: type=inline
+
+  deploy_test:
+    runs-on: self-hosted
+    if: success() && github.ref == 'refs/heads/test' && github.event_name == 'push'
+    needs: [ build_and_push_test ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: SSH and run docker container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            docker stop $(docker ps -a -q)
+            docker stop taste-test-server
+            docker rm -f taste-test-server
+            docker run -d --name taste-test-server -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
