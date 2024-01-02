@@ -133,6 +133,7 @@ jobs:
 
   build_and_push_test:
     if: success() && github.ref == 'refs/heads/test' && github.event_name == 'push'
+    needs: [ test ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -168,6 +169,6 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_REGISTRY }}/taste-server:latest
+            ${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
           cache-to: type=inline
