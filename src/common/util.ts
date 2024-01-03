@@ -10,3 +10,8 @@ export function detachEmoji(words: string[]) {
     );
   });
 }
+
+export function isExpired(expiredAt: Date, standardTime?: Date): boolean {
+  const currentTime = standardTime ?? new Date();
+  return expiredAt.getTime() <= currentTime.getTime();
+}

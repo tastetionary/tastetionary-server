@@ -2,8 +2,9 @@ import { truncateTables } from '@root/jest.setup';
 import {
   createAccount,
   createToken,
-  deleteTokens,
+  removeAllToken,
   getAccount,
+  removeAllAccount,
 } from '@domain/account/service/account.service';
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AccountCategory } from '@domain/account/account.enum';
@@ -15,6 +16,21 @@ import { CallerWrongUsageException } from '@common/exception/internal.exception'
 describe('account service', () => {
   beforeEach(async () => {
     await truncateTables(prismaClient, ['accounts', 'user_tokens', 'users']);
+  });
+
+  it('should remove account', async () => {
+    const dto: AccountDTO = {
+      identification: 'test',
+      password: 'pwd',
+      category: AccountCategory.EMAIL,
+    };
+    const userId = 99;
+    await createAccount(userId, dto);
+
+    await removeAllAccount(userId);
+
+    const res = await getIdentification(dto.identification, dto.category);
+    expect(res).toBeNull();
   });
 
   it('should return auth entity', async () => {
@@ -40,7 +56,7 @@ describe('account service', () => {
     await createAccount(userId, dto);
 
     await createToken(dto);
-    await deleteTokens(userId);
+    await removeAllToken(userId);
 
     const tokens = await getTokenByUserId(userId);
     expect(tokens).toBeNull();

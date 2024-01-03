@@ -8,3 +8,13 @@ Content-Type: {{content_type_json}}
   "password": "pwd",
   "category": "email"
 }
+
+### update password
+PUT {{base_url}}/v1/account/password
+Content-Type: {{content_type_json}}
+
+{
+  "historyId":242,
+  "code":"301316",
+  "password":"kkkk"
+}

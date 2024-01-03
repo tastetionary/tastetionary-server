@@ -5,11 +5,13 @@ import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  deleteAccountByUserId,
   getIdentification,
   saveAccount,
+  updateAccountById,
 } from '@domain/account/repository/account.repository';
 import {
-  deleteToken,
+  deleteTokensByUserId,
   getTokenByUserId,
   saveToken,
 } from '@domain/account/repository/user-token.repository';
@@ -56,11 +58,22 @@ export async function createAccount(userId: number, dto: AccountDTO) {
   }
 
   const password = await encryptValue(dto.password);
-
   await saveAccount({
     userId,
     category: dto.category,
     identification: dto.identification,
+    password,
+  });
+}
+
+export async function updatePassword(param: {
+  accountId: number;
+  identification: string;
+  password: string;
+}) {
+  const password = await encryptValue(param.password);
+  await updateAccountById(param.accountId, {
+    identification: param.identification,
     password,
   });
 }
@@ -122,9 +135,10 @@ function makeTokens(payload: { userId: number }) {
   };
 }
 
-export async function deleteTokens(userId: number) {
-  const token = await getTokenByUserId(userId);
-  if (!token) return;
+export async function removeAllToken(userId: number) {
+  await deleteTokensByUserId(userId);
+}
 
-  await deleteToken(token.id);
+export async function removeAllAccount(userId: number) {
+  await deleteAccountByUserId(userId);
 }

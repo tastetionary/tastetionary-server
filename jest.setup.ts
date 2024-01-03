@@ -73,7 +73,8 @@ type tableNames =
   | 'restaurant_reviews'
   | 'authentications'
   | 'authentication_histories'
-  | 'external_restaurant_informations';
+  | 'external_restaurant_informations'
+  | 'user_opinions';
 async function truncateTables(prisma: PrismaClient, tableNames: tableNames[]) {
   for (const name of tableNames) {
     await prisma.$queryRawUnsafe(

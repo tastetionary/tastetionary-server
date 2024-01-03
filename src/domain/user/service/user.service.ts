@@ -5,7 +5,12 @@ import {
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
-import { AreaCategory, UserState } from '@domain/user/user.enum';
+import {
+  WithdrawalTypeEnum,
+  AreaCategory,
+  OpinionCategory,
+  UserState,
+} from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { syncAuthentication } from '@domain/authentication/service/authentication.service';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
@@ -19,6 +24,7 @@ import {
 import {
   getNicknamePartRecord,
   getUserById,
+  saveOpinion,
   saveUser,
   updateUserById,
 } from '@domain/user/repository/user.repository';
@@ -170,6 +176,19 @@ function createRandomNickname() {
   const randomName = getRandomItem(nicknameList.name[randomNameKey]);
 
   return `${randomAdj} ${randomName}`;
+}
+
+export async function changeUserState(userId: number, state: UserState) {
+  await updateUserById(userId, { state });
+}
+
+export async function createUserOpinion(params: {
+  userId: number;
+  category: OpinionCategory;
+  type: WithdrawalTypeEnum;
+  opinion?: string;
+}) {
+  await saveOpinion(params);
 }
 
 export const _private = {

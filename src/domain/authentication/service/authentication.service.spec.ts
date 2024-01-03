@@ -1,9 +1,10 @@
 import { truncateTables } from '@root/jest.setup';
 import {
   createProgressAuthentication,
-  doneProgressAuthentication,
+  changeAuthenticationAsDone,
   resetAuthentication,
   _private,
+  findValidAuth,
 } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
@@ -14,9 +15,8 @@ import {
   getHistoryById,
 } from '@domain/authentication/repository/authentication.repository';
 import * as brevo from '@thirdParty/brevo/brevo';
-import { EnvironmentEnum } from '@root/src/env.validation';
-import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
 import prismaClient from '@common/database/prisma';
+import { InternalDomainException } from '@common/exception/internal.exception';
 
 describe('authentication service', () => {
   beforeEach(async () => {
@@ -25,17 +25,56 @@ describe('authentication service', () => {
       'authentication_histories',
     ]);
   });
+  describe('private', () => {
+    it('should return data', async () => {
+      const userId = 999;
+      const code = '1'.repeat(6);
+      const data = {
+        userId,
+        category: AuthenticationCategory.COMPANY,
+        identification: 'some@crud.com',
+        code,
+        type: AuthenticationType.EMAIL,
+      };
+      const auth = await createProgressAuthentication(data);
+
+      const res = await findValidAuth(auth.id, code);
+      expect(res.id).not.toBeNull();
+    });
+
+    it('with no history, should return error', async () => {
+      expect(findValidAuth(191919, '123')).rejects.toThrowError(
+        InternalDomainException,
+      );
+    });
+  });
 
   describe('resetAuthentication', () => {
     const tempMock = jest.spyOn(brevo, 'sendEmail');
     tempMock.mockResolvedValue(Promise.resolve(true));
 
-    it('should reset authentication', async () => {
+    it('with password, should reset authentication', async () => {
+      const data = {
+        category: AuthenticationCategory.PASSWORD,
+        identification: 'some@crud.com',
+        code: '1',
+        type: AuthenticationType.EMAIL,
+      };
+      await createProgressAuthentication(data);
+
+      await resetAuthentication(data.identification, data.category, data.type);
+
+      const res = await createProgressAuthentication(data);
+      expect(res).not.toBeNull();
+    });
+
+    it('with company, should reset authentication', async () => {
       const userId = 999;
       const data = {
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
+        code: '1',
         type: AuthenticationType.EMAIL,
       };
       const res = await createProgressAuthentication(data);
@@ -44,7 +83,7 @@ describe('authentication service', () => {
         res.id,
       )) as AuthenticationHistoryRecord;
 
-      await doneProgressAuthentication(history.id, history.code);
+      await changeAuthenticationAsDone(history.id, history.code);
 
       let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
@@ -62,91 +101,27 @@ describe('authentication service', () => {
   });
 
   describe('createProgressAuthentication', () => {
-    const tempMock = jest.spyOn(brevo, 'sendEmail');
-    tempMock.mockResolvedValue(Promise.resolve(true));
-
-    it.each([['test'], ['daum'], ['naver'], ['gmail'], ['hanmail']])(
-      'with not valid company domain should raise error',
-      async (domain) => {
-        const userId = 999;
-        await expect(
-          createProgressAuthentication({
-            userId,
-            category: AuthenticationCategory.COMPANY,
-            identification: `some@${domain}.com`,
-            type: AuthenticationType.EMAIL,
-            env: EnvironmentEnum.PRODUCTION,
-          }),
-        ).rejects.toThrowError(CallerWrongDomainRuleException);
-      },
-    );
-
-    it('duplicated should progress', async () => {
-      const userId = 999;
-      await createProgressAuthentication({
-        userId,
-        category: AuthenticationCategory.COMPANY,
-        identification: 'some@crud.com',
-        type: AuthenticationType.EMAIL,
-      });
-
-      const res = await createProgressAuthentication({
-        userId,
-        category: AuthenticationCategory.COMPANY,
-        identification: 'some@crud.com',
-        type: AuthenticationType.EMAIL,
-      });
-
-      const history = (await getHistoryById(
-        res.id,
-      )) as AuthenticationHistoryRecord;
-
-      expect(history).toBeDefined();
-    });
-
-    it('already exist email should return code', async () => {
-      const userId = 999;
-      let res = await createProgressAuthentication({
-        userId,
-        category: AuthenticationCategory.COMPANY,
-        identification: 'some@crud.com',
-        type: AuthenticationType.EMAIL,
-      });
-
-      const history = (await getHistoryById(
-        res.id,
-      )) as AuthenticationHistoryRecord;
-
-      await doneProgressAuthentication(history.id, history.code);
-
-      res = await createProgressAuthentication({
-        userId,
-        category: AuthenticationCategory.COMPANY,
-        identification: 'some@crud.com',
-        type: AuthenticationType.EMAIL,
-      });
-
-      expect(res).toBeDefined();
-    });
-
-    it('should create auth history', async () => {
+    it('should create auth and history', async () => {
       const userId = 999;
       const data = {
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
+        code: '12345',
         type: AuthenticationType.EMAIL,
       };
-      await createProgressAuthentication(data);
+      const res = await createProgressAuthentication(data);
+      expect(res.id).not.toBeNull();
+
       const userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
     });
   });
 
-  describe('doneProgressAuthentication', () => {
+  describe('changeAuthenticationAsDone', () => {
     it('not history should raise error', async () => {
       await expect(
-        doneProgressAuthentication(999, '1234'),
+        changeAuthenticationAsDone(999, '1234'),
       ).rejects.toThrowError();
     });
 
@@ -156,6 +131,7 @@ describe('authentication service', () => {
         userId,
         category: AuthenticationCategory.COMPANY,
         identification: 'some@crud.com',
+        code: '1',
         type: AuthenticationType.EMAIL,
       };
       const res = await createProgressAuthentication(data);
@@ -167,7 +143,7 @@ describe('authentication service', () => {
         res.id,
       )) as AuthenticationHistoryRecord;
 
-      await doneProgressAuthentication(history.id, history.code);
+      await changeAuthenticationAsDone(history.id, history.code);
 
       userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(false);

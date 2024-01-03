@@ -168,3 +168,20 @@ model AuthenticationHistories {
   @@index([identification, category, type, code])
   @@map("authentication_histories")
 }
+
+model UserOpinions {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  category  String   @map("category") @db.VarChar(32) /// 의견 수집 이벤트, 탈퇴시, 가입시 등
+  type      String   @map("type") @db.VarChar(64) /// 의견 1차 분류
+  opinion   String?  @map("opinion") @db.VarChar(1024) /// 상세의견
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, category])
+  @@index([userId])
+  @@index([category])
+  @@index([type])
+  @@index([category, type])
+  @@map("user_opinions")
+}
