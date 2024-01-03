@@ -139,8 +139,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: origin/testing
+          ref: testing
           fetch-depth: 0
+
+      - name: test-log
+        run: |
+          git log --oneline
+          git branch -a
 
       - name: inject env
         run: |
