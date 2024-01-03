@@ -5,7 +5,7 @@ on:
     types: [published]
   push:
     branches:
-      - test
+      - testing
 
 jobs:
   test:
@@ -132,7 +132,7 @@ jobs:
           cache-to: type=inline
 
   build_and_push_test:
-    if: success() && github.ref == 'refs/heads/test' && github.event_name == 'push'
+    if: success() && github.ref == 'refs/heads/testing' && github.event_name == 'push'
     needs: [ test ]
     runs-on: ubuntu-latest
     steps:
@@ -175,7 +175,7 @@ jobs:
 
   deploy_test:
     runs-on: self-hosted
-    if: success() && github.ref == 'refs/heads/test' && github.event_name == 'push'
+    if: success() && github.ref == 'refs/heads/testing' && github.event_name == 'push'
     needs: [ build_and_push_test ]
     steps:
       - name: Checkout
