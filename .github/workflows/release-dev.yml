@@ -139,7 +139,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: testing
+          ref: origin/testing
           fetch-depth: 0
 
       - name: inject env
