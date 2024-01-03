@@ -142,11 +142,6 @@ jobs:
           ref: testing
           fetch-depth: 0
 
-      - name: test-log
-        run: |
-          git log --oneline
-          git branch -a
-
       - name: inject env
         run: |
           echo "ENV=dev" > .env
@@ -198,6 +193,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             docker stop $(docker ps -a -q)
-            docker stop taste-test-server
-            docker rm -f taste-test-server
+            docker rm -f $(docker ps -a -q)
+            docker rmi -f $(docker images -q)
             docker run -d --name taste-test-server -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
