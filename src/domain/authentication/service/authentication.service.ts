@@ -97,30 +97,36 @@ async function getUserAuth(param: {
   return new UserAuth(param.userId ?? null, data);
 }
 
-export async function resetAuthentication(
+export async function resetRegisteredUserAuth(
+  userId: number,
   identification: string,
   category: AuthenticationCategory,
   type: AuthenticationType,
-  userId?: number,
 ) {
   const auth = await getAuthentication(identification, category, type);
-
   if (!auth) {
     return;
   }
 
-  if (!userId) {
-    await deleteAuthentications([auth.id]);
-    return;
+  if (auth.userId != userId) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'not matched userId',
+      `auth userId(${auth.userId}) and request userId(${userId}) is not matched`,
+    );
   }
 
-  if (auth.userId != userId) {
-    throw new InternalDomainException(
-      ErrorNameEnum.INVALID_INPUT,
-      'user and auth user is not matched',
-      'check identification or someone steal others auth',
-      { userId, targetAuthId: auth.id },
-    );
+  await deleteAuthentications([auth.id]);
+}
+
+export async function resetNotRegisteredUserAuth(
+  identification: string,
+  category: AuthenticationCategory,
+  type: AuthenticationType,
+) {
+  const auth = await getAuthentication(identification, category, type);
+  if (!auth) {
+    return;
   }
   await deleteAuthentications([auth.id]);
 }
