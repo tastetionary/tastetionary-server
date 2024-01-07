@@ -9,6 +9,7 @@ import {
   resetNotRegisteredUserAuth,
   validateDomainWhenCompanyCase,
   resetRegisteredUserAuth,
+  syncAuthentication,
 } from '@domain/authentication/service/authentication.service';
 import { sendAuthenticationCodeToEmail } from '@domain/authentication/service/auth-code.executer';
 
@@ -48,6 +49,15 @@ export async function beginAuthProgress(param: {
   return createProgressAuthentication({ ...param, code: authCode });
 }
 
-export async function finishAuthProgress(historyId: number, code: string) {
-  return changeAuthenticationAsDone(historyId, code);
+export async function finishAuthProgress(param: {
+  historyId: number;
+  code: string;
+  userId?: number;
+}) {
+  const auth = await changeAuthenticationAsDone(param.historyId, param.code);
+  if (param.userId) {
+    await syncAuthentication(param.userId, auth.id);
+  }
+
+  return auth;
 }

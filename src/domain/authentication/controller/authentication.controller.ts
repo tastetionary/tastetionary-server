@@ -56,16 +56,16 @@ export class AuthenticationController {
   async doneProgress(
     @TypedBody() dto: DoneProgressRequest,
   ): Promise<BaseResponseDto<DoneAuthenticationResponse>> {
-    const { id: authenticationId } = await finishAuthProgress(
-      dto.historyId,
-      dto.code,
-    );
+    const { id: authenticationId } = await finishAuthProgress({
+      historyId: dto.historyId,
+      code: dto.code,
+    });
     return new BaseResponseDto({ authenticationId });
   }
 
   /**
    * @tag authentication
-   * @summary re create company authentication, it will delete company type auth
+   * @summary reCreate company authentication, it will delete company type auth if data exists
    */
   @UseGuards(AuthGuard)
   @TypedRoute.Post('/company')
@@ -82,5 +82,24 @@ export class AuthenticationController {
     });
 
     return new BaseResponseDto(res);
+  }
+
+  /**
+   * @tag authentication
+   * @summary done in progress authentication and sync auth result to user
+   */
+  @UseGuards(AuthGuard)
+  @TypedRoute.Post('/status/done')
+  @HttpCode(200)
+  async doneUserProgress(
+    @Request() req,
+    @TypedBody() dto: DoneProgressRequest,
+  ): Promise<BaseResponseDto<DoneAuthenticationResponse>> {
+    const { id: authenticationId } = await finishAuthProgress({
+      historyId: dto.historyId,
+      code: dto.code,
+      userId: req.user.userId,
+    });
+    return new BaseResponseDto({ authenticationId });
   }
 }

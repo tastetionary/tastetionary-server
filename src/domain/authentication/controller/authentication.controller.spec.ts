@@ -39,12 +39,13 @@ describe('authentication controller', () => {
           historyId: 1,
           code: '1234',
         });
-      expect(res.statusCode).toEqual(200);
+      assertStatusCode(res, 200);
     });
 
     it.each([
       [AuthenticationCategory.ACCOUNT],
       [AuthenticationCategory.COMPANY],
+      [AuthenticationCategory.PASSWORD],
     ])(
       '/authentication/public/{$category} should return 200',
       async (category) => {
@@ -62,6 +63,32 @@ describe('authentication controller', () => {
         assertStatusCode(res, 200);
       },
     );
+  });
+
+  it('/status/done should return 200', async () => {
+    const key = configService.getTokenData().accessTokenSecret;
+    const spy = jest.spyOn(facade, 'finishAuthProgress');
+    spy.mockResolvedValue({ id: 1 });
+
+    const userId = 123;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const data = {
+      historyId: 1,
+      code: '1234',
+    };
+    const res = await request(app.getHttpServer())
+      .post('/v1/authentication/status/done')
+      .set('Authorization', `Bearer ${token}`)
+      .send(data);
+
+    expect(spy).toHaveBeenCalledWith({
+      ...data,
+      userId,
+    });
+    assertStatusCode(res, 200);
   });
 
   it('/authentication/{$category} should return 200', async () => {
