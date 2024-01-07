@@ -29,46 +29,64 @@ describe('authentication controller', () => {
     await app.init();
   });
 
-  it('/status/done should return 200', async () => {
-    const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(123, key, {
-      expiresIn: '10h',
+  describe('[public]', () => {
+    it('/public/status/done should return 200', async () => {
+      jest.spyOn(facade, 'finishAuthProgress').mockResolvedValue({ id: 1 });
+
+      const res = await request(app.getHttpServer())
+        .post('/v1/authentication/public/status/done')
+        .send({
+          historyId: 1,
+          code: '1234',
+        });
+      expect(res.statusCode).toEqual(200);
     });
 
-    jest.spyOn(facade, 'finishAuthProgress').mockResolvedValue({ id: 1 });
+    it.each([
+      [AuthenticationCategory.ACCOUNT],
+      [AuthenticationCategory.COMPANY],
+    ])(
+      '/authentication/public/{$category} should return 200',
+      async (category) => {
+        jest
+          .spyOn(facade, 'beginAuthProgress')
+          .mockResolvedValue({ id: 1, expiredAt: new Date() });
 
-    const res = await request(app.getHttpServer())
-      .post('/v1/authentication/status/done')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        historyId: 1,
-        code: '1234',
-      });
-    expect(res.statusCode).toEqual(200);
+        const res = await request(app.getHttpServer())
+          .post(`/v1/authentication/public/${category}`)
+          .send({
+            identification: 'test@email.com',
+            type: AuthenticationType.EMAIL,
+          });
+
+        assertStatusCode(res, 200);
+      },
+    );
   });
 
-  it.each([
-    [AuthenticationCategory.ACCOUNT],
-    [AuthenticationCategory.COMPANY],
-    [AuthenticationCategory.PASSWORD],
-  ])('/authentication/{$category} should return 200', async (category) => {
+  it('/authentication/{$category} should return 200', async () => {
     const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(123, key, {
+    const userId = 123;
+    const token = createUserToken(userId, key, {
       expiresIn: '10h',
     });
+    const spy = jest.spyOn(facade, 'beginAuthProgress');
+    spy.mockResolvedValue({ id: 1, expiredAt: new Date() });
 
-    jest
-      .spyOn(facade, 'beginAuthProgress')
-      .mockResolvedValue({ id: 1, expiredAt: new Date() });
-
+    const data = {
+      identification: 'test@email.com',
+      type: AuthenticationType.EMAIL,
+    };
     const res = await request(app.getHttpServer())
-      .post(`/v1/authentication/${category}`)
+      .post('/v1/authentication/company')
       .set('Authorization', `Bearer ${token}`)
-      .send({
-        identification: 'test@email.com',
-        type: AuthenticationType.EMAIL,
-      });
+      .send(data);
 
+    expect(spy).toHaveBeenCalledWith({
+      ...data,
+      category: 'company',
+      userId,
+    });
     assertStatusCode(res, 200);
   });
 });

@@ -8,14 +8,15 @@ import {
   changeAuthenticationAsDone,
   resetNotRegisteredUserAuth,
   validateDomainWhenCompanyCase,
+  resetRegisteredUserAuth,
 } from '@domain/authentication/service/authentication.service';
 import { sendAuthenticationCodeToEmail } from '@domain/authentication/service/auth-code.executer';
 
 export async function beginAuthProgress(param: {
-  userId?: number;
   identification: string;
   category: AuthenticationCategory;
   type: AuthenticationType;
+  userId?: number;
   env?: EnvironmentEnum;
 }) {
   validateDomainWhenCompanyCase(param);
@@ -34,11 +35,20 @@ export async function beginAuthProgress(param: {
     return { id: 0, expiredAt: new Date() };
   }
 
-  await resetNotRegisteredUserAuth(
-    param.identification,
-    param.category,
-    param.type,
-  );
+  if (param.userId) {
+    await resetRegisteredUserAuth(
+      param.userId,
+      param.identification,
+      param.category,
+      param.type,
+    );
+  } else {
+    await resetNotRegisteredUserAuth(
+      param.identification,
+      param.category,
+      param.type,
+    );
+  }
 
   return createProgressAuthentication({ ...param, code: authCode });
 }
