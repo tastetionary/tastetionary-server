@@ -18,10 +18,7 @@ import {
   getHistoryById,
 } from '@domain/authentication/repository/authentication.repository';
 import prismaClient from '@common/database/prisma';
-import {
-  CallerWrongDomainRuleException,
-  InternalDomainException,
-} from '@common/exception/internal.exception';
+import { InternalDomainException } from '@common/exception/internal.exception';
 
 describe('authentication service', () => {
   beforeEach(async () => {
@@ -55,32 +52,6 @@ describe('authentication service', () => {
   });
 
   describe('resetRegisteredUserAuth', () => {
-    it('with not correct user should throw error', async () => {
-      const data = {
-        category: AuthenticationCategory.COMPANY,
-        identification: 'some@crud.com',
-        code: '1',
-        type: AuthenticationType.EMAIL,
-      };
-      const res = await createProgressAuthentication(data);
-
-      const history = (await getHistoryById(
-        res.id,
-      )) as AuthenticationHistoryRecord;
-      const auth = await changeAuthenticationAsDone(history.id, history.code);
-      const userId = 456;
-      await syncAuthentication(userId, auth.id);
-
-      await expect(
-        resetRegisteredUserAuth(
-          999,
-          data.identification,
-          data.category,
-          data.type,
-        ),
-      ).rejects.toThrowError(CallerWrongDomainRuleException);
-    });
-
     it('should delete registered user auth', async () => {
       const data = {
         category: AuthenticationCategory.COMPANY,
@@ -97,12 +68,7 @@ describe('authentication service', () => {
       const userId = 123;
       await syncAuthentication(userId, auth.id);
 
-      await resetRegisteredUserAuth(
-        userId,
-        data.identification,
-        data.category,
-        data.type,
-      );
+      await resetRegisteredUserAuth(userId, data.category, data.type);
 
       const authRes = await getAuthentication(
         data.identification,

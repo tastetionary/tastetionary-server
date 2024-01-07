@@ -12,7 +12,7 @@ import {
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
   deleteAuthentications,
-  getAuthenticationByIdentification,
+  getAuthenticationByCondition,
   getHistoryById,
   saveAuthentication,
   saveAuthenticationHistory,
@@ -79,7 +79,7 @@ export async function getAuthentication(
   category: AuthenticationCategory,
   type: AuthenticationType,
 ) {
-  return getAuthenticationByIdentification(identification, category, type);
+  return getAuthenticationByCondition({ identification, category, type });
 }
 
 async function getUserAuth(param: {
@@ -88,32 +88,23 @@ async function getUserAuth(param: {
   type: AuthenticationType;
   userId?: number;
 }) {
-  const record = await getAuthenticationByIdentification(
-    param.identification,
-    param.category,
-    param.type,
-  );
+  const record = await getAuthenticationByCondition({
+    identification: param.identification,
+    category: param.category,
+    type: param.type,
+  });
   const data = record ? [record] : [];
   return new UserAuth(param.userId ?? null, data);
 }
 
 export async function resetRegisteredUserAuth(
   userId: number,
-  identification: string,
   category: AuthenticationCategory,
   type: AuthenticationType,
 ) {
-  const auth = await getAuthentication(identification, category, type);
+  const auth = await getAuthenticationByCondition({ category, type, userId });
   if (!auth) {
-    return;
-  }
-
-  if (auth.userId != userId) {
-    throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
-      'not matched userId',
-      `auth userId(${auth.userId}) and request userId(${userId}) is not matched`,
-    );
+    return null;
   }
 
   await deleteAuthentications([auth.id]);
@@ -178,11 +169,11 @@ function createExpiredAt(seconds = 180) {
 }
 
 export function validateDomainWhenCompanyCase(param: {
-  userId?: number | undefined;
+  userId?: number;
   identification: string;
   category: AuthenticationCategory;
   type: AuthenticationType;
-  env?: EnvironmentEnum | undefined;
+  env?: EnvironmentEnum;
 }) {
   if (param.category !== AuthenticationCategory.COMPANY) {
     return;

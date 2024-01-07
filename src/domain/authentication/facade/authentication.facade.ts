@@ -36,12 +36,7 @@ export async function beginAuthProgress(param: {
   }
 
   if (param.userId) {
-    await resetRegisteredUserAuth(
-      param.userId,
-      param.identification,
-      param.category,
-      param.type,
-    );
+    await resetRegisteredUserAuth(param.userId, param.category, param.type);
   } else {
     await resetNotRegisteredUserAuth(
       param.identification,
