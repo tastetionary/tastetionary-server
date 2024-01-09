@@ -88,13 +88,16 @@ export function transformAuthentications(
   });
 }
 
-export async function getAuthenticationByIdentification(
-  identification: string,
-  category: AuthenticationCategory,
-  type: AuthenticationType,
+type AuthenticationParams = { identification: string } | { userId: number };
+
+export async function getAuthenticationByCondition(
+  param: {
+    category: AuthenticationCategory;
+    type: AuthenticationType;
+  } & AuthenticationParams,
 ): Promise<AuthenticationRecord | null> {
   const record = await prismaClient.authentications.findFirst({
-    where: { category, type, identification },
+    where: { ...param },
   });
   if (!record) return null;
 

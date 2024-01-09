@@ -1,6 +1,6 @@
 import {
   findValidAuth,
-  resetAuthentication,
+  resetNotRegisteredUserAuth,
 } from '@domain/authentication/service/authentication.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import {
@@ -26,7 +26,7 @@ export async function resetEmailPassword(
     password: newPassword,
   });
 
-  await resetAuthentication(
+  await resetNotRegisteredUserAuth(
     account.identification,
     AuthenticationCategory.PASSWORD,
     AuthenticationType.EMAIL,

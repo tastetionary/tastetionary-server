@@ -2,9 +2,12 @@ import { truncateTables } from '@root/jest.setup';
 import {
   createProgressAuthentication,
   changeAuthenticationAsDone,
-  resetAuthentication,
+  resetNotRegisteredUserAuth,
   _private,
   findValidAuth,
+  resetRegisteredUserAuth,
+  syncAuthentication,
+  getAuthentication,
 } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
@@ -14,7 +17,6 @@ import {
   AuthenticationHistoryRecord,
   getHistoryById,
 } from '@domain/authentication/repository/authentication.repository';
-import * as brevo from '@thirdParty/brevo/brevo';
 import prismaClient from '@common/database/prisma';
 import { InternalDomainException } from '@common/exception/internal.exception';
 
@@ -49,10 +51,35 @@ describe('authentication service', () => {
     });
   });
 
-  describe('resetAuthentication', () => {
-    const tempMock = jest.spyOn(brevo, 'sendEmail');
-    tempMock.mockResolvedValue(Promise.resolve(true));
+  describe('resetRegisteredUserAuth', () => {
+    it('should delete registered user auth', async () => {
+      const data = {
+        category: AuthenticationCategory.COMPANY,
+        identification: 'some@crud.com',
+        code: '1',
+        type: AuthenticationType.EMAIL,
+      };
+      const res = await createProgressAuthentication(data);
 
+      const history = (await getHistoryById(
+        res.id,
+      )) as AuthenticationHistoryRecord;
+      const auth = await changeAuthenticationAsDone(history.id, history.code);
+      const userId = 123;
+      await syncAuthentication(userId, auth.id);
+
+      await resetRegisteredUserAuth(userId, data.category, data.type);
+
+      const authRes = await getAuthentication(
+        data.identification,
+        data.category,
+        data.type,
+      );
+      expect(authRes).toBeNull();
+    });
+  });
+
+  describe('resetNotRegisteredUserAuth', () => {
     it('with password, should reset authentication', async () => {
       const data = {
         category: AuthenticationCategory.PASSWORD,
@@ -62,7 +89,11 @@ describe('authentication service', () => {
       };
       await createProgressAuthentication(data);
 
-      await resetAuthentication(data.identification, data.category, data.type);
+      await resetNotRegisteredUserAuth(
+        data.identification,
+        data.category,
+        data.type,
+      );
 
       const res = await createProgressAuthentication(data);
       expect(res).not.toBeNull();
@@ -88,11 +119,10 @@ describe('authentication service', () => {
       let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
 
-      await resetAuthentication(
+      await resetNotRegisteredUserAuth(
         data.identification,
         data.category,
         data.type,
-        userId,
       );
 
       userAuth = await _private.getUserAuth(data);

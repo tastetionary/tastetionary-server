@@ -12,7 +12,7 @@ import {
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
   deleteAuthentications,
-  getAuthenticationByIdentification,
+  getAuthenticationByCondition,
   getHistoryById,
   saveAuthentication,
   saveAuthenticationHistory,
@@ -79,7 +79,7 @@ export async function getAuthentication(
   category: AuthenticationCategory,
   type: AuthenticationType,
 ) {
-  return getAuthenticationByIdentification(identification, category, type);
+  return getAuthenticationByCondition({ identification, category, type });
 }
 
 async function getUserAuth(param: {
@@ -88,39 +88,36 @@ async function getUserAuth(param: {
   type: AuthenticationType;
   userId?: number;
 }) {
-  const record = await getAuthenticationByIdentification(
-    param.identification,
-    param.category,
-    param.type,
-  );
+  const record = await getAuthenticationByCondition({
+    identification: param.identification,
+    category: param.category,
+    type: param.type,
+  });
   const data = record ? [record] : [];
   return new UserAuth(param.userId ?? null, data);
 }
 
-export async function resetAuthentication(
+export async function resetRegisteredUserAuth(
+  userId: number,
+  category: AuthenticationCategory,
+  type: AuthenticationType,
+) {
+  const auth = await getAuthenticationByCondition({ category, type, userId });
+  if (!auth) {
+    return null;
+  }
+
+  await deleteAuthentications([auth.id]);
+}
+
+export async function resetNotRegisteredUserAuth(
   identification: string,
   category: AuthenticationCategory,
   type: AuthenticationType,
-  userId?: number,
 ) {
   const auth = await getAuthentication(identification, category, type);
-
   if (!auth) {
     return;
-  }
-
-  if (!userId) {
-    await deleteAuthentications([auth.id]);
-    return;
-  }
-
-  if (auth.userId != userId) {
-    throw new InternalDomainException(
-      ErrorNameEnum.INVALID_INPUT,
-      'user and auth user is not matched',
-      'check identification or someone steal others auth',
-      { userId, targetAuthId: auth.id },
-    );
   }
   await deleteAuthentications([auth.id]);
 }
@@ -172,11 +169,11 @@ function createExpiredAt(seconds = 180) {
 }
 
 export function validateDomainWhenCompanyCase(param: {
-  userId?: number | undefined;
+  userId?: number;
   identification: string;
   category: AuthenticationCategory;
   type: AuthenticationType;
-  env?: EnvironmentEnum | undefined;
+  env?: EnvironmentEnum;
 }) {
   if (param.category !== AuthenticationCategory.COMPANY) {
     return;

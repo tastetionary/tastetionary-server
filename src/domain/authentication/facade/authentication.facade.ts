@@ -6,16 +6,18 @@ import { EnvironmentEnum } from '@root/src/env.validation';
 import {
   createProgressAuthentication,
   changeAuthenticationAsDone,
-  resetAuthentication,
+  resetNotRegisteredUserAuth,
   validateDomainWhenCompanyCase,
+  resetRegisteredUserAuth,
+  syncAuthentication,
 } from '@domain/authentication/service/authentication.service';
 import { sendAuthenticationCodeToEmail } from '@domain/authentication/service/auth-code.executer';
 
 export async function beginAuthProgress(param: {
-  userId?: number;
   identification: string;
   category: AuthenticationCategory;
   type: AuthenticationType;
+  userId?: number;
   env?: EnvironmentEnum;
 }) {
   validateDomainWhenCompanyCase(param);
@@ -27,21 +29,35 @@ export async function beginAuthProgress(param: {
     param.env,
   );
 
-  // TODO fail 관련 공통 response 모양 만들어야함
+  /**
+   * @TODO  공통 response 추가
+   */
   if (!isSendingSuccess) {
     return { id: 0, expiredAt: new Date() };
   }
 
-  await resetAuthentication(
-    param.identification,
-    param.category,
-    param.type,
-    param.userId,
-  );
+  if (param.userId) {
+    await resetRegisteredUserAuth(param.userId, param.category, param.type);
+  } else {
+    await resetNotRegisteredUserAuth(
+      param.identification,
+      param.category,
+      param.type,
+    );
+  }
 
   return createProgressAuthentication({ ...param, code: authCode });
 }
 
-export async function finishAuthProgress(historyId: number, code: string) {
-  return changeAuthenticationAsDone(historyId, code);
+export async function finishAuthProgress(param: {
+  historyId: number;
+  code: string;
+  userId?: number;
+}) {
+  const auth = await changeAuthenticationAsDone(param.historyId, param.code);
+  if (param.userId) {
+    await syncAuthentication(param.userId, auth.id);
+  }
+
+  return auth;
 }
