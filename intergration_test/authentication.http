@@ -1,6 +1,6 @@
 
 ### create progress
-POST {{base_url}}/v1/authentication/account
+POST {{base_url}}/v1/authentication/public/account
 Content-Type: {{content_type_json}}
 
 {
@@ -10,7 +10,7 @@ Content-Type: {{content_type_json}}
 }
 
 ### create progress
-POST {{base_url}}/v1/authentication/password
+POST {{base_url}}/v1/authentication/public/password
 Content-Type: {{content_type_json}}
 
 {
@@ -20,8 +20,44 @@ Content-Type: {{content_type_json}}
 }
 
 
+### done progress
+POST {{base_url}}/v1/authentication/public/status/done
+Content-Type: {{content_type_json}}
+
+{
+  "historyId": 48,
+  "code":"612068"
+}
+
+### get token(use after register user)
+# @name token
+post {{base_url}}/v1/account/tokens
+content-type: {{content_type_json}}
+
+{
+  "identification": "matthew-0917",
+  "password": "pwd",
+  "category": "email"
+}
+
+###
+@access_token = {{token.response.body.data.accessToken}}
+
+
+### create company progress
+POST {{base_url}}/v1/authentication/company
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "wkdgndldi@naver.com",
+  "type":"email"
+}
+
+
 ### donw progress
 POST {{base_url}}/v1/authentication/status/done
+Authorization: Bearer {{access_token}}
 Content-Type: {{content_type_json}}
 
 {
