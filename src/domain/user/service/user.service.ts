@@ -34,7 +34,6 @@ import {
   getAuthenticationsByUserId,
 } from '@domain/authentication/repository/authentication.repository';
 import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
-import { createAccount } from '@domain/account/service/account.service';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -118,7 +117,6 @@ export async function createProfile(dto: RegisterUserDTO) {
   const user = await createUser(dto.userProperty);
   await createAgreements(user.id, dto.agreements);
   await createAreas(user.id, dto.areas);
-  await createAccount(user.id, dto.account);
 
   return user;
 }
