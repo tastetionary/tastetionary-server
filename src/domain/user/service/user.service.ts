@@ -163,7 +163,9 @@ function createRandomNickname() {
   const nicknameList = getNicknamePartRecord();
   const randomAdj = getRandomItem(nicknameList.adj);
   const randomNameKey = getRandomItem(Object.keys(nicknameList.name));
-  const randomName = getRandomItem(nicknameList.name[randomNameKey]);
+  const randomName = getRandomItem(
+    nicknameList.name[randomNameKey] as string[],
+  ).replace(' ', '');
 
   return `${randomAdj} ${randomName}`;
 }
