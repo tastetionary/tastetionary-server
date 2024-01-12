@@ -10,6 +10,7 @@ import {
   removeAllToken,
 } from '@domain/account/service/account.service';
 import { WithdrawalTypeEnum, UserState } from '@domain/user/user.enum';
+import { removeAllAuth } from '@domain/authentication/service/authentication.service';
 
 export async function getProfile(userId: number) {
   return searchProfile(userId);
@@ -27,4 +28,5 @@ export async function withdrawProfile(
   await changeUserState(userId, UserState.WITHDRAWAL);
   await removeAllAccount(userId);
   await removeAllToken(userId);
+  await removeAllAuth(userId);
 }
