@@ -1,5 +1,9 @@
 import { AccountCategory } from '@domain/account/account.enum';
+import { Prisma } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
+import { ErrorNameEnum } from '@root/src/common/exception/enum';
+import { InternalDomainException } from '@root/src/common/exception/internal.exception';
+import * as E from 'fp-ts/Either';
 
 export async function saveAccount(param: {
   userId: number;
@@ -55,5 +59,19 @@ export async function updateAccountById(
 }
 
 export async function deleteAccountByUserId(userId: number) {
-  await prismaClient.accounts.deleteMany({ where: { userId } });
+  try {
+    await prismaClient.accounts.deleteMany({ where: { userId } });
+    return E.right({ userId });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      return E.left(
+        new InternalDomainException(
+          ErrorNameEnum.INTERNAL_ERROR,
+          e.message,
+          e.code,
+        ),
+      );
+    }
+    return E.left(new InternalDomainException(ErrorNameEnum.INTERNAL_ERROR, e));
+  }
 }
