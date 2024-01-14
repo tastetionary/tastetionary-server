@@ -25,25 +25,14 @@ describe('account service', () => {
     await truncateTables(prismaClient, ['accounts', 'user_tokens', 'users']);
   });
 
-  const createAuthAsDone = async (identification: string) => {
-    const res = await createProgressAuthentication({
-      identification: `${identification}_${new Date().getMilliseconds()}`,
-      category: AuthenticationCategory.ACCOUNT,
-      type: AuthenticationType.EMAIL,
-      code: '1234',
-    });
-    return await changeAuthenticationAsDone(res.id, '1234');
-  };
-
   it('should remove account', async () => {
     const dto = {
       identification: 'test',
       password: 'pwd',
       category: AccountCategory.EMAIL,
     };
-    const auth = await createAuthAsDone(dto.identification);
     const userId = 99;
-    await createAccount({ userId, ...dto, authenticationId: auth.id });
+    await createAccount({ userId, ...dto });
 
     await removeAllAccount(userId);
 
@@ -58,8 +47,7 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    const auth = await createAuthAsDone(dto.identification);
-    await createAccount({ userId, ...dto, authenticationId: auth.id });
+    await createAccount({ userId, ...dto });
 
     const entity = await getAccount(dto.identification, dto.category);
     expect(entity).not.toBeNull();
@@ -72,8 +60,7 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    const auth = await createAuthAsDone(dto.identification);
-    await createAccount({ userId, ...dto, authenticationId: auth.id });
+    await createAccount({ userId, ...dto });
 
     await createToken(dto);
     await removeAllToken(userId);
@@ -89,12 +76,11 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    const auth = await createAuthAsDone(dto.identification);
-    await createAccount({ userId, ...dto, authenticationId: auth.id });
+    await createAccount({ userId, ...dto });
 
-    await expect(
-      createAccount({ userId, ...dto, authenticationId: auth.id }),
-    ).rejects.toThrowError(CallerWrongUsageException);
+    await expect(createAccount({ userId, ...dto })).rejects.toThrowError(
+      CallerWrongUsageException,
+    );
   });
 
   it('should create token', async () => {
@@ -104,8 +90,7 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    const auth = await createAuthAsDone(dto.identification);
-    await createAccount({ userId, ...dto, authenticationId: auth.id });
+    await createAccount({ userId, ...dto });
 
     const token = await createToken(dto);
     expect(token).not.toBeNull();
@@ -120,8 +105,7 @@ describe('account service', () => {
       category: AccountCategory.EMAIL,
     };
     const userId = 666;
-    const auth = await createAuthAsDone(dto.identification);
-    await createAccount({ userId, ...dto, authenticationId: auth.id });
+    await createAccount({ userId, ...dto });
 
     const res = await getIdentification(dto.identification, dto.category);
     expect(res).not.toBeNull();

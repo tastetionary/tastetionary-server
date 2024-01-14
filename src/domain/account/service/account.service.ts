@@ -47,7 +47,6 @@ export async function findAccount(
 
 export async function createAccount(param: {
   userId: number;
-  authenticationId: number;
   identification: string;
   password: string;
   category: AccountCategory;
