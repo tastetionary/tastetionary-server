@@ -109,7 +109,12 @@ describe('user service', () => {
         state: AuthenticationState.INPROGRESS,
       });
       const dto = {
-        companyData: { authenticationId: auth.id, companyName: 'name' },
+        companyData: {
+          authenticationId: auth.id,
+          companyName: 'name',
+          identification: 'ide',
+          category: 'email' as const,
+        },
       };
       const updatedUser = await _private.changeCompany(
         user.id,

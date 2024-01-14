@@ -67,26 +67,26 @@ describe('user facade', () => {
 
     const com = createIde('company');
     const acc = createIde('account');
-    const res = await createProgressAuthentication({
+    const comAuth = await createProgressAuthentication({
       identification: com,
       category: AuthenticationCategory.COMPANY,
       type: AuthenticationType.EMAIL,
       code: '1234',
     });
-    await changeAuthenticationAsDone(res.id, '1234');
+    const comAuthId = (await changeAuthenticationAsDone(comAuth.id, '1234')).id;
 
-    const accRes = await createProgressAuthentication({
+    const accAuth = await createProgressAuthentication({
       identification: acc,
       category: AuthenticationCategory.ACCOUNT,
       type: AuthenticationType.EMAIL,
       code: '1234',
     });
-    await changeAuthenticationAsDone(accRes.id, '1234');
+    const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
 
     const dto: RegisterUserDTO = {
       userProperty: {
         company: {
-          authenticationId: res.id,
+          authenticationId: comAuthId,
           companyName: 'test',
           identification: com,
           category: 'email',
@@ -110,7 +110,7 @@ describe('user facade', () => {
         identification: acc,
         password: 'pwd',
         category: AccountCategory.EMAIL,
-        authenticationId: accRes.id,
+        authenticationId: accAuthId,
       },
       agreements: [
         {
