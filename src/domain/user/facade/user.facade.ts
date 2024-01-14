@@ -22,7 +22,7 @@ export async function getProfile(userId: number) {
 
 export async function registerProfile(dto: RegisterProfileRequest) {
   const user = await createProfile(dto);
-  await createAccount(user.id, dto.account);
+  await createAccount({ userId: user.id, ...dto.account });
 
   if (dto.userProperty.company) {
     await syncAuthentication(

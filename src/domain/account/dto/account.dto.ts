@@ -10,7 +10,7 @@ export interface AccountDTO {
    * authentication id which is done
    * @type number
    */
-  authenticationId?: number;
+  authenticationId: number;
 
   /**
    * unique identification for accounts, such as email
