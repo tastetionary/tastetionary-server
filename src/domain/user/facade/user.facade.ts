@@ -24,11 +24,12 @@ export async function registerProfile(dto: RegisterUserDTO) {
   const user = await createProfile(dto);
   await createAccount(user.id, dto.account);
 
-  await syncAuthentication(
-    user.id,
-    dto.userProperty.companyData?.authenticationId || 0,
-  );
-
+  if (dto.userProperty.company) {
+    await syncAuthentication(
+      user.id,
+      dto.userProperty.company.authenticationId,
+    );
+  }
   return user;
 }
 

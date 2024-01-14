@@ -115,6 +115,11 @@ async function searchAuthList(userId: number) {
 
 export async function createProfile(dto: RegisterUserDTO) {
   const user = await createUser(dto.userProperty);
+
+  if (dto.userProperty.company) {
+    await changeCompany(user.id, dto.userProperty.company);
+  }
+
   await createAgreements(user.id, dto.agreements);
   await createAreas(user.id, dto.areas);
 
@@ -148,15 +153,10 @@ export async function createUser(dto: UserPropertyDto) {
     property: {},
   });
 
-  if (dto.companyData) {
-    await changeCompany(user.id, dto.companyData);
-  }
-
   return user;
 }
 
 async function changeCompany(userId: number, dto: CompanyDto) {
-  await syncAuthentication(userId, dto.authenticationId);
   return await updateUserById(userId, {
     property: { companyName: dto.companyName },
   });

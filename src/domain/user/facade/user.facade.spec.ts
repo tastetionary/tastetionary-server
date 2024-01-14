@@ -24,14 +24,7 @@ import {
 describe('user facade', () => {
   it('withdrawFrom should update state ', async () => {
     const dto: RegisterUserDTO = {
-      userProperty: {
-        companyData: {
-          authenticationId: 1,
-          companyName: 'test',
-          identification: `test_${new Date().getMilliseconds()}`,
-          category: 'email',
-        },
-      },
+      userProperty: {},
       areas: [
         {
           latitude: 1,
@@ -74,7 +67,7 @@ describe('user facade', () => {
 
     const com = createIde('company');
     const acc = createIde('account');
-    let res = await createProgressAuthentication({
+    const res = await createProgressAuthentication({
       identification: com,
       category: AuthenticationCategory.COMPANY,
       type: AuthenticationType.EMAIL,
@@ -82,9 +75,17 @@ describe('user facade', () => {
     });
     await changeAuthenticationAsDone(res.id, '1234');
 
+    const accRes = await createProgressAuthentication({
+      identification: acc,
+      category: AuthenticationCategory.ACCOUNT,
+      type: AuthenticationType.EMAIL,
+      code: '1234',
+    });
+    await changeAuthenticationAsDone(accRes.id, '1234');
+
     const dto: RegisterUserDTO = {
       userProperty: {
-        companyData: {
+        company: {
           authenticationId: res.id,
           companyName: 'test',
           identification: com,
@@ -109,7 +110,7 @@ describe('user facade', () => {
         identification: acc,
         password: 'pwd',
         category: AccountCategory.EMAIL,
-        authenticationId: 1,
+        authenticationId: accRes.id,
       },
       agreements: [
         {
@@ -118,14 +119,6 @@ describe('user facade', () => {
         },
       ],
     };
-
-    res = await createProgressAuthentication({
-      identification: acc,
-      category: AuthenticationCategory.ACCOUNT,
-      type: AuthenticationType.EMAIL,
-      code: '1234',
-    });
-    await changeAuthenticationAsDone(res.id, '1234');
 
     const user = await registerProfile(dto);
 
