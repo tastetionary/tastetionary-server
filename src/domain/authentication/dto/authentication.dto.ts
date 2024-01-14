@@ -38,6 +38,9 @@ export interface CreateProgressRequest {
   category?: AuthenticationCategory;
 }
 
+export interface ReCreateProgressRequest
+  extends Omit<CreateProgressRequest, 'category'> {}
+
 export interface CreateAuthenticationResponse {
   /**
    * authentication history id

@@ -63,7 +63,7 @@ describe('user controller', () => {
     });
 
     const res = await request(app.getHttpServer())
-      .get('/v1/user/profile')
+      .get('/v1/user')
       .set('Authorization', `Bearer ${token}`);
 
     assertStatusCode(res, 200);
