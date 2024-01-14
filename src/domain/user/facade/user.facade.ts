@@ -10,7 +10,10 @@ import {
   removeAllToken,
 } from '@domain/account/service/account.service';
 import { WithdrawalTypeEnum, UserState } from '@domain/user/user.enum';
-import { removeAllAuth } from '@domain/authentication/service/authentication.service';
+import {
+  removeAllAuth,
+  syncAuthentication,
+} from '@domain/authentication/service/authentication.service';
 import { createAccount } from '@domain/account/service/account.service';
 
 export async function getProfile(userId: number) {
@@ -20,6 +23,12 @@ export async function getProfile(userId: number) {
 export async function registerProfile(dto: RegisterUserDTO) {
   const user = await createProfile(dto);
   await createAccount(user.id, dto.account);
+
+  await syncAuthentication(
+    user.id,
+    dto.userProperty.companyData?.authenticationId || 0,
+  );
+
   return user;
 }
 

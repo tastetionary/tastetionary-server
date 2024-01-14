@@ -11,11 +11,27 @@ import {
   registerProfile,
   withdrawProfile,
 } from '@domain/user/facade/user.facade';
+import {
+  changeAuthenticationAsDone,
+  createProgressAuthentication,
+  getAuthentication,
+} from '@domain/authentication/service/authentication.service';
+import {
+  AuthenticationCategory,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
 
 describe('user facade', () => {
   it('withdrawFrom should update state ', async () => {
     const dto: RegisterUserDTO = {
-      userProperty: {},
+      userProperty: {
+        companyData: {
+          authenticationId: 1,
+          companyName: 'test',
+          identification: `test_${new Date().getMilliseconds()}`,
+          category: 'email',
+        },
+      },
       areas: [
         {
           latitude: 1,
@@ -31,6 +47,7 @@ describe('user facade', () => {
         },
       ],
       account: {
+        authenticationId: 1,
         identification: `test_${new Date().getMilliseconds()}`,
         password: 'pwd',
         category: AccountCategory.EMAIL,
@@ -51,9 +68,29 @@ describe('user facade', () => {
     expect(profile.user.state).toEqual(UserState.WITHDRAWAL);
   });
 
-  it('registerProfile should create profile', async () => {
+  it('registerProfile should create profile and auth list', async () => {
+    const createIde = (category: string) =>
+      `${category}_${new Date().getMilliseconds()}`;
+
+    const com = createIde('company');
+    const acc = createIde('account');
+    let res = await createProgressAuthentication({
+      identification: com,
+      category: AuthenticationCategory.COMPANY,
+      type: AuthenticationType.EMAIL,
+      code: '1234',
+    });
+    await changeAuthenticationAsDone(res.id, '1234');
+
     const dto: RegisterUserDTO = {
-      userProperty: {},
+      userProperty: {
+        companyData: {
+          authenticationId: res.id,
+          companyName: 'test',
+          identification: com,
+          category: 'email',
+        },
+      },
       areas: [
         {
           latitude: 1,
@@ -69,9 +106,10 @@ describe('user facade', () => {
         },
       ],
       account: {
-        identification: `test_${new Date().getMilliseconds()}`,
+        identification: acc,
         password: 'pwd',
         category: AccountCategory.EMAIL,
+        authenticationId: 1,
       },
       agreements: [
         {
@@ -81,9 +119,24 @@ describe('user facade', () => {
       ],
     };
 
-    const user = await registerProfile(dto);
-    const profile = await getProfile(user.id);
+    res = await createProgressAuthentication({
+      identification: acc,
+      category: AuthenticationCategory.ACCOUNT,
+      type: AuthenticationType.EMAIL,
+      code: '1234',
+    });
+    await changeAuthenticationAsDone(res.id, '1234');
 
+    const user = await registerProfile(dto);
+
+    const profile = await getProfile(user.id);
     expect(profile).not.toBeNull();
+
+    const auth = await getAuthentication(
+      com,
+      AuthenticationCategory.COMPANY,
+      AuthenticationType.EMAIL,
+    );
+    expect(auth?.userId).toEqual(user.id);
   });
 });
