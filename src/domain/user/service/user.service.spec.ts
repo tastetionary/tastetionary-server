@@ -14,14 +14,8 @@ import {
   UserState,
 } from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
-import {
-  AuthenticationCategory,
-  AuthenticationState,
-  AuthenticationType,
-} from '@domain/authentication/authentication.enum';
-import prismaClient from '@root/src/common/database/prisma';
-import { saveAuthentication } from '@domain/authentication/repository/authentication.repository';
-import { getProfile } from '../facade/user.facade';
+import prismaClient from '@common/database/prisma';
+import { getProfile } from '@domain/user/facade/user.facade';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -100,35 +94,21 @@ describe('user service', () => {
   });
 
   describe('[private] ', () => {
-    it('changeCompany should update auth and user property', async () => {
-      const user = await _private.createUser({});
-      const auth = await saveAuthentication({
-        identification: '',
-        category: AuthenticationCategory.COMPANY,
-        type: AuthenticationType.EMAIL,
-        state: AuthenticationState.INPROGRESS,
-      });
+    it('createUser should create user', async () => {
       const dto = {
-        companyData: {
-          authenticationId: auth.id,
+        company: {
+          authenticationId: 1,
           companyName: 'name',
           identification: 'ide',
           category: 'email' as const,
         },
       };
-      const updatedUser = await _private.changeCompany(
-        user.id,
-        dto.companyData,
-      );
-      expect(updatedUser).toHaveProperty('property');
-      const company = updatedUser.property;
-      expect(company).toEqual({ companyName: dto.companyData.companyName });
-    });
+      const user = await _private.createUser(dto);
+      expect(user).toHaveProperty('id');
 
-    it('createUser should create user', async () => {
-      const dto = {};
-      const res = await _private.createUser(dto);
-      expect(res).toHaveProperty('id');
+      expect(user).toHaveProperty('property');
+      const company = user.property;
+      expect(company).toEqual({ companyName: dto.company.companyName });
     });
 
     it('createRandomNickname should return random nickname', () => {

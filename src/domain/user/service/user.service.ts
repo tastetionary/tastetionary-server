@@ -1,7 +1,6 @@
 import {
   AgreementDTO,
   AreaDto,
-  CompanyDto,
   RegisterUserDTO,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
@@ -12,7 +11,6 @@ import {
   UserState,
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
-import { syncAuthentication } from '@domain/authentication/service/authentication.service';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
@@ -116,10 +114,6 @@ async function searchAuthList(userId: number) {
 export async function createProfile(dto: RegisterUserDTO) {
   const user = await createUser(dto.userProperty);
 
-  if (dto.userProperty.company) {
-    await changeCompany(user.id, dto.userProperty.company);
-  }
-
   await createAgreements(user.id, dto.agreements);
   await createAreas(user.id, dto.areas);
 
@@ -150,16 +144,10 @@ export async function createUser(dto: UserPropertyDto) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: createRandomNickname(),
-    property: {},
+    property: { companyName: dto.company?.companyName || null },
   });
 
   return user;
-}
-
-async function changeCompany(userId: number, dto: CompanyDto) {
-  return await updateUserById(userId, {
-    property: { companyName: dto.companyName },
-  });
 }
 
 export async function changeArea(userId: number, dto: AreaDto) {
@@ -192,5 +180,4 @@ export async function createUserOpinion(params: {
 export const _private = {
   createRandomNickname,
   createUser,
-  changeCompany,
 };
