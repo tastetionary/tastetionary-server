@@ -1,5 +1,5 @@
 import { AccountCategory } from '@domain/account/account.enum';
-import { RegisterUserDTO } from '@domain/user/dto/user.dto';
+import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
   WithdrawalTypeEnum,
   AgreementCategory,
@@ -23,7 +23,7 @@ import {
 
 describe('user facade', () => {
   it('withdrawFrom should update state ', async () => {
-    const dto: RegisterUserDTO = {
+    const dto: RegisterProfileRequest = {
       userProperty: {},
       areas: [
         {
@@ -83,7 +83,7 @@ describe('user facade', () => {
     });
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
 
-    const dto: RegisterUserDTO = {
+    const dto: RegisterProfileRequest = {
       userProperty: {
         company: {
           authenticationId: comAuthId,

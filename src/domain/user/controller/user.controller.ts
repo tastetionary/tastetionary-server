@@ -11,7 +11,7 @@ import { TypedBody, TypedRoute } from '@nestia/core';
 import {
   AreaDto,
   ProfileResponse,
-  RegisterUserDTO,
+  RegisterProfileRequest,
   WithdrawUserDto,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
@@ -34,7 +34,7 @@ export class UserController {
   @HttpCode(200)
   @TypedRoute.Post('/')
   async registerAccount(
-    @TypedBody() dto: RegisterUserDTO,
+    @TypedBody() dto: RegisterProfileRequest,
   ): Promise<BaseResponseDto<object>> {
     await registerProfile(dto);
     return new BaseResponseDto({ state: 'success' });

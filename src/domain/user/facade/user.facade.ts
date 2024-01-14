@@ -4,7 +4,7 @@ import {
   createUserOpinion,
   searchProfile,
 } from '@domain/user/service/user.service';
-import { RegisterUserDTO } from '@domain/user/dto/user.dto';
+import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
   removeAllAccount,
   removeAllToken,
@@ -20,7 +20,7 @@ export async function getProfile(userId: number) {
   return searchProfile(userId);
 }
 
-export async function registerProfile(dto: RegisterUserDTO) {
+export async function registerProfile(dto: RegisterProfileRequest) {
   const user = await createProfile(dto);
   await createAccount(user.id, dto.account);
 
