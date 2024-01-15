@@ -11,14 +11,6 @@ import { getIdentification } from '@domain/account/repository/account.repository
 import { getTokenByUserId } from '@domain/account/repository/user-token.repository';
 import prismaClient from '@common/database/prisma';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import {
-  changeAuthenticationAsDone,
-  createProgressAuthentication,
-} from '@domain/authentication/service/authentication.service';
-import {
-  AuthenticationCategory,
-  AuthenticationType,
-} from '@domain/authentication/authentication.enum';
 
 describe('account service', () => {
   beforeEach(async () => {

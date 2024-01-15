@@ -1,4 +1,4 @@
-import { truncateTables } from '@root/jest.setup';
+import { assertLeft, assertRight, truncateTables } from '@root/jest.setup';
 import {
   createProgressAuthentication,
   changeAuthenticationAsDone,
@@ -8,15 +8,12 @@ import {
   resetRegisteredUserAuth,
   syncAuthentication,
   getAuthentication,
+  validateDoneIdentification,
 } from '@domain/authentication/service/authentication.service';
 import {
   AuthenticationCategory,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
-import {
-  AuthenticationHistoryRecord,
-  getHistoryById,
-} from '@domain/authentication/repository/authentication.repository';
 import prismaClient from '@common/database/prisma';
 import { InternalDomainException } from '@common/exception/internal.exception';
 
@@ -51,6 +48,41 @@ describe('authentication service', () => {
     });
   });
 
+  describe('validateDoneIdentification', () => {
+    it('with done, should return right', async () => {
+      const userId = 123;
+      const data = {
+        userId,
+        category: AuthenticationCategory.ACCOUNT,
+        identification: 'some@crud.com',
+        code: '1234',
+        type: AuthenticationType.EMAIL,
+      };
+      const history = await createProgressAuthentication(data);
+      const auth = await changeAuthenticationAsDone(history.id, '1234');
+
+      const res = await validateDoneIdentification({
+        authenticationId: auth.id,
+        identification: data.identification,
+        category: AuthenticationCategory.ACCOUNT,
+        type: AuthenticationType.EMAIL,
+      });
+
+      assertRight(res);
+    });
+
+    it('with not done, should return left', async () => {
+      const res = await validateDoneIdentification({
+        authenticationId: 1,
+        identification: 'ide',
+        category: AuthenticationCategory.ACCOUNT,
+        type: AuthenticationType.EMAIL,
+      });
+
+      assertLeft(res);
+    });
+  });
+
   describe('resetRegisteredUserAuth', () => {
     it('should delete registered user auth', async () => {
       const data = {
@@ -59,12 +91,9 @@ describe('authentication service', () => {
         code: '1',
         type: AuthenticationType.EMAIL,
       };
-      const res = await createProgressAuthentication(data);
+      const history = await createProgressAuthentication(data);
+      const auth = await changeAuthenticationAsDone(history.id, data.code);
 
-      const history = (await getHistoryById(
-        res.id,
-      )) as AuthenticationHistoryRecord;
-      const auth = await changeAuthenticationAsDone(history.id, history.code);
       const userId = 123;
       await syncAuthentication(userId, auth.id);
 
@@ -108,13 +137,8 @@ describe('authentication service', () => {
         code: '1',
         type: AuthenticationType.EMAIL,
       };
-      const res = await createProgressAuthentication(data);
-
-      const history = (await getHistoryById(
-        res.id,
-      )) as AuthenticationHistoryRecord;
-
-      await changeAuthenticationAsDone(history.id, history.code);
+      const history = await createProgressAuthentication(data);
+      await changeAuthenticationAsDone(history.id, data.code);
 
       let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isDone(data.category, data.type)).toBe(true);
@@ -164,16 +188,12 @@ describe('authentication service', () => {
         code: '1',
         type: AuthenticationType.EMAIL,
       };
-      const res = await createProgressAuthentication(data);
+      const history = await createProgressAuthentication(data);
 
       let userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(true);
 
-      const history = (await getHistoryById(
-        res.id,
-      )) as AuthenticationHistoryRecord;
-
-      await changeAuthenticationAsDone(history.id, history.code);
+      await changeAuthenticationAsDone(history.id, data.code);
 
       userAuth = await _private.getUserAuth(data);
       expect(userAuth.isInProgress(data.category, data.type)).toBe(false);

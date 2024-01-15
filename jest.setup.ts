@@ -6,6 +6,37 @@ import { validate } from '@src/env.validation';
 import * as jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import SuperTest from 'supertest';
+import * as E from 'fp-ts/Either';
+
+const getEitherData = (data: E.Either<any, any>) => {
+  return E.fold(
+    (_leftValue) => {
+      return { status: false, data: _leftValue };
+    },
+    (_rightValue) => {
+      return {
+        status: true,
+        data: _rightValue,
+      };
+    },
+  )(data);
+};
+
+export const assertLeft = (data: E.Either<any, any>) => {
+  const res = getEitherData(data);
+  if (res.status) {
+    throw new Error('no left');
+  }
+  return res.data;
+};
+
+export const assertRight = (data: E.Either<any, any>) => {
+  const res = getEitherData(data);
+  if (!res.status) {
+    throw new Error('no left');
+  }
+  return res.data;
+};
 
 export const assertStatusCode = (
   res: SuperTest.Response,

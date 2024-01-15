@@ -19,7 +19,27 @@ import {
   saveAuthenticationHistory,
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
-import { isExpired } from '@root/src/common/util';
+import { isExpired } from '@common/util';
+import * as E from 'fp-ts/Either';
+
+export async function validateDoneIdentification(param: {
+  authenticationId: number;
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+}) {
+  const { authenticationId, ...rest } = { ...param };
+  const auth = await getAuthenticationByCondition({ ...rest });
+  if (!auth) {
+    return E.left({ reason: 'no auth' });
+  }
+
+  if (auth.id != authenticationId) {
+    return E.left({ reason: 'not matched auth id' });
+  }
+
+  return E.right({ reason: null, data: { ...param } });
+}
 
 export async function changeAuthenticationAsDone(
   historyId: number,
