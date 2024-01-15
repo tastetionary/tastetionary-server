@@ -1,4 +1,4 @@
-import { assertLeft, assertRight, truncateTables } from '@root/jest.setup';
+import { truncateTables } from '@root/jest.setup';
 import {
   createProgressAuthentication,
   changeAuthenticationAsDone,
@@ -15,7 +15,10 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import prismaClient from '@common/database/prisma';
-import { InternalDomainException } from '@common/exception/internal.exception';
+import {
+  CallerWrongDomainRuleException,
+  InternalDomainException,
+} from '@common/exception/internal.exception';
 
 describe('authentication service', () => {
   beforeEach(async () => {
@@ -67,19 +70,18 @@ describe('authentication service', () => {
         category: AuthenticationCategory.ACCOUNT,
         type: AuthenticationType.EMAIL,
       });
-
-      assertRight(res);
+      expect(res.authenticationId).not.toBeNull();
     });
 
-    it('with not done, should return left', async () => {
-      const res = await validateDoneIdentification({
-        authenticationId: 1,
-        identification: 'ide',
-        category: AuthenticationCategory.ACCOUNT,
-        type: AuthenticationType.EMAIL,
-      });
-
-      assertLeft(res);
+    it('with not done, should raise error', async () => {
+      await expect(
+        validateDoneIdentification({
+          authenticationId: 1,
+          identification: 'ide',
+          category: AuthenticationCategory.ACCOUNT,
+          type: AuthenticationType.EMAIL,
+        }),
+      ).rejects.toThrowError(CallerWrongDomainRuleException);
     });
   });
 

@@ -7,7 +7,7 @@ import {
   searchProfile,
   changeUserState,
 } from '@domain/user/service/user.service';
-import { RegisterUserDTO } from '@domain/user/dto/user.dto';
+import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
   AgreementCategory,
   AreaCategory,
@@ -28,7 +28,7 @@ describe('user service', () => {
     ]);
   });
 
-  const DTO: RegisterUserDTO = {
+  const DTO: RegisterProfileRequest = {
     userProperty: {},
     areas: [
       {
@@ -45,6 +45,7 @@ describe('user service', () => {
       },
     ],
     account: {
+      authenticationId: 1,
       identification: 'test',
       password: 'pwd',
       category: AccountCategory.EMAIL,

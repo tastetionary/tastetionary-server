@@ -23,6 +23,14 @@ import {
 
 describe('user facade', () => {
   it('withdrawFrom should update state ', async () => {
+    const identification = `test_${new Date().getMilliseconds()}`;
+    const accAuth = await createProgressAuthentication({
+      identification,
+      category: AuthenticationCategory.ACCOUNT,
+      type: AuthenticationType.EMAIL,
+      code: '1234',
+    });
+    const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
     const dto: RegisterProfileRequest = {
       userProperty: {},
       areas: [
@@ -40,8 +48,8 @@ describe('user facade', () => {
         },
       ],
       account: {
-        authenticationId: 1,
-        identification: `test_${new Date().getMilliseconds()}`,
+        authenticationId: accAuthId,
+        identification,
         password: 'pwd',
         category: AccountCategory.EMAIL,
       },

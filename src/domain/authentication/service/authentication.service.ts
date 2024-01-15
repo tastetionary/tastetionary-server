@@ -20,7 +20,6 @@ import {
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
 import { isExpired } from '@common/util';
-import * as E from 'fp-ts/Either';
 
 export async function validateDoneIdentification(param: {
   authenticationId: number;
@@ -31,14 +30,20 @@ export async function validateDoneIdentification(param: {
   const { authenticationId, ...rest } = { ...param };
   const auth = await getAuthenticationByCondition({ ...rest });
   if (!auth) {
-    return E.left({ reason: 'no auth' });
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'no data',
+    );
   }
 
   if (auth.id != authenticationId) {
-    return E.left({ reason: 'not matched auth id' });
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'not matched data',
+    );
   }
 
-  return E.right({ reason: null, data: { ...param } });
+  return param;
 }
 
 export async function changeAuthenticationAsDone(
