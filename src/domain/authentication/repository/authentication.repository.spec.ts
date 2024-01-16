@@ -35,7 +35,7 @@ describe('authentication', () => {
       userId,
     });
 
-    const records = await getAuthenticationsByUserId(userId);
+    const records = await getAuthenticationsByUserId(userId, data.state);
     expect(records[0].id).toEqual(res.id);
   });
 
@@ -65,7 +65,7 @@ describe('authentication', () => {
       state: AuthenticationState.INPROGRESS,
     };
     await saveAuthentication(data);
-    const res = await getAuthenticationsByUserId(data.userId);
+    const res = await getAuthenticationsByUserId(data.userId, data.state);
     expect(res.length).toEqual(1);
   });
 });
