@@ -181,8 +181,8 @@ jobs:
 
   deploy_test:
     runs-on: self-hosted
-    if: success() && github.ref == 'refs/heads/testing' && github.event_name == 'push'
-    needs: [ build_and_push_test ]
+    if: success()
+    needs: [ build_and_push_test, build_and_push ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -198,4 +198,8 @@ jobs:
             docker stop $(docker ps -a -q)
             docker rm -f $(docker ps -a -q)
             docker rmi -f $(docker images -q)
-            docker run -d --name taste-test-server -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
+            if [ ${{ github.ref }} == 'refs/heads/testing' ]; then
+              docker run -d --name taste-test-server -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
+            else
+              docker run -d --name taste-server -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}/taste-server:latest
+            fi
