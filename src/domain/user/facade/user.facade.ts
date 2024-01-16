@@ -36,6 +36,8 @@ export async function registerProfile(dto: RegisterProfileRequest) {
   const user = await createProfile(dto);
   await createAccount({ userId: user.id, ...dto.account });
 
+  await syncAuthentication(user.id, dto.account.authenticationId);
+
   if (dto.userProperty.company) {
     await validateDoneIdentification({
       identification: dto.userProperty.company.identification,
