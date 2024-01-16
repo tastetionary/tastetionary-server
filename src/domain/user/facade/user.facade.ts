@@ -10,13 +10,27 @@ import {
   removeAllToken,
 } from '@domain/account/service/account.service';
 import { WithdrawalTypeEnum, UserState } from '@domain/user/user.enum';
+import {
+  removeAllAuth,
+  syncAuthentication,
+} from '@domain/authentication/service/authentication.service';
+import { createAccount } from '@domain/account/service/account.service';
 
 export async function getProfile(userId: number) {
   return searchProfile(userId);
 }
 
 export async function registerProfile(dto: RegisterUserDTO) {
-  return createProfile(dto);
+  const user = await createProfile(dto);
+  await createAccount(user.id, dto.account);
+
+  if (dto.userProperty.company) {
+    await syncAuthentication(
+      user.id,
+      dto.userProperty.company.authenticationId,
+    );
+  }
+  return user;
 }
 
 export async function withdrawProfile(
@@ -27,4 +41,5 @@ export async function withdrawProfile(
   await changeUserState(userId, UserState.WITHDRAWAL);
   await removeAllAccount(userId);
   await removeAllToken(userId);
+  await removeAllAuth(userId);
 }

@@ -7,6 +7,12 @@ export interface ResetPasswordRequest
 
 export interface AccountDTO {
   /**
+   * authentication id which is done
+   * @type number
+   */
+  authenticationId?: number;
+
+  /**
    * unique identification for accounts, such as email
    * @type string
    */

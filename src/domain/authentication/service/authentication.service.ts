@@ -11,6 +11,7 @@ import {
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  deleteAuthenticationByUserId,
   deleteAuthentications,
   getAuthenticationByCondition,
   getHistoryById,
@@ -201,6 +202,10 @@ function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
   const generalDomainList = ['test', 'gmail', 'naver', 'daum', 'hanmail'];
   const domain = identification.split('@')[1].split('.')[0];
   return generalDomainList.includes(domain);
+}
+
+export async function removeAllAuth(userId: number) {
+  return await deleteAuthenticationByUserId(userId);
 }
 
 export const _private = {

@@ -32,7 +32,7 @@ export interface RegisterUserDTO {
 
   /**
    * account data
-   * @type Object
+   * @type AccountDTO
    */
   account: AccountDTO;
 
@@ -92,7 +92,7 @@ export interface UserPropertyDto {
    * company data, not essential, when user authenticate with company
    * @type CompanyDto
    */
-  companyData?: CompanyDto;
+  company?: CompanyDto;
 }
 
 export interface CompanyDto {
@@ -108,6 +108,18 @@ export interface CompanyDto {
    * @type string
    */
   companyName: string;
+
+  /**
+   * string to identify unique, like email. it is coupled by category
+   * @type string
+   */
+  identification: string;
+
+  /**
+   * identification category, available use: email
+   * @type string
+   */
+  category: 'email';
 }
 
 export interface ProfileResponse {

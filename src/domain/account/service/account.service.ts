@@ -12,7 +12,6 @@ import {
 } from '@domain/account/repository/account.repository';
 import {
   deleteTokensByUserId,
-  getTokenByUserId,
   saveToken,
 } from '@domain/account/repository/user-token.repository';
 import * as jwt from 'jsonwebtoken';
@@ -140,5 +139,5 @@ export async function removeAllToken(userId: number) {
 }
 
 export async function removeAllAccount(userId: number) {
-  await deleteAccountByUserId(userId);
+  return await deleteAccountByUserId(userId);
 }
