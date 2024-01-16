@@ -5,27 +5,32 @@ Content-Type: {{content_type_json}}
 
 {
   "userProperty": {
-    "companyName": "test"
+    "company": {
+      "authenticationId": 286,
+      "companyName": "matthew-test",
+      "identification": "wkdgndldi@naver.com",
+      "category": "email"
+    }
   },
   "areas": [
     {
       "latitude": 37.48913764364786,
       "longitude": 127.0311629855974,
       "category": "activity_area",
-      "address":"activity"
+      "address": "activity"
     },
     {
       "latitude": 37.48913764364786,
       "longitude": 127.0311629855974,
       "category": "dining_area",
-      "address":"dining"
+      "address": "dining"
     }
   ],
   "account": {
-    "identification": "matthew-0917",
+    "authenticationId": 285,
+    "identification": "wkdgndldi@naver.com",
     "password": "pwd",
     "category": "email"
-    
   },
   "agreements": [
     {
@@ -42,7 +47,7 @@ post {{base_url}}/v1/account/tokens
 content-type: {{content_type_json}}
 
 {
-  "identification": "matthew-0917",
+  "identification": "wkdgndldi@naver.com",
   "password": "pwd",
   "category": "email"
 }
