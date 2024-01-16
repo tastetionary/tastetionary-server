@@ -16,6 +16,7 @@ import {
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import * as userService from '@domain/user/service/user.service';
 import * as accountService from '@domain/account/service/account.service';
+import * as authService from '@domain/authentication/service/authentication.service';
 import * as facade from '@domain/user/facade/user.facade';
 import { profileEntityFactory } from '@root/test/factory/user.factory';
 
@@ -99,6 +100,7 @@ describe('user controller', () => {
   it('register should return success', async () => {
     jest.spyOn(userService, 'createUser').mockImplementation();
     jest.spyOn(accountService, 'createAccount').mockImplementation();
+    jest.spyOn(authService, 'validateDoneIdentification').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')

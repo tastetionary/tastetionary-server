@@ -1,7 +1,7 @@
 import {
   AgreementDTO,
   AreaDto,
-  RegisterUserDTO,
+  RegisterProfileRequest,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
 import {
@@ -111,7 +111,7 @@ async function searchAuthList(userId: number) {
   };
 }
 
-export async function createProfile(dto: RegisterUserDTO) {
+export async function createProfile(dto: RegisterProfileRequest) {
   const user = await createUser(dto.userProperty);
 
   await createAgreements(user.id, dto.agreements);

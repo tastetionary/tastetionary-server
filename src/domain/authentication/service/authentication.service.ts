@@ -19,7 +19,32 @@ import {
   saveAuthenticationHistory,
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
-import { isExpired } from '@root/src/common/util';
+import { isExpired } from '@common/util';
+
+export async function validateDoneIdentification(param: {
+  authenticationId: number;
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+}) {
+  const { authenticationId, ...rest } = { ...param };
+  const auth = await getAuthenticationByCondition({ ...rest });
+  if (!auth) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'no data',
+    );
+  }
+
+  if (auth.id != authenticationId) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'not matched data',
+    );
+  }
+
+  return param;
+}
 
 export async function changeAuthenticationAsDone(
   historyId: number,

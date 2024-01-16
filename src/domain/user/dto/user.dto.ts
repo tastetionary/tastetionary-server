@@ -7,7 +7,7 @@ import {
 import { AccountDTO } from '@domain/account/dto/account.dto';
 import { AreaEntity } from '@domain/user/service/user.service';
 
-export const checkRegisterAccountDto = typia.createIs<RegisterUserDTO>();
+export const checkRegisterAccountDto = typia.createIs<RegisterProfileRequest>();
 
 export interface WithdrawUserDto {
   /**
@@ -17,7 +17,7 @@ export interface WithdrawUserDto {
   type: WithdrawalTypeEnum;
 }
 
-export interface RegisterUserDTO {
+export interface RegisterProfileRequest {
   /**
    * user data, not essential
    * @type Object

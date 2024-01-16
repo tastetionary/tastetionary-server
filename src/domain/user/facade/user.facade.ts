@@ -4,7 +4,7 @@ import {
   createUserOpinion,
   searchProfile,
 } from '@domain/user/service/user.service';
-import { RegisterUserDTO } from '@domain/user/dto/user.dto';
+import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
   removeAllAccount,
   removeAllToken,
@@ -13,18 +13,36 @@ import { WithdrawalTypeEnum, UserState } from '@domain/user/user.enum';
 import {
   removeAllAuth,
   syncAuthentication,
+  validateDoneIdentification,
 } from '@domain/authentication/service/authentication.service';
 import { createAccount } from '@domain/account/service/account.service';
+import {
+  AuthenticationCategory,
+  AuthenticationType,
+} from '@domain/authentication/authentication.enum';
 
 export async function getProfile(userId: number) {
   return searchProfile(userId);
 }
 
-export async function registerProfile(dto: RegisterUserDTO) {
+export async function registerProfile(dto: RegisterProfileRequest) {
+  await validateDoneIdentification({
+    identification: dto.account.identification,
+    authenticationId: dto.account.authenticationId,
+    category: AuthenticationCategory.ACCOUNT,
+    type: AuthenticationType.EMAIL,
+  });
+
   const user = await createProfile(dto);
-  await createAccount(user.id, dto.account);
+  await createAccount({ userId: user.id, ...dto.account });
 
   if (dto.userProperty.company) {
+    await validateDoneIdentification({
+      identification: dto.userProperty.company.identification,
+      authenticationId: dto.userProperty.company.authenticationId,
+      category: AuthenticationCategory.COMPANY,
+      type: AuthenticationType.EMAIL,
+    });
     await syncAuthentication(
       user.id,
       dto.userProperty.company.authenticationId,

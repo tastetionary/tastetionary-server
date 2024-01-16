@@ -33,7 +33,10 @@ describe('facade', () => {
         password: 'pwd',
         category: AccountCategory.EMAIL,
       };
-      await createAccount(userId, dto);
+      await createAccount({
+        userId,
+        ...dto,
+      });
 
       const code = '1'.repeat(6);
 

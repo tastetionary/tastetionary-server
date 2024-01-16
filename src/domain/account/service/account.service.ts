@@ -1,4 +1,3 @@
-import { AccountDTO } from '@domain/account/dto/account.dto';
 import { add } from 'date-fns';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
@@ -46,8 +45,13 @@ export async function findAccount(
   }
 }
 
-export async function createAccount(userId: number, dto: AccountDTO) {
-  const accountEntity = await findAccount(dto.identification, dto.category);
+export async function createAccount(param: {
+  userId: number;
+  identification: string;
+  password: string;
+  category: AccountCategory;
+}) {
+  const accountEntity = await findAccount(param.identification, param.category);
   if (accountEntity) {
     throw new CallerWrongUsageException(
       ErrorNameEnum.INVALID_INPUT,
@@ -56,11 +60,11 @@ export async function createAccount(userId: number, dto: AccountDTO) {
     );
   }
 
-  const password = await encryptValue(dto.password);
+  const password = await encryptValue(param.password);
   await saveAccount({
-    userId,
-    category: dto.category,
-    identification: dto.identification,
+    userId: param.userId,
+    category: param.category,
+    identification: param.identification,
     password,
   });
 }
@@ -81,10 +85,14 @@ async function encryptValue(value: string) {
   return bcrypt.hash(value, 10);
 }
 
-export async function createToken(dto: AccountDTO) {
-  const entity = await getAccount(dto.identification, dto.category);
+export async function createToken(param: {
+  identification: string;
+  category: AccountCategory;
+  password: string;
+}) {
+  const entity = await getAccount(param.identification, param.category);
 
-  await checkPassword(entity, dto.password);
+  await checkPassword(entity, param.password);
 
   const tokens = makeTokens({ userId: entity.userId });
   await saveToken({
