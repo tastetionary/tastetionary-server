@@ -4,7 +4,7 @@ import {
   AreaCategory,
   WithdrawalTypeEnum,
 } from '@domain/user/user.enum';
-import { AccountDTO } from '@domain/account/dto/account.dto';
+import { CreateAccountRequest } from '@domain/account/dto/account.dto';
 import { AreaEntity } from '@domain/user/service/user.service';
 
 export const checkRegisterAccountDto = typia.createIs<RegisterProfileRequest>();
@@ -32,9 +32,9 @@ export interface RegisterProfileRequest {
 
   /**
    * account data
-   * @type AccountDTO
+   * @type CreateAccountRequest
    */
-  account: AccountDTO;
+  account: CreateAccountRequest;
 
   /**
    * agreements data

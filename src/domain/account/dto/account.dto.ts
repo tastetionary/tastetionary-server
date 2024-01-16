@@ -3,9 +3,9 @@ import { DoneProgressRequest } from '@domain/authentication/dto/authentication.d
 
 export interface ResetPasswordRequest
   extends DoneProgressRequest,
-    Pick<AccountDTO, 'password'> {}
+    Pick<CreateAccountRequest, 'password'> {}
 
-export interface AccountDTO {
+export interface CreateAccountRequest {
   /**
    * authentication id which is done
    * @type number
@@ -30,6 +30,9 @@ export interface AccountDTO {
    */
   category: AccountCategory;
 }
+
+export interface CreateTokenRequest
+  extends Omit<CreateAccountRequest, 'authenticationId'> {}
 
 export interface TokenDTO {
   accessToken: string;

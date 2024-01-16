@@ -5,8 +5,27 @@ Content-Type: {{content_type_json}}
 
 {
   "identification": "wkdgndldi@naver.com",
+  "category":"company",
+  "type":"email"
+}
+
+### create progress
+POST {{base_url}}/v1/authentication/public/company
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "wkdgndldi@naver.com",
   "category":"account",
   "type":"email"
+}
+
+### done progress //285, 286
+POST {{base_url}}/v1/authentication/public/status/done
+Content-Type: {{content_type_json}}
+
+{
+  "historyId": 264,
+  "code":"551093"
 }
 
 ### create progress
@@ -20,14 +39,6 @@ Content-Type: {{content_type_json}}
 }
 
 
-### done progress
-POST {{base_url}}/v1/authentication/public/status/done
-Content-Type: {{content_type_json}}
-
-{
-  "historyId": 48,
-  "code":"612068"
-}
 
 ### get token(use after register user)
 # @name token
