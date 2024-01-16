@@ -72,12 +72,13 @@ describe('account controller', () => {
     const res = await request(app.getHttpServer())
       .post('/v1/account/tokens')
       .send({
+        authenticationId: 1,
         identification: 'test',
         password: 'pwd',
         category: AccountCategory.EMAIL,
       });
 
-    expect(res.statusCode).toEqual(200);
+    assertStatusCode(res, 200);
   });
 
   it('invalid request, should return tokens', async () => {

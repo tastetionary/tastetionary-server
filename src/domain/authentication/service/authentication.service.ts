@@ -11,6 +11,7 @@ import {
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  deleteAuthenticationByUserId,
   deleteAuthentications,
   getAuthenticationByCondition,
   getHistoryById,
@@ -18,7 +19,32 @@ import {
   saveAuthenticationHistory,
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
-import { isExpired } from '@root/src/common/util';
+import { isExpired } from '@common/util';
+
+export async function validateDoneIdentification(param: {
+  authenticationId: number;
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+}) {
+  const { authenticationId, ...rest } = { ...param };
+  const auth = await getAuthenticationByCondition({ ...rest });
+  if (!auth) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'no data',
+    );
+  }
+
+  if (auth.id != authenticationId) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'not matched data',
+    );
+  }
+
+  return param;
+}
 
 export async function changeAuthenticationAsDone(
   historyId: number,
@@ -201,6 +227,10 @@ function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
   const generalDomainList = ['test', 'gmail', 'naver', 'daum', 'hanmail'];
   const domain = identification.split('@')[1].split('.')[0];
   return generalDomainList.includes(domain);
+}
+
+export async function removeAllAuth(userId: number) {
+  return await deleteAuthenticationByUserId(userId);
 }
 
 export const _private = {

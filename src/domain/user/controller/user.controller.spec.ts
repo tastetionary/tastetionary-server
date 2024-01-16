@@ -14,7 +14,9 @@ import {
   WithdrawalTypeEnum,
 } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import * as service from '@domain/user/service/user.service';
+import * as userService from '@domain/user/service/user.service';
+import * as accountService from '@domain/account/service/account.service';
+import * as authService from '@domain/authentication/service/authentication.service';
 import * as facade from '@domain/user/facade/user.facade';
 import { profileEntityFactory } from '@root/test/factory/user.factory';
 
@@ -55,7 +57,7 @@ describe('user controller', () => {
 
   it('myPage profile should return data', async () => {
     const profile = profileEntityFactory();
-    jest.spyOn(service, 'searchProfile').mockResolvedValueOnce(profile);
+    jest.spyOn(userService, 'searchProfile').mockResolvedValueOnce(profile);
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(profile.user.id, key, {
       expiresIn: '10h',
@@ -76,7 +78,7 @@ describe('user controller', () => {
   });
 
   it('updateArea should return success', async () => {
-    jest.spyOn(service, 'changeArea').mockImplementation();
+    jest.spyOn(userService, 'changeArea').mockImplementation();
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(122, key, {
       expiresIn: '10h',
@@ -96,12 +98,14 @@ describe('user controller', () => {
   });
 
   it('register should return success', async () => {
-    jest.spyOn(service, 'createUser').mockImplementation();
+    jest.spyOn(userService, 'createUser').mockImplementation();
+    jest.spyOn(accountService, 'createAccount').mockImplementation();
+    jest.spyOn(authService, 'validateDoneIdentification').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')
       .send({
-        userProperty: { companyName: 'test' },
+        userProperty: {},
         areas: [
           {
             latitude: 1,
@@ -117,6 +121,7 @@ describe('user controller', () => {
           },
         ],
         account: {
+          authenticationId: 1,
           identification: `test-${new Date().getMilliseconds()}`,
           password: 'pwd',
           category: AccountCategory.EMAIL,
@@ -133,7 +138,7 @@ describe('user controller', () => {
   });
 
   it('wrong input should return bad request', async () => {
-    jest.spyOn(service, 'createProfile').mockImplementation();
+    jest.spyOn(userService, 'createProfile').mockImplementation();
 
     const res = await request(app.getHttpServer())
       .post('/v1/user')
