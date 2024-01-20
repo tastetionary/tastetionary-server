@@ -1,4 +1,5 @@
 import {
+  changeCompany,
   changeUserState,
   createProfile,
   createUserOpinion,
@@ -45,10 +46,13 @@ export async function registerProfile(dto: RegisterProfileRequest) {
       category: AuthenticationCategory.COMPANY,
       type: AuthenticationType.EMAIL,
     });
+
     await syncAuthentication(
       user.id,
       dto.userProperty.company.authenticationId,
     );
+
+    await changeCompany(user.id, dto.userProperty.company);
   }
   return user;
 }

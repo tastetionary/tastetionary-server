@@ -1,6 +1,7 @@
 import {
   AgreementDTO,
   AreaDto,
+  CompanyDto,
   RegisterProfileRequest,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
@@ -148,6 +149,12 @@ export async function createUser(dto: UserPropertyDto) {
   });
 
   return user;
+}
+
+export async function changeCompany(userId: number, dto: CompanyDto) {
+  return await updateUserById(userId, {
+    property: { companyName: dto.companyName },
+  });
 }
 
 export async function changeArea(userId: number, dto: AreaDto) {
