@@ -92,7 +92,7 @@ export interface UserPropertyDto {
    * company data, not essential, when user authenticate with company
    * @type CompanyDto
    */
-  company?: CompanyDto;
+  companyData?: CompanyDto;
 }
 
 export interface CompanyDto {

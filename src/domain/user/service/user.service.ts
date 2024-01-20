@@ -145,7 +145,7 @@ export async function createUser(dto: UserPropertyDto) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: createRandomNickname(),
-    property: { companyName: dto.company?.companyName || null },
+    property: { companyName: dto.companyData?.companyName || null },
   });
 
   return user;
