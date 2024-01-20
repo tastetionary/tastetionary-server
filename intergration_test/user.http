@@ -1,5 +1,5 @@
 
-### Register User 
+### Register User , full auth
 POST {{base_url}}/v1/user
 Content-Type: {{content_type_json}}
 
@@ -40,6 +40,41 @@ Content-Type: {{content_type_json}}
   ]
 }
 
+### Register User, only account
+POST {{base_url}}/v1/user
+Content-Type: {{content_type_json}}
+
+{
+  "userProperty": {
+  },
+  "areas": [
+    {
+      "latitude": 37.48913764364786,
+      "longitude": 127.0311629855974,
+      "category": "activity_area",
+      "address": "activity"
+    },
+    {
+      "latitude": 37.48913764364786,
+      "longitude": 127.0311629855974,
+      "category": "dining_area",
+      "address": "dining"
+    }
+  ],
+  "account": {
+    "authenticationId": 287,
+    "identification": "wkdgndldi@naver.com",
+    "password": "pwd",
+    "category": "email"
+  },
+  "agreements": [
+    {
+      "category": "personal_information",
+      "is_agree": true
+    }
+  ]
+}
+
 
 ### get token(use after register user)
 # @name token
@@ -57,7 +92,7 @@ content-type: {{content_type_json}}
 
 
 ### get profile 
-GET {{base_url}}/v1/user/profile
+GET {{base_url}}/v1/user
 Authorization: Bearer {{access_token}}
 Content-Type: {{content_type_json}}
 

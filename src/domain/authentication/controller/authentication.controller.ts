@@ -40,7 +40,7 @@ export class AuthenticationController {
     // TODO add limit logic
     const res = await beginAuthProgress({
       identification: dto.identification,
-      category,
+      category: dto.category ?? category,
       type: dto.type,
     });
 
