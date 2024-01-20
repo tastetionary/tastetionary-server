@@ -97,7 +97,7 @@ describe('user service', () => {
   describe('[private] ', () => {
     it('createUser should create user', async () => {
       const dto = {
-        company: {
+        companyData: {
           authenticationId: 1,
           companyName: 'name',
           identification: 'ide',
@@ -109,7 +109,7 @@ describe('user service', () => {
 
       expect(user).toHaveProperty('property');
       const company = user.property;
-      expect(company).toEqual({ companyName: dto.company.companyName });
+      expect(company).toEqual({ companyName: dto.companyData.companyName });
     });
 
     it('createRandomNickname should return random nickname', () => {
