@@ -39,20 +39,20 @@ export async function registerProfile(dto: RegisterProfileRequest) {
 
   await syncAuthentication(user.id, dto.account.authenticationId);
 
-  if (dto.userProperty.company) {
+  if (dto.userProperty.companyData) {
     await validateDoneIdentification({
-      identification: dto.userProperty.company.identification,
-      authenticationId: dto.userProperty.company.authenticationId,
+      identification: dto.userProperty.companyData.identification,
+      authenticationId: dto.userProperty.companyData.authenticationId,
       category: AuthenticationCategory.COMPANY,
       type: AuthenticationType.EMAIL,
     });
 
     await syncAuthentication(
       user.id,
-      dto.userProperty.company.authenticationId,
+      dto.userProperty.companyData.authenticationId,
     );
 
-    await changeCompany(user.id, dto.userProperty.company);
+    await changeCompany(user.id, dto.userProperty.companyData);
   }
   return user;
 }
