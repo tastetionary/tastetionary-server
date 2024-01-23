@@ -32,7 +32,10 @@ import {
   AuthenticationRecord,
   getAuthenticationsByUserId,
 } from '@domain/authentication/repository/authentication.repository';
-import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
+import {
+  AuthenticationCategory,
+  AuthenticationState,
+} from '@domain/authentication/authentication.enum';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -59,24 +62,28 @@ async function searchUser(userId: number) {
   };
 }
 
+const transformRecordToEntity = <T extends AreaRecord | AuthenticationRecord>(
+  records: T[],
+  target: AreaCategory | AuthenticationCategory,
+) => {
+  const record = records.find((r) => r.category === target);
+
+  if (!record) {
+    return null;
+  }
+  const { category, ...data } = record;
+  return {
+    ...data,
+    category: target,
+  };
+};
+
 export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
 export async function searchAreas(userId: number) {
-  const transformer = (areas: AreaRecord[], target: AreaCategory) => {
-    const area = areas.find((area) => area.category == target);
-    if (!area) {
-      return undefined;
-    }
-    const { category, ...data } = area;
-    return {
-      ...data,
-      category: target,
-    };
-  };
-
   const areas = await getAreasByUserId(userId);
   const data = {
-    diningArea: transformer(areas, AreaCategory.DINING_AREA),
-    activityArea: transformer(areas, AreaCategory.ACTIVITY_AREA),
+    diningArea: transformRecordToEntity(areas, AreaCategory.DINING_AREA),
+    activityArea: transformRecordToEntity(areas, AreaCategory.ACTIVITY_AREA),
   };
   return {
     ...data,
@@ -86,26 +93,15 @@ export async function searchAreas(userId: number) {
 
 export type AuthEntity = Awaited<ReturnType<typeof searchAuthList>>;
 async function searchAuthList(userId: number) {
-  const transformer = (
-    authList: AuthenticationRecord[],
-    target: AuthenticationCategory,
-  ) => {
-    const area = authList.find((auth) => auth.category == target);
-    if (!area) {
-      return undefined;
-    }
-    const { category, ...data } = area;
-    return {
-      ...data,
-      category: target,
-    };
+  const authList = await getAuthenticationsByUserId(
+    userId,
+    AuthenticationState.DONE,
+  );
+  const data = {
+    company: transformRecordToEntity(authList, AuthenticationCategory.COMPANY),
+    account: transformRecordToEntity(authList, AuthenticationCategory.ACCOUNT),
   };
 
-  const authList = await getAuthenticationsByUserId(userId);
-  const data = {
-    company: transformer(authList, AuthenticationCategory.COMPANY),
-    account: transformer(authList, AuthenticationCategory.ACCOUNT),
-  };
   return {
     ...data,
     account: data.account as NonNullable<typeof data.account>,
@@ -145,7 +141,7 @@ export async function createUser(dto: UserPropertyDto) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: createRandomNickname(),
-    property: { companyName: dto.companyData?.companyName || null },
+    property: { companyName: dto.companyData?.companyName ?? null },
   });
 
   return user;
@@ -166,7 +162,9 @@ function createRandomNickname() {
   const nicknameList = getNicknamePartRecord();
   const randomAdj = getRandomItem(nicknameList.adj);
   const randomNameKey = getRandomItem(Object.keys(nicknameList.name));
-  const randomName = getRandomItem(nicknameList.name[randomNameKey]);
+  const randomName = getRandomItem(
+    nicknameList.name[randomNameKey] as string[],
+  ).replace(' ', '');
 
   return `${randomAdj} ${randomName}`;
 }
