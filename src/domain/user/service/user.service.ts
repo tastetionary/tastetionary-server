@@ -1,6 +1,7 @@
 import {
   AgreementDTO,
   AreaDto,
+  CompanyDto,
   RegisterProfileRequest,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
@@ -144,10 +145,16 @@ export async function createUser(dto: UserPropertyDto) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: createRandomNickname(),
-    property: { companyName: dto.company?.companyName || null },
+    property: { companyName: dto.companyData?.companyName || null },
   });
 
   return user;
+}
+
+export async function changeCompany(userId: number, dto: CompanyDto) {
+  return await updateUserById(userId, {
+    property: { companyName: dto.companyName },
+  });
 }
 
 export async function changeArea(userId: number, dto: AreaDto) {

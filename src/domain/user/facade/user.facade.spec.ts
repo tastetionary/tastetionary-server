@@ -93,7 +93,7 @@ describe('user facade', () => {
 
     const dto: RegisterProfileRequest = {
       userProperty: {
-        company: {
+        companyData: {
           authenticationId: comAuthId,
           companyName: 'test',
           identification: com,

@@ -10,7 +10,8 @@ import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
-  AccountDTO,
+  CreateAccountRequest,
+  CreateTokenRequest,
   ResetPasswordRequest,
   TokenDTO,
 } from '@domain/account/dto/account.dto';
@@ -33,7 +34,7 @@ export class AccountController {
   @TypedRoute.Post('/tokens')
   @HttpCode(200)
   async createToken(
-    @TypedBody() dto: AccountDTO,
+    @TypedBody() dto: CreateTokenRequest,
   ): Promise<BaseResponseDto<TokenDTO>> {
     const token = await createToken(dto);
     return new BaseResponseDto({ ...token });
