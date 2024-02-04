@@ -1,8 +1,10 @@
 import { truncateTables } from '@root/jest.setup';
-import { UserState } from '@domain/user/user.enum';
+import { UserState, WithdrawalTypeEnum } from '@domain/user/user.enum';
 import prismaClient from '@root/src/common/database/prisma';
 import {
+  getOpinionsByUserId,
   getUsers,
+  saveOpinion,
   saveUser,
   saveUsers,
   updateUserById,
@@ -10,7 +12,21 @@ import {
 
 describe('user repository', () => {
   beforeEach(async () => {
-    await truncateTables(prismaClient, ['users']);
+    await truncateTables(prismaClient, ['users', 'user_opinions']);
+  });
+
+  it('should save opinions', async () => {
+    const data = {
+      userId: 99,
+      category: 'withdrawal' as const,
+      type: WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
+      opinion: 'kk',
+    };
+
+    await saveOpinion(data);
+
+    const res = await getOpinionsByUserId({ userIds: [data.userId] });
+    expect(res.length).toEqual(1);
   });
 
   it('should update user', async () => {

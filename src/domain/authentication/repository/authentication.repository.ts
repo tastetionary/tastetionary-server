@@ -3,8 +3,11 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
+import { Prisma } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
-
+import { ErrorNameEnum } from '@root/src/common/exception/enum';
+import { InternalDomainException } from '@root/src/common/exception/internal.exception';
+import * as E from 'fp-ts/Either';
 export interface AuthenticationHistoryRecord {
   id: number;
   identification: string;
@@ -88,13 +91,16 @@ export function transformAuthentications(
   });
 }
 
-export async function getAuthenticationByIdentification(
-  identification: string,
-  category: AuthenticationCategory,
-  type: AuthenticationType,
+type AuthenticationParams = { identification: string } | { userId: number };
+
+export async function getAuthenticationByCondition(
+  param: {
+    category: AuthenticationCategory;
+    type: AuthenticationType;
+  } & AuthenticationParams,
 ): Promise<AuthenticationRecord | null> {
   const record = await prismaClient.authentications.findFirst({
-    where: { category, type, identification },
+    where: { ...param },
   });
   if (!record) return null;
 
@@ -159,6 +165,26 @@ export async function deleteAuthentications(ids: number[]) {
   await prismaClient.authentications.deleteMany({
     where: { id: { in: ids } },
   });
+}
+
+export async function deleteAuthenticationByUserId(userId: number) {
+  try {
+    await prismaClient.authentications.deleteMany({
+      where: { userId },
+    });
+    return E.right({ userId });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      return E.left(
+        new InternalDomainException(
+          ErrorNameEnum.INTERNAL_ERROR,
+          e.message,
+          e.code,
+        ),
+      );
+    }
+    return E.left(new InternalDomainException(ErrorNameEnum.INTERNAL_ERROR, e));
+  }
 }
 
 type UpdateParam =

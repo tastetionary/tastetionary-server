@@ -1,16 +1,16 @@
-import { AccountDTO } from '@domain/account/dto/account.dto';
 import { add } from 'date-fns';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  deleteAccountByUserId,
   getIdentification,
   saveAccount,
+  updateAccountById,
 } from '@domain/account/repository/account.repository';
 import {
-  deleteToken,
-  getTokenByUserId,
+  deleteTokensByUserId,
   saveToken,
 } from '@domain/account/repository/user-token.repository';
 import * as jwt from 'jsonwebtoken';
@@ -45,8 +45,13 @@ export async function findAccount(
   }
 }
 
-export async function createAccount(userId: number, dto: AccountDTO) {
-  const accountEntity = await findAccount(dto.identification, dto.category);
+export async function createAccount(param: {
+  userId: number;
+  identification: string;
+  password: string;
+  category: AccountCategory;
+}) {
+  const accountEntity = await findAccount(param.identification, param.category);
   if (accountEntity) {
     throw new CallerWrongUsageException(
       ErrorNameEnum.INVALID_INPUT,
@@ -55,12 +60,23 @@ export async function createAccount(userId: number, dto: AccountDTO) {
     );
   }
 
-  const password = await encryptValue(dto.password);
-
+  const password = await encryptValue(param.password);
   await saveAccount({
-    userId,
-    category: dto.category,
-    identification: dto.identification,
+    userId: param.userId,
+    category: param.category,
+    identification: param.identification,
+    password,
+  });
+}
+
+export async function updatePassword(param: {
+  accountId: number;
+  identification: string;
+  password: string;
+}) {
+  const password = await encryptValue(param.password);
+  await updateAccountById(param.accountId, {
+    identification: param.identification,
     password,
   });
 }
@@ -69,10 +85,14 @@ async function encryptValue(value: string) {
   return bcrypt.hash(value, 10);
 }
 
-export async function createToken(dto: AccountDTO) {
-  const entity = await getAccount(dto.identification, dto.category);
+export async function createToken(param: {
+  identification: string;
+  category: AccountCategory;
+  password: string;
+}) {
+  const entity = await getAccount(param.identification, param.category);
 
-  await checkPassword(entity, dto.password);
+  await checkPassword(entity, param.password);
 
   const tokens = makeTokens({ userId: entity.userId });
   await saveToken({
@@ -122,9 +142,10 @@ function makeTokens(payload: { userId: number }) {
   };
 }
 
-export async function deleteTokens(userId: number) {
-  const token = await getTokenByUserId(userId);
-  if (!token) return;
+export async function removeAllToken(userId: number) {
+  await deleteTokensByUserId(userId);
+}
 
-  await deleteToken(token.id);
+export async function removeAllAccount(userId: number) {
+  return await deleteAccountByUserId(userId);
 }

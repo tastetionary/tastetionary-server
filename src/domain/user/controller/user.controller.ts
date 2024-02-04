@@ -11,12 +11,17 @@ import { TypedBody, TypedRoute } from '@nestia/core';
 import {
   AreaDto,
   ProfileResponse,
-  RegisterUserDTO,
+  RegisterProfileRequest,
+  WithdrawUserDto,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { changeArea } from '@domain/user/service/user.service';
-import { getProfile, registerProfile } from '@domain/user/facade/user.facade';
+import {
+  getProfile,
+  registerProfile,
+  withdrawProfile,
+} from '@domain/user/facade/user.facade';
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
@@ -29,7 +34,7 @@ export class UserController {
   @HttpCode(200)
   @TypedRoute.Post('/')
   async registerAccount(
-    @TypedBody() dto: RegisterUserDTO,
+    @TypedBody() dto: RegisterProfileRequest,
   ): Promise<BaseResponseDto<object>> {
     await registerProfile(dto);
     return new BaseResponseDto({ state: 'success' });
@@ -42,27 +47,6 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard)
   @TypedRoute.Get('/')
-  async getProfile(@Request() req): Promise<BaseResponseDto<any>> {
-    const profile = await getProfile(req.user.userId);
-    return new BaseResponseDto({
-      id: profile.user.id,
-      nickname: profile.user.nickname,
-      activity_area: profile.areas.activityArea ?? {},
-      dining_area: profile.areas.diningArea ?? {},
-      authentication: {
-        account_email: profile.authList.account.identification,
-        company_email: profile.authList.company?.identification || '',
-      },
-    });
-  }
-
-  /**
-   * @tag user
-   * @summary get profile
-   */
-  @HttpCode(200)
-  @UseGuards(AuthGuard)
-  @TypedRoute.Get('/profile')
   async inquireMyPageProfile(
     @Request() req,
   ): Promise<BaseResponseDto<ProfileResponse>> {
@@ -90,6 +74,21 @@ export class UserController {
     @TypedBody() dto: AreaDto,
   ): Promise<BaseResponseDto<object>> {
     await changeArea(req.user.userId, dto);
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag user
+   * @summary withdraw user, delete account, token and update state
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Delete('/')
+  async withdrawUser(
+    @Request() req,
+    @TypedBody() dto: WithdrawUserDto,
+  ): Promise<BaseResponseDto<object>> {
+    await withdrawProfile(req.user.userId, dto.type);
     return new BaseResponseDto({ state: 'success' });
   }
 }

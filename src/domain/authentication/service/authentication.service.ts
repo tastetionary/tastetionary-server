@@ -1,35 +1,68 @@
-import { Inject, Injectable } from '@nestjs/common';
 import {
   AuthenticationCategory,
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 import { UserAuth } from '@domain/authentication/core/user-auth';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { sendEmail } from '@thirdParty/brevo/brevo';
 import { EnvironmentEnum } from '@root/src/env.validation';
-import * as fs from 'fs';
-import path from 'path';
 import {
   CallerWrongDomainRuleException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
+  deleteAuthenticationByUserId,
   deleteAuthentications,
-  getAuthenticationByIdentification,
+  getAuthenticationByCondition,
   getHistoryById,
   saveAuthentication,
   saveAuthenticationHistory,
   updateAuthentication,
 } from '@domain/authentication/repository/authentication.repository';
-import { ConfigService } from '@nestjs/config';
+import { isExpired } from '@common/util';
 
-// facade 로 옮길 만한 사이즈
-export async function doneProgressAuthentication(
+export async function validateDoneIdentification(param: {
+  authenticationId: number;
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+}) {
+  const { authenticationId, ...rest } = { ...param };
+  const auth = await getAuthenticationByCondition({ ...rest });
+  if (!auth) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'no data',
+    );
+  }
+
+  if (auth.id != authenticationId) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'not matched data',
+    );
+  }
+
+  return param;
+}
+
+export async function changeAuthenticationAsDone(
   historyId: number,
   code: string,
 ) {
+  const auth = await findValidAuth(historyId, code);
+
+  await updateAuthentication({
+    id: auth.id,
+    state: AuthenticationState.DONE,
+  });
+
+  return {
+    id: auth.id,
+  };
+}
+
+export async function findValidAuth(historyId: number, code: string) {
   const historyRecord = await getHistoryById(historyId);
   if (!historyRecord) {
     throw new InternalDomainException(
@@ -37,14 +70,22 @@ export async function doneProgressAuthentication(
       `history: ${historyId} not found, check history id`,
     );
   }
+
   if (historyRecord.code != code) {
     throw new CallerWrongDomainRuleException(
       ErrorNameEnum.INVALID_INPUT,
-      `given six digit code: ${code} not matched with database code: ${historyRecord.code}, check code`,
+      `given digit code: ${code} not matched with database code, check code`,
     );
   }
 
-  const authRecord = await getAuthenticationByIdentification(
+  if (isExpired(historyRecord.expiredAt)) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'expired auth, start new process',
+    );
+  }
+
+  const authRecord = await getAuthentication(
     historyRecord.identification,
     historyRecord.category,
     historyRecord.type,
@@ -56,15 +97,15 @@ export async function doneProgressAuthentication(
       `auth not found from given history id, ${historyId}, check authentication on history`,
     );
   }
+  return authRecord;
+}
 
-  await updateAuthentication({
-    id: authRecord.id,
-    state: AuthenticationState.DONE,
-  });
-
-  return {
-    id: authRecord.id,
-  };
+export async function getAuthentication(
+  identification: string,
+  category: AuthenticationCategory,
+  type: AuthenticationType,
+) {
+  return getAuthenticationByCondition({ identification, category, type });
 }
 
 async function getUserAuth(param: {
@@ -73,43 +114,36 @@ async function getUserAuth(param: {
   type: AuthenticationType;
   userId?: number;
 }) {
-  const record = await getAuthenticationByIdentification(
-    param.identification,
-    param.category,
-    param.type,
-  );
+  const record = await getAuthenticationByCondition({
+    identification: param.identification,
+    category: param.category,
+    type: param.type,
+  });
   const data = record ? [record] : [];
   return new UserAuth(param.userId ?? null, data);
 }
 
-// facade 로 갈만함
-export async function resetAuthentication(
+export async function resetRegisteredUserAuth(
+  userId: number,
+  category: AuthenticationCategory,
+  type: AuthenticationType,
+) {
+  const auth = await getAuthenticationByCondition({ category, type, userId });
+  if (!auth) {
+    return null;
+  }
+
+  await deleteAuthentications([auth.id]);
+}
+
+export async function resetNotRegisteredUserAuth(
   identification: string,
   category: AuthenticationCategory,
   type: AuthenticationType,
-  userId?: number,
 ) {
-  const auth = await getAuthenticationByIdentification(
-    identification,
-    category,
-    type,
-  );
-
+  const auth = await getAuthentication(identification, category, type);
   if (!auth) {
     return;
-  }
-
-  if (!userId) {
-    return;
-  }
-
-  if (auth.userId != userId) {
-    throw new InternalDomainException(
-      ErrorNameEnum.INVALID_INPUT,
-      'user and auth user is not matched',
-      'check identification or someone steel others auth',
-      { userId, targetAuthId: auth.id },
-    );
   }
   await deleteAuthentications([auth.id]);
 }
@@ -129,42 +163,9 @@ export async function createProgressAuthentication(param: {
   identification: string;
   category: AuthenticationCategory;
   type: AuthenticationType;
+  code: string;
   env?: EnvironmentEnum;
 }) {
-  if (param.category == AuthenticationCategory.COMPANY) {
-    if (isGeneralEmailDomain(param.type, param.identification, param.env)) {
-      throw new CallerWrongDomainRuleException(
-        ErrorNameEnum.INVALID_INPUT,
-        'only company email can be used',
-        'change email domain',
-        { identification: param.identification },
-      );
-    }
-  }
-
-  await resetAuthentication(
-    param.identification,
-    param.category,
-    param.type,
-    param.userId,
-  );
-
-  const code = createSixDigitCode(param.env);
-
-  const res = await sendAuthenticationCode(
-    param.category,
-    param.type,
-    code,
-    param.identification,
-  );
-  if (!res) {
-    throw new InternalDomainException(
-      ErrorNameEnum.UNEXPECTED_STATUS,
-      'can not send authentication code',
-      'check brevo status and log',
-    );
-  }
-
   await saveAuthentication({
     userId: param.userId,
     identification: param.identification,
@@ -177,7 +178,7 @@ export async function createProgressAuthentication(param: {
     identification: param.identification,
     category: param.category,
     type: param.type,
-    code,
+    code: param.code,
     expiredAt: createExpiredAt(),
   });
 
@@ -187,77 +188,35 @@ export async function createProgressAuthentication(param: {
   };
 }
 
-async function sendAuthenticationCode(
-  category: AuthenticationCategory,
-  type: AuthenticationType,
-  code: string,
-  identification: string,
-) {
-  if (type != AuthenticationType.EMAIL) {
-    throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
-      'not supported type check AuthenticationType',
-    );
-  }
-
-  let subject = '';
-  let htmlContentFile = '';
-  if (category == AuthenticationCategory.ACCOUNT) {
-    subject = '계정인증';
-    htmlContentFile = path.resolve(
-      __dirname,
-      process.cwd() +
-        '/src/domain/authentication/resource/verify-register/index.html',
-    );
-  }
-
-  if (category == AuthenticationCategory.COMPANY) {
-    subject = '회사인증';
-    htmlContentFile = path.resolve(
-      __dirname,
-      process.cwd() +
-        '/src/domain/authentication/resource/verify-company/index.html',
-    );
-  }
-
-  let htmlContent = fs.readFileSync(htmlContentFile, 'utf8');
-  htmlContent = htmlContent.replace('{{verificationCode}}', code);
-
-  const contents = {
-    subject: subject,
-    htmlContent: htmlContent,
-    to: [{ email: identification }],
-  };
-
-  const config = new ConfigurationService(new ConfigService()).getBrevoConfig();
-  return sendEmail(contents, config);
-}
-
 function createExpiredAt(seconds = 180) {
   const currentDate = new Date();
   currentDate.setSeconds(currentDate.getSeconds() + seconds);
   return currentDate;
 }
-function createSixDigitCode(env?: EnvironmentEnum) {
-  if (env == EnvironmentEnum.TEST || env == EnvironmentEnum.LOCAL) {
-    return '000000';
+
+export function validateDomainWhenCompanyCase(param: {
+  userId?: number;
+  identification: string;
+  category: AuthenticationCategory;
+  type: AuthenticationType;
+  env?: EnvironmentEnum;
+}) {
+  if (param.category !== AuthenticationCategory.COMPANY) {
+    return;
   }
-  const min = 100000;
-  const max = 999999;
-  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-  return randomNumber.toString().padStart(6, '0');
+
+  if (isGeneralEmailDomain(param.identification, param.env)) {
+    throw new CallerWrongDomainRuleException(
+      ErrorNameEnum.INVALID_INPUT,
+      'only company email can be used',
+      'change email domain',
+      { identification: param.identification },
+    );
+  }
 }
 
-function isGeneralEmailDomain(
-  type: AuthenticationType,
-  identification: string,
-  env?: EnvironmentEnum,
-) {
+function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
   if (env != EnvironmentEnum.PRODUCTION) {
-    return false;
-  }
-
-  if (type != AuthenticationType.EMAIL) {
     return false;
   }
 
@@ -268,6 +227,10 @@ function isGeneralEmailDomain(
   const generalDomainList = ['test', 'gmail', 'naver', 'daum', 'hanmail'];
   const domain = identification.split('@')[1].split('.')[0];
   return generalDomainList.includes(domain);
+}
+
+export async function removeAllAuth(userId: number) {
+  return await deleteAuthenticationByUserId(userId);
 }
 
 export const _private = {

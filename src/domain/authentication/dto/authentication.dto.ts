@@ -29,15 +29,17 @@ export interface CreateProgressRequest {
    * @type AuthenticationType
    */
   type: AuthenticationType;
-}
 
-export interface CreateAccountProgressRequest extends CreateProgressRequest {
   /**
-   * authentication category, such as account, company
+   * @deprecated
+   * authentication category, such as account, company, optional param
    * @type AuthenticationCategory
    */
-  category: AuthenticationCategory;
+  category?: AuthenticationCategory;
 }
+
+export interface ReCreateProgressRequest
+  extends Omit<CreateProgressRequest, 'category'> {}
 
 export interface CreateAuthenticationResponse {
   /**

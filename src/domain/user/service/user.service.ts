@@ -2,12 +2,16 @@ import {
   AgreementDTO,
   AreaDto,
   CompanyDto,
-  RegisterUserDTO,
+  RegisterProfileRequest,
   UserPropertyDto,
 } from '@domain/user/dto/user.dto';
-import { AreaCategory, UserState } from '@domain/user/user.enum';
+import {
+  WithdrawalTypeEnum,
+  AreaCategory,
+  OpinionCategory,
+  UserState,
+} from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
-import { syncAuthentication } from '@domain/authentication/service/authentication.service';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { ErrorNameEnum } from '@common/exception/enum';
 import {
@@ -19,6 +23,7 @@ import {
 import {
   getNicknamePartRecord,
   getUserById,
+  saveOpinion,
   saveUser,
   updateUserById,
 } from '@domain/user/repository/user.repository';
@@ -31,7 +36,6 @@ import {
   AuthenticationCategory,
   AuthenticationState,
 } from '@domain/authentication/authentication.enum';
-import { createAccount } from '@domain/account/service/account.service';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -104,11 +108,11 @@ async function searchAuthList(userId: number) {
   };
 }
 
-export async function createProfile(dto: RegisterUserDTO) {
+export async function createProfile(dto: RegisterProfileRequest) {
   const user = await createUser(dto.userProperty);
+
   await createAgreements(user.id, dto.agreements);
   await createAreas(user.id, dto.areas);
-  await createAccount(user.id, dto.account);
 
   return user;
 }
@@ -137,18 +141,13 @@ export async function createUser(dto: UserPropertyDto) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: createRandomNickname(),
-    property: {},
+    property: { companyName: dto.companyData?.companyName ?? null },
   });
-
-  if (dto.companyData) {
-    await changeCompany(user.id, dto.companyData);
-  }
 
   return user;
 }
 
-async function changeCompany(userId: number, dto: CompanyDto) {
-  await syncAuthentication(userId, dto.authenticationId);
+export async function changeCompany(userId: number, dto: CompanyDto) {
   return await updateUserById(userId, {
     property: { companyName: dto.companyName },
   });
@@ -170,8 +169,20 @@ function createRandomNickname() {
   return `${randomAdj} ${randomName}`;
 }
 
+export async function changeUserState(userId: number, state: UserState) {
+  await updateUserById(userId, { state });
+}
+
+export async function createUserOpinion(params: {
+  userId: number;
+  category: OpinionCategory;
+  type: WithdrawalTypeEnum;
+  opinion?: string;
+}) {
+  await saveOpinion(params);
+}
+
 export const _private = {
   createRandomNickname,
   createUser,
-  changeCompany,
 };

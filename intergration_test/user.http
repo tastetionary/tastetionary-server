@@ -1,31 +1,71 @@
 
-### Register User 
+### Register User , full auth
 POST {{base_url}}/v1/user
 Content-Type: {{content_type_json}}
 
 {
   "userProperty": {
-    "companyName": "test"
+    "company": {
+      "authenticationId": 286,
+      "companyName": "matthew-test",
+      "identification": "wkdgndldi@naver.com",
+      "category": "email"
+    }
   },
   "areas": [
     {
       "latitude": 37.48913764364786,
       "longitude": 127.0311629855974,
       "category": "activity_area",
-      "address":"activity"
+      "address": "activity"
     },
     {
       "latitude": 37.48913764364786,
       "longitude": 127.0311629855974,
       "category": "dining_area",
-      "address":"dining"
+      "address": "dining"
     }
   ],
   "account": {
-    "identification": "matthew-0917",
+    "authenticationId": 285,
+    "identification": "wkdgndldi@naver.com",
     "password": "pwd",
     "category": "email"
-    
+  },
+  "agreements": [
+    {
+      "category": "personal_information",
+      "is_agree": true
+    }
+  ]
+}
+
+### Register User, only account
+POST {{base_url}}/v1/user
+Content-Type: {{content_type_json}}
+
+{
+  "userProperty": {
+  },
+  "areas": [
+    {
+      "latitude": 37.48913764364786,
+      "longitude": 127.0311629855974,
+      "category": "activity_area",
+      "address": "activity"
+    },
+    {
+      "latitude": 37.48913764364786,
+      "longitude": 127.0311629855974,
+      "category": "dining_area",
+      "address": "dining"
+    }
+  ],
+  "account": {
+    "authenticationId": 287,
+    "identification": "wkdgndldi@naver.com",
+    "password": "pwd",
+    "category": "email"
   },
   "agreements": [
     {
@@ -42,8 +82,8 @@ post {{base_url}}/v1/account/tokens
 content-type: {{content_type_json}}
 
 {
-  "identification": "matthew-1022",
-  "password": "pwd",
+  "identification": "wkdgndldi@naver.com",
+  "password": "01304932d9ebd816b45b7f1f515fb7ffb12e7e0a63c18d498977418caa8ccec6",
   "category": "email"
 }
 
@@ -66,4 +106,13 @@ Content-Type: {{content_type_json}}
       "longitude": 100,
       "category": "activity_area",
       "address":"activity-update"
+}
+
+### delete user
+DELETE  {{base_url}}/v1/user
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+  "type":"inconvenient_usage"
 }

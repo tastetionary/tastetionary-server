@@ -1,6 +1,17 @@
 import { AccountCategory } from '@domain/account/account.enum';
+import { DoneProgressRequest } from '@domain/authentication/dto/authentication.dto';
 
-export interface AccountDTO {
+export interface ResetPasswordRequest
+  extends DoneProgressRequest,
+    Pick<CreateAccountRequest, 'password'> {}
+
+export interface CreateAccountRequest {
+  /**
+   * authentication id which is done
+   * @type number
+   */
+  authenticationId: number;
+
   /**
    * unique identification for accounts, such as email
    * @type string
@@ -19,6 +30,9 @@ export interface AccountDTO {
    */
   category: AccountCategory;
 }
+
+export interface CreateTokenRequest
+  extends Omit<CreateAccountRequest, 'authenticationId'> {}
 
 export interface TokenDTO {
   accessToken: string;

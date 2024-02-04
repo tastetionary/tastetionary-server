@@ -1,6 +1,16 @@
 
 ### create progress
-POST {{base_url}}/v1/authentication/account
+POST {{base_url}}/v1/authentication/public/account
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "wkdgndldi@naver.com",
+  "category":"company",
+  "type":"email"
+}
+
+### create progress
+POST {{base_url}}/v1/authentication/public/company
 Content-Type: {{content_type_json}}
 
 {
@@ -9,9 +19,56 @@ Content-Type: {{content_type_json}}
   "type":"email"
 }
 
+### done progress //285, 286
+POST {{base_url}}/v1/authentication/public/status/done
+Content-Type: {{content_type_json}}
+
+{
+  "historyId": 264,
+  "code":"551093"
+}
+
+### create progress
+POST {{base_url}}/v1/authentication/public/password
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "wkdgndldi@naver.com",
+  "category":"password",
+  "type":"email"
+}
+
+
+
+### get token(use after register user)
+# @name token
+post {{base_url}}/v1/account/tokens
+content-type: {{content_type_json}}
+
+{
+  "identification": "matthew-0917",
+  "password": "pwd",
+  "category": "email"
+}
+
+###
+@access_token = {{token.response.body.data.accessToken}}
+
+
+### create company progress
+POST {{base_url}}/v1/authentication/company
+Authorization: Bearer {{access_token}}
+Content-Type: {{content_type_json}}
+
+{
+  "identification": "wkdgndldi@naver.com",
+  "type":"email"
+}
+
 
 ### donw progress
 POST {{base_url}}/v1/authentication/status/done
+Authorization: Bearer {{access_token}}
 Content-Type: {{content_type_json}}
 
 {
