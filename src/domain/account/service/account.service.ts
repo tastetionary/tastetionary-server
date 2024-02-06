@@ -6,6 +6,7 @@ import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   deleteAccountByUserId,
   getIdentification,
+  getToken,
   saveAccount,
   updateAccountById,
 } from '@domain/account/repository/account.repository';
@@ -16,6 +17,8 @@ import {
 import * as jwt from 'jsonwebtoken';
 import { AccountCategory } from '@domain/account/account.enum';
 import bcrypt from 'bcrypt';
+import * as TE from 'fp-ts/TaskEither';
+import { pipe } from 'fp-ts/lib/function';
 
 export type AccountEntity = Awaited<ReturnType<typeof getAccount>>;
 export async function getAccount(
@@ -151,4 +154,8 @@ export async function removeAllToken(userId: number) {
 
 export async function removeAllAccount(userId: number) {
   return await deleteAccountByUserId(userId);
+}
+
+export function findAccessToken(accessToken: string) {
+  return pipe(accessToken, getToken);
 }

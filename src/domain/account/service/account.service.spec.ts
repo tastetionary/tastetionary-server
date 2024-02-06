@@ -5,6 +5,7 @@ import {
   removeAllToken,
   getAccount,
   removeAllAccount,
+  findAccessToken,
 } from '@domain/account/service/account.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import { getIdentification } from '@domain/account/repository/account.repository';
@@ -15,6 +16,19 @@ import { CallerWrongUsageException } from '@common/exception/internal.exception'
 describe('account service', () => {
   beforeEach(async () => {
     await truncateTables(prismaClient, ['accounts', 'user_tokens', 'users']);
+  });
+  it('should return value', async () => {
+    const dto = {
+      identification: 'test',
+      password: 'pwd',
+      category: AccountCategory.EMAIL,
+    };
+    const userId = 666;
+    await createAccount({ userId, ...dto });
+
+    const token = await createToken(dto);
+    const res = await findAccessToken(token.accessToken)();
+    expect(res).toBeRight();
   });
 
   it('should remove account', async () => {
