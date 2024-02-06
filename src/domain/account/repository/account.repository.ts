@@ -1,14 +1,25 @@
 import { AccountCategory } from '@domain/account/account.enum';
 import { Prisma } from '@prisma/client';
 import prismaClient from '@common/database/prisma';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
-  ErrorCategoryEnum,
-  ErrorSubCategoryEnum,
-} from '@common/exception/enum';
-import { InternalDomainException } from '@common/exception/internal.exception';
+  ErrorContents,
+  InternalDomainException,
+} from '@common/exception/internal.exception';
 import * as E from 'fp-ts/Either';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
+
+type TokenRecord = {
+  id: number;
+  userId: number;
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiredAt: Date;
+  refreshTokenExpiredAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export async function saveAccount(param: {
   userId: number;
@@ -83,7 +94,9 @@ export async function deleteAccountByUserId(userId: number) {
   }
 }
 
-export function getToken(accessToken: string) {
+export function getToken(
+  accessToken: string,
+): TE.TaskEither<ErrorContents, TokenRecord> {
   return pipe(
     TE.tryCatch(
       () =>

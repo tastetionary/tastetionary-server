@@ -4,16 +4,29 @@ import prismaClient from '@common/database/prisma';
 import {
   deleteAccountByUserId,
   getAccount,
+  getToken,
   saveAccount,
   saveAccounts,
   updateAccountById,
 } from '@domain/account/repository/account.repository';
+import '@relmify/jest-fp-ts';
+import { pipe } from 'fp-ts/lib/function';
+import * as TE from 'fp-ts/TaskEither';
 
 describe('account repository', () => {
   beforeEach(async () => {
     await truncateTables(prismaClient, ['accounts']);
   });
-  it('should return token', () => {});
+
+  it('should return error with message', async () => {
+    await pipe(
+      getToken('123'),
+      TE.mapError((error) => {
+        console.log(error);
+        expect(error).not.toBeNull();
+      }),
+    )();
+  });
 
   it('should delete account', async () => {
     const userId = 1;
