@@ -9,7 +9,7 @@ import {
   CallerWrongDomainRuleException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
-import { ErrorNameEnum } from '@common/exception/enum';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   deleteAuthenticationByUserId,
   deleteAuthentications,
@@ -31,14 +31,14 @@ export async function validateDoneIdentification(param: {
   const auth = await getAuthenticationByCondition({ ...rest });
   if (!auth) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'no data',
     );
   }
 
   if (auth.id != authenticationId) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'not matched data',
     );
   }
@@ -66,21 +66,21 @@ export async function findValidAuth(historyId: number, code: string) {
   const historyRecord = await getHistoryById(historyId);
   if (!historyRecord) {
     throw new InternalDomainException(
-      ErrorNameEnum.NO_DATA,
+      ErrorSubCategoryEnum.NO_DATA,
       `history: ${historyId} not found, check history id`,
     );
   }
 
   if (historyRecord.code != code) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       `given digit code: ${code} not matched with database code, check code`,
     );
   }
 
   if (isExpired(historyRecord.expiredAt)) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'expired auth, start new process',
     );
   }
@@ -93,7 +93,7 @@ export async function findValidAuth(historyId: number, code: string) {
 
   if (!authRecord) {
     throw new InternalDomainException(
-      ErrorNameEnum.NO_DATA,
+      ErrorSubCategoryEnum.NO_DATA,
       `auth not found from given history id, ${historyId}, check authentication on history`,
     );
   }
@@ -207,7 +207,7 @@ export function validateDomainWhenCompanyCase(param: {
 
   if (isGeneralEmailDomain(param.identification, param.env)) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'only company email can be used',
       'change email domain',
       { identification: param.identification },

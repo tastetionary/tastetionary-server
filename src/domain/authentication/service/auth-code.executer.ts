@@ -8,7 +8,7 @@ import { EnvironmentEnum } from '@root/src/env.validation';
 import * as fs from 'fs';
 import path from 'path';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
-import { ErrorNameEnum } from '@common/exception/enum';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { ConfigService } from '@nestjs/config';
 
 export async function sendAuthenticationCodeToEmail(
@@ -19,7 +19,7 @@ export async function sendAuthenticationCodeToEmail(
 ) {
   if (type != AuthenticationType.EMAIL) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'not supported type, only support email type',
     );
   }

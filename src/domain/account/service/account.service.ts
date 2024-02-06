@@ -2,7 +2,7 @@ import { add } from 'date-fns';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import { ErrorNameEnum } from '@common/exception/enum';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   deleteAccountByUserId,
   getIdentification,
@@ -24,7 +24,10 @@ export async function getAccount(
 ) {
   const data = await getIdentification(identification, paramCategory);
   if (!data) {
-    throw new CallerWrongUsageException(ErrorNameEnum.INVALID_INPUT, 'no data');
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'no data',
+    );
   }
   const { category, ...rest } = data;
   return {
@@ -54,7 +57,7 @@ export async function createAccount(param: {
   const accountEntity = await findAccount(param.identification, param.category);
   if (accountEntity) {
     throw new CallerWrongUsageException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'duplicated identification',
       'already registered identification, change other identification',
     );
@@ -110,7 +113,7 @@ async function checkPassword(entity: AccountEntity, password: string) {
   }
 
   throw new CallerWrongUsageException(
-    ErrorNameEnum.INVALID_INPUT,
+    ErrorSubCategoryEnum.INVALID_INPUT,
     'identification or password is not matched',
   );
 }

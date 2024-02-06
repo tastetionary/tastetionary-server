@@ -13,7 +13,7 @@ import {
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import { ErrorNameEnum } from '@common/exception/enum';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   AreaRecord,
   deleteAreas,
@@ -41,7 +41,7 @@ export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
   if (!user) {
     throw new CallerWrongUsageException(
-      ErrorNameEnum.NO_DATA,
+      ErrorSubCategoryEnum.NO_DATA,
       `user not found: ${userId}`,
     );
   }
