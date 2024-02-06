@@ -1,6 +1,6 @@
 import { truncateTables } from '@root/jest.setup';
 import { AccountCategory } from '@domain/account/account.enum';
-import prismaClient from '@root/src/common/database/prisma';
+import prismaClient from '@common/database/prisma';
 import {
   deleteAccountByUserId,
   getAccount,
@@ -13,6 +13,7 @@ describe('account repository', () => {
   beforeEach(async () => {
     await truncateTables(prismaClient, ['accounts']);
   });
+  it('should return token', () => {});
 
   it('should delete account', async () => {
     const userId = 1;

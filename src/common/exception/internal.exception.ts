@@ -1,5 +1,14 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ErrorCategoryEnum, ErrorNameEnum } from '@common/exception/enum';
+import {
+  ErrorCategoryEnum,
+  ErrorSubCategoryEnum,
+} from '@common/exception/enum';
+
+export interface ErrorContents {
+  subCategory: ErrorSubCategoryEnum;
+  message: string;
+  hint?: string;
+}
 
 type loggedData = { [key: string]: any };
 export class BaseException extends HttpException {
@@ -8,7 +17,7 @@ export class BaseException extends HttpException {
   private readonly _loggedData?: loggedData;
   constructor(
     category: ErrorCategoryEnum,
-    name: ErrorNameEnum,
+    name: ErrorSubCategoryEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
@@ -39,7 +48,7 @@ export class BaseException extends HttpException {
 
 export class CallerWrongUsageException extends BaseException {
   constructor(
-    name: ErrorNameEnum,
+    name: ErrorSubCategoryEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
@@ -56,7 +65,7 @@ export class CallerWrongUsageException extends BaseException {
 
 export class CallerWrongDomainRuleException extends BaseException {
   constructor(
-    name: ErrorNameEnum,
+    name: ErrorSubCategoryEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
@@ -73,7 +82,7 @@ export class CallerWrongDomainRuleException extends BaseException {
 
 export class SupplierSystemException extends BaseException {
   constructor(
-    name: ErrorNameEnum,
+    name: ErrorSubCategoryEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,
@@ -90,7 +99,7 @@ export class SupplierSystemException extends BaseException {
 
 export class InternalDomainException extends BaseException {
   constructor(
-    name: ErrorNameEnum,
+    name: ErrorSubCategoryEnum,
     message: string,
     hint?: string,
     loggedData?: loggedData,

@@ -1,9 +1,14 @@
 import { AccountCategory } from '@domain/account/account.enum';
 import { Prisma } from '@prisma/client';
-import prismaClient from '@root/src/common/database/prisma';
-import { ErrorNameEnum } from '@root/src/common/exception/enum';
-import { InternalDomainException } from '@root/src/common/exception/internal.exception';
+import prismaClient from '@common/database/prisma';
+import {
+  ErrorCategoryEnum,
+  ErrorSubCategoryEnum,
+} from '@common/exception/enum';
+import { InternalDomainException } from '@common/exception/internal.exception';
 import * as E from 'fp-ts/Either';
+import * as TE from 'fp-ts/TaskEither';
+import { pipe } from 'fp-ts/lib/function';
 
 export async function saveAccount(param: {
   userId: number;
@@ -66,12 +71,32 @@ export async function deleteAccountByUserId(userId: number) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       return E.left(
         new InternalDomainException(
-          ErrorNameEnum.INTERNAL_ERROR,
+          ErrorSubCategoryEnum.INTERNAL_ERROR,
           e.message,
           e.code,
         ),
       );
     }
-    return E.left(new InternalDomainException(ErrorNameEnum.INTERNAL_ERROR, e));
+    return E.left(
+      new InternalDomainException(ErrorSubCategoryEnum.INTERNAL_ERROR, e),
+    );
   }
+}
+
+export function getToken(accessToken: string) {
+  return pipe(
+    TE.tryCatch(
+      () =>
+        prismaClient.userTokens.findFirstOrThrow({
+          where: { accessToken },
+        }),
+      E.toError,
+    ),
+    TE.mapError((_error) => {
+      return {
+        subCategory: ErrorSubCategoryEnum.INVALID_INPUT,
+        message: 'no data, it is deleted so can not use',
+      };
+    }),
+  );
 }
