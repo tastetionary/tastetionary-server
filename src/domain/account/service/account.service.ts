@@ -17,7 +17,6 @@ import {
 import * as jwt from 'jsonwebtoken';
 import { AccountCategory } from '@domain/account/account.enum';
 import bcrypt from 'bcrypt';
-import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 
 export type AccountEntity = Awaited<ReturnType<typeof getAccount>>;
