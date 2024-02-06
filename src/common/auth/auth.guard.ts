@@ -10,6 +10,7 @@ import { Request } from 'express';
 import { findAccessToken } from '@root/src/domain/account/service/account.service';
 import { pipe } from 'fp-ts/lib/function';
 import * as TE from 'fp-ts/TaskEither';
+import { EnvironmentEnum } from '@root/src/env.validation';
 @Injectable()
 export class AuthGuard implements CanActivate {
   private readonly masterToken = 'master-tastionary';
@@ -28,7 +29,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const token = await this.validateToken(request);
+    const token = await this.validateTokenOnEnv(request);
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -46,12 +47,16 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private async validateToken(request: any) {
+  private async validateTokenOnEnv(request: any) {
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException(
         'no token in request, check Bearer header',
       );
+    }
+
+    if (process.env.ENV == EnvironmentEnum.TEST) {
+      return token;
     }
 
     await pipe(
