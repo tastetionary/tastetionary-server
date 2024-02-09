@@ -44,7 +44,7 @@ jobs:
           cp .env.sample .env
           npx prisma migrate deploy
           npx prisma generate
-          npm run test
+          npm run test:seq
 
   publish:
     runs-on: ubuntu-latest
