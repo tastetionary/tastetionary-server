@@ -22,7 +22,7 @@ import {
   EmptyContentException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
-import { ErrorNameEnum } from '@common/exception/enum';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { AreaEntity, searchAreas } from '@domain/user/service/user.service';
 
 export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
@@ -125,7 +125,7 @@ export async function createReview(param: {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas.activityArea) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.NO_DATA,
+      ErrorSubCategoryEnum.NO_DATA,
       'can not register review, should register activity area',
     );
   }
@@ -136,7 +136,7 @@ export async function createReview(param: {
 
   if (!externalInfo) {
     throw new InternalDomainException(
-      ErrorNameEnum.NO_DATA,
+      ErrorSubCategoryEnum.NO_DATA,
       `no data or can not register about uuid: ${param.externalDto.externalUUID}`,
     );
   }

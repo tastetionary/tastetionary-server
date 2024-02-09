@@ -3,7 +3,7 @@ import {
   getRecommendedRestaurant,
   getSearchOptions,
 } from '@domain/restaurant/service/restaurant.service';
-import { ErrorNameEnum } from '@common/exception/enum';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
 import { searchAreas } from '@domain/user/service/user.service';
 import {
@@ -23,7 +23,7 @@ export async function getRecommendations(param: {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas.diningArea) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.NO_DATA,
+      ErrorSubCategoryEnum.NO_DATA,
       'no dining area',
       'should register first',
     );
@@ -40,7 +40,7 @@ export async function registerReview(param: {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas.activityArea) {
     throw new CallerWrongDomainRuleException(
-      ErrorNameEnum.NO_DATA,
+      ErrorSubCategoryEnum.NO_DATA,
       'can not register review, should register activity area',
     );
   }

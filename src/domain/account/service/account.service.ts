@@ -2,10 +2,11 @@ import { add } from 'date-fns';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import { ErrorNameEnum } from '@common/exception/enum';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   deleteAccountByUserId,
   getIdentification,
+  getToken,
   saveAccount,
   updateAccountById,
 } from '@domain/account/repository/account.repository';
@@ -16,6 +17,7 @@ import {
 import * as jwt from 'jsonwebtoken';
 import { AccountCategory } from '@domain/account/account.enum';
 import bcrypt from 'bcrypt';
+import { pipe } from 'fp-ts/lib/function';
 
 export type AccountEntity = Awaited<ReturnType<typeof getAccount>>;
 export async function getAccount(
@@ -24,7 +26,10 @@ export async function getAccount(
 ) {
   const data = await getIdentification(identification, paramCategory);
   if (!data) {
-    throw new CallerWrongUsageException(ErrorNameEnum.INVALID_INPUT, 'no data');
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'no data',
+    );
   }
   const { category, ...rest } = data;
   return {
@@ -54,7 +59,7 @@ export async function createAccount(param: {
   const accountEntity = await findAccount(param.identification, param.category);
   if (accountEntity) {
     throw new CallerWrongUsageException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'duplicated identification',
       'already registered identification, change other identification',
     );
@@ -110,7 +115,7 @@ async function checkPassword(entity: AccountEntity, password: string) {
   }
 
   throw new CallerWrongUsageException(
-    ErrorNameEnum.INVALID_INPUT,
+    ErrorSubCategoryEnum.INVALID_INPUT,
     'identification or password is not matched',
   );
 }
@@ -148,4 +153,8 @@ export async function removeAllToken(userId: number) {
 
 export async function removeAllAccount(userId: number) {
   return await deleteAccountByUserId(userId);
+}
+
+export function findAccessToken(accessToken: string) {
+  return pipe(accessToken, getToken);
 }

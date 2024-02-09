@@ -3,7 +3,7 @@ import { transformer, UserEntity } from './lab';
 describe('lab', () => {
   it('temp', () => {
     const user = { id: 1, nickname: '', state: '' };
-    const areaUser = transformer<UserEntity, 'area'>(user, (user) => {
+    const _areaUser = transformer<UserEntity, 'area'>(user, (user) => {
       return {
         ...user,
         type: 'area',
@@ -13,7 +13,7 @@ describe('lab', () => {
       };
     });
 
-    const authUser = transformer<UserEntity, 'auth'>(user, (user) => {
+    const _authUser = transformer<UserEntity, 'auth'>(user, (user) => {
       return {
         ...user,
         type: 'auth',

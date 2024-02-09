@@ -5,7 +5,7 @@ import {
 } from '@domain/authentication/authentication.enum';
 import { Prisma } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
-import { ErrorNameEnum } from '@root/src/common/exception/enum';
+import { ErrorSubCategoryEnum } from '@root/src/common/exception/enum';
 import { InternalDomainException } from '@root/src/common/exception/internal.exception';
 import * as E from 'fp-ts/Either';
 export interface AuthenticationHistoryRecord {
@@ -108,10 +108,11 @@ export async function getAuthenticationByCondition(
 }
 
 export async function getAuthenticationsByUserId(
-  userId,
+  userId: number,
+  state: AuthenticationState,
 ): Promise<AuthenticationRecord[]> {
   const records = await prismaClient.authentications.findMany({
-    where: { userId },
+    where: { userId, state },
   });
   return transformAuthentications(records);
 }
@@ -176,13 +177,15 @@ export async function deleteAuthenticationByUserId(userId: number) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       return E.left(
         new InternalDomainException(
-          ErrorNameEnum.INTERNAL_ERROR,
+          ErrorSubCategoryEnum.INTERNAL_ERROR,
           e.message,
           e.code,
         ),
       );
     }
-    return E.left(new InternalDomainException(ErrorNameEnum.INTERNAL_ERROR, e));
+    return E.left(
+      new InternalDomainException(ErrorSubCategoryEnum.INTERNAL_ERROR, e),
+    );
   }
 }
 

@@ -1,4 +1,7 @@
-import { ErrorCategoryEnum, ErrorNameEnum } from '@common/exception/enum';
+import {
+  ErrorCategoryEnum,
+  ErrorSubCategoryEnum,
+} from '@common/exception/enum';
 import {
   BaseException,
   CallerWrongUsageException,
@@ -7,7 +10,7 @@ import {
 describe('exception', () => {
   it('should create caller error', () => {
     const error = new CallerWrongUsageException(
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'message',
       'hint',
       {
@@ -23,7 +26,7 @@ describe('exception', () => {
   it('should create error', () => {
     const error = new BaseException(
       ErrorCategoryEnum.CALLER_WRONG_DOMAIN_ERROR,
-      ErrorNameEnum.INVALID_INPUT,
+      ErrorSubCategoryEnum.INVALID_INPUT,
       'message',
       'hint',
       { userId: 'userId' },
