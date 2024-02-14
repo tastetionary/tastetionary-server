@@ -6,11 +6,13 @@ on:
       - main
       - develop
       - 'bridge/*' # Use single quotes around 'bridge/*' to treat it as a string
+      - testing
   pull_request:
     branches:
       - main
       - develop
       - 'bridge/*' #
+      - testing
 
 jobs:
   build:
