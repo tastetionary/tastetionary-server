@@ -93,7 +93,7 @@ describe('restaurant controller', () => {
           distance: 10,
         },
         aggregateReviews: {
-          categories: [RestaurantCategory.ALL],
+          categories: [RestaurantCategory.KOREAN],
           summaries: [''],
           opinions: [''],
           keywords: [''],
