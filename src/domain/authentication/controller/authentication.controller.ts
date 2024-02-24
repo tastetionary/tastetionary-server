@@ -23,6 +23,7 @@ import {
   finishAuthProgress,
 } from '@domain/authentication/facade/authentication.facade';
 import { AuthGuard } from '@common/auth/auth.guard';
+
 @Controller('v1/authentication')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
