@@ -27,9 +27,7 @@ describe('account controller', () => {
   });
 
   it('/password should success', async () => {
-    jest
-      .spyOn(facade, 'resetEmailPassword')
-      .mockReturnValue(Promise.resolve(1));
+    jest.spyOn(facade, 'resetPassword').mockReturnValue(Promise.resolve('abc'));
 
     const res = await request(app.getHttpServer())
       .put('/v1/account/password')

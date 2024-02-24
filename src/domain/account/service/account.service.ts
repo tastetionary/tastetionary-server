@@ -84,6 +84,8 @@ export async function updatePassword(param: {
     identification: param.identification,
     password,
   });
+
+  return password;
 }
 
 async function encryptValue(value: string) {

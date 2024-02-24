@@ -12,25 +12,23 @@ import {
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
 
-export async function resetEmailPassword(
-  historyId: number,
-  code: string,
-  newPassword: string,
-) {
+export async function resetPassword(historyId: number, code: string) {
   const auth = await findValidAuth(historyId, code);
   const account = await getAccount(auth.identification, AccountCategory.EMAIL);
 
+  const newPassword = Math.random().toString(36).substring(2, 8);
   await updatePassword({
     accountId: account.id,
     identification: account.identification,
     password: newPassword,
   });
 
+  // for clear history
   await resetNotRegisteredUserAuth(
     account.identification,
     AuthenticationCategory.PASSWORD,
     AuthenticationType.EMAIL,
   );
 
-  return account.id;
+  return newPassword;
 }

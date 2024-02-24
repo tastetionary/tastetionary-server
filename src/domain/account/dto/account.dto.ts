@@ -1,9 +1,7 @@
 import { AccountCategory } from '@domain/account/account.enum';
 import { DoneProgressRequest } from '@domain/authentication/dto/authentication.dto';
 
-export interface ResetPasswordRequest
-  extends DoneProgressRequest,
-    Pick<CreateAccountRequest, 'password'> {}
+export interface ResetPasswordRequest extends DoneProgressRequest {}
 
 export interface CreateAccountRequest {
   /**
