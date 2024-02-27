@@ -106,7 +106,16 @@ type tableNames =
   | 'authentication_histories'
   | 'external_restaurant_informations'
   | 'user_opinions';
+
 async function truncateTables(prisma: PrismaClient, tableNames: tableNames[]) {
+  const url = prisma['_engineConfig'].env.DATABASE_URL;
+  if (!url.includes('localhost')) {
+    console.warn(
+      `wrong db url, only in localhost env, data deleted. should check on .env, DATABASE_URL, given db url: ${url}`,
+    );
+    return;
+  }
+
   for (const name of tableNames) {
     await prisma.$queryRawUnsafe(
       `TRUNCATE "${name}" RESTART IDENTITY CASCADE;`,
