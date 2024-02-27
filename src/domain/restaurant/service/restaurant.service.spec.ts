@@ -117,6 +117,7 @@ describe('restaurant service', () => {
         categories: [RestaurantCategory.ASIAN],
         excludeRestaurantIds: [],
       });
+      expect(res.aggregateReviews.keywords).toEqual(['깨끗해요✨']);
       expect(res).not.toBeNull();
     });
 
