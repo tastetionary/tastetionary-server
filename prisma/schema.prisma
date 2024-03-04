@@ -185,3 +185,14 @@ model UserOpinions {
   @@index([category, type])
   @@map("user_opinions")
 }
+
+model Logs {
+  id        Int      @id @default(autoincrement())
+  level     String   @map("level") @db.VarChar(32) /// 로그의 종류, 에러, 정보, 디버그 등
+  type      String   @map("type") @db.VarChar(32) /// 로그 타입 food, restaurant 등
+  message   String   @map("message") @db.VarChar(1024) /// 로그의 내용
+  timestamp DateTime @default(now()) @map("timestamp")
+
+  @@index([level])
+  @@map("logs")
+}
