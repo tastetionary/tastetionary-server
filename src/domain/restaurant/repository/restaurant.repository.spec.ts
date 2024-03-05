@@ -177,52 +177,52 @@ describe('Restaurant repository', () => {
     const expected = {
       categories: [
         {
-          id: 0,
+          id: 1,
           name: '한식',
           icon: 'menu_korean',
         },
         {
-          id: 1,
+          id: 2,
           name: '중식',
           icon: 'menu_chinese',
         },
         {
-          id: 2,
+          id: 3,
           name: '양식',
           icon: 'menu_western',
         },
         {
-          id: 3,
+          id: 4,
           name: '일식',
           icon: 'menu_japanese',
         },
         {
-          id: 4,
+          id: 5,
           name: '패스트푸드',
           icon: 'menu_fastfood',
         },
         {
-          id: 5,
+          id: 6,
           name: '분식',
           icon: 'menu_snack',
         },
         {
-          id: 6,
+          id: 7,
           name: '아시아식',
           icon: 'menu_asian',
         },
         {
-          id: 7,
+          id: 8,
           name: '뷔페',
           icon: 'menu_buffet',
         },
         {
-          id: 8,
+          id: 9,
           name: '샐러드',
           icon: 'menu_salad',
         },
         {
-          id: 9,
+          id: 10,
           name: '카페/디저트',
           icon: 'menu_cafedessert',
         },
