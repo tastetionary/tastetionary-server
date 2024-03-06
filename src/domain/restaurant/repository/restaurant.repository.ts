@@ -186,7 +186,7 @@ export function getRestaurantOptionsRecord() {
   const categories = Object.values(RestaurantCategory).map(
     (category, index) => {
       return {
-        id: index,
+        id: index + 1,
         name: category,
         icon: RestaurantCategoryIcons[category],
       };
