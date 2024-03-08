@@ -16,9 +16,7 @@ function initSentry(dsn: string, env: string) {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: winstonLogger,
-  });
+  const app = await NestFactory.create(AppModule);
 
   const config = app.get(ConfigService);
   const url = config.get<string>('API_SERVER_URL') as string;

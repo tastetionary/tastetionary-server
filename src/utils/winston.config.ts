@@ -1,43 +1,51 @@
-import { utilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import winstonDaily from 'winston-daily-rotate-file';
-const { colorize } = winston.format;
-import { EnvironmentEnum } from '@src/env.validation';
+import { PostgresTransport } from '@innova2/winston-pg';
+import { ConfigService } from '@nestjs/config';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
 
-const env = process.env.ENV;
-const logDir = `${process.cwd()}/logs`;
+export class ResultLogTable {
+  level: string;
+  timestamp: string;
+  message: string;
+  type: string;
+  keyword: string;
+  category: string;
+}
 
-const dailyOptions = (level: string) => {
-  return {
-    level,
-    datePattern: 'YYYY-MM-DD',
-    dirname: logDir + `/${level}`,
-    filename: `%DATE%.${level}.log`,
-    maxFiles: 30,
-    zippedArchive: true,
-  };
-};
-
-export const winstonLogger = WinstonModule.createLogger({
-  transports: [
-    new winston.transports.Console({
-      level: env === EnvironmentEnum.PRODUCTION ? 'info' : 'silly',
-      format:
-        env === EnvironmentEnum.PRODUCTION
-          ? winston.format.simple()
-          : winston.format.combine(
-              winston.format.timestamp({
-                format: 'YYYY-MM-DD HH:mm:ss',
-              }),
-              colorize({ all: true }),
-              utilities.format.nestLike('taste-dictionary-server', {
-                prettyPrint: true,
-              }),
-            ),
-    }),
-
-    new winstonDaily(dailyOptions('info')),
-    new winstonDaily(dailyOptions('warn')),
-    new winstonDaily(dailyOptions('error')),
+const configService = new ConfigurationService(new ConfigService());
+const pgTransport = new PostgresTransport<ResultLogTable>({
+  connectionString: configService.getDataBaseUrl() || '',
+  maxPool: 10,
+  tableName: 'sample_logs',
+  tableColumns: [
+    {
+      name: 'level',
+      dataType: 'VARCHAR',
+    },
+    {
+      name: 'timestamp',
+      dataType: 'TIMESTAMP',
+    },
+    {
+      name: 'message',
+      dataType: 'VARCHAR',
+    },
+    {
+      name: 'type',
+      dataType: 'character varying',
+    },
+    {
+      name: 'keyword',
+      dataType: 'character varying',
+    },
+    {
+      name: 'category',
+      dataType: 'character varying',
+    },
   ],
+});
+
+export const winstonLogger = winston.createLogger({
+  level: 'info',
+  transports: [pgTransport as unknown as winston.transport],
 });
