@@ -13,6 +13,7 @@ export enum RestaurantCategory {
 
 export enum RestaurantKeyword {
   ALL = '전체',
+  TASTE = '맛있어요',
   CLEAN = '깨끗해요',
   KIND = '친절해요',
   ATMOSPHERE = '분위기 좋아요',
@@ -21,6 +22,7 @@ export enum RestaurantKeyword {
   ROTATION = '회전율 좋아요',
   LARGE = '양이 많아요',
   WIDE = '넓고 쾌적해요',
+  WAITING = '웨이팅 있어요',
 }
 
 export enum RestaurantPrice {
@@ -46,6 +48,7 @@ export const RestaurantCategoryIcons: Record<RestaurantCategory, string> = {
 
 export const RestaurantKeywordEmoji: Record<RestaurantKeyword, string> = {
   [RestaurantKeyword.ALL]: '',
+  [RestaurantKeyword.TASTE]: '👅',
   [RestaurantKeyword.CLEAN]: '✨',
   [RestaurantKeyword.KIND]: '💕',
   [RestaurantKeyword.ATMOSPHERE]: '🍷',
@@ -53,5 +56,6 @@ export const RestaurantKeywordEmoji: Record<RestaurantKeyword, string> = {
   [RestaurantKeyword.PARKING]: '🚘',
   [RestaurantKeyword.ROTATION]: '⏩',
   [RestaurantKeyword.LARGE]: '🥰',
-  [RestaurantKeyword.WIDE]: '🖼️',
+  [RestaurantKeyword.WIDE]: '🎶',
+  [RestaurantKeyword.WAITING]: '💦',
 };
