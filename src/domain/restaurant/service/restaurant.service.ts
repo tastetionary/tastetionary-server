@@ -14,7 +14,10 @@ import {
   saveExternalRestaurantInformation,
   saveReview,
 } from '@domain/restaurant/repository/restaurant.repository';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantKeywordEmoji,
+} from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
 import {
@@ -42,6 +45,7 @@ export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
     revisitRatio: 0,
     totalCount: randomReviews.length,
   };
+
   fx.pipe(
     randomReviews,
     fx.map((review) => {
@@ -96,6 +100,7 @@ export async function getRecommendedRestaurant(param: {
     (r) => r.id.toString() == id,
   ) as ExternalRestaurantInformationRecord;
 
+  data.keywords = attachEmoji(data.keywords);
   return {
     restaurant: targetRestaurant,
     aggregateReviews: data,
@@ -211,6 +216,10 @@ function aggregatePrice(prices: number[]) {
   const uniquePrices = [...new Set(prices)];
   data['avg'] = fx.average(uniquePrices);
   return data;
+}
+
+function attachEmoji(data: string[]) {
+  return data.map((d) => d + RestaurantKeywordEmoji[d]);
 }
 
 export const _private = {
