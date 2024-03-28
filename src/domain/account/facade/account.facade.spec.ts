@@ -11,7 +11,7 @@ import {
   createAccount,
   createToken,
 } from '@domain/account/service/account.service';
-import { resetEmailPassword } from '@domain/account/facade/account.facade';
+import { resetPassword } from '@domain/account/facade/account.facade';
 import { truncateTables } from '@root/jest.setup';
 import prismaClient from '@common/database/prisma';
 
@@ -49,8 +49,7 @@ describe('facade', () => {
       };
       const history = await createProgressAuthentication(data);
 
-      const newPassword = 'updatedPassword';
-      await resetEmailPassword(history.id, code, newPassword);
+      const newPassword = await resetPassword(history.id, code);
 
       const token = await createToken({
         identification: dto.identification,

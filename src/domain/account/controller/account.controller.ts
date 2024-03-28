@@ -20,7 +20,7 @@ import {
   createToken,
   removeAllToken,
 } from '@domain/account/service/account.service';
-import { resetEmailPassword } from '@domain/account/facade/account.facade';
+import { resetPassword } from '@domain/account/facade/account.facade';
 
 @Controller('v1/account')
 @UseFilters(new HttpExceptionFilter())
@@ -62,7 +62,7 @@ export class AccountController {
   async resetPassword(
     @TypedBody() req: ResetPasswordRequest,
   ): Promise<BaseResponseDto<object>> {
-    await resetEmailPassword(req.historyId, req.code, req.password);
-    return new BaseResponseDto({ state: 'success' });
+    const newPassword = await resetPassword(req.historyId, req.code);
+    return new BaseResponseDto({ state: 'success', password: newPassword });
   }
 }
