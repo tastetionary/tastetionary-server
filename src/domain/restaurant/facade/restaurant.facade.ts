@@ -2,6 +2,7 @@ import {
   createReview,
   getRecommendedRestaurant,
   getSearchOptions,
+  getReviewOptions,
 } from '@domain/restaurant/service/restaurant.service';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
@@ -50,4 +51,8 @@ export async function registerReview(param: {
 
 export function getFilterOptions() {
   return getSearchOptions();
+}
+
+export function getReviewFilterOptions() {
+  return getReviewOptions();
 }

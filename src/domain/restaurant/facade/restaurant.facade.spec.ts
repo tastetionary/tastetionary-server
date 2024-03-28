@@ -1,6 +1,7 @@
 import { areaEntityFactory } from '@root/test/factory/user.factory';
 import {
   getFilterOptions,
+  getReviewFilterOptions,
   getRecommendations,
   registerReview,
 } from '@domain/restaurant/facade/restaurant.facade';
@@ -46,6 +47,15 @@ describe('registerReview', () => {
 describe('getFilterOptions', () => {
   it('getFilterOptions should return data', () => {
     const res = getFilterOptions();
+    expect(res).toHaveProperty('categories');
+    expect(res).toHaveProperty('keywords');
+    expect(res).toHaveProperty('prices');
+  });
+});
+
+describe('getReviewFilterOptions', () => {
+  it('getFilterOptions should return data', () => {
+    const res = getReviewFilterOptions();
     expect(res).toHaveProperty('categories');
     expect(res).toHaveProperty('keywords');
     expect(res).toHaveProperty('prices');
