@@ -20,6 +20,7 @@ import { ExternalRestaurantInformationRecord } from '@domain/restaurant/reposito
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import {
   getFilterOptions,
+  getReviewFilterOptions,
   getRecommendations,
   registerReview,
 } from '@domain/restaurant/facade/restaurant.facade';
@@ -133,6 +134,22 @@ export class RestaurantController {
   @TypedRoute.Get('option')
   @HttpCode(200)
   getOptions(): BaseResponseDto<GetRestaurantFilterOption> {
+    const res = getFilterOptions();
+
+    return new BaseResponseDto({
+      categories: res.categories,
+      keywords: res.keywords,
+      prices: res.prices,
+    });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary get restaurant filter option
+   */
+  @TypedRoute.Get('/review/option')
+  @HttpCode(200)
+  getReviewOptions(): BaseResponseDto<GetRestaurantFilterOption> {
     const res = getFilterOptions();
 
     return new BaseResponseDto({
