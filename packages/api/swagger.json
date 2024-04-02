@@ -26,7 +26,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AccountDTO"
+                "$ref": "#/components/schemas/CreateTokenRequest"
               }
             }
           },
@@ -139,10 +139,10 @@
         "x-nestia-method": "DELETE"
       }
     },
-    "/v1/authentication/account": {
-      "post": {
+    "/v1/account/password": {
+      "put": {
         "tags": [
-          "authentication"
+          "account"
         ],
         "parameters": [],
         "requestBody": {
@@ -150,7 +150,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateAccountProgressRequest"
+                "$ref": "#/components/schemas/ResetPasswordRequest"
               }
             }
           },
@@ -163,20 +163,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_CreateAuthenticationResponse_gt_"
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
                 }
               }
             },
             "x-nestia-encrypted": false
           }
         },
-        "x-nestia-namespace": "v1.authentication.account.createProgressAboutAccount",
+        "x-nestia-namespace": "v1.account.password.resetPassword",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
             "text": [
               {
-                "text": "authentication",
+                "text": "account",
                 "kind": "text"
               }
             ]
@@ -185,21 +185,31 @@
             "name": "summary",
             "text": [
               {
-                "text": "create authentication in progress, return progress id, it need when check. it can be used for account, company",
+                "text": "update password, need authentication code and id and identification",
                 "kind": "text"
               }
             ]
           }
         ],
-        "x-nestia-method": "POST"
+        "x-nestia-method": "PUT"
       }
     },
-    "/v1/authentication/company": {
+    "/v1/authentication/public/{category}": {
       "post": {
         "tags": [
           "authentication"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/AuthenticationCategory"
+            },
+            "required": true
+          }
+        ],
         "requestBody": {
           "description": "",
           "content": {
@@ -225,12 +235,7 @@
             "x-nestia-encrypted": false
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "x-nestia-namespace": "v1.authentication.company.createProgressAboutCompany",
+        "x-nestia-namespace": "v1.authentication.public.createProgressingAccount",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
@@ -245,16 +250,117 @@
             "name": "summary",
             "text": [
               {
-                "text": "create company authentication in progress, return progress id, it need when check",
+                "text": "[noToken] create authentication in progress, return progress id, it need when check. it can be used for account, company",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/authentication/public/status/done": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoneProgressRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_DoneAuthenticationResponse_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.authentication.public.status.done.doneProgress",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "authentication",
                 "kind": "text"
               }
             ]
           },
           {
-            "name": "security",
+            "name": "summary",
             "text": [
               {
-                "text": "bearer",
+                "text": "[noToken] done in progress authentication, return id will be used",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/authentication/company": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReCreateProgressRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_CreateAuthenticationResponse_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.authentication.company.reCreateCompanyAuthentication",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "authentication",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "reCreate company authentication, it will delete company type auth if data exists",
                 "kind": "text"
               }
             ]
@@ -294,7 +400,7 @@
             "x-nestia-encrypted": false
           }
         },
-        "x-nestia-namespace": "v1.authentication.status.done.doneProgress",
+        "x-nestia-namespace": "v1.authentication.status.done.doneUserProgress",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
@@ -309,7 +415,7 @@
             "name": "summary",
             "text": [
               {
-                "text": "done in progress authentication, return id will be uses",
+                "text": "done in progress authentication and sync auth result to user",
                 "kind": "text"
               }
             ]
@@ -668,7 +774,50 @@
             "x-nestia-encrypted": false
           }
         },
-        "x-nestia-namespace": "v1.restaurant.option.getOption",
+        "x-nestia-namespace": "v1.restaurant.option.getOptions",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get restaurant filter option",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "GET"
+      }
+    },
+    "/v1/restaurant/review/option": {
+      "get": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetRestaurantFilterOption_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.restaurant.review.option.getReviewOptions",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
@@ -703,7 +852,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterUserDTO"
+                "$ref": "#/components/schemas/RegisterProfileRequest"
               }
             }
           },
@@ -764,7 +913,7 @@
             "x-nestia-encrypted": false
           }
         },
-        "x-nestia-namespace": "v1.user.getProfile",
+        "x-nestia-namespace": "v1.user.inquireMyPageProfile",
         "x-nestia-jsDocTags": [
           {
             "name": "tag",
@@ -839,12 +988,65 @@
           }
         ],
         "x-nestia-method": "PUT"
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawUserDto"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.user.withdrawUser",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "user",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "withdraw user, delete account, token and update state",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "DELETE"
       }
     }
   },
   "components": {
     "schemas": {
-      "AccountDTO": {
+      "CreateTokenRequest": {
         "type": "object",
         "properties": {
           "identification": {
@@ -977,12 +1179,80 @@
         "nullable": false,
         "x-typia-jsDocTags": []
       },
-      "CreateAccountProgressRequest": {
+      "ResetPasswordRequest": {
         "type": "object",
         "properties": {
-          "category": {
-            "$ref": "#/components/schemas/AuthenticationCategory"
+          "historyId": {
+            "description": "history id to validate create authentication",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
           },
+          "code": {
+            "description": "authentication code for validating",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "password": {
+            "description": "password for accounts, it should be one-way encrypted",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "historyId",
+          "code",
+          "password"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "AuthenticationCategory": {
+        "type": "string",
+        "enum": [
+          "account",
+          "company",
+          "password"
+        ]
+      },
+      "CreateProgressRequest": {
+        "type": "object",
+        "properties": {
           "identification": {
             "description": "unique identification for authentication, such as test@gmail.com",
             "x-typia-jsDocTags": [
@@ -1019,22 +1289,45 @@
             "enum": [
               "email"
             ]
+          },
+          "category": {
+            "deprecated": true,
+            "x-typia-jsDocTags": [
+              {
+                "name": "deprecated",
+                "text": [
+                  {
+                    "text": "authentication category, such as account, company, optional param",
+                    "kind": "text"
+                  }
+                ]
+              },
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "AuthenticationCategory",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string",
+            "enum": [
+              "account",
+              "company",
+              "password"
+            ]
           }
         },
         "nullable": false,
         "required": [
-          "category",
           "identification",
           "type"
         ],
         "x-typia-jsDocTags": []
-      },
-      "AuthenticationCategory": {
-        "type": "string",
-        "enum": [
-          "account",
-          "company"
-        ]
       },
       "BaseResponseDto_lt_CreateAuthenticationResponse_gt_": {
         "type": "object",
@@ -1092,54 +1385,6 @@
         "required": [
           "id",
           "expiredAt"
-        ],
-        "x-typia-jsDocTags": []
-      },
-      "CreateProgressRequest": {
-        "type": "object",
-        "properties": {
-          "identification": {
-            "description": "unique identification for authentication, such as test@gmail.com",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
-          },
-          "type": {
-            "description": "authentication type, such as email",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "AuthenticationType",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "enum": [
-              "email"
-            ]
-          }
-        },
-        "nullable": false,
-        "required": [
-          "identification",
-          "type"
         ],
         "x-typia-jsDocTags": []
       },
@@ -1228,11 +1473,59 @@
         ],
         "x-typia-jsDocTags": []
       },
+      "ReCreateProgressRequest": {
+        "type": "object",
+        "properties": {
+          "identification": {
+            "description": "unique identification for authentication, such as test@gmail.com",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "type": {
+            "description": "authentication type, such as email",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "AuthenticationType",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "email"
+            ]
+          }
+        },
+        "nullable": false,
+        "required": [
+          "identification",
+          "type"
+        ],
+        "x-typia-jsDocTags": []
+      },
       "ServerConfig": {
         "type": "object",
         "properties": {
           "env": {
-            "$ref": "#/components/schemas/Environment"
+            "$ref": "#/components/schemas/EnvironmentEnum"
           }
         },
         "nullable": false,
@@ -1241,7 +1534,7 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "Environment": {
+      "EnvironmentEnum": {
         "type": "string",
         "enum": [
           "local",
@@ -1333,7 +1626,6 @@
           "패스트푸드",
           "분식",
           "아시아식",
-          "뷔페",
           "샐러드",
           "카페/디저트"
         ]
@@ -1561,6 +1853,26 @@
       "GetRestaurantInput": {
         "type": "object",
         "properties": {
+          "category": {
+            "description": "restaurant category array,\nexample: [\"한식\"]",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "RestaurantCategory",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RestaurantCategory"
+            }
+          },
           "excludeIds": {
             "description": "already recommended restaurant ids, it will be ignored\nexample: 10000",
             "x-typia-jsDocTags": [
@@ -1594,9 +1906,6 @@
               "x-typia-optional": false,
               "type": "number"
             }
-          },
-          "category": {
-            "$ref": "#/components/schemas/RestaurantCategory"
           },
           "keywords": {
             "description": "restaurant keywords\nexample: \"깨끗해요\"",
@@ -1652,8 +1961,8 @@
         },
         "nullable": false,
         "required": [
-          "excludeIds",
           "category",
+          "excludeIds",
           "keywords",
           "price"
         ],
@@ -2287,7 +2596,7 @@
           "13,000원~"
         ]
       },
-      "RegisterUserDTO": {
+      "RegisterProfileRequest": {
         "type": "object",
         "properties": {
           "userProperty": {
@@ -2314,7 +2623,7 @@
             }
           },
           "account": {
-            "$ref": "#/components/schemas/AccountDTO"
+            "$ref": "#/components/schemas/CreateAccountRequest"
           },
           "agreements": {
             "description": "agreements data",
@@ -2392,12 +2701,51 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
+          },
+          "identification": {
+            "description": "string to identify unique, like email. it is coupled by category",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "category": {
+            "description": "identification category, available use: email",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "email"
+            ]
           }
         },
         "nullable": false,
         "required": [
           "authenticationId",
-          "companyName"
+          "companyName",
+          "identification",
+          "category"
         ],
         "x-typia-jsDocTags": []
       },
@@ -2474,6 +2822,90 @@
           "activity_area",
           "dining_area"
         ]
+      },
+      "CreateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "authenticationId": {
+            "description": "authentication id which is done",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "identification": {
+            "description": "unique identification for accounts, such as email",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "password": {
+            "description": "password for accounts, it should be one-way encrypted",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "category": {
+            "description": "category for accounts, now only support 'EMAIL'",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "email"
+            ]
+          }
+        },
+        "nullable": false,
+        "required": [
+          "authenticationId",
+          "identification",
+          "password",
+          "category"
+        ],
+        "x-typia-jsDocTags": []
       },
       "AgreementDTO": {
         "type": "object",
@@ -2573,62 +3005,224 @@
             "x-typia-optional": false,
             "type": "string"
           },
-          "activity_area": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/object"
-              },
-              {
-                "$ref": "#/components/schemas/AreaDto"
-              }
-            ],
-            "description": "user activity_area, if not, return empty object",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "AreaDto",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false
+          "area": {
+            "$ref": "#/components/schemas/__object"
           },
-          "dining_area": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/object"
-              },
-              {
-                "$ref": "#/components/schemas/AreaDto"
-              }
-            ],
-            "description": "user dining_area,",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "AreaDto",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": false,
-            "x-typia-optional": true
+          "account": {
+            "$ref": "#/components/schemas/__type.o1"
           }
         },
         "nullable": false,
         "required": [
           "id",
           "nickname",
-          "activity_area"
+          "area",
+          "account"
         ],
         "x-typia-jsDocTags": []
+      },
+      "__object": {
+        "type": "object",
+        "properties": {
+          "diningArea": {
+            "$ref": "#/components/schemas/Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_"
+          },
+          "activityArea": {
+            "$ref": "#/components/schemas/Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_.Nullable"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "diningArea",
+          "activityArea"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "latitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "longitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "createdAt": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          "order": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "address": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "userId": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "category": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "account",
+              "company",
+              "password",
+              "activity_area",
+              "dining_area"
+            ]
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "latitude",
+          "longitude",
+          "order",
+          "address",
+          "userId",
+          "category"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_.Nullable": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "latitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "longitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "createdAt": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          "order": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "address": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "userId": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "category": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "account",
+              "company",
+              "password",
+              "activity_area",
+              "dining_area"
+            ]
+          }
+        },
+        "nullable": true,
+        "required": [
+          "id",
+          "latitude",
+          "longitude",
+          "order",
+          "address",
+          "userId",
+          "category"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "__type.o1": {
+        "type": "object",
+        "properties": {
+          "accountEmail": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "companyEmail": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "nullable": false,
+        "required": [
+          "accountEmail",
+          "companyEmail"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "WithdrawUserDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/WithdrawalTypeEnum"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "type"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "WithdrawalTypeEnum": {
+        "type": "string",
+        "enum": [
+          "inconvenient_usage",
+          "no_longer_need_service",
+          "infrequently_use",
+          "found_similar_service",
+          "low_reliability_contents",
+          "want_to_delete_personal_information"
+        ]
       }
     },
     "securitySchemes": {
