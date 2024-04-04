@@ -177,11 +177,6 @@ describe('Restaurant repository', () => {
     const expected = {
       categories: [
         {
-          id: 0,
-          name: '전체',
-          icon: 'menu_all',
-        },
-        {
           id: 1,
           name: '한식',
           icon: 'menu_korean',

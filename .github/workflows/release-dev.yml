@@ -179,9 +179,9 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/taste-test-server:latest
           cache-to: type=inline
 
-  deploy_test:
+  deploy:
     runs-on: self-hosted
-    if: success()
+    if: always()
     needs: [ build_and_push_test, build_and_push ]
     steps:
       - name: Checkout

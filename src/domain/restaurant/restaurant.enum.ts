@@ -1,5 +1,4 @@
 export enum RestaurantCategory {
-  ALL = '전체',
   KOREAN = '한식',
   CHINESE = '중식',
   WESTERN = '양식',
@@ -35,7 +34,6 @@ export enum RestaurantPrice {
 }
 
 export const RestaurantCategoryIcons: Record<RestaurantCategory, string> = {
-  [RestaurantCategory.ALL]: 'menu_all',
   [RestaurantCategory.KOREAN]: 'menu_korean',
   [RestaurantCategory.CHINESE]: 'menu_chinese',
   [RestaurantCategory.WESTERN]: 'menu_western',
