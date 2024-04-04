@@ -169,4 +169,12 @@ describe('restaurant controller', () => {
 
     expect(res.statusCode).toEqual(200);
   });
+
+  it('/review/option, should return 200', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/v1/restaurant/review/option')
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+  });
 });

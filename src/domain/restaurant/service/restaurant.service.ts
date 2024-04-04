@@ -202,6 +202,17 @@ export function getSearchOptions() {
   return getRestaurantOptionsRecord();
 }
 
+export function getReviewOptions() {
+  const options = getRestaurantOptionsRecord();
+  return {
+    categories: options.categories.filter(
+      (c) => c.name != RestaurantCategory.ALL,
+    ),
+    keywords: options.keywords,
+    prices: options.prices,
+  };
+}
+
 function calcRevisitRatio(opinions: string[], standard = 'Y') {
   const standardCount = opinions.filter((op) => op === standard).length;
   return parseFloat(((standardCount / opinions.length) * 100).toFixed(1));
