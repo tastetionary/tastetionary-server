@@ -77,6 +77,8 @@ model RestaurantReviews {
   opinion                            String?  @map("opinion") @db.VarChar(16) // 최종 의견, 
   keywords                           String[] @map("keywords") @db.Text // tags
   price                              Int      @map("price") @db.Integer // 가격
+  like                               Int      @default(0) @map("like") @db.Integer // 좋아요
+  dislike                            Int      @default(0) @map("dislike") @db.Integer // 싫어요
   createdAt                          DateTime @default(now()) @map("created_at")
   updatedAt                          DateTime @updatedAt @map("updated_at")
 
