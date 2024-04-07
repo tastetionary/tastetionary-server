@@ -33,6 +33,8 @@ export function restaurantReviewRecordFactory(param: {
   category?: RestaurantCategory;
   keywords?: string[];
   price?: number;
+  like?: number;
+  dislike?: number;
   summary?: string;
   opinion?: string;
 }) {
@@ -46,6 +48,8 @@ export function restaurantReviewRecordFactory(param: {
       return param.keywords || ['깨끗해요'];
     },
     price: param.price || 10_000,
+    like: param.like || 0,
+    dislike: param.dislike || 0,
     createdAt: () => new Date(),
     updatedAt: () => new Date(),
   })();

@@ -3,6 +3,7 @@ import {
   getFilterOptions,
   getReviewFilterOptions,
   getRecommendations,
+  getReviews,
   registerReview,
 } from '@domain/restaurant/facade/restaurant.facade';
 import * as userService from '@domain/user/service/user.service';
@@ -41,6 +42,13 @@ describe('registerReview', () => {
         dto: '' as any,
       }),
     ).rejects.toThrowError(CallerWrongDomainRuleException);
+  });
+});
+
+describe('getReviews', () => {
+  it('getReviews should return data', async () => {
+    const res = await getReviews({ restaurantId: 1n });
+    expect(res).not.toBeNull();
   });
 });
 
