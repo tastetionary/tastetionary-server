@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,7 +10,7 @@ datasource db {
 model Users {
   id        Int      @id @default(autoincrement())
   nickname  String   @map("nickname") @db.VarChar(128)
-  state     String   @map("state") @db.VarChar(16) // user 의 상태, 가입 완료, 탈퇴, 블락 등
+  state     String   @map("state") @db.VarChar(16)
   property  Json     @map("property")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -42,12 +39,12 @@ model UserTokens {
 model UserAreas {
   id        Int                      @id @default(autoincrement())
   userId    Int                      @map("user_id")
-  category  String                   @map("category") @db.VarChar(32) // 활동지역, 식사지역 등 종류
-  order     Int                      @map("order") @db.SmallInt // user 의 상태, 가입 완료, 탈퇴, 블락 등
-  address   String                   @map("address") @db.VarChar(128) // 주소, 2-3 depth
-  location  Unsupported("geography") // 위경도
+  category  String                   @map("category") @db.VarChar(32)
+  order     Int                      @map("order") @db.SmallInt
+  location  Unsupported("geography")
   createdAt DateTime                 @default(now()) @map("created_at")
   updatedAt DateTime                 @updatedAt @map("updated_at")
+  address   String                   @map("address") @db.VarChar(128)
 
   @@index([userId])
   @@index([location], type: Gist)
@@ -57,10 +54,10 @@ model UserAreas {
 model UserPreferences {
   id                      Int      @id @default(autoincrement())
   userId                  Int      @map("user_id")
-  bookmark_restaurant_ids Int[]    @map("bookmark_restaurant_ids") @db.Integer
-  exclude_restaurant_ids  Int[]    @map("exclude_restaurant_ids") @db.Integer
   createdAt               DateTime @default(now()) @map("created_at")
   updatedAt               DateTime @updatedAt @map("updated_at")
+  bookmark_restaurant_ids Int[]    @map("bookmark_restaurant_ids")
+  exclude_restaurant_ids  Int[]    @map("exclude_restaurant_ids")
 
   @@index([userId])
   @@index([bookmark_restaurant_ids], type: Gin)
@@ -70,7 +67,6 @@ model UserPreferences {
 
 model RestaurantReviews {
   id                                 Int      @id @default(autoincrement())
-  external_restaurant_information_id BigInt   @map("external_restaurant_information_id") /// 외부 API 를 통해 가져온 식당 uuid
   userId                             Int      @map("user_id")
   category                           String   @map("category") @db.VarChar(32) /// 리뷰시 등록되는 음식 종류, 한식 중식 양식 등
   summary                            String   @map("summary") @db.VarChar(128) /// 한줄 요약
@@ -81,6 +77,8 @@ model RestaurantReviews {
   dislike                            Int      @default(0) @map("dislike") @db.Integer // 싫어요
   createdAt                          DateTime @default(now()) @map("created_at")
   updatedAt                          DateTime @updatedAt @map("updated_at")
+  /// 외부 API 를 통해 가져온 식당 uuid
+  external_restaurant_information_id BigInt   @map("external_restaurant_information_id")
 
   @@index([userId])
   @@index([external_restaurant_information_id])
@@ -92,14 +90,13 @@ model RestaurantReviews {
 
 model ExternalRestaurantInformations {
   id             BigInt                   @id @default(autoincrement())
-  external_uuid  BigInt                   @map("external_uuid") // 외부 API 를 통해 가져온 식당 uuid
-  name           String                   @map("name") @db.VarChar(128) // 상호명
-  location       Unsupported("geography") // 위경도
+  external_uuid  BigInt                   @unique @map("external_uuid")
+  location       Unsupported("geography")
   reference_link String                   @map("reference_link") @db.VarChar(1024)
   createdAt      DateTime                 @default(now()) @map("created_at")
   updatedAt      DateTime                 @updatedAt @map("updated_at")
+  name           String                   @map("name") @db.VarChar(128)
 
-  @@unique([external_uuid])
   @@index([external_uuid])
   @@index([location], type: Gist)
   @@map("external_restaurant_informations")
@@ -108,9 +105,9 @@ model ExternalRestaurantInformations {
 model Accounts {
   id             Int      @id @default(autoincrement())
   userId         Int      @map("user_id")
-  category       String   @map("category") @db.VarChar(32) // 로그인 수단(종류), 구글 로그인, 이메일 로그인 등
-  identification String   @map("identification") @db.VarChar(256) // 로그인 수단에 사용된 고유 값
-  password       String   @map("password") @db.VarChar(256) // 
+  category       String   @map("category") @db.VarChar(32)
+  identification String   @map("identification") @db.VarChar(256)
+  password       String   @map("password") @db.VarChar(256)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
@@ -124,8 +121,8 @@ model Accounts {
 model Agreements {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-  category  String   @map("category") @db.VarChar(32) // 서비스에서 제공하는 규약 종류
-  is_agree  Boolean  @map("state") @db.Boolean // 규약에 대한 동의 비동의 여부
+  category  String   @map("category") @db.VarChar(32)
+  is_agree  Boolean  @map("state")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -134,15 +131,13 @@ model Agreements {
   @@map("agreements")
 }
 
-// 개인 인증 내용을 저장, 회사인증 조직인증 등 
-// 개인 인증 내용을 저장, 회사인증 조직인증 등 
 model Authentications {
   id             Int      @id @default(autoincrement())
   userId         Int?     @map("user_id")
-  identification String   @map("identification") @db.VarChar(256) // 인증시 사용한 수단의 고유값, email, phone_number 등
-  category       String   @map("category") @db.VarChar(32) // 인증의 종류, 회사 인증, 동아리 인증 등
-  type           String   @map("type") @db.VarChar(16) // 인증시 사용된 수단, Email, SMS 등
-  state          String   @map("state") @db.VarChar(16) // 인증 상태, 진행중, 완료
+  identification String   @map("identification") @db.VarChar(256)
+  category       String   @map("category") @db.VarChar(32)
+  type           String   @map("type") @db.VarChar(16)
+  state          String   @map("state") @db.VarChar(16)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
@@ -158,13 +153,13 @@ model Authentications {
 
 model AuthenticationHistories {
   id             Int      @id @default(autoincrement())
-  identification String   @map("identification") @db.VarChar(256) // 인증에서 사용된 고유값, email, phone-number 등
-  category       String   @map("category") @db.VarChar(32) // 인증의 종류, 회사 인증, 동아리 인증 등
-  type           String   @map("type") @db.VarChar(16) // 인증에서 사용되는 수단, email, sms 등
-  code           String   @map("code") @db.VarChar(16) // 인증을 위해 사용되는 code 값
+  identification String   @map("identification") @db.VarChar(256)
+  type           String   @map("type") @db.VarChar(16)
+  code           String   @map("code") @db.VarChar(16)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  expiredAt      DateTime @map("expired_at") // 인증 만료 시간
+  expiredAt      DateTime @map("expired_at")
+  category       String   @map("category") @db.VarChar(32)
 
   @@index([identification, category, type])
   @@index([identification, category, type, code])
@@ -174,9 +169,12 @@ model AuthenticationHistories {
 model UserOpinions {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-  category  String   @map("category") @db.VarChar(32) /// 의견 수집 이벤트, 탈퇴시, 가입시 등
-  type      String   @map("type") @db.VarChar(64) /// 의견 1차 분류
-  opinion   String?  @map("opinion") @db.VarChar(1024) /// 상세의견
+  /// 의견 수집 이벤트, 탈퇴시, 가입시 등
+  category  String   @map("category") @db.VarChar(32)
+  /// 의견 1차 분류
+  type      String   @map("type") @db.VarChar(64)
+  /// 상세의견
+  opinion   String?  @map("opinion") @db.VarChar(1024)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -186,4 +184,13 @@ model UserOpinions {
   @@index([type])
   @@index([category, type])
   @@map("user_opinions")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
 }
