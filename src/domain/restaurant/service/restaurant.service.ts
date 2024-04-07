@@ -10,6 +10,7 @@ import {
   getRestaurantOptionsRecord,
   getReviewsByConditions,
   getReviewsByUserId,
+  getUserReviewCount,
   RestaurantReviewRecord,
   saveExternalRestaurantInformation,
   saveReview,
@@ -26,7 +27,11 @@ import {
   InternalDomainException,
 } from '@common/exception/internal.exception';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
-import { AreaEntity, searchAreas } from '@domain/user/service/user.service';
+import {
+  AreaEntity,
+  searchAreas,
+  searchProfile,
+} from '@domain/user/service/user.service';
 
 export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
   const groupedReview = fx.groupBy(
@@ -196,6 +201,28 @@ export async function findExternalRestaurant(uuid: number) {
 
 export async function getReviews(userId: number) {
   return getReviewsByUserId(userId);
+}
+
+export async function getRestaurantReviews(restaurantId: bigint) {
+  const reviews = await getReviewsByConditions({
+    restaurantIds: [restaurantId],
+  });
+  const data = await Promise.all(
+    reviews.map(async (review) => {
+      const profile = await searchProfile(review.userId);
+      const count = await getUserReviewCount(review.userId);
+      return {
+        user: {
+          id: profile.user.id,
+          nickname: profile.user.nickname,
+          reviews: count,
+        },
+        ...review,
+      };
+    }),
+  );
+
+  return data;
 }
 
 export function getSearchOptions() {
