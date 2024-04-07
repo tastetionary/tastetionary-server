@@ -5,6 +5,7 @@ import {
   getRestaurantOptionsRecord,
   getReviewsByConditions,
   getReviewsByUserId,
+  getUserReviewCount,
   saveExternalRestaurantInformation,
   saveExternalRestaurantInformations,
   saveReview,
@@ -170,6 +171,8 @@ describe('Restaurant repository', () => {
 
     const res = await getReviewsByUserId(data[0].userId);
     expect(res).toHaveLength(1);
+    const count = await getUserReviewCount(data[0].userId);
+    expect(count).toBe(1);
   });
 
   it('should get restaurant options', async () => {

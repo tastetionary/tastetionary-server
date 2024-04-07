@@ -17,6 +17,8 @@ export interface RestaurantReviewRecord {
   opinion: string | null;
   keywords: string[];
   price: number;
+  like: number;
+  dislike: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -67,6 +69,10 @@ export async function saveReviews(
 
 export async function getReviewsByUserId(userId: number) {
   return prismaClient.restaurantReviews.findMany({ where: { userId } });
+}
+
+export async function getUserReviewCount(userId: number) {
+  return prismaClient.restaurantReviews.count({ where: { userId } });
 }
 
 export async function saveExternalRestaurantInformation(param: {
