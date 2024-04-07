@@ -16,14 +16,19 @@ import {
   GetRestaurantFilterOption,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
+import {
+  ExternalRestaurantInformationRecord,
+  RestaurantReviewRecord,
+} from '@domain/restaurant/repository/restaurant.repository';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import {
   getFilterOptions,
   getReviewFilterOptions,
   getRecommendations,
+  getReviews,
   registerReview,
 } from '@domain/restaurant/facade/restaurant.facade';
+import { RestaurantReviews } from '@prisma/client';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -65,6 +70,32 @@ export interface GetRestaurantsOutput
    * @type AggregateReviewDTO
    */
   aggregateReviews: AggregateReviewDTO | null;
+}
+
+export interface RestaurantReview
+  extends Omit<
+    RestaurantReviewRecord,
+    | 'id'
+    | 'external_restaurant_information_id'
+    | 'userId'
+    | 'category'
+    | 'price'
+  > {
+  id: string;
+  external_restaurant_information_id: string;
+  user: {
+    id: number;
+    nickname: string;
+    reviews: number;
+  };
+}
+
+export interface GetRestaurantReviewOutput {
+  /**
+   * restaurant reviews
+   * @type RestaurantReview
+   */
+  reviews: RestaurantReview[];
 }
 
 @Controller('v1/restaurant')
@@ -129,10 +160,43 @@ export class RestaurantController {
 
   /**
    * @tag restaurant
+   * @summary get restaurant reviews by restaurant id
+   * @security bearer
+   */
+  @UseGuards(AuthGuard)
+  @HttpCode(200)
+  @TypedRoute.Get('/:restaurantId/review')
+  async getReviews(
+    @Request() req,
+  ): Promise<BaseResponseDto<GetRestaurantReviewOutput>> {
+    const restaurantId = BigInt(req.params.restaurantId);
+    const res = await getReviews({
+      restaurantId,
+    });
+
+    const reviews: RestaurantReview[] = res.map((review) => ({
+      id: review.id.toString(),
+      external_restaurant_information_id:
+        review.external_restaurant_information_id.toString(),
+      user: review.user,
+      summary: review.summary,
+      opinion: review.opinion,
+      keywords: review.keywords,
+      like: review.like,
+      dislike: review.dislike,
+    }));
+
+    return new BaseResponseDto({
+      reviews: reviews,
+    });
+  }
+
+  /**
+   * @tag restaurant
    * @summary get restaurant filter option
    */
-  @TypedRoute.Get('option')
   @HttpCode(200)
+  @TypedRoute.Get('option')
   getOptions(): BaseResponseDto<GetRestaurantFilterOption> {
     const res = getFilterOptions();
 
