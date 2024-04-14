@@ -175,15 +175,10 @@ export class RestaurantController {
     });
 
     const reviews: RestaurantReview[] = res.map((review) => ({
+      ...review,
       id: review.id.toString(),
       external_restaurant_information_id:
         review.external_restaurant_information_id.toString(),
-      user: review.user,
-      summary: review.summary,
-      opinion: review.opinion,
-      keywords: review.keywords,
-      like: review.like,
-      dislike: review.dislike,
     }));
 
     return new BaseResponseDto({
