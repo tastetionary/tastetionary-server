@@ -164,7 +164,7 @@ export class RestaurantController {
    * @summary get restaurant reviews by restaurant id
    * @security bearer
    */
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @HttpCode(200)
   @TypedRoute.Get('/:restaurantId/review')
   async getReviews(
