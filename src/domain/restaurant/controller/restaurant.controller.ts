@@ -5,6 +5,7 @@ import {
   UseFilters,
   UseGuards,
   Request,
+  Param,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -163,15 +164,14 @@ export class RestaurantController {
    * @summary get restaurant reviews by restaurant id
    * @security bearer
    */
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @HttpCode(200)
   @TypedRoute.Get('/:restaurantId/review')
   async getReviews(
-    @Request() req,
+    @Param('restaurantId') restaurantId: string,
   ): Promise<BaseResponseDto<GetRestaurantReviewOutput>> {
-    const restaurantId = BigInt(req.params.restaurantId);
     const res = await getReviews({
-      restaurantId,
+      restaurantId: BigInt(restaurantId),
     });
 
     const reviews: RestaurantReview[] = res.map((review) => ({
