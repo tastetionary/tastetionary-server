@@ -49,4 +49,10 @@ export class ConfigurationService {
       },
     };
   }
+
+  getDiscordConfig() {
+    return {
+      webHookUrl: this.configService.get('DISCORD_WEBHOOK_URL'),
+    };
+  }
 }
