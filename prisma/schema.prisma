@@ -186,6 +186,24 @@ model UserOpinions {
   @@map("user_opinions")
 }
 
+model ReviewReports {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  reviewId  Int      @map("review_id")
+  category  String   @map("category") @db.VarChar(32)
+  content   String   @map("content") @db.VarChar(1024)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([reviewId])
+  @@index([category])
+  @@index([userId, reviewId])
+  @@index([userId, category])
+  @@index([reviewId, category])
+  @@map("review_reports")
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model spatial_ref_sys {
   srid      Int     @id
