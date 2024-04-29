@@ -8,21 +8,25 @@ import {
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
   getRestaurantOptionsRecord,
+  getReviewById,
   getReviewsByConditions,
   getReviewsByUserId,
   getUserReviewCount,
   RestaurantReviewRecord,
   saveExternalRestaurantInformation,
   saveReview,
+  saveReviewReport,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
   RestaurantKeywordEmoji,
+  ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
 import {
   CallerWrongDomainRuleException,
+  CallerWrongUsageException,
   EmptyContentException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
@@ -32,6 +36,9 @@ import {
   searchAreas,
   searchProfile,
 } from '@domain/user/service/user.service';
+import { sendDiscordMessage } from '@thirdParty/discord/discord';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { ConfigService } from '@nestjs/config';
 
 export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
   const groupedReview = fx.groupBy(
@@ -240,6 +247,35 @@ export function getReviewOptions() {
   };
 }
 
+export async function reportRestaurantReview(param: {
+  reviewId: number;
+  userId: number;
+  content: string;
+  category: ReviewReportCategory;
+}) {
+  const review = await getReviewById(param.reviewId);
+  if (!review) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.NO_DATA,
+      `no review data ${param.reviewId}`,
+    );
+  }
+
+  const discordConfig = new ConfigurationService(
+    new ConfigService(),
+  ).getDiscordConfig();
+  const discordContent = getDiscordContentsForm(
+    {
+      ...review,
+      category: review.category as RestaurantCategory,
+    },
+    param.userId,
+    param.category,
+  );
+  await sendDiscordMessage(discordContent, discordConfig);
+  await saveReviewReport(param);
+}
+
 function calcRevisitRatio(opinions: string[], standard = 'Y') {
   const standardCount = opinions.filter((op) => op === standard).length;
   return parseFloat(((standardCount / opinions.length) * 100).toFixed(1));
@@ -260,7 +296,21 @@ function attachEmoji(data: string[]) {
   return data.map((d) => d + RestaurantKeywordEmoji[d]);
 }
 
+function getDiscordContentsForm(
+  review: RestaurantReviewRecord,
+  userId: number,
+  category: ReviewReportCategory,
+) {
+  const contents = {
+    title: '식당 리뷰 신고',
+    description: `유저 아이디: ${userId} \n 신고 카테고리: ${category} \n 리뷰 아이디: ${review.id} \n 리뷰 내용: ${review.summary} \n 리뷰 카테고리: ${review.category} \n 리뷰 키워드: ${review.keywords} \n 리뷰 가격: ${review.price} \n 리뷰 의견: ${review.opinion} \n 리뷰 생성일: ${review.createdAt}`,
+  };
+
+  return contents;
+}
+
 export const _private = {
   registerExternalRestaurantInformationWhenNoData,
   aggregatePrice,
+  getDiscordContentsForm,
 };
