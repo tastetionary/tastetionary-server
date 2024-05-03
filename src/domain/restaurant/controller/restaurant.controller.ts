@@ -16,20 +16,24 @@ import {
   ExternalRestaurantInformationDTO,
   GetRestaurantFilterOption,
   RestaurantReviewDTO,
+  ReviewReportDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
   ExternalRestaurantInformationRecord,
   RestaurantReviewRecord,
 } from '@domain/restaurant/repository/restaurant.repository';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  ReviewReportCategory,
+} from '@domain/restaurant/restaurant.enum';
 import {
   getFilterOptions,
   getReviewFilterOptions,
   getRecommendations,
   getReviews,
   registerReview,
+  reportReview,
 } from '@domain/restaurant/facade/restaurant.facade';
-import { RestaurantReviews } from '@prisma/client';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -215,6 +219,30 @@ export class RestaurantController {
       categories: res.categories,
       keywords: res.keywords,
       prices: res.prices,
+    });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary report restaurant review
+   */
+  @UseGuards(AuthGuard)
+  @TypedRoute.Post('/review/report')
+  @HttpCode(201)
+  async reportReview(
+    @Request() req,
+    @TypedBody() dto: ReviewReportDTO,
+  ): Promise<BaseResponseDto<object>> {
+    const userId = req.user.userId;
+    await reportReview({
+      reviewId: dto.reviewId,
+      userId,
+      content: dto.content,
+      category: dto.category as ReviewReportCategory,
+    });
+
+    return new BaseResponseDto({
+      state: 'success',
     });
   }
 }

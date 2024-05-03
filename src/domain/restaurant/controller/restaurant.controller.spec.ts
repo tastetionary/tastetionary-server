@@ -181,6 +181,31 @@ describe('restaurant controller', () => {
     assertStatusCode(res, 200);
   });
 
+  it('/review/report, should return 201', async () => {
+    const userId = 123;
+    const reviewId = 123;
+    const content = 'content';
+    const category = '스팸';
+    jest
+      .spyOn(restaurantService, 'reportRestaurantReview')
+      .mockImplementation(async () => {});
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+    const res = await request(app.getHttpServer())
+      .post('/v1/restaurant/review/report')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        reviewId,
+        content,
+        category,
+      });
+
+    assertStatusCode(res, 201);
+  });
+
   it('/option, should return 200', async () => {
     const res = await request(app.getHttpServer())
       .get('/v1/restaurant/option')

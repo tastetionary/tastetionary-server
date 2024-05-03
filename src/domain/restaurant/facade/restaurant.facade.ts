@@ -4,6 +4,7 @@ import {
   getSearchOptions,
   getReviewOptions,
   getRestaurantReviews,
+  reportRestaurantReview,
 } from '@domain/restaurant/service/restaurant.service';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
@@ -12,7 +13,10 @@ import {
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  ReviewReportCategory,
+} from '@domain/restaurant/restaurant.enum';
 
 export async function getRecommendations(param: {
   userId: number;
@@ -52,6 +56,15 @@ export async function registerReview(param: {
 
 export async function getReviews(param: { restaurantId: bigint }) {
   return await getRestaurantReviews(param.restaurantId);
+}
+
+export async function reportReview(param: {
+  reviewId: number;
+  userId: number;
+  content: string;
+  category: ReviewReportCategory;
+}) {
+  await reportRestaurantReview(param);
 }
 
 export function getFilterOptions() {

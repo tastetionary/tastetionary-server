@@ -2,6 +2,7 @@ import {
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantPrice,
+  ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 
 export interface RestaurantReviewDTO {
@@ -164,4 +165,27 @@ export interface GetRestaurantFilterOption {
    * @type RestaurantPriceOption[]
    */
   prices: RestaurantPriceOption[];
+}
+
+export interface ReviewReportDTO {
+  /**
+   * review id
+   * example: 10000
+   * @type number
+   */
+  reviewId: number;
+
+  /**
+   * report content
+   * example: "content"
+   * @type string
+   */
+  content: string;
+
+  /**
+   * report category
+   * example: "SPAM"
+   * @type ReviewReportCategory
+   */
+  category: ReviewReportCategory;
 }
