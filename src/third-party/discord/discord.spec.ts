@@ -3,7 +3,7 @@ import { sendDiscordMessage } from './discord';
 xdescribe('sendDiscordMessage', () => {
   it('should send a message to discord', async () => {
     const config = {
-      url: '',
+      webHookUrl: '',
     };
 
     const content = {
