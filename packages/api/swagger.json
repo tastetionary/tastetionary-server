@@ -908,6 +908,61 @@
         "x-nestia-method": "GET"
       }
     },
+    "/v1/restaurant/review/report": {
+      "post": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewReportDTO"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.restaurant.review.report.reportReview",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "report restaurant review",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
     "/v1/user": {
       "post": {
         "tags": [
@@ -2786,6 +2841,66 @@
           "~12,000원",
           "~13,000원",
           "13,000원~"
+        ]
+      },
+      "ReviewReportDTO": {
+        "type": "object",
+        "properties": {
+          "reviewId": {
+            "description": "review id\nexample: 10000",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "content": {
+            "description": "report content\nexample: \"content\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/ReviewReportCategory"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "reviewId",
+          "content",
+          "category"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "ReviewReportCategory": {
+        "type": "string",
+        "enum": [
+          "부적절한 내용",
+          "스팸",
+          "혐오 발언",
+          "광고",
+          "허위 정보",
+          "기타"
         ]
       },
       "RegisterProfileRequest": {
