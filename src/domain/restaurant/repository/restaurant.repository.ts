@@ -86,7 +86,7 @@ export async function saveReviewReport(param: {
   category: ReviewReportCategory;
   content: string;
 }) {
-  await prismaClient.reviewReports.create({ data: param });
+  await saveReviewReports([param]);
 }
 
 export async function saveReviewReports(
@@ -98,6 +98,10 @@ export async function saveReviewReports(
   }[],
 ) {
   await prismaClient.reviewReports.createMany({ data: params });
+}
+
+export async function getReviewReportById(id: number) {
+  return prismaClient.reviewReports.findUnique({ where: { id } });
 }
 
 export async function saveExternalRestaurantInformation(param: {

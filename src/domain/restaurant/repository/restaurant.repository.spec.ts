@@ -4,6 +4,7 @@ import {
   getExternalRestaurantInformation,
   getRestaurantOptionsRecord,
   getReviewById,
+  getReviewReportById,
   getReviewsByConditions,
   getReviewsByUserId,
   getUserReviewCount,
@@ -324,8 +325,8 @@ describe('Restaurant repository', () => {
     };
 
     await saveReviewReport(data);
-    const report = await getReviewById(data.reviewId);
-    expect(report).not.toBeNull();
+    const res = await getReviewReportById(data.reviewId);
+    expect(res).not.toBeNull();
   });
 
   it('should save review reports', async () => {
@@ -339,7 +340,7 @@ describe('Restaurant repository', () => {
     ];
 
     await saveReviewReports(data);
-    const report = await getReviewById(data[0].reviewId);
-    expect(report).not.toBeNull();
+    const res = await getReviewReportById(data[0].reviewId);
+    expect(res).not.toBeNull();
   });
 });
