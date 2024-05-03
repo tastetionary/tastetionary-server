@@ -5,6 +5,7 @@ import {
   RestaurantPrice,
   RestaurantCategoryIcons,
   RestaurantKeywordEmoji,
+  ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
 
@@ -73,6 +74,30 @@ export async function getReviewsByUserId(userId: number) {
 
 export async function getUserReviewCount(userId: number) {
   return prismaClient.restaurantReviews.count({ where: { userId } });
+}
+
+export async function getReviewById(id: number) {
+  return prismaClient.restaurantReviews.findUnique({ where: { id } });
+}
+
+export async function saveReviewReport(param: {
+  userId: number;
+  reviewId: number;
+  category: ReviewReportCategory;
+  content: string;
+}) {
+  await prismaClient.reviewReports.create({ data: param });
+}
+
+export async function saveReviewReports(
+  params: {
+    userId: number;
+    reviewId: number;
+    category: ReviewReportCategory;
+    content: string;
+  }[],
+) {
+  await prismaClient.reviewReports.createMany({ data: params });
 }
 
 export async function saveExternalRestaurantInformation(param: {
