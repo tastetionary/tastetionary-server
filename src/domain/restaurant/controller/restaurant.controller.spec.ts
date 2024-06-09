@@ -176,7 +176,7 @@ describe('restaurant controller', () => {
     const res = await request(app.getHttpServer())
       .get(`/v1/restaurant/${restaurantId}/review`)
       .set('Authorization', `Bearer ${token}`)
-      .send(REVIEW_INPUT);
+      .send();
 
     assertStatusCode(res, 200);
   });
