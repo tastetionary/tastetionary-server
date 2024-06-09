@@ -49,7 +49,7 @@ describe('getReviews', () => {
   it('getReviews should return data', async () => {
     const res = await getReviews({ restaurantId: 1n });
     expect(res).not.toBeNull();
-    expect(res).toHaveLength(0);
+    expect(res.data).toHaveLength(0);
   });
 });
 

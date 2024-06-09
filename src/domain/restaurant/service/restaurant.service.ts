@@ -215,12 +215,6 @@ export async function getRestaurantReviews(restaurantId: bigint) {
     restaurantIds: [restaurantId],
   });
 
-  if (reviews.length == 0) {
-    throw new EmptyContentException(
-      '검색 조건에 부합 되는 식당이 존재 하지 않음',
-    );
-  }
-
   const keywordsWithEmojis = reviews.flatMap((review) =>
     attachEmoji(review.keywords),
   );
