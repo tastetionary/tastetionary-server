@@ -2496,6 +2496,9 @@
       "GetRestaurantReviewOutput": {
         "type": "object",
         "properties": {
+          "keywordReviews": {
+            "$ref": "#/components/schemas/KeywordReviews"
+          },
           "reviews": {
             "description": "restaurant reviews",
             "x-typia-jsDocTags": [
@@ -2519,9 +2522,57 @@
         },
         "nullable": false,
         "required": [
+          "keywordReviews",
           "reviews"
         ],
         "x-typia-jsDocTags": []
+      },
+      "KeywordReviews": {
+        "type": "object",
+        "properties": {
+          "keywordCounts": {
+            "$ref": "#/components/schemas/Record_lt_string_comma__space_number_gt_"
+          },
+          "revisitRatio": {
+            "description": "revisit ratio\nexample: 0.5",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "keywordCounts",
+          "revisitRatio"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "Record_lt_string_comma__space_number_gt_": {
+        "type": "object",
+        "properties": {},
+        "nullable": false,
+        "x-typia-jsDocTags": [],
+        "x-typia-additionalProperties": {
+          "x-typia-required": true,
+          "x-typia-optional": false,
+          "type": "number"
+        },
+        "additionalProperties": {
+          "x-typia-required": true,
+          "x-typia-optional": false,
+          "type": "number"
+        }
       },
       "RestaurantReview": {
         "type": "object",
