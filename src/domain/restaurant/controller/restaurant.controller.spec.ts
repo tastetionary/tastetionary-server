@@ -165,9 +165,17 @@ describe('restaurant controller', () => {
   it('/:restaurantId/review, should return 200', async () => {
     const userId = 123;
     const restaurantId = 1n;
-    jest.spyOn(restaurantService, 'getReviews').mockImplementation(async () => {
-      return [];
-    });
+    jest
+      .spyOn(restaurantService, 'getRestaurantReviews')
+      .mockImplementation(async () => {
+        return {
+          keywordReviews: {
+            keywordCounts: {},
+            revisitRatio: 0,
+          },
+          data: [],
+        };
+      });
 
     const key = configService.getTokenData().accessTokenSecret;
     const token = createUserToken(userId, key, {
