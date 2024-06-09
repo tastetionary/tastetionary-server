@@ -214,6 +214,30 @@ export async function getRestaurantReviews(restaurantId: bigint) {
   const reviews = await getReviewsByConditions({
     restaurantIds: [restaurantId],
   });
+
+  if (reviews.length == 0) {
+    throw new EmptyContentException(
+      '검색 조건에 부합 되는 식당이 존재 하지 않음',
+    );
+  }
+
+  const keywordsWithEmojis = reviews.flatMap((review) =>
+    attachEmoji(review.keywords),
+  );
+  const keywordCounts = keywordsWithEmojis.reduce(
+    (counts, keyword) => ({
+      ...counts,
+      [keyword]: (counts[keyword] || 0) + 1,
+    }),
+    {},
+  );
+
+  const opinions = reviews.map((r) => r.opinion);
+  const filteredOpinions = opinions.filter(
+    (opinion) => opinion !== null,
+  ) as string[];
+  const revisitRatio = calcRevisitRatio(filteredOpinions);
+
   const data = await Promise.all(
     reviews.map(async (review) => {
       const profile = await searchProfile(review.userId);
@@ -225,11 +249,18 @@ export async function getRestaurantReviews(restaurantId: bigint) {
           reviews: count,
         },
         ...review,
+        keywords: attachEmoji(review.keywords),
       };
     }),
   );
 
-  return data;
+  return {
+    keywordReviews: {
+      keywordCounts,
+      revisitRatio,
+    },
+    data,
+  };
 }
 
 export function getSearchOptions() {

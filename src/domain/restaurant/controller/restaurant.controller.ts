@@ -15,6 +15,7 @@ import {
   AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
   GetRestaurantFilterOption,
+  KeywordReviews,
   RestaurantReviewDTO,
   ReviewReportDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
@@ -97,6 +98,11 @@ export interface RestaurantReview
 
 export interface GetRestaurantReviewOutput {
   /**
+   * keyword reviews
+   * @type KeywordReviews
+   */
+  keywordReviews: KeywordReviews;
+  /**
    * restaurant reviews
    * @type RestaurantReview
    */
@@ -178,7 +184,8 @@ export class RestaurantController {
       restaurantId: BigInt(restaurantId),
     });
 
-    const reviews: RestaurantReview[] = res.map((review) => ({
+    const { keywordReviews, data } = res;
+    const reviews: RestaurantReview[] = data.map((review) => ({
       ...review,
       id: review.id.toString(),
       external_restaurant_information_id:
@@ -186,6 +193,7 @@ export class RestaurantController {
     }));
 
     return new BaseResponseDto({
+      keywordReviews,
       reviews: reviews,
     });
   }

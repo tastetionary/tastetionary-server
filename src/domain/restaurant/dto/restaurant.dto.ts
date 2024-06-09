@@ -189,3 +189,19 @@ export interface ReviewReportDTO {
    */
   category: ReviewReportCategory;
 }
+
+export interface KeywordReviews {
+  /**
+   * keyword counts
+   * example: {"깨끗해요": 3}
+   * @type { [index: string]: number }
+   */
+  keywordCounts: Record<string, number>;
+
+  /**
+   * revisit ratio
+   * example: 0.5
+   * @type number
+   */
+  revisitRatio: number;
+}

@@ -209,7 +209,8 @@ describe('restaurant service', () => {
 
       const restaurantId = 1n;
       const res = await getRestaurantReviews(restaurantId);
-      expect(res).toHaveLength(1);
+      expect(res).not.toBeNull();
+      expect(res.data).toHaveLength(1);
     });
   });
 });
