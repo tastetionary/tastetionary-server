@@ -199,9 +199,9 @@ export interface KeywordReviews {
   total: number;
 
   /**
-   * keyword count
+   * keyword count list
    * example: [{name: "한식", count: 10}]
-   * @type { [index: string]: number }
+   * @type KeywordCountDTO[]
    */
   keywordCounts: KeywordCountDTO[];
 
