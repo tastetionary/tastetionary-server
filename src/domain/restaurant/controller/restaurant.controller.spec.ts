@@ -170,7 +170,8 @@ describe('restaurant controller', () => {
       .mockImplementation(async () => {
         return {
           keywordReviews: {
-            keywordCounts: {},
+            total: 10,
+            keywordCounts: [],
             revisitRatio: 0,
           },
           data: [],

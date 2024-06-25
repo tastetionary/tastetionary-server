@@ -2530,8 +2530,50 @@
       "KeywordReviews": {
         "type": "object",
         "properties": {
+          "total": {
+            "description": "total review count\nexample: 100",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
           "keywordCounts": {
-            "$ref": "#/components/schemas/Record_lt_string_comma__space_number_gt_"
+            "description": "keyword count\nexample: [{name: \"한식\", count: 10}]",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "{ [index: string]",
+                    "kind": "text"
+                  },
+                  {
+                    "text": " ",
+                    "kind": "space"
+                  },
+                  {
+                    "text": ": number }",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeywordCountDTO"
+            }
           },
           "revisitRatio": {
             "description": "revisit ratio\nexample: 0.5",
@@ -2553,26 +2595,56 @@
         },
         "nullable": false,
         "required": [
+          "total",
           "keywordCounts",
           "revisitRatio"
         ],
         "x-typia-jsDocTags": []
       },
-      "Record_lt_string_comma__space_number_gt_": {
+      "KeywordCountDTO": {
         "type": "object",
-        "properties": {},
-        "nullable": false,
-        "x-typia-jsDocTags": [],
-        "x-typia-additionalProperties": {
-          "x-typia-required": true,
-          "x-typia-optional": false,
-          "type": "number"
+        "properties": {
+          "name": {
+            "description": "keyword name\nexample: \"한식\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "count": {
+            "description": "keyword count\nexample: 10",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
         },
-        "additionalProperties": {
-          "x-typia-required": true,
-          "x-typia-optional": false,
-          "type": "number"
-        }
+        "nullable": false,
+        "required": [
+          "name",
+          "count"
+        ],
+        "x-typia-jsDocTags": []
       },
       "RestaurantReview": {
         "type": "object",
