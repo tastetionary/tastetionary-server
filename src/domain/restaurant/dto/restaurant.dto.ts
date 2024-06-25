@@ -192,11 +192,18 @@ export interface ReviewReportDTO {
 
 export interface KeywordReviews {
   /**
-   * keyword counts
-   * example: {"깨끗해요": 3}
+   * total review count
+   * example: 100
+   * @type number
+   */
+  total: number;
+
+  /**
+   * keyword count
+   * example: [{name: "한식", count: 10}]
    * @type { [index: string]: number }
    */
-  keywordCounts: Record<string, number>;
+  keywordCounts: KeywordCountDTO[];
 
   /**
    * revisit ratio
@@ -204,4 +211,20 @@ export interface KeywordReviews {
    * @type number
    */
   revisitRatio: number;
+}
+
+export interface KeywordCountDTO {
+  /**
+   * keyword name
+   * example: "한식"
+   * @type string
+   */
+  name: string;
+
+  /**
+   * keyword count
+   * example: 10
+   * @type number
+   */
+  count: number;
 }

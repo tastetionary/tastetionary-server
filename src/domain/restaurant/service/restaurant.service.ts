@@ -19,6 +19,7 @@ import {
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
+  RestaurantKeyword,
   RestaurantKeywordEmoji,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
@@ -214,6 +215,7 @@ export async function getRestaurantReviews(restaurantId: bigint) {
   const reviews = await getReviewsByConditions({
     restaurantIds: [restaurantId],
   });
+  const total = reviews.length;
 
   const keywordsWithEmojis = reviews.flatMap((review) =>
     attachEmoji(review.keywords),
@@ -225,6 +227,15 @@ export async function getRestaurantReviews(restaurantId: bigint) {
     }),
     {},
   );
+
+  const restaurantKeywords = Object.values(RestaurantKeyword).filter(
+    (keyword) => keyword !== RestaurantKeyword.ALL,
+  );
+  const keywordsWithEmojisList = attachEmoji(restaurantKeywords);
+  const keywordList = keywordsWithEmojisList.map((name) => ({
+    name,
+    count: keywordCounts[name] || 0,
+  }));
 
   const opinions = reviews.map((r) => r.opinion);
   const filteredOpinions = opinions.filter(
@@ -250,8 +261,9 @@ export async function getRestaurantReviews(restaurantId: bigint) {
 
   return {
     keywordReviews: {
-      keywordCounts,
+      total,
       revisitRatio,
+      keywordCounts: keywordList,
     },
     data,
   };
