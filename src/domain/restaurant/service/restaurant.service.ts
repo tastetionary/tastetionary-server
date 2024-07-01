@@ -123,7 +123,7 @@ export async function getRecommendedRestaurant(param: {
 async function getRestaurantsByDistance(param: {
   userAreas: AreaEntity;
   maxDistanceMeter: number;
-  excludeRestaurantIds: bigint[];
+  excludeRestaurantIds?: bigint[];
 }) {
   if (!param.userAreas.diningArea) return [];
 
@@ -209,6 +209,62 @@ export async function findExternalRestaurant(uuid: number) {
 
 export async function getReviews(userId: number) {
   return getReviewsByUserId(userId);
+}
+
+export async function getNearyByRestaurants(param: {
+  userAreas: AreaEntity;
+  maxDistanceMeter: number;
+}) {
+  const restaurants = await getRestaurantsByDistance({ ...param });
+
+  if (restaurants.length == 0) {
+    throw new EmptyContentException('식사 지역 내 식당이 존재하지 않음');
+  }
+
+  const ids = restaurants.map((r) => r.id);
+  const targetReviews = await getReviewsByConditions({
+    restaurantIds: ids,
+  });
+
+  if (targetReviews.length == 0) {
+    throw new EmptyContentException(
+      '검색 조건에 부합 되는 식당이 존재 하지 않음',
+    );
+  }
+
+  const groupedReview = fx.groupBy(
+    (r) => r.external_restaurant_information_id.toString(),
+    targetReviews,
+  );
+
+  return restaurants.map((r) => {
+    const groupReviews = groupedReview[r.id.toString()];
+    const review = groupReviews.filter(
+      (item) => item.external_restaurant_information_id == r.id,
+    );
+    const category = review[0].category;
+    const opinions = groupReviews
+      .map((r) => r.opinion)
+      .filter((opinion) => opinion !== null) as string[];
+    const revisitRatio = calcRevisitRatio(opinions);
+    const prices = aggregatePrice(groupReviews.map((r) => r.price));
+    const numReviews = groupReviews.length;
+
+    const data = {
+      id: r.id,
+      category: category,
+      name: r.name,
+      latitude: r.latitude,
+      longitude: r.longitude,
+      aggregateReviews: {
+        revisitRatio: revisitRatio,
+        avgPrice: prices.avg,
+        totalCount: numReviews,
+      },
+    };
+
+    return data;
+  });
 }
 
 export async function getRestaurantReviews(restaurantId: bigint) {

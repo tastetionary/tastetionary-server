@@ -190,6 +190,26 @@ describe('restaurant controller', () => {
     assertStatusCode(res, 200);
   });
 
+  it('/test should return 200', async () => {
+    const userId = 123;
+    jest
+      .spyOn(restaurantService, 'getNearyByRestaurants')
+      .mockImplementation(async () => {
+        return [];
+      });
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+    const res = await request(app.getHttpServer())
+      .get('/v1/restaurant/nearby')
+      .set('Authorization', `Bearer ${token}`)
+      .send();
+
+    assertStatusCode(res, 200);
+  });
+
   it('/review/report, should return 201', async () => {
     const userId = 123;
     const reviewId = 123;

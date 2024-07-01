@@ -1,6 +1,7 @@
 import {
   createReview,
   getRecommendedRestaurant,
+  getNearyByRestaurants,
   getSearchOptions,
   getReviewOptions,
   getRestaurantReviews,
@@ -36,6 +37,22 @@ export async function getRecommendations(param: {
   }
 
   return getRecommendedRestaurant({ userAreas, ...param });
+}
+
+export async function getNearByRestaurants(param: {
+  userId: number;
+  maxDistanceMeter: number;
+}) {
+  const userAreas = await searchAreas(param.userId);
+  if (!userAreas.diningArea) {
+    throw new CallerWrongDomainRuleException(
+      ErrorSubCategoryEnum.NO_DATA,
+      'no dining area',
+      'should register first',
+    );
+  }
+
+  return getNearyByRestaurants({ userAreas, ...param });
 }
 
 export async function registerReview(param: {

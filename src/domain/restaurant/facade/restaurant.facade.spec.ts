@@ -5,6 +5,7 @@ import {
   getRecommendations,
   getReviews,
   registerReview,
+  getNearByRestaurants,
 } from '@domain/restaurant/facade/restaurant.facade';
 import * as userService from '@domain/user/service/user.service';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
@@ -50,6 +51,22 @@ describe('getReviews', () => {
     const res = await getReviews({ restaurantId: 1n });
     expect(res).not.toBeNull();
     expect(res.data).toHaveLength(0);
+  });
+});
+
+describe('getNearbyRestaurants', () => {
+  it('getNearbyRestaurants should return data', async () => {
+    const userId = 99;
+    const entity = areaEntityFactory({ userId });
+    entity.activityArea = null;
+    jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
+
+    await expect(
+      getNearByRestaurants({
+        userId,
+        maxDistanceMeter: 100,
+      }),
+    ).rejects.toThrowError(CallerWrongDomainRuleException);
   });
 });
 
