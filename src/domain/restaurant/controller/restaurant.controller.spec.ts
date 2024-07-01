@@ -190,8 +190,13 @@ describe('restaurant controller', () => {
     assertStatusCode(res, 200);
   });
 
-  it('/test should return 200', async () => {
+  it('/nearby should return 200', async () => {
     const userId = 123;
+    const entity = areaEntityFactory({ userId });
+    jest
+      .spyOn(userService, 'searchAreas')
+      .mockReturnValueOnce(Promise.resolve(entity));
+
     jest
       .spyOn(restaurantService, 'getNearyByRestaurants')
       .mockImplementation(async () => {
