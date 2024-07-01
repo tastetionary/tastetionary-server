@@ -17,6 +17,7 @@ import {
   GetRestaurantFilterOption,
   KeywordReviews,
   RestaurantReviewDTO,
+  ReviewAggregateData,
   ReviewReportDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
@@ -34,6 +35,7 @@ import {
   getReviews,
   registerReview,
   reportReview,
+  getNearByRestaurants,
 } from '@domain/restaurant/facade/restaurant.facade';
 
 export interface RegisterRestaurantReviewInput {
@@ -76,6 +78,26 @@ export interface GetRestaurantsOutput
    * @type AggregateReviewDTO
    */
   aggregateReviews: AggregateReviewDTO | null;
+}
+
+export interface GetNearByRestaurantsOutput
+  extends Omit<
+    ExternalRestaurantInformationRecord,
+    | 'id'
+    | 'externalUUID'
+    | 'referenceLink'
+    | 'createdAt'
+    | 'updatedAt'
+    | 'distance'
+  > {
+  restaurantId: string;
+
+  category: RestaurantCategory;
+  /**
+   * aggregate data from review, if not reviewed, it will be null
+   * @type ReviewAggregateData
+   */
+  aggregateReviews: ReviewAggregateData;
 }
 
 export interface RestaurantReview
@@ -145,6 +167,37 @@ export class RestaurantController {
       ...rest,
       aggregateReviews: data.aggregateReviews,
     });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary get nearby reviewed restaurants
+   * @security bearer
+   */
+  @UseGuards(AuthGuard)
+  @HttpCode(200)
+  @TypedRoute.Get('/nearby')
+  async getNearByRestaurants(
+    @Request() req,
+  ): Promise<BaseResponseDto<GetNearByRestaurantsOutput[]>> {
+    const userId = 3;
+    const maxDistanceMeter = 1_000;
+
+    const data = await getNearByRestaurants({
+      userId,
+      maxDistanceMeter: maxDistanceMeter,
+    });
+
+    const result = data.map((d) => {
+      const { id, ...rest } = d;
+      return {
+        restaurantId: id.toString(),
+        ...rest,
+        aggregateReviews: d.aggregateReviews,
+      };
+    });
+
+    return new BaseResponseDto(result);
   }
 
   /**

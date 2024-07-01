@@ -89,6 +89,29 @@ export interface AggregateReviewDTO {
   totalCount: number;
 }
 
+export interface ReviewAggregateData {
+  /**
+   * avg price
+   * example: 10
+   * @type number
+   * @minimum 0
+   */
+  avgPrice: number;
+
+  /**
+   * revisit ratio
+   * example: 0.5
+   * @type number
+   */
+  revisitRatio: number;
+
+  /**
+   * total review count
+   * example: 10
+   * @type number
+   */
+  totalCount: number;
+}
 export interface RestaurantCategoryOption {
   /**
    * food category id
