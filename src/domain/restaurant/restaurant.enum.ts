@@ -22,7 +22,7 @@ export enum RestaurantKeyword {
   PARKING = '주차 가능해요',
   ROTATION = '회전율 좋아요',
   LARGE = '양이 많아요',
-  WIDE = '넓고 쾌적해요',
+  WIDE = '넓고 쾌적해요️',
   WAITING = '웨이팅 있어요',
 }
 
