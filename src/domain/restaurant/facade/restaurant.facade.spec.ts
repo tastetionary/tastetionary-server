@@ -57,9 +57,6 @@ describe('getReviews', () => {
 describe('getNearbyRestaurants', () => {
   it('getNearbyRestaurants should return data', async () => {
     const userId = 99;
-    const entity = areaEntityFactory({ userId });
-    entity.activityArea = null;
-    jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
 
     await expect(
       getNearByRestaurants({
