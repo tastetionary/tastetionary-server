@@ -282,7 +282,7 @@ describe('Restaurant repository', () => {
         },
         {
           id: 9,
-          name: '넓고 쾌적해요🎶',
+          name: '넓고 쾌적해요️🎶',
         },
         {
           id: 10,
