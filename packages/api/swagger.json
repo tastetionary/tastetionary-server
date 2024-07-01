@@ -686,6 +686,63 @@
         "x-nestia-method": "POST"
       }
     },
+    "/v1/restaurant/nearby": {
+      "get": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_Array_lt_GetNearByRestaurantsOutput_gt__gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-nestia-namespace": "v1.restaurant.nearby.getNearByRestaurants",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get nearby reviewed restaurants",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "GET"
+      }
+    },
     "/v1/restaurant/review": {
       "post": {
         "tags": [
@@ -2263,6 +2320,144 @@
           "type": "number"
         }
       },
+      "BaseResponseDto_lt_Array_lt_GetNearByRestaurantsOutput_gt__gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetNearByRestaurantsOutput"
+            }
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "GetNearByRestaurantsOutput": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/RestaurantCategory"
+          },
+          "aggregateReviews": {
+            "$ref": "#/components/schemas/ReviewAggregateData"
+          },
+          "name": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "latitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "longitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "restaurantId",
+          "category",
+          "aggregateReviews",
+          "name",
+          "latitude",
+          "longitude"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "ReviewAggregateData": {
+        "type": "object",
+        "properties": {
+          "avgPrice": {
+            "description": "avg price\nexample: 10",
+            "x-typia-metaTags": [
+              {
+                "kind": "minimum",
+                "value": 0
+              }
+            ],
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              },
+              {
+                "name": "minimum",
+                "text": [
+                  {
+                    "text": "0",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number",
+            "minimum": 0
+          },
+          "revisitRatio": {
+            "description": "revisit ratio\nexample: 0.5",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "totalCount": {
+            "description": "total review count\nexample: 10",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "avgPrice",
+          "revisitRatio",
+          "totalCount"
+        ],
+        "x-typia-jsDocTags": []
+      },
       "RegisterRestaurantReviewInput": {
         "type": "object",
         "properties": {
@@ -2548,21 +2743,13 @@
             "type": "number"
           },
           "keywordCounts": {
-            "description": "keyword count\nexample: [{name: \"한식\", count: 10}]",
+            "description": "keyword count list\nexample: [{name: \"한식\", count: 10}]",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
                 "text": [
                   {
-                    "text": "{ [index: string]",
-                    "kind": "text"
-                  },
-                  {
-                    "text": " ",
-                    "kind": "space"
-                  },
-                  {
-                    "text": ": number }",
+                    "text": "KeywordCountDTO[]",
                     "kind": "text"
                   }
                 ]
