@@ -218,7 +218,7 @@ export async function getNearyByRestaurants(param: {
   const restaurants = await getRestaurantsByDistance({ ...param });
 
   if (restaurants.length == 0) {
-    throw new EmptyContentException('식사 지역 내 식당이 존재하지 않음');
+    return [];
   }
 
   const ids = restaurants.map((r) => r.id);
