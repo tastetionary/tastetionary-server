@@ -6,6 +6,7 @@ import {
   UseGuards,
   Request,
   Param,
+  Query,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -83,12 +84,7 @@ export interface GetRestaurantsOutput
 export interface GetNearByRestaurantsOutput
   extends Omit<
     ExternalRestaurantInformationRecord,
-    | 'id'
-    | 'externalUUID'
-    | 'referenceLink'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'distance'
+    'id' | 'externalUUID' | 'referenceLink' | 'createdAt' | 'updatedAt'
   > {
   restaurantId: string;
 
@@ -179,13 +175,17 @@ export class RestaurantController {
   @TypedRoute.Get('/nearby')
   async getNearByRestaurants(
     @Request() req,
+    @Query('latitude') latitude: number,
+    @Query('longitude') longitude: number,
   ): Promise<BaseResponseDto<GetNearByRestaurantsOutput[]>> {
-    const userId = 3;
+    const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
     const data = await getNearByRestaurants({
       userId,
       maxDistanceMeter: maxDistanceMeter,
+      latitude,
+      longitude,
     });
 
     const result = data.map((d) => {

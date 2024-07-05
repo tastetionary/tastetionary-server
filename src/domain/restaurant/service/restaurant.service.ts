@@ -213,9 +213,15 @@ export async function getReviews(userId: number) {
 
 export async function getNearyByRestaurants(param: {
   userAreas: AreaEntity;
+  latitude: number;
+  longitude: number;
   maxDistanceMeter: number;
 }) {
-  const restaurants = await getRestaurantsByDistance({ ...param });
+  const restaurants = await getExternalRestaurantIdsByDistance({
+    latitude: param.latitude,
+    longitude: param.longitude,
+    maxDistanceMeter: param.maxDistanceMeter,
+  });
 
   if (restaurants.length == 0) {
     return [];
@@ -256,6 +262,7 @@ export async function getNearyByRestaurants(param: {
       name: r.name,
       latitude: r.latitude,
       longitude: r.longitude,
+      distance: r.distance,
       aggregateReviews: {
         revisitRatio: revisitRatio,
         avgPrice: prices.avg,

@@ -691,7 +691,26 @@
         "tags": [
           "restaurant"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2366,6 +2385,11 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
+          },
+          "distance": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
           }
         },
         "nullable": false,
@@ -2375,7 +2399,8 @@
           "aggregateReviews",
           "name",
           "latitude",
-          "longitude"
+          "longitude",
+          "distance"
         ],
         "x-typia-jsDocTags": []
       },

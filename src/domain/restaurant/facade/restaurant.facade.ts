@@ -42,6 +42,8 @@ export async function getRecommendations(param: {
 export async function getNearByRestaurants(param: {
   userId: number;
   maxDistanceMeter: number;
+  latitude: number;
+  longitude: number;
 }) {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas.diningArea) {

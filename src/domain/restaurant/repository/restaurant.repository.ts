@@ -199,21 +199,22 @@ export async function getExternalRestaurantIdsByDistance(param: {
   }
 
   const queryRaw = Prisma.sql`
-      SELECT id, 
-          name, 
-          external_uuid as "externalUUID", 
-          reference_link as "referenceLink",
-          ST_Y(location::geometry) as latitude,
-          ST_X(location::geometry) as longitude, 
-          ST_Distance(location, ST_MakePoint(${param.longitude}, ${
-    param.latitude
-  })) as distance
-      FROM external_restaurant_informations 
-        WHERE id NOT IN (${Prisma.join(excludedIds)})
-        AND st_dwithin(location, ST_MakePoint(${param.longitude}, ${
-    param.latitude
-  }), ${param.maxDistanceMeter})`;
-
+  SELECT id,
+    name,
+    external_uuid as "externalUUID",
+    reference_link as "referenceLink",
+    ST_Y(location::geometry) as latitude,
+    ST_X(location::geometry) as longitude,
+    ST_Distance(location, ST_MakePoint(cast(${
+      param.longitude
+    } as numeric), cast(${param.latitude} as numeric))) as distance
+  FROM external_restaurant_informations
+  WHERE id NOT IN (${Prisma.join(excludedIds)})
+    AND st_dwithin(location, ST_MakePoint(cast(${
+      param.longitude
+    } as numeric), cast(${param.latitude} as numeric)), ${
+    param.maxDistanceMeter
+  })`;
   return await prismaClient.$queryRaw(queryRaw);
 }
 
