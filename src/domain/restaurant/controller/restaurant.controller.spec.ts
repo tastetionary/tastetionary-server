@@ -209,6 +209,10 @@ describe('restaurant controller', () => {
     });
     const res = await request(app.getHttpServer())
       .get('/v1/restaurant/nearby')
+      .query({
+        latitude: 10,
+        longitude: 10,
+      })
       .set('Authorization', `Bearer ${token}`)
       .send();
 

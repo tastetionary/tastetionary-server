@@ -62,6 +62,8 @@ describe('getNearbyRestaurants', () => {
       getNearByRestaurants({
         userId,
         maxDistanceMeter: 100,
+        latitude: 10,
+        longitude: 10,
       }),
     ).rejects.toThrowError(CallerWrongDomainRuleException);
   });
