@@ -162,6 +162,88 @@ describe('restaurant controller', () => {
     assertStatusCode(res, 200);
   });
 
+  it('/:restaurantId/review, should return 200', async () => {
+    const userId = 123;
+    const restaurantId = 1n;
+    jest
+      .spyOn(restaurantService, 'getRestaurantReviews')
+      .mockImplementation(async () => {
+        return {
+          keywordReviews: {
+            total: 10,
+            keywordCounts: [],
+            revisitRatio: 0,
+          },
+          data: [],
+        };
+      });
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+    const res = await request(app.getHttpServer())
+      .get(`/v1/restaurant/${restaurantId}/review`)
+      .set('Authorization', `Bearer ${token}`)
+      .send();
+
+    assertStatusCode(res, 200);
+  });
+
+  it('/nearby should return 200', async () => {
+    const userId = 123;
+    const entity = areaEntityFactory({ userId });
+    jest
+      .spyOn(userService, 'searchAreas')
+      .mockReturnValueOnce(Promise.resolve(entity));
+
+    jest
+      .spyOn(restaurantService, 'getNearyByRestaurants')
+      .mockImplementation(async () => {
+        return [];
+      });
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+    const res = await request(app.getHttpServer())
+      .get('/v1/restaurant/nearby')
+      .query({
+        latitude: 10,
+        longitude: 10,
+      })
+      .set('Authorization', `Bearer ${token}`)
+      .send();
+
+    assertStatusCode(res, 200);
+  });
+
+  it('/review/report, should return 201', async () => {
+    const userId = 123;
+    const reviewId = 123;
+    const content = 'content';
+    const category = '스팸';
+    jest
+      .spyOn(restaurantService, 'reportRestaurantReview')
+      .mockImplementation(async () => {});
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+    const res = await request(app.getHttpServer())
+      .post('/v1/restaurant/review/report')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        reviewId,
+        content,
+        category,
+      });
+
+    assertStatusCode(res, 201);
+  });
+
   it('/option, should return 200', async () => {
     const res = await request(app.getHttpServer())
       .get('/v1/restaurant/option')

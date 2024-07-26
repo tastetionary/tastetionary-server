@@ -8,6 +8,7 @@ import {
   getRecommendedRestaurant,
   getReviews,
   getSearchOptions,
+  getRestaurantReviews,
   _private,
 } from '@domain/restaurant/service/restaurant.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
@@ -19,6 +20,7 @@ import {
   externalRestaurantInformationRecordFactory,
   restaurantReviewRecordFactory,
 } from '@root/test/factory/restaurant.factory';
+import { profileEntityFactory } from '@root/test/factory/user.factory';
 
 describe('restaurant service', () => {
   beforeEach(async () => {
@@ -59,6 +61,8 @@ describe('restaurant service', () => {
           opinion: 'Y',
           keywords: ['clean'],
           price: 10_000,
+          like: 0,
+          dislike: 0,
         },
         {
           id: 2,
@@ -69,6 +73,8 @@ describe('restaurant service', () => {
           opinion: 'N',
           keywords: ['kind'],
           price: 15_000,
+          like: 0,
+          dislike: 0,
         },
         {
           id: 3,
@@ -79,6 +85,8 @@ describe('restaurant service', () => {
           opinion: 'N',
           keywords: ['kind'],
           price: 15_000,
+          like: 0,
+          dislike: 0,
         },
       ];
 
@@ -187,6 +195,22 @@ describe('restaurant service', () => {
       expect(res).toHaveProperty('categories');
       expect(res).toHaveProperty('keywords');
       expect(res).toHaveProperty('prices');
+    });
+  });
+
+  describe('getReviewsByRestaurantId', () => {
+    it('should get reviews by restaurant id', async () => {
+      const userId = 999;
+      const profile = profileEntityFactory();
+      const review = restaurantReviewRecordFactory({ userId });
+      jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValue([review]);
+      jest.spyOn(userService, 'searchProfile').mockResolvedValueOnce(profile);
+      jest.spyOn(repo, 'getUserReviewCount').mockResolvedValue(1);
+
+      const restaurantId = 1n;
+      const res = await getRestaurantReviews(restaurantId);
+      expect(res).not.toBeNull();
+      expect(res.data).toHaveLength(1);
     });
   });
 });

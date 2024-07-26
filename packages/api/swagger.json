@@ -686,6 +686,82 @@
         "x-nestia-method": "POST"
       }
     },
+    "/v1/restaurant/nearby": {
+      "get": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_Array_lt_GetNearByRestaurantsOutput_gt__gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-nestia-namespace": "v1.restaurant.nearby.getNearByRestaurants",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get nearby reviewed restaurants",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "GET"
+      }
+    },
     "/v1/restaurant/review": {
       "post": {
         "tags": [
@@ -753,6 +829,73 @@
           }
         ],
         "x-nestia-method": "POST"
+      }
+    },
+    "/v1/restaurant/{restaurantId}/review": {
+      "get": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetRestaurantReviewOutput_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-nestia-namespace": "v1.restaurant.review.getReviews",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get restaurant reviews by restaurant id",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "GET"
       }
     },
     "/v1/restaurant/option": {
@@ -839,6 +982,61 @@
           }
         ],
         "x-nestia-method": "GET"
+      }
+    },
+    "/v1/restaurant/review/report": {
+      "post": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewReportDTO"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.restaurant.review.report.reportReview",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "report restaurant review",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
       }
     },
     "/v1/user": {
@@ -1215,30 +1413,12 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
-          },
-          "password": {
-            "description": "password for accounts, it should be one-way encrypted",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
           }
         },
         "nullable": false,
         "required": [
           "historyId",
-          "code",
-          "password"
+          "code"
         ],
         "x-typia-jsDocTags": []
       },
@@ -2159,6 +2339,150 @@
           "type": "number"
         }
       },
+      "BaseResponseDto_lt_Array_lt_GetNearByRestaurantsOutput_gt__gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetNearByRestaurantsOutput"
+            }
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "GetNearByRestaurantsOutput": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/RestaurantCategory"
+          },
+          "aggregateReviews": {
+            "$ref": "#/components/schemas/ReviewAggregateData"
+          },
+          "name": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "latitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "longitude": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "distance": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "restaurantId",
+          "category",
+          "aggregateReviews",
+          "name",
+          "latitude",
+          "longitude",
+          "distance"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "ReviewAggregateData": {
+        "type": "object",
+        "properties": {
+          "avgPrice": {
+            "description": "avg price\nexample: 10",
+            "x-typia-metaTags": [
+              {
+                "kind": "minimum",
+                "value": 0
+              }
+            ],
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              },
+              {
+                "name": "minimum",
+                "text": [
+                  {
+                    "text": "0",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number",
+            "minimum": 0
+          },
+          "revisitRatio": {
+            "description": "revisit ratio\nexample: 0.5",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "totalCount": {
+            "description": "total review count\nexample: 10",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "avgPrice",
+          "revisitRatio",
+          "totalCount"
+        ],
+        "x-typia-jsDocTags": []
+      },
       "RegisterRestaurantReviewInput": {
         "type": "object",
         "properties": {
@@ -2373,6 +2697,264 @@
           "name",
           "latitude",
           "longitude"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "BaseResponseDto_lt_GetRestaurantReviewOutput_gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/GetRestaurantReviewOutput"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "GetRestaurantReviewOutput": {
+        "type": "object",
+        "properties": {
+          "keywordReviews": {
+            "$ref": "#/components/schemas/KeywordReviews"
+          },
+          "reviews": {
+            "description": "restaurant reviews",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "RestaurantReview",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RestaurantReview"
+            }
+          }
+        },
+        "nullable": false,
+        "required": [
+          "keywordReviews",
+          "reviews"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "KeywordReviews": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "description": "total review count\nexample: 100",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "keywordCounts": {
+            "description": "keyword count list\nexample: [{name: \"한식\", count: 10}]",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "KeywordCountDTO[]",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeywordCountDTO"
+            }
+          },
+          "revisitRatio": {
+            "description": "revisit ratio\nexample: 0.5",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "total",
+          "keywordCounts",
+          "revisitRatio"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "KeywordCountDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "keyword name\nexample: \"한식\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "count": {
+            "description": "keyword count\nexample: 10",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "name",
+          "count"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "RestaurantReview": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "external_restaurant_information_id": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/__type.o1"
+          },
+          "summary": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "opinion": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "nullable": true
+          },
+          "keywords": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "x-typia-required": true,
+              "x-typia-optional": false,
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          "like": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "dislike": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "external_restaurant_information_id",
+          "user",
+          "summary",
+          "opinion",
+          "keywords",
+          "like",
+          "dislike"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "__type.o1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "nickname": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "reviews": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "nickname",
+          "reviews"
         ],
         "x-typia-jsDocTags": []
       },
@@ -2594,6 +3176,66 @@
           "~12,000원",
           "~13,000원",
           "13,000원~"
+        ]
+      },
+      "ReviewReportDTO": {
+        "type": "object",
+        "properties": {
+          "reviewId": {
+            "description": "review id\nexample: 10000",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "content": {
+            "description": "report content\nexample: \"content\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/ReviewReportCategory"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "reviewId",
+          "content",
+          "category"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "ReviewReportCategory": {
+        "type": "string",
+        "enum": [
+          "부적절한 내용",
+          "스팸",
+          "혐오 발언",
+          "광고",
+          "허위 정보",
+          "기타"
         ]
       },
       "RegisterProfileRequest": {
@@ -3009,7 +3651,7 @@
             "$ref": "#/components/schemas/__object"
           },
           "account": {
-            "$ref": "#/components/schemas/__type.o1"
+            "$ref": "#/components/schemas/__type.o2"
           }
         },
         "nullable": false,
@@ -3068,6 +3710,11 @@
             "type": "string",
             "format": "date-time"
           },
+          "userId": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
           "order": {
             "x-typia-required": true,
             "x-typia-optional": false,
@@ -3077,11 +3724,6 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
-          },
-          "userId": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
           },
           "category": {
             "x-typia-required": true,
@@ -3101,9 +3743,9 @@
           "id",
           "latitude",
           "longitude",
+          "userId",
           "order",
           "address",
-          "userId",
           "category"
         ],
         "x-typia-jsDocTags": []
@@ -3138,6 +3780,11 @@
             "type": "string",
             "format": "date-time"
           },
+          "userId": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
           "order": {
             "x-typia-required": true,
             "x-typia-optional": false,
@@ -3147,11 +3794,6 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
-          },
-          "userId": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
           },
           "category": {
             "x-typia-required": true,
@@ -3171,14 +3813,14 @@
           "id",
           "latitude",
           "longitude",
+          "userId",
           "order",
           "address",
-          "userId",
           "category"
         ],
         "x-typia-jsDocTags": []
       },
-      "__type.o1": {
+      "__type.o2": {
         "type": "object",
         "properties": {
           "accountEmail": {

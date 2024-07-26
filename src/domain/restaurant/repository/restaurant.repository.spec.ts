@@ -3,13 +3,21 @@ import {
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
   getRestaurantOptionsRecord,
+  getReviewById,
+  getReviewReportById,
   getReviewsByConditions,
   getReviewsByUserId,
+  getUserReviewCount,
   saveExternalRestaurantInformation,
   saveExternalRestaurantInformations,
   saveReview,
+  saveReviewReport,
+  saveReviewReports,
 } from '@domain/restaurant/repository/restaurant.repository';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  ReviewReportCategory,
+} from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
 
 describe('Restaurant repository', () => {
@@ -17,6 +25,7 @@ describe('Restaurant repository', () => {
     await truncateTables(prismaClient, [
       'restaurant_reviews',
       'external_restaurant_informations',
+      'review_reports',
     ]);
   });
 
@@ -170,6 +179,8 @@ describe('Restaurant repository', () => {
 
     const res = await getReviewsByUserId(data[0].userId);
     expect(res).toHaveLength(1);
+    const count = await getUserReviewCount(data[0].userId);
+    expect(count).toBe(1);
   });
 
   it('should get restaurant options', async () => {
@@ -271,7 +282,7 @@ describe('Restaurant repository', () => {
         },
         {
           id: 9,
-          name: '넓고 쾌적해요🎶',
+          name: '넓고 쾌적해요️🎶',
         },
         {
           id: 10,
@@ -303,5 +314,33 @@ describe('Restaurant repository', () => {
     };
 
     expect(res).toEqual(expected);
+  });
+
+  it('should save review report', async () => {
+    const data = {
+      userId: 1,
+      reviewId: 1,
+      category: ReviewReportCategory.ADVERTISEMENT,
+      content: 'test-content',
+    };
+
+    await saveReviewReport(data);
+    const res = await getReviewReportById(data.reviewId);
+    expect(res).not.toBeNull();
+  });
+
+  it('should save review reports', async () => {
+    const data = [
+      {
+        userId: 1,
+        reviewId: 1,
+        category: ReviewReportCategory.ADVERTISEMENT,
+        content: 'test-content',
+      },
+    ];
+
+    await saveReviewReports(data);
+    const res = await getReviewReportById(data[0].reviewId);
+    expect(res).not.toBeNull();
   });
 });

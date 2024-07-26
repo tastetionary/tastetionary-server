@@ -8,25 +8,38 @@ import {
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
   getRestaurantOptionsRecord,
+  getReviewById,
   getReviewsByConditions,
   getReviewsByUserId,
+  getUserReviewCount,
   RestaurantReviewRecord,
   saveExternalRestaurantInformation,
   saveReview,
+  saveReviewReport,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
+  RestaurantKeyword,
   RestaurantKeywordEmoji,
+  ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
 import { detachEmoji, getRandomItem } from '@common/util';
 import {
   CallerWrongDomainRuleException,
+  CallerWrongUsageException,
   EmptyContentException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
-import { AreaEntity, searchAreas } from '@domain/user/service/user.service';
+import {
+  AreaEntity,
+  searchAreas,
+  searchProfile,
+} from '@domain/user/service/user.service';
+import { sendDiscordMessage } from '@thirdParty/discord/discord';
+import { ConfigurationService } from '@domain/configuration/configuration.service';
+import { ConfigService } from '@nestjs/config';
 
 export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
   const groupedReview = fx.groupBy(
@@ -110,7 +123,7 @@ export async function getRecommendedRestaurant(param: {
 async function getRestaurantsByDistance(param: {
   userAreas: AreaEntity;
   maxDistanceMeter: number;
-  excludeRestaurantIds: bigint[];
+  excludeRestaurantIds?: bigint[];
 }) {
   if (!param.userAreas.diningArea) return [];
 
@@ -198,6 +211,127 @@ export async function getReviews(userId: number) {
   return getReviewsByUserId(userId);
 }
 
+export async function getNearyByRestaurants(param: {
+  userAreas: AreaEntity;
+  latitude: number;
+  longitude: number;
+  maxDistanceMeter: number;
+}) {
+  const restaurants = await getExternalRestaurantIdsByDistance({
+    latitude: param.latitude,
+    longitude: param.longitude,
+    maxDistanceMeter: param.maxDistanceMeter,
+  });
+
+  if (restaurants.length == 0) {
+    return [];
+  }
+
+  const ids = restaurants.map((r) => r.id);
+  const targetReviews = await getReviewsByConditions({
+    restaurantIds: ids,
+  });
+
+  if (targetReviews.length == 0) {
+    throw new EmptyContentException(
+      '검색 조건에 부합 되는 식당이 존재 하지 않음',
+    );
+  }
+
+  const groupedReview = fx.groupBy(
+    (r) => r.external_restaurant_information_id.toString(),
+    targetReviews,
+  );
+
+  return restaurants.map((r) => {
+    const groupReviews = groupedReview[r.id.toString()];
+    const review = groupReviews.filter(
+      (item) => item.external_restaurant_information_id == r.id,
+    );
+    const category = review[0].category;
+    const opinions = groupReviews
+      .map((r) => r.opinion)
+      .filter((opinion) => opinion !== null) as string[];
+    const revisitRatio = calcRevisitRatio(opinions);
+    const prices = aggregatePrice(groupReviews.map((r) => r.price));
+    const numReviews = groupReviews.length;
+
+    const data = {
+      id: r.id,
+      category: category,
+      name: r.name,
+      latitude: r.latitude,
+      longitude: r.longitude,
+      distance: r.distance,
+      aggregateReviews: {
+        revisitRatio: revisitRatio,
+        avgPrice: prices.avg,
+        totalCount: numReviews,
+      },
+    };
+
+    return data;
+  });
+}
+
+export async function getRestaurantReviews(restaurantId: bigint) {
+  const reviews = await getReviewsByConditions({
+    restaurantIds: [restaurantId],
+  });
+  const total = reviews.length;
+
+  const keywordsWithEmojis = reviews.flatMap((review) =>
+    attachEmoji(review.keywords),
+  );
+  const keywordCounts = keywordsWithEmojis.reduce(
+    (counts, keyword) => ({
+      ...counts,
+      [keyword]: (counts[keyword] || 0) + 1,
+    }),
+    {},
+  );
+
+  const restaurantKeywords = Object.values(RestaurantKeyword).filter(
+    (keyword) => keyword !== RestaurantKeyword.ALL,
+  );
+  const keywordsWithEmojisList = attachEmoji(restaurantKeywords);
+  const keywordList = keywordsWithEmojisList.map((name) => ({
+    name,
+    count: keywordCounts[name] || 0,
+  }));
+
+  const opinions = reviews.map((r) => r.opinion);
+  const filteredOpinions = opinions.filter(
+    (opinion) => opinion !== null,
+  ) as string[];
+  const revisitRatio = calcRevisitRatio(filteredOpinions);
+
+  const data = await Promise.all(
+    reviews.map(async (review) => {
+      const profile = await searchProfile(review.userId);
+      const count = await getUserReviewCount(review.userId);
+      return {
+        user: {
+          id: profile.user.id,
+          nickname: profile.user.nickname,
+          reviews: count,
+        },
+        ...review,
+        keywords: attachEmoji(review.keywords),
+      };
+    }),
+  );
+
+  return {
+    keywordReviews: {
+      total,
+      revisitRatio,
+      keywordCounts: keywordList,
+    },
+    data,
+  };
+}
+
 export function getSearchOptions() {
   return getRestaurantOptionsRecord();
 }
@@ -211,6 +345,35 @@ export function getReviewOptions() {
     keywords: options.keywords,
     prices: options.prices,
   };
+}
+
+export async function reportRestaurantReview(param: {
+  reviewId: number;
+  userId: number;
+  content: string;
+  category: ReviewReportCategory;
+}) {
+  const review = await getReviewById(param.reviewId);
+  if (!review) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.NO_DATA,
+      `no review data ${param.reviewId}`,
+    );
+  }
+
+  const discordConfig = new ConfigurationService(
+    new ConfigService(),
+  ).getDiscordConfig();
+  const discordContent = getDiscordContentsForm(
+    {
+      ...review,
+      category: review.category as RestaurantCategory,
+    },
+    param.userId,
+    param.category,
+  );
+  await sendDiscordMessage(discordContent, discordConfig);
+  await saveReviewReport(param);
 }
 
 function calcRevisitRatio(opinions: string[], standard = 'Y') {
@@ -233,7 +396,21 @@ function attachEmoji(data: string[]) {
   return data.map((d) => d + RestaurantKeywordEmoji[d]);
 }
 
+function getDiscordContentsForm(
+  review: RestaurantReviewRecord,
+  userId: number,
+  category: ReviewReportCategory,
+) {
+  const contents = {
+    title: '식당 리뷰 신고',
+    description: `유저 아이디: ${userId} \n 신고 카테고리: ${category} \n 리뷰 아이디: ${review.id} \n 리뷰 내용: ${review.summary} \n 리뷰 카테고리: ${review.category} \n 리뷰 키워드: ${review.keywords} \n 리뷰 가격: ${review.price} \n 리뷰 의견: ${review.opinion} \n 리뷰 생성일: ${review.createdAt}`,
+  };
+
+  return contents;
+}
+
 export const _private = {
   registerExternalRestaurantInformationWhenNoData,
   aggregatePrice,
+  getDiscordContentsForm,
 };

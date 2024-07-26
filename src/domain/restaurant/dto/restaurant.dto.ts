@@ -2,6 +2,7 @@ import {
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantPrice,
+  ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 
 export interface RestaurantReviewDTO {
@@ -88,6 +89,29 @@ export interface AggregateReviewDTO {
   totalCount: number;
 }
 
+export interface ReviewAggregateData {
+  /**
+   * avg price
+   * example: 10
+   * @type number
+   * @minimum 0
+   */
+  avgPrice: number;
+
+  /**
+   * revisit ratio
+   * example: 0.5
+   * @type number
+   */
+  revisitRatio: number;
+
+  /**
+   * total review count
+   * example: 10
+   * @type number
+   */
+  totalCount: number;
+}
 export interface RestaurantCategoryOption {
   /**
    * food category id
@@ -164,4 +188,66 @@ export interface GetRestaurantFilterOption {
    * @type RestaurantPriceOption[]
    */
   prices: RestaurantPriceOption[];
+}
+
+export interface ReviewReportDTO {
+  /**
+   * review id
+   * example: 10000
+   * @type number
+   */
+  reviewId: number;
+
+  /**
+   * report content
+   * example: "content"
+   * @type string
+   */
+  content: string;
+
+  /**
+   * report category
+   * example: "SPAM"
+   * @type ReviewReportCategory
+   */
+  category: ReviewReportCategory;
+}
+
+export interface KeywordReviews {
+  /**
+   * total review count
+   * example: 100
+   * @type number
+   */
+  total: number;
+
+  /**
+   * keyword count list
+   * example: [{name: "한식", count: 10}]
+   * @type KeywordCountDTO[]
+   */
+  keywordCounts: KeywordCountDTO[];
+
+  /**
+   * revisit ratio
+   * example: 0.5
+   * @type number
+   */
+  revisitRatio: number;
+}
+
+export interface KeywordCountDTO {
+  /**
+   * keyword name
+   * example: "한식"
+   * @type string
+   */
+  name: string;
+
+  /**
+   * keyword count
+   * example: 10
+   * @type number
+   */
+  count: number;
 }

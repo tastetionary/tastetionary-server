@@ -22,7 +22,7 @@ export enum RestaurantKeyword {
   PARKING = '주차 가능해요',
   ROTATION = '회전율 좋아요',
   LARGE = '양이 많아요',
-  WIDE = '넓고 쾌적해요',
+  WIDE = '넓고 쾌적해요️',
   WAITING = '웨이팅 있어요',
 }
 
@@ -61,3 +61,12 @@ export const RestaurantKeywordEmoji: Record<RestaurantKeyword, string> = {
   [RestaurantKeyword.WIDE]: '🎶',
   [RestaurantKeyword.WAITING]: '💦',
 };
+
+export enum ReviewReportCategory {
+  INAPPROPRIATE_CONTENT = '부적절한 내용',
+  SPAM = '스팸',
+  HATE_SPEECH = '혐오 발언',
+  ADVERTISEMENT = '광고',
+  FALSE_INFO = '허위 정보',
+  ETC = '기타',
+}

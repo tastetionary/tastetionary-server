@@ -5,6 +5,7 @@ import {
   RestaurantPrice,
   RestaurantCategoryIcons,
   RestaurantKeywordEmoji,
+  ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
 
@@ -17,6 +18,8 @@ export interface RestaurantReviewRecord {
   opinion: string | null;
   keywords: string[];
   price: number;
+  like: number;
+  dislike: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -67,6 +70,38 @@ export async function saveReviews(
 
 export async function getReviewsByUserId(userId: number) {
   return prismaClient.restaurantReviews.findMany({ where: { userId } });
+}
+
+export async function getUserReviewCount(userId: number) {
+  return prismaClient.restaurantReviews.count({ where: { userId } });
+}
+
+export async function getReviewById(id: number) {
+  return prismaClient.restaurantReviews.findUnique({ where: { id } });
+}
+
+export async function saveReviewReport(param: {
+  userId: number;
+  reviewId: number;
+  category: ReviewReportCategory;
+  content: string;
+}) {
+  await saveReviewReports([param]);
+}
+
+export async function saveReviewReports(
+  params: {
+    userId: number;
+    reviewId: number;
+    category: ReviewReportCategory;
+    content: string;
+  }[],
+) {
+  await prismaClient.reviewReports.createMany({ data: params });
+}
+
+export async function getReviewReportById(id: number) {
+  return prismaClient.reviewReports.findUnique({ where: { id } });
 }
 
 export async function saveExternalRestaurantInformation(param: {
@@ -164,21 +199,22 @@ export async function getExternalRestaurantIdsByDistance(param: {
   }
 
   const queryRaw = Prisma.sql`
-      SELECT id, 
-          name, 
-          external_uuid as "externalUUID", 
-          reference_link as "referenceLink",
-          ST_Y(location::geometry) as latitude,
-          ST_X(location::geometry) as longitude, 
-          ST_Distance(location, ST_MakePoint(${param.longitude}, ${
-    param.latitude
-  })) as distance
-      FROM external_restaurant_informations 
-        WHERE id NOT IN (${Prisma.join(excludedIds)})
-        AND st_dwithin(location, ST_MakePoint(${param.longitude}, ${
-    param.latitude
-  }), ${param.maxDistanceMeter})`;
-
+  SELECT id,
+    name,
+    external_uuid as "externalUUID",
+    reference_link as "referenceLink",
+    ST_Y(location::geometry) as latitude,
+    ST_X(location::geometry) as longitude,
+    ST_Distance(location, ST_MakePoint(cast(${
+      param.longitude
+    } as numeric), cast(${param.latitude} as numeric))) as distance
+  FROM external_restaurant_informations
+  WHERE id NOT IN (${Prisma.join(excludedIds)})
+    AND st_dwithin(location, ST_MakePoint(cast(${
+      param.longitude
+    } as numeric), cast(${param.latitude} as numeric)), ${
+    param.maxDistanceMeter
+  })`;
   return await prismaClient.$queryRaw(queryRaw);
 }
 
