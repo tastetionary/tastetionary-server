@@ -8,10 +8,7 @@ import {
   changeUserState,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
-import {
-  AgreementCategory,
-  UserState,
-} from '@domain/user/user.enum';
+import { AgreementCategory, UserState } from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
 import { getProfile } from '@domain/user/facade/user.facade';
@@ -30,10 +27,10 @@ describe('user service', () => {
   const DTO: RegisterProfileRequest = {
     userProperty: {},
     areas: {
-        latitude: 1,
-        longitude: 1,
-        address: 'test',
-      },
+      latitude: 1,
+      longitude: 1,
+      address: 'test',
+    },
     account: {
       authenticationId: 1,
       identification: 'test',
@@ -66,7 +63,7 @@ describe('user service', () => {
     });
 
     const updatedUser = await searchProfile(user.id);
-    expect(updatedUser.areas.address).toEqual('update activity');
+    expect(updatedUser.area?.address).toEqual('update activity');
   });
 
   it('should return user entity and essential field', async () => {

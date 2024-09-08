@@ -32,9 +32,7 @@ describe('facade', () => {
 describe('registerReview', () => {
   it('with not register activity_area, should not register review', async () => {
     const userId = 99;
-    const entity = areaEntityFactory({ userId });
-    entity.activityArea = null;
-    jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
+    jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(null as any);
 
     await expect(
       registerReview({

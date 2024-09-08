@@ -22,11 +22,9 @@ export async function saveAreas(
 ) {
   const query = params.map(
     (param) =>
-      Prisma.sql`(${param.userId}, ${param.order}, ${
-        param.address
-      }, st_point(${param.location.longitude},${
-        param.location.latitude
-      }), ${new Date()})`,
+      Prisma.sql`(${param.userId}, ${param.order}, ${param.address}, st_point(${
+        param.location.longitude
+      },${param.location.latitude}), ${new Date()})`,
   );
   await prismaClient.$queryRaw`
       INSERT INTO user_areas (user_id, "order", address, location, updated_at) 
@@ -43,7 +41,7 @@ export async function saveArea(param: {
 }
 
 export async function getAreasByUserId(userId: number) {
-  const areas: AreaRecord = await prismaClient.$queryRaw`
+  const areas: AreaRecord[] = await prismaClient.$queryRaw`
       SELECT
           id,
           user_id as "userId",
@@ -52,7 +50,7 @@ export async function getAreasByUserId(userId: number) {
           ST_X(location::geometry) as longitude,
           ST_Y(location::geometry) as latitude
       FROM user_areas WHERE user_id = ${userId}`;
-  return areas;
+  return areas[0];
 }
 
 export async function deleteAreas(params: { userId }) {

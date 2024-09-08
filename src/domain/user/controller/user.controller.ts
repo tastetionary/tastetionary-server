@@ -54,7 +54,7 @@ export class UserController {
     return new BaseResponseDto({
       id: profile.user.id,
       nickname: profile.user.nickname,
-      area: profile.areas,
+      area: profile.area,
       account: {
         accountEmail: profile.authList.account.identification,
         companyEmail: profile.authList.company?.identification || null,

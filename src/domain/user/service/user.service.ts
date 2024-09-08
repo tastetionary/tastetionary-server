@@ -44,11 +44,11 @@ export async function searchProfile(userId: number) {
       `user not found: ${userId}`,
     );
   }
-  const areas = await searchAreas(userId);
+  const area = await searchAreas(userId);
   const authList = await searchAuthList(userId);
   return {
     user,
-    areas,
+    area,
     authList,
   };
 }
@@ -78,9 +78,12 @@ const transformRecordToEntity = <T extends AuthenticationRecord>(
 
 export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
 export async function searchAreas(userId: number) {
-  const areas = await getAreasByUserId(userId);
-  return areas;
-  
+  const area = await getAreasByUserId(userId);
+  if (!area) {
+    return null;
+  }
+
+  return area;
 }
 
 export type AuthEntity = Awaited<ReturnType<typeof searchAuthList>>;
@@ -111,11 +114,11 @@ export async function createProfile(dto: RegisterProfileRequest) {
 
 async function createAreas(userId: number, dto: AreaDto) {
   const area = {
-      userId,
-      order: 0,
-      address: dto .address,
-      location: { latitude: dto.latitude, longitude: dto.longitude },
-    };
+    userId,
+    order: 0,
+    address: dto.address,
+    location: { latitude: dto.latitude, longitude: dto.longitude },
+  };
 
   await saveArea(area);
 }

@@ -8,11 +8,7 @@ import {
 } from '@root/jest.setup';
 import { UserModule } from '@domain/user/user.module';
 import { AccountCategory } from '@domain/account/account.enum';
-import {
-  AgreementCategory,
-  AreaCategory,
-  WithdrawalTypeEnum,
-} from '@domain/user/user.enum';
+import { AgreementCategory, WithdrawalTypeEnum } from '@domain/user/user.enum';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import * as userService from '@domain/user/service/user.service';
 import * as accountService from '@domain/account/service/account.service';
@@ -73,8 +69,6 @@ describe('user controller', () => {
     expect(res.body.data).toHaveProperty('nickname');
     expect(res.body.data).toHaveProperty('area');
     expect(res.body.data).toHaveProperty('account');
-    expect(res.body.data.area).toHaveProperty('diningArea');
-    expect(res.body.data.area).toHaveProperty('activityArea');
   });
 
   it('updateArea should return success', async () => {
@@ -90,7 +84,6 @@ describe('user controller', () => {
       .send({
         latitude: 1,
         longitude: 1,
-        category: AreaCategory.ACTIVITY_AREA,
         address: 'test',
       });
 
@@ -106,20 +99,11 @@ describe('user controller', () => {
       .post('/v1/user')
       .send({
         userProperty: {},
-        areas: [
-          {
-            latitude: 1,
-            longitude: 1,
-            category: AreaCategory.ACTIVITY_AREA,
-            address: 'test',
-          },
-          {
-            latitude: 1,
-            longitude: 1,
-            category: AreaCategory.DINING_AREA,
-            address: 'test',
-          },
-        ],
+        areas: {
+          latitude: 1,
+          longitude: 1,
+          address: 'test',
+        },
         account: {
           authenticationId: 1,
           identification: `test-${new Date().getMilliseconds()}`,

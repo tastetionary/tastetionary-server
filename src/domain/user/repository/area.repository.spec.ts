@@ -14,39 +14,42 @@ describe('new area repository', () => {
 
   it('should save area', async () => {
     const userId = 1;
-    const data = [
-      {
-        userId,
-        order: 0,
-        address: 'address',
-        location: {
-          latitude: 1,
-          longitude: 1,
-        },
+    const data = {
+      userId,
+      order: 0,
+      address: 'address',
+      location: {
+        latitude: 1,
+        longitude: 1,
       },
-    ];
-    await saveAreas(data);
+    };
+    await saveArea(data);
     const res = await getAreasByUserId(userId);
-    expect(res).toEqual(data);
+    expect(res).toEqual({
+      id: 1,
+      userId,
+      order: 0,
+      address: 'address',
+      latitude: 1,
+      longitude: 1,
+    });
   });
 
   it('should delete area', async () => {
     const userId = 1;
-    const data = [
-      {
-        userId,
-        order: 0,
-        address: 'address',
-        location: {
-          latitude: 1,
-          longitude: 1,
-        },
+    const data = {
+      userId,
+      order: 0,
+      address: 'address',
+      location: {
+        latitude: 1,
+        longitude: 1,
       },
-    ];
-    await saveAreas(data);
+    };
+    await saveArea(data);
 
     await deleteAreas({ userId });
     const res = await getAreasByUserId(userId);
-    expect(res).toBeNull();
+    expect(res).toBeUndefined();
   });
 });
