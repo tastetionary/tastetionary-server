@@ -7,10 +7,10 @@ export enum AgreementCategory {
   PERSONAL_INFORMATION = 'personal_information',
 }
 
-export enum AreaCategory {
-  ACTIVITY_AREA = 'activity_area',
-  DINING_AREA = 'dining_area',
-}
+// export enum AreaCategory {
+//   ACTIVITY_AREA = 'activity_area',
+//   DINING_AREA = 'dining_area',
+// }
 
 /**
  * enum 대신할 type literal 시험 삼아 사용

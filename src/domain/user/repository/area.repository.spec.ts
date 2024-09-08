@@ -5,7 +5,6 @@ import {
   saveAreas,
 } from '@domain/user/repository/area.repository';
 import { truncateTables } from '@root/jest.setup';
-import { AreaCategory } from '@domain/user/user.enum';
 import prismaClient from '@root/src/common/database/prisma';
 
 describe('new area repository', () => {
@@ -18,7 +17,6 @@ describe('new area repository', () => {
     const data = [
       {
         userId,
-        category: AreaCategory.ACTIVITY_AREA,
         order: 0,
         address: 'address',
         location: {
@@ -28,9 +26,8 @@ describe('new area repository', () => {
       },
     ];
     await saveAreas(data);
-    await saveArea(data[0]);
     const res = await getAreasByUserId(userId);
-    expect(res.length).toEqual(2);
+    expect(res).toEqual(data);
   });
 
   it('should delete area', async () => {
@@ -38,7 +35,6 @@ describe('new area repository', () => {
     const data = [
       {
         userId,
-        category: AreaCategory.ACTIVITY_AREA,
         order: 0,
         address: 'address',
         location: {
@@ -49,8 +45,8 @@ describe('new area repository', () => {
     ];
     await saveAreas(data);
 
-    await deleteAreas({ userId, category: AreaCategory.ACTIVITY_AREA });
+    await deleteAreas({ userId });
     const res = await getAreasByUserId(userId);
-    expect(res.length).toEqual(0);
+    expect(res).toBeNull();
   });
 });

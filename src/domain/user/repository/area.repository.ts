@@ -1,11 +1,9 @@
-import { AreaCategory } from '@domain/user/user.enum';
 import { Prisma } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
 
 export interface AreaRecord {
   id: number;
   userId: number;
-  category: AreaCategory;
   order: number;
   address: string;
   latitude: number;
@@ -17,7 +15,6 @@ export interface AreaRecord {
 export async function saveAreas(
   params: {
     userId: number;
-    category: AreaCategory;
     order: number;
     address: string;
     location: { latitude: number; longitude: number };
@@ -25,20 +22,19 @@ export async function saveAreas(
 ) {
   const query = params.map(
     (param) =>
-      Prisma.sql`(${param.userId}, ${param.category}, ${param.order}, ${
+      Prisma.sql`(${param.userId}, ${param.order}, ${
         param.address
       }, st_point(${param.location.longitude},${
         param.location.latitude
       }), ${new Date()})`,
   );
   await prismaClient.$queryRaw`
-      INSERT INTO user_areas (user_id, category, "order", address, location, updated_at) 
+      INSERT INTO user_areas (user_id, "order", address, location, updated_at) 
       VALUES ${Prisma.join(query)}`;
 }
 
 export async function saveArea(param: {
   userId: number;
-  category: AreaCategory;
   order: number;
   address: string;
   location: { latitude: number; longitude: number };
@@ -47,11 +43,10 @@ export async function saveArea(param: {
 }
 
 export async function getAreasByUserId(userId: number) {
-  const areas: AreaRecord[] = await prismaClient.$queryRaw`
+  const areas: AreaRecord = await prismaClient.$queryRaw`
       SELECT
           id,
           user_id as "userId",
-          category,
           "order",
           address,
           ST_X(location::geometry) as longitude,
@@ -60,8 +55,8 @@ export async function getAreasByUserId(userId: number) {
   return areas;
 }
 
-export async function deleteAreas(params: { userId; category: AreaCategory }) {
+export async function deleteAreas(params: { userId }) {
   await prismaClient.userAreas.deleteMany({
-    where: { userId: params.userId, category: params.category },
+    where: { userId: params.userId },
   });
 }
