@@ -28,7 +28,7 @@ export async function getRecommendations(param: {
   excludeRestaurantIds: bigint[];
 }) {
   const userAreas = await searchAreas(param.userId);
-  if (!userAreas.diningArea) {
+  if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
       'no dining area',
@@ -46,7 +46,7 @@ export async function getNearByRestaurants(param: {
   longitude: number;
 }) {
   const userAreas = await searchAreas(param.userId);
-  if (!userAreas.diningArea) {
+  if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
       'no dining area',
@@ -63,7 +63,7 @@ export async function registerReview(param: {
   dto: RestaurantReviewDTO;
 }) {
   const userAreas = await searchAreas(param.userId);
-  if (!userAreas.activityArea) {
+  if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
       'can not register review, should register activity area',

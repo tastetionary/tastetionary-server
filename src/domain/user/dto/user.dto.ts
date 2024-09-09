@@ -1,7 +1,6 @@
 import typia from 'typia';
 import {
   AgreementCategory,
-  AreaCategory,
   WithdrawalTypeEnum,
 } from '@domain/user/user.enum';
 import { CreateAccountRequest } from '@domain/account/dto/account.dto';
@@ -25,10 +24,10 @@ export interface RegisterProfileRequest {
   userProperty: UserPropertyDto;
 
   /**
-   * user location data, now only support 'ACTIVITY_AREA' and 'DINING_AREA'
-   * @type AreaDto[]
+   * user location data
+   * @type AreaDto
    */
-  areas: AreaDto[];
+  areas: AreaDto;
 
   /**
    * account data
@@ -58,13 +57,6 @@ export interface AgreementDTO {
 }
 
 export interface AreaDto {
-  /**
-   * area category
-   * example: 'dining_area'
-   * @type AreaCategory
-   */
-  category: AreaCategory;
-
   /**
    * human-readable address,
    * example: '서울특별시 강남구 00동'

@@ -3,7 +3,6 @@ import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
   WithdrawalTypeEnum,
   AgreementCategory,
-  AreaCategory,
   UserState,
 } from '@domain/user/user.enum';
 import {
@@ -33,20 +32,13 @@ describe('user facade', () => {
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
     const dto: RegisterProfileRequest = {
       userProperty: {},
-      areas: [
+      areas: 
         {
           latitude: 1,
           longitude: 1,
-          category: AreaCategory.ACTIVITY_AREA,
           address: 'test',
         },
-        {
-          latitude: 1,
-          longitude: 1,
-          category: AreaCategory.DINING_AREA,
-          address: 'test',
-        },
-      ],
+      
       account: {
         authenticationId: accAuthId,
         identification,
@@ -100,20 +92,11 @@ describe('user facade', () => {
           category: 'email',
         },
       },
-      areas: [
-        {
+      areas: {
           latitude: 1,
-          longitude: 1,
-          category: AreaCategory.ACTIVITY_AREA,
+          longitude: 1,   
           address: 'test',
         },
-        {
-          latitude: 1,
-          longitude: 1,
-          category: AreaCategory.DINING_AREA,
-          address: 'test',
-        },
-      ],
       account: {
         identification: acc,
         password: 'pwd',

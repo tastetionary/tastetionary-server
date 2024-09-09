@@ -20,7 +20,8 @@ describe('user factory', () => {
 
   it('areaEntityFactory should return data', () => {
     const res = areaEntityFactory({ userId: 1 });
-    expect(res).toHaveProperty('diningArea');
-    expect(res).toHaveProperty('activityArea');
+    expect(res).toHaveProperty('id');
+    expect(res).toHaveProperty('latitude');
+    expect(res).toHaveProperty('longitude');
   });
 });

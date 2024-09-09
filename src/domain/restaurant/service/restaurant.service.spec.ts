@@ -147,8 +147,7 @@ describe('restaurant service', () => {
 
     it('with no dining area user, should throw error', async () => {
       const userId = 99;
-      const entity = areaEntityFactory({ userId });
-      entity.diningArea = undefined as any;
+      const entity = undefined as any;
 
       await expect(
         getRecommendedRestaurant({

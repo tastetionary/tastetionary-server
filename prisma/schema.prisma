@@ -39,7 +39,6 @@ model UserTokens {
 model UserAreas {
   id        Int                      @id @default(autoincrement())
   userId    Int                      @map("user_id")
-  category  String                   @map("category") @db.VarChar(32)
   order     Int                      @map("order") @db.SmallInt
   location  Unsupported("geography")
   createdAt DateTime                 @default(now()) @map("created_at")

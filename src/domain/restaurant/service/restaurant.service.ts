@@ -125,11 +125,11 @@ async function getRestaurantsByDistance(param: {
   maxDistanceMeter: number;
   excludeRestaurantIds?: bigint[];
 }) {
-  if (!param.userAreas.diningArea) return [];
+  if (!param.userAreas) return [];
 
   return await getExternalRestaurantIdsByDistance({
-    latitude: param.userAreas.diningArea?.latitude,
-    longitude: param.userAreas.diningArea?.longitude,
+    latitude: param.userAreas?.latitude,
+    longitude: param.userAreas?.longitude,
     maxDistanceMeter: param.maxDistanceMeter,
     excludedIds: param.excludeRestaurantIds,
   });
@@ -141,7 +141,7 @@ export async function createReview(param: {
   dto: RestaurantReviewDTO;
 }) {
   const userAreas = await searchAreas(param.userId);
-  if (!userAreas.activityArea) {
+  if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
       'can not register review, should register activity area',

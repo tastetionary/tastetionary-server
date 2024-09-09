@@ -7,7 +7,6 @@ import {
 } from '@domain/user/dto/user.dto';
 import {
   WithdrawalTypeEnum,
-  AreaCategory,
   OpinionCategory,
   UserState,
 } from '@domain/user/user.enum';
@@ -18,7 +17,7 @@ import {
   AreaRecord,
   deleteAreas,
   getAreasByUserId,
-  saveAreas,
+  saveArea,
 } from '@domain/user/repository/area.repository';
 import {
   getNicknamePartRecord,
@@ -45,11 +44,11 @@ export async function searchProfile(userId: number) {
       `user not found: ${userId}`,
     );
   }
-  const areas = await searchAreas(userId);
+  const area = await searchAreas(userId);
   const authList = await searchAuthList(userId);
   return {
     user,
-    areas,
+    area,
     authList,
   };
 }
@@ -62,9 +61,9 @@ async function searchUser(userId: number) {
   };
 }
 
-const transformRecordToEntity = <T extends AreaRecord | AuthenticationRecord>(
+const transformRecordToEntity = <T extends AuthenticationRecord>(
   records: T[],
-  target: AreaCategory | AuthenticationCategory,
+  target: AuthenticationCategory,
 ) => {
   const record = records.find((r) => r.category === target);
 
@@ -74,21 +73,17 @@ const transformRecordToEntity = <T extends AreaRecord | AuthenticationRecord>(
   const { category, ...data } = record;
   return {
     ...data,
-    category: target,
   };
 };
 
 export type AreaEntity = Awaited<ReturnType<typeof searchAreas>>;
 export async function searchAreas(userId: number) {
-  const areas = await getAreasByUserId(userId);
-  const data = {
-    diningArea: transformRecordToEntity(areas, AreaCategory.DINING_AREA),
-    activityArea: transformRecordToEntity(areas, AreaCategory.ACTIVITY_AREA),
-  };
-  return {
-    ...data,
-    diningArea: data.diningArea as NonNullable<typeof data.diningArea>,
-  };
+  const area = await getAreasByUserId(userId);
+  if (!area) {
+    return null;
+  }
+
+  return area;
 }
 
 export type AuthEntity = Awaited<ReturnType<typeof searchAuthList>>;
@@ -117,17 +112,15 @@ export async function createProfile(dto: RegisterProfileRequest) {
   return user;
 }
 
-async function createAreas(userId: number, dtoList: AreaDto[]) {
-  const areas = dtoList.map((dto) => {
-    return {
-      userId,
-      order: 0,
-      category: dto.category,
-      address: dto.address,
-      location: { latitude: dto.latitude, longitude: dto.longitude },
-    };
-  });
-  await saveAreas(areas);
+async function createAreas(userId: number, dto: AreaDto) {
+  const area = {
+    userId,
+    order: 0,
+    address: dto.address,
+    location: { latitude: dto.latitude, longitude: dto.longitude },
+  };
+
+  await saveArea(area);
 }
 
 async function createAgreements(userId: number, dtoList: AgreementDTO[]) {
@@ -154,8 +147,8 @@ export async function changeCompany(userId: number, dto: CompanyDto) {
 }
 
 export async function changeArea(userId: number, dto: AreaDto) {
-  await deleteAreas({ userId, category: dto.category });
-  await createAreas(userId, [dto]);
+  await deleteAreas({ userId });
+  await createAreas(userId, dto);
 }
 
 function createRandomNickname() {

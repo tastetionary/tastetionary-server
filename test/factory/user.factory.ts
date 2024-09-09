@@ -1,5 +1,5 @@
 import { define, extend, random } from 'cooky-cutter';
-import { AreaCategory, UserState } from '@domain/user/user.enum';
+import { UserState } from '@domain/user/user.enum';
 import {
   AreaEntity,
   AuthEntity,
@@ -18,11 +18,11 @@ const baseModel = define<model>({
 export function profileEntityFactory() {
   const user = userEntityFactory();
   const authList = authEntityFactory({ userId: user.id });
-  const areas = areaEntityFactory({ userId: user.id });
+  const area = areaEntityFactory({ userId: user.id });
 
   return {
     user,
-    areas,
+    area,
     authList,
   };
 }
@@ -77,29 +77,12 @@ export function areaEntityFactory(param: {
   location?: { address: string; lat: number; lon: number };
 }) {
   const location = param.location ?? seoulLatLon;
-  // TODO order에 sequence 가 왜 안되는지 확인 필요
   return define<AreaEntity>({
-    diningArea: () => {
-      return {
         id: random(),
         userId: param.userId ?? random(),
-        category: AreaCategory.DINING_AREA,
         order: 1,
         address: `factory_${location.address}`,
         latitude: location.lat,
         longitude: location.lon,
-      };
-    },
-    activityArea: () => {
-      return {
-        id: random(),
-        userId: param.userId ?? random(),
-        category: AreaCategory.DINING_AREA,
-        order: 1,
-        address: `factory_${location.address}`,
-        latitude: location.lat,
-        longitude: location.lon,
-      };
-    },
   })();
 }
