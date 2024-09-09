@@ -3245,24 +3245,7 @@
             "$ref": "#/components/schemas/UserPropertyDto"
           },
           "areas": {
-            "description": "user location data, now only support 'ACTIVITY_AREA' and 'DINING_AREA'",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "AreaDto[]",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AreaDto"
-            }
+            "$ref": "#/components/schemas/AreaDto"
           },
           "account": {
             "$ref": "#/components/schemas/CreateAccountRequest"
@@ -3394,9 +3377,6 @@
       "AreaDto": {
         "type": "object",
         "properties": {
-          "category": {
-            "$ref": "#/components/schemas/AreaCategory"
-          },
           "address": {
             "description": "human-readable address,\nexample: '서울특별시 강남구 00동'",
             "x-typia-jsDocTags": [
@@ -3451,19 +3431,11 @@
         },
         "nullable": false,
         "required": [
-          "category",
           "address",
           "latitude",
           "longitude"
         ],
         "x-typia-jsDocTags": []
-      },
-      "AreaCategory": {
-        "type": "string",
-        "enum": [
-          "activity_area",
-          "dining_area"
-        ]
       },
       "CreateAccountRequest": {
         "type": "object",
@@ -3648,7 +3620,7 @@
             "type": "string"
           },
           "area": {
-            "$ref": "#/components/schemas/__object"
+            "$ref": "#/components/schemas/AreaRecord.Nullable"
           },
           "account": {
             "$ref": "#/components/schemas/__type.o2"
@@ -3663,30 +3635,28 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "__object": {
-        "type": "object",
-        "properties": {
-          "diningArea": {
-            "$ref": "#/components/schemas/Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_"
-          },
-          "activityArea": {
-            "$ref": "#/components/schemas/Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_.Nullable"
-          }
-        },
-        "nullable": false,
-        "required": [
-          "diningArea",
-          "activityArea"
-        ],
-        "x-typia-jsDocTags": []
-      },
-      "Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_": {
+      "AreaRecord.Nullable": {
         "type": "object",
         "properties": {
           "id": {
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
+          },
+          "userId": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "order": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "address": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
           },
           "latitude": {
             "x-typia-required": true,
@@ -3709,114 +3679,16 @@
             "x-typia-optional": true,
             "type": "string",
             "format": "date-time"
-          },
-          "userId": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "order": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "address": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
-          },
-          "category": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "enum": [
-              "account",
-              "company",
-              "password",
-              "activity_area",
-              "dining_area"
-            ]
-          }
-        },
-        "nullable": false,
-        "required": [
-          "id",
-          "latitude",
-          "longitude",
-          "userId",
-          "order",
-          "address",
-          "category"
-        ],
-        "x-typia-jsDocTags": []
-      },
-      "Omit_lt_AreaRecord_comma__space__doublequote_category_doublequote__gt__space__and__space__blt__space_category:_space_AuthenticationCategory_space__or__space_AreaCategory;_space__bgt_.Nullable": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "latitude": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "longitude": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "createdAt": {
-            "x-typia-required": false,
-            "x-typia-optional": true,
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "x-typia-required": false,
-            "x-typia-optional": true,
-            "type": "string",
-            "format": "date-time"
-          },
-          "userId": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "order": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "address": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
-          },
-          "category": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "enum": [
-              "account",
-              "company",
-              "password",
-              "activity_area",
-              "dining_area"
-            ]
           }
         },
         "nullable": true,
         "required": [
           "id",
-          "latitude",
-          "longitude",
           "userId",
           "order",
           "address",
-          "category"
+          "latitude",
+          "longitude"
         ],
         "x-typia-jsDocTags": []
       },
