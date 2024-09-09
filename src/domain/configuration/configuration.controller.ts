@@ -24,4 +24,9 @@ export class V1ConfigurationController {
   getServerStatus() {
     return this.cfgService.getServerMetaData();
   }
+
+  @TypedRoute.Get('/debug-sentry')
+  getError() {
+    throw new Error('My first Sentry error!');
+  }
 }
