@@ -137,7 +137,7 @@ jobs:
           cache-to: type=inline
 
   build_and_push_test:
-    if: success() && github.ref == 'refs/heads/testing' && github.event_name == 'push'
+    if: success() && github.ref == 'refs/heads/develop' && github.event_name == 'push'
     needs: [ test ]
     runs-on: ubuntu-latest
     steps:

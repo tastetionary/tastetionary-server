@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - main
-      - develop
       - 'bridge/*' # Use single quotes around 'bridge/*' to treat it as a string
-      - testing
   pull_request:
     branches:
       - main
