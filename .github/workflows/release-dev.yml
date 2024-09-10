@@ -5,7 +5,6 @@ on:
     types: [published]
   push:
     branches:
-      - testing
       - develop
 
 jobs:
@@ -144,7 +143,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: testing
+          ref: develop
           fetch-depth: 0
 
       - name: inject env
