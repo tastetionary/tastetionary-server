@@ -98,8 +98,9 @@ export async function createToken(param: {
   password: string;
 }) {
   const entity = await getAccount(param.identification, param.category);
-
-  await checkPassword(entity, param.password);
+  if (param.category === AccountCategory.EMAIL) {
+    await checkPassword(entity, param.password);
+  }
 
   const tokens = makeTokens({ userId: entity.userId });
   await saveToken({
