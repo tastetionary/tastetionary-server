@@ -1,9 +1,13 @@
+import { RestaurantReviewRxnDistinctCnt } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantPrice,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
+import { ApiProperty } from '@nestjs/swagger';
+import { REACTION_TYPE } from '@prisma/client';
+import { IsDefined, IsEnum, ValidateIf } from 'class-validator';
 
 export interface RestaurantReviewDTO {
   /**
@@ -87,6 +91,8 @@ export interface AggregateReviewDTO {
   aggregatePrice: { [index: string]: number };
   revisitRatio: number;
   totalCount: number;
+  reviewReactionCnt: RestaurantReviewRxnDistinctCnt;
+  userReaction: REACTION_TYPE | null;
 }
 
 export interface ReviewAggregateData {
@@ -250,4 +256,16 @@ export interface KeywordCountDTO {
    * @type number
    */
   count: number;
+}
+
+export class PutRestaurantReviewReactionDTO {
+  @IsDefined()
+  @IsEnum(REACTION_TYPE)
+  @ValidateIf((_, value) => value !== null)
+  @ApiProperty({
+    description: '리뷰 리액션(L: 좋아요 | D: 싫어요 | null: 리액션 취소)',
+    example: REACTION_TYPE.L,
+    enum: REACTION_TYPE,
+  })
+  reaction_type: REACTION_TYPE | null;
 }

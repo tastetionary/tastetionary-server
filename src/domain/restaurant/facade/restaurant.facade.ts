@@ -6,6 +6,7 @@ import {
   getReviewOptions,
   getRestaurantReviews,
   reportRestaurantReview,
+  upsertRestaurantReviewRxn,
 } from '@domain/restaurant/service/restaurant.service';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
@@ -18,6 +19,7 @@ import {
   RestaurantCategory,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
+import { REACTION_TYPE } from '@prisma/client';
 
 export async function getRecommendations(param: {
   userId: number;
@@ -73,8 +75,11 @@ export async function registerReview(param: {
   await createReview(param);
 }
 
-export async function getReviews(param: { restaurantId: bigint }) {
-  return await getRestaurantReviews(param.restaurantId);
+export async function getReviews(param: {
+  restaurantId: bigint;
+  userId?: number;
+}) {
+  return await getRestaurantReviews(param.restaurantId, param.userId);
 }
 
 export async function reportReview(param: {
@@ -84,6 +89,15 @@ export async function reportReview(param: {
   category: ReviewReportCategory;
 }) {
   await reportRestaurantReview(param);
+}
+
+export async function reactToRestaurantReview(param: {
+  reviewId: number;
+  restaurantId: number;
+  userId: number;
+  reactionType: REACTION_TYPE | null;
+}) {
+  await upsertRestaurantReviewRxn(param);
 }
 
 export function getFilterOptions() {

@@ -8,12 +8,13 @@ datasource db {
 }
 
 model Users {
-  id        Int      @id @default(autoincrement())
-  nickname  String   @map("nickname") @db.VarChar(128)
-  state     String   @map("state") @db.VarChar(16)
-  property  Json     @map("property")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id                        Int                         @id @default(autoincrement())
+  nickname                  String                      @map("nickname") @db.VarChar(128)
+  state                     String                      @map("state") @db.VarChar(16)
+  property                  Json                        @map("property")
+  createdAt                 DateTime                    @default(now()) @map("created_at")
+  updatedAt                 DateTime                    @updatedAt @map("updated_at")
+  RestaurantReviewReactions RestaurantReviewReactions[]
 
   @@index([nickname])
   @@index([state])
@@ -65,19 +66,18 @@ model UserPreferences {
 }
 
 model RestaurantReviews {
-  id                                 Int      @id @default(autoincrement())
-  userId                             Int      @map("user_id")
-  category                           String   @map("category") @db.VarChar(32) /// 리뷰시 등록되는 음식 종류, 한식 중식 양식 등
-  summary                            String   @map("summary") @db.VarChar(128) /// 한줄 요약
-  opinion                            String?  @map("opinion") @db.VarChar(16) // 최종 의견, 
-  keywords                           String[] @map("keywords") @db.Text // tags
-  price                              Int      @map("price") @db.Integer // 가격
-  like                               Int      @default(0) @map("like") @db.Integer // 좋아요
-  dislike                            Int      @default(0) @map("dislike") @db.Integer // 싫어요
-  createdAt                          DateTime @default(now()) @map("created_at")
-  updatedAt                          DateTime @updatedAt @map("updated_at")
+  id                                 Int                         @id @default(autoincrement())
+  userId                             Int                         @map("user_id")
+  category                           String                      @map("category") @db.VarChar(32) /// 리뷰시 등록되는 음식 종류, 한식 중식 양식 등
+  summary                            String                      @map("summary") @db.VarChar(128) /// 한줄 요약
+  opinion                            String?                     @map("opinion") @db.VarChar(16) // 최종 의견,
+  keywords                           String[]                    @map("keywords") @db.Text // tags
+  price                              Int                         @map("price") @db.Integer // 가격
+  createdAt                          DateTime                    @default(now()) @map("created_at")
+  updatedAt                          DateTime                    @updatedAt @map("updated_at")
   /// 외부 API 를 통해 가져온 식당 uuid
-  external_restaurant_information_id BigInt   @map("external_restaurant_information_id")
+  external_restaurant_information_id BigInt                      @map("external_restaurant_information_id")
+  reactions                          RestaurantReviewReactions[]
 
   @@index([userId])
   @@index([external_restaurant_information_id])
@@ -85,6 +85,27 @@ model RestaurantReviews {
   @@index([keywords], type: Gin)
   @@index([price])
   @@map("restaurant_reviews")
+}
+
+enum REACTION_TYPE {
+  L // LIKE
+  D // DISLIKE
+}
+
+model RestaurantReviewReactions {
+  id           Int                @id @default(autoincrement())
+  userId       Int                @map("user_id")
+  reviewId     Int                @map("review_id")
+  reactionType REACTION_TYPE      @default(L) @map("reaction_type") // 리액션 타입: L: Like | D: Dislike
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+  User         Users?             @relation(fields: [userId], references: [id])
+  Review       RestaurantReviews? @relation(fields: [reviewId], references: [id])
+
+  @@unique([userId, reviewId])
+  @@index([userId])
+  @@index([reviewId])
+  @@map("restaurant_review_reactions")
 }
 
 model ExternalRestaurantInformations {
