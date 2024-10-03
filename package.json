@@ -60,6 +60,7 @@
     "fp-ts": "^2.16.1",
     "joi": "^17.9.2",
     "nest-winston": "^1.9.3",
+    "redis": "^4.7.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "ts-mailgun": "^0.5.1",
