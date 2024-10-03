@@ -12,7 +12,7 @@ describe('user auth', () => {
       userId: 1,
       identification: 'identification',
       type: AuthenticationType.EMAIL,
-      category: AuthenticationCategory.COMPANY,
+      category: AuthenticationCategory.ACCOUNT,
       state: AuthenticationState.INPROGRESS,
     };
 
@@ -26,7 +26,7 @@ describe('user auth', () => {
       userId: 1,
       identification: 'identification',
       type: AuthenticationType.EMAIL,
-      category: AuthenticationCategory.COMPANY,
+      category: AuthenticationCategory.ACCOUNT,
       state: AuthenticationState.INPROGRESS,
     };
 

@@ -52,7 +52,6 @@ function getEmailContentsForm(
 ) {
   const subjects: Record<AuthenticationCategory, string> = {
     [AuthenticationCategory.ACCOUNT]: '계정인증',
-    [AuthenticationCategory.COMPANY]: '회사인증',
     [AuthenticationCategory.PASSWORD]: '비밀번호변경',
   };
 

@@ -22,7 +22,7 @@ import {
   beginAuthProgress,
   finishAuthProgress,
 } from '@domain/authentication/facade/authentication.facade';
-import { AuthGuard } from '@common/auth/auth.guard';
+import { JwtAuthGuard } from '@common/auth/auth.guard';
 
 @Controller('v1/authentication')
 @UseFilters(new HttpExceptionFilter())
@@ -64,32 +64,32 @@ export class AuthenticationController {
     return new BaseResponseDto({ authenticationId });
   }
 
-  /**
-   * @tag authentication
-   * @summary reCreate company authentication, it will delete company type auth if data exists
-   */
-  @UseGuards(AuthGuard)
-  @TypedRoute.Post('/company')
-  @HttpCode(200)
-  async reCreateCompanyAuthentication(
-    @Request() req,
-    @TypedBody() dto: ReCreateProgressRequest,
-  ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
-    const res = await beginAuthProgress({
-      userId: req.user.userId,
-      identification: dto.identification,
-      category: AuthenticationCategory.COMPANY,
-      type: dto.type,
-    });
+  // /**
+  //  * @tag authentication
+  //  * @summary reCreate company authentication, it will delete company type auth if data exists
+  //  */
+  // @UseGuards(JwtAuthGuard)
+  // @TypedRoute.Post('/company')
+  // @HttpCode(200)
+  // async reCreateCompanyAuthentication(
+  //   @Request() req,
+  //   @TypedBody() dto: ReCreateProgressRequest,
+  // ): Promise<BaseResponseDto<CreateAuthenticationResponse>> {
+  //   const res = await beginAuthProgress({
+  //     userId: req.user.userId,
+  //     identification: dto.identification,
+  //     category: AuthenticationCategory.COMPANY,
+  //     type: dto.type,
+  //   });
 
-    return new BaseResponseDto(res);
-  }
+  //   return new BaseResponseDto(res);
+  // }
 
   /**
    * @tag authentication
    * @summary done in progress authentication and sync auth result to user
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @TypedRoute.Post('/status/done')
   @HttpCode(200)
   async doneUserProgress(

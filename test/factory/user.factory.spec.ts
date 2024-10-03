@@ -14,7 +14,6 @@ describe('user factory', () => {
 
   it('authEntityFactory should return data', () => {
     const res = authEntityFactory({ userId: 1 });
-    expect(res).toHaveProperty('company');
     expect(res).toHaveProperty('account');
   });
 

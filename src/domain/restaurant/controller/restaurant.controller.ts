@@ -11,7 +11,7 @@ import {
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
-import { AuthGuard } from '@common/auth/auth.guard';
+import { JwtAuthGuard } from '@common/auth/auth.guard';
 import {
   AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
@@ -136,7 +136,7 @@ export class RestaurantController {
    * @summary get restaurants by condition
    * @security bearer
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @TypedRoute.Post('/recommendation')
   async getRestaurants(
@@ -170,7 +170,7 @@ export class RestaurantController {
    * @summary get nearby reviewed restaurants
    * @security bearer
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @TypedRoute.Get('/nearby')
   async getNearByRestaurants(
@@ -205,7 +205,7 @@ export class RestaurantController {
    * @summary register restaurant review only for end-user who register activity area
    * @security bearer
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @TypedRoute.Post('/review')
   async registerRestaurantReview(
@@ -227,7 +227,7 @@ export class RestaurantController {
    * @summary get restaurant reviews by restaurant id
    * @security bearer
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @TypedRoute.Get('/:restaurantId/review')
   async getReviews(
@@ -287,7 +287,7 @@ export class RestaurantController {
    * @tag restaurant
    * @summary report restaurant review
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @TypedRoute.Post('/review/report')
   @HttpCode(201)
   async reportReview(

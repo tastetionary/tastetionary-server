@@ -7,7 +7,6 @@ import {
   createProgressAuthentication,
   changeAuthenticationAsDone,
   resetNotRegisteredUserAuth,
-  validateDomainWhenCompanyCase,
   resetRegisteredUserAuth,
   syncAuthentication,
 } from '@domain/authentication/service/authentication.service';
@@ -20,7 +19,7 @@ export async function beginAuthProgress(param: {
   userId?: number;
   env?: EnvironmentEnum;
 }) {
-  validateDomainWhenCompanyCase(param);
+  // validateDomainWhenCompanyCase(param);
 
   const { authCode, isSendingSuccess } = await sendAuthenticationCodeToEmail(
     param.category,

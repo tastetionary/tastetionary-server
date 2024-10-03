@@ -33,7 +33,7 @@ describe('authentication service', () => {
       const code = '1'.repeat(6);
       const data = {
         userId,
-        category: AuthenticationCategory.COMPANY,
+        category: AuthenticationCategory.ACCOUNT,
         identification: 'some@crud.com',
         code,
         type: AuthenticationType.EMAIL,
@@ -88,7 +88,7 @@ describe('authentication service', () => {
   describe('resetRegisteredUserAuth', () => {
     it('should delete registered user auth', async () => {
       const data = {
-        category: AuthenticationCategory.COMPANY,
+        category: AuthenticationCategory.ACCOUNT,
         identification: 'some@crud.com',
         code: '1',
         type: AuthenticationType.EMAIL,
@@ -130,11 +130,11 @@ describe('authentication service', () => {
       expect(res).not.toBeNull();
     });
 
-    it('with company, should reset authentication', async () => {
+    it('with data, should reset authentication', async () => {
       const userId = 999;
       const data = {
         userId,
-        category: AuthenticationCategory.COMPANY,
+        category: AuthenticationCategory.ACCOUNT,
         identification: 'some@crud.com',
         code: '1',
         type: AuthenticationType.EMAIL,
@@ -161,7 +161,7 @@ describe('authentication service', () => {
       const userId = 999;
       const data = {
         userId,
-        category: AuthenticationCategory.COMPANY,
+        category: AuthenticationCategory.ACCOUNT,
         identification: 'some@crud.com',
         code: '12345',
         type: AuthenticationType.EMAIL,
@@ -185,7 +185,7 @@ describe('authentication service', () => {
       const userId = 999;
       const data = {
         userId,
-        category: AuthenticationCategory.COMPANY,
+        category: AuthenticationCategory.ACCOUNT,
         identification: 'some@crud.com',
         code: '1',
         type: AuthenticationType.EMAIL,

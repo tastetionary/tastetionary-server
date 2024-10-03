@@ -1,5 +1,4 @@
 import {
-  changeCompany,
   changeUserState,
   createProfile,
   createUserOpinion,
@@ -36,24 +35,8 @@ export async function registerProfile(dto: RegisterProfileRequest) {
 
   const user = await createProfile(dto);
   await createAccount({ userId: user.id, ...dto.account });
-
   await syncAuthentication(user.id, dto.account.authenticationId);
 
-  if (dto.userProperty.companyData) {
-    await validateDoneIdentification({
-      identification: dto.userProperty.companyData.identification,
-      authenticationId: dto.userProperty.companyData.authenticationId,
-      category: AuthenticationCategory.COMPANY,
-      type: AuthenticationType.EMAIL,
-    });
-
-    await syncAuthentication(
-      user.id,
-      dto.userProperty.companyData.authenticationId,
-    );
-
-    await changeCompany(user.id, dto.userProperty.companyData);
-  }
   return user;
 }
 

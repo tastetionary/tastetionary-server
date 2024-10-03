@@ -25,7 +25,7 @@ describe('user service', () => {
   });
 
   const DTO: RegisterProfileRequest = {
-    userProperty: {},
+    nickname: 'nickname',
     areas: {
       latitude: 1,
       longitude: 1,
@@ -67,7 +67,7 @@ describe('user service', () => {
   });
 
   it('should return user entity and essential field', async () => {
-    const user = await createUser(DTO.userProperty);
+    const user = await createUser(DTO.nickname);
     const profileEntity = await searchProfile(user.id);
     expect(profileEntity).toHaveProperty('user');
   });
@@ -82,20 +82,9 @@ describe('user service', () => {
 
   describe('[private] ', () => {
     it('createUser should create user', async () => {
-      const dto = {
-        companyData: {
-          authenticationId: 1,
-          companyName: 'name',
-          identification: 'ide',
-          category: 'email' as const,
-        },
-      };
-      const user = await _private.createUser(dto);
+      const nickname = 'nickname';
+      const user = await _private.createUser(nickname);
       expect(user).toHaveProperty('id');
-
-      expect(user).toHaveProperty('property');
-      const company = user.property;
-      expect(company).toEqual({ companyName: dto.companyData.companyName });
     });
 
     it('createRandomNickname should return random nickname', () => {

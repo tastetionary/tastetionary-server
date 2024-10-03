@@ -24,7 +24,7 @@ describe('authentication', () => {
   it('should update authentication', async () => {
     const data = {
       identification: 'identification',
-      category: AuthenticationCategory.COMPANY,
+      category: AuthenticationCategory.ACCOUNT,
       type: AuthenticationType.EMAIL,
       state: AuthenticationState.INPROGRESS,
     };
@@ -60,7 +60,7 @@ describe('authentication', () => {
     const data = {
       userId: 1,
       identification: 'identification',
-      category: AuthenticationCategory.COMPANY,
+      category: AuthenticationCategory.ACCOUNT,
       type: AuthenticationType.EMAIL,
       state: AuthenticationState.INPROGRESS,
     };
