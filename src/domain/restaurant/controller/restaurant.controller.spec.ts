@@ -1,4 +1,7 @@
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { TestingModule } from '@nestjs/testing';
+import { REACTION_TYPE } from '@prisma/client';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import {
@@ -101,6 +104,8 @@ describe('restaurant controller', () => {
           aggregatePrice: { '10': 10 },
           revisitRatio: 10,
           totalCount: 10,
+          reviewReactionCnt: { [REACTION_TYPE.L]: 1, [REACTION_TYPE.D]: 0 },
+          userReaction: null,
         },
       });
 
@@ -258,5 +263,58 @@ describe('restaurant controller', () => {
       .send();
 
     expect(res.statusCode).toEqual(200);
+  });
+
+  it('/:restaurantId/review/:reviewId/react, should return 201', async () => {
+    const userId = 123;
+    const restaurantId = 1n;
+    const reviewId = 1;
+
+    jest
+      .spyOn(restaurantService, 'upsertRestaurantReviewRxn')
+      .mockResolvedValueOnce(undefined);
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .put(`/v1/restaurant/${restaurantId}/review/${reviewId}/react`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        reactionType: REACTION_TYPE.L,
+      });
+
+    assertStatusCode(res, 201);
+  });
+
+  it('/:restaurantId/review/:reviewId/react, should return 201 even when upsert fails', async () => {
+    const userId = 123;
+    const restaurantId = 1n;
+    const reviewId = 1;
+
+    jest
+      .spyOn(restaurantService, 'upsertRestaurantReviewRxn')
+      .mockRejectedValueOnce(
+        new CallerWrongUsageException(
+          ErrorSubCategoryEnum.NO_DATA,
+          `no review data ${reviewId}`,
+        ),
+      );
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .put(`/v1/restaurant/${restaurantId}/review/${reviewId}/react`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        reactionType: REACTION_TYPE.L,
+      });
+
+    assertStatusCode(res, 201);
   });
 });

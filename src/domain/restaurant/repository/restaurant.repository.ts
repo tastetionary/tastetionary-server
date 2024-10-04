@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, REACTION_TYPE } from '@prisma/client';
 import {
   RestaurantCategory,
   RestaurantKeyword,
@@ -18,11 +18,26 @@ export interface RestaurantReviewRecord {
   opinion: string | null;
   keywords: string[];
   price: number;
-  like: number;
-  dislike: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  reactions?: RestaurantReviewReactionSummaryRecord[];
+}
+
+export type RestaurantReviewRxnDistinctCnt = Record<REACTION_TYPE, number>;
+
+export interface RestaurantReviewReactionRecord {
+  id: number;
+  userId: number;
+  reviewId: number;
+  reactionType: REACTION_TYPE;
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export type RestaurantReviewReactionSummaryRecord = Pick<
+  RestaurantReviewReactionRecord,
+  'userId' | 'reactionType'
+>;
 
 export interface ExternalRestaurantInformationRecord {
   id: bigint;
@@ -175,6 +190,14 @@ export async function getReviewsByConditions(param: {
 
   const res = await prismaClient.restaurantReviews.findMany({
     where: condition,
+    include: {
+      reactions: {
+        select: {
+          userId: true,
+          reactionType: true,
+        },
+      },
+    },
   });
 
   return res.map((r) => {
@@ -185,6 +208,19 @@ export async function getReviewsByConditions(param: {
 
     return { ...rest, category: enumCategory };
   });
+}
+
+function getRestaurantRxnDistinctCnt(
+  reactionList: Array<{ userId: number; reactionType: REACTION_TYPE }>,
+): RestaurantReviewRxnDistinctCnt {
+  const map: RestaurantReviewRxnDistinctCnt = Object.values(
+    REACTION_TYPE,
+  ).reduce(
+    (map, key) => ({ ...map, [key]: 0 }),
+    {} as RestaurantReviewRxnDistinctCnt,
+  );
+  reactionList.forEach(({ reactionType }) => map[reactionType]++);
+  return map;
 }
 
 export async function getExternalRestaurantIdsByDistance(param: {
@@ -248,4 +284,34 @@ export function getRestaurantOptionsRecord() {
     keywords,
     prices,
   };
+}
+
+export async function saveReviewReaction(params: {
+  userId: number;
+  reviewId: number;
+  reactionType: REACTION_TYPE;
+}): Promise<void> {
+  const data = {
+    userId: params.userId,
+    reviewId: params.reviewId,
+    reactionType: params.reactionType,
+  };
+  await prismaClient.restaurantReviewReactions.upsert({
+    create: data,
+    update: data,
+    where: {
+      userId_reviewId: { userId: params.userId, reviewId: params.reviewId },
+    },
+  });
+}
+
+export async function deleteReviewReaction(params: {
+  userId: number;
+  reviewId: number;
+}): Promise<void> {
+  await prismaClient.restaurantReviewReactions.delete({
+    where: {
+      userId_reviewId: { userId: params.userId, reviewId: params.reviewId },
+    },
+  });
 }
