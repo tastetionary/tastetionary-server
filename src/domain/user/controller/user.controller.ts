@@ -15,7 +15,7 @@ import {
   WithdrawUserDto,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
-import { JwtAuthGuard } from '@common/auth/auth.guard';
+import { AuthGuard } from '@common/auth/auth.guard';
 import { changeArea } from '@domain/user/service/user.service';
 import {
   getProfile,
@@ -45,7 +45,7 @@ export class UserController {
    * @summary get profile
    */
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @TypedRoute.Get('/')
   async inquireMyPageProfile(
     @Request() req,
@@ -66,7 +66,7 @@ export class UserController {
    * @summary update user area
    */
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @TypedRoute.Put('/')
   async updateArea(
     @Request() req,
@@ -81,7 +81,7 @@ export class UserController {
    * @summary withdraw user, delete account, token and update state
    */
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @TypedRoute.Delete('/')
   async withdrawUser(
     @Request() req,

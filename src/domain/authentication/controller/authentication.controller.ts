@@ -22,7 +22,7 @@ import {
   beginAuthProgress,
   finishAuthProgress,
 } from '@domain/authentication/facade/authentication.facade';
-import { JwtAuthGuard } from '@common/auth/auth.guard';
+import { AuthGuard } from '@common/auth/auth.guard';
 
 @Controller('v1/authentication')
 @UseFilters(new HttpExceptionFilter())
@@ -89,7 +89,7 @@ export class AuthenticationController {
    * @tag authentication
    * @summary done in progress authentication and sync auth result to user
    */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @TypedRoute.Post('/status/done')
   @HttpCode(200)
   async doneUserProgress(

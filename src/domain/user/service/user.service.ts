@@ -130,7 +130,7 @@ async function createAgreements(userId: number, dtoList: AgreementDTO[]) {
 export async function createUser(nickname: string) {
   const user = await saveUser({
     state: UserState.ACTIVE,
-    nickname: nickname,
+    nickname: nickname || createRandomNickname(),
     property: {},
   });
 

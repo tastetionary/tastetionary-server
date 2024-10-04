@@ -32,9 +32,25 @@ export interface CreateAccountRequest {
 export interface CreateTokenRequest
   extends Omit<CreateAccountRequest, 'authenticationId'> {}
 
+export interface SocialTokenRequest {
+  /**
+   * social token
+   * @type string
+   */
+  code: string;
+}
+
 export interface TokenDTO {
   accessToken: string;
   refreshToken: string;
   accessTokenExpiredAt: Date;
   refreshTokenExpiredAt: Date;
+}
+
+export interface SocialTokenDTO {
+  accessToken?: string;
+  refreshToken?: string;
+  accessTokenExpiredAt?: Date;
+  refreshTokenExpiredAt?: Date;
+  state?: string;
 }
