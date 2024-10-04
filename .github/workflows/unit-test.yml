@@ -4,13 +4,10 @@ on:
   push:
     branches:
       - main
-      - 'bridge/*' # Use single quotes around 'bridge/*' to treat it as a string
   pull_request:
     branches:
       - main
       - develop
-      - 'bridge/*' #
-      - testing
 
 jobs:
   build:
