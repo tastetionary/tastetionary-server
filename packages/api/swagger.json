@@ -519,6 +519,21 @@
         "x-nestia-method": "GET"
       }
     },
+    "/v1/configuration/debug-sentry": {
+      "get": {
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.configuration.debug-sentry.getError",
+        "x-nestia-jsDocTags": [],
+        "x-nestia-method": "GET"
+      }
+    },
     "/v1/food/recommendation": {
       "post": {
         "tags": [
@@ -1037,6 +1052,94 @@
           }
         ],
         "x-nestia-method": "POST"
+      }
+    },
+    "/v1/restaurant/{restaurantId}/review/{reviewId}/react": {
+      "put": {
+        "tags": [
+          "restaurant"
+        ],
+        "parameters": [
+          {
+            "name": "reviewId",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          },
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutRestaurantReviewReactionDTO"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-nestia-namespace": "v1.restaurant.review.react.putReviewReaction",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "restaurant",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "upsert/delete review reaction",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "security",
+            "text": [
+              {
+                "text": "bearer",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "PUT"
       }
     },
     "/v1/user": {
@@ -2308,6 +2411,19 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
+          },
+          "reviewReactionCnt": {
+            "$ref": "#/components/schemas/RestaurantReviewRxnDistinctCnt"
+          },
+          "userReaction": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "L",
+              "D"
+            ],
+            "nullable": true
           }
         },
         "nullable": true,
@@ -2319,7 +2435,9 @@
           "prices",
           "aggregatePrice",
           "revisitRatio",
-          "totalCount"
+          "totalCount",
+          "reviewReactionCnt",
+          "userReaction"
         ],
         "x-typia-jsDocTags": []
       },
@@ -2338,6 +2456,27 @@
           "x-typia-optional": false,
           "type": "number"
         }
+      },
+      "RestaurantReviewRxnDistinctCnt": {
+        "type": "object",
+        "properties": {
+          "L": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          },
+          "D": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "L",
+          "D"
+        ],
+        "x-typia-jsDocTags": []
       },
       "BaseResponseDto_lt_Array_lt_GetNearByRestaurantsOutput_gt__gt_": {
         "type": "object",
@@ -2874,6 +3013,19 @@
           "user": {
             "$ref": "#/components/schemas/__type.o1"
           },
+          "reviewReactionCnt": {
+            "$ref": "#/components/schemas/RestaurantReviewRxnDistinctCnt"
+          },
+          "userReaction": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "L",
+              "D"
+            ],
+            "nullable": true
+          },
           "summary": {
             "x-typia-required": true,
             "x-typia-optional": false,
@@ -2906,16 +3058,6 @@
             "x-typia-optional": true,
             "type": "string",
             "format": "date-time"
-          },
-          "like": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "dislike": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
           }
         },
         "nullable": false,
@@ -2923,11 +3065,11 @@
           "id",
           "external_restaurant_information_id",
           "user",
+          "reviewReactionCnt",
+          "userReaction",
           "summary",
           "opinion",
-          "keywords",
-          "like",
-          "dislike"
+          "keywords"
         ],
         "x-typia-jsDocTags": []
       },
@@ -3237,6 +3379,26 @@
           "허위 정보",
           "기타"
         ]
+      },
+      "PutRestaurantReviewReactionDTO": {
+        "type": "object",
+        "properties": {
+          "reaction_type": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string",
+            "enum": [
+              "L",
+              "D"
+            ],
+            "nullable": true
+          }
+        },
+        "nullable": false,
+        "required": [
+          "reaction_type"
+        ],
+        "x-typia-jsDocTags": []
       },
       "RegisterProfileRequest": {
         "type": "object",
