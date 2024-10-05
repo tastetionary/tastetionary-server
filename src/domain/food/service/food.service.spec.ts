@@ -1,24 +1,24 @@
-import { TestingModule } from '@nestjs/testing';
-import { appModuleFixture } from '@root/jest.setup';
-import { FoodService } from './food.service';
-import { FoodModule } from '../food.module';
-import { FoodCategory, FoodKeyword } from '../food.enum';
+import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
+import { getRecommendedFood } from '@domain/food/service/food.service';
+import { EmptyContentException } from '@root/src/common/exception/internal.exception';
 
-describe('food service', () => {
-  let module: TestingModule;
-  let service: FoodService;
-  beforeAll(async () => {
-    module = (await appModuleFixture([], [], [FoodModule])) as TestingModule;
-    service = module.get(FoodService);
-  });
-
+describe('service', () => {
   const data = {
     categories: [FoodCategory.KOREAN, FoodCategory.CHINESE],
     keywords: [FoodKeyword.SPICY, FoodKeyword.GREASY],
   };
 
   it('should get recommend Food', async () => {
-    const res = await expect(service.getRecommendedFood(data));
+    const res = getRecommendedFood(data);
     expect(res).not.toBeNull();
+  });
+
+  it('with no data, should throw error', () => {
+    expect(() => {
+      getRecommendedFood({
+        keywords: [FoodKeyword.RICH],
+        categories: [FoodCategory.SALAD],
+      });
+    }).toThrowError(EmptyContentException);
   });
 });
