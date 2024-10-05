@@ -1,44 +1,34 @@
-import {
-  Controller,
-  HttpCode,
-  Injectable,
-  UseGuards,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, HttpCode, Injectable, UseFilters } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
-import { AuthGuard } from '@common/auth/auth.guard';
-import { FoodService } from '@domain/food/service/food.service';
 import {
   FoodOption,
   GetFoodFilterOption,
   GetFoodOutput,
 } from '@domain/food/dto/food.dto';
+import {
+  getRecommendations,
+  getFilterOptions,
+} from '@domain/food/facade/food.facade';
 
 @Controller('v1/food')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class FoodController {
-  constructor(private service: FoodService) {}
-
   /**
    * @tag food
    * @summary get food recommentation
    */
   @TypedRoute.Post('/recommendation')
   @HttpCode(200)
-  async getRecommentation(
+  getRecommentation(
     @TypedBody() dto: FoodOption,
-  ): Promise<BaseResponseDto<GetFoodOutput | null>> {
-    const res = await this.service.getRecommendedFood({
+  ): BaseResponseDto<GetFoodOutput> {
+    const res = getRecommendations({
       keywords: dto.keywords,
       categories: dto.categories,
     });
-
-    if (res === null) {
-      return new BaseResponseDto(null);
-    }
 
     return new BaseResponseDto({
       id: res.id,
@@ -52,8 +42,8 @@ export class FoodController {
    */
   @TypedRoute.Get('option')
   @HttpCode(200)
-  async getOption(): Promise<BaseResponseDto<GetFoodFilterOption>> {
-    const res = await this.service.getFoodOptions();
+  getOption(): BaseResponseDto<GetFoodFilterOption> {
+    const res = getFilterOptions();
 
     return new BaseResponseDto({
       categories: res.categories,

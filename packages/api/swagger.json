@@ -558,7 +558,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetFoodOutput_space__or__space_null_gt_"
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_GetFoodOutput_gt_"
                 }
               }
             },
@@ -1931,11 +1931,11 @@
           "풍미가 있는"
         ]
       },
-      "BaseResponseDto_lt_GetFoodOutput_space__or__space_null_gt_": {
+      "BaseResponseDto_lt_GetFoodOutput_gt_": {
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/GetFoodOutput.Nullable"
+            "$ref": "#/components/schemas/GetFoodOutput"
           }
         },
         "nullable": false,
@@ -1944,7 +1944,7 @@
         ],
         "x-typia-jsDocTags": []
       },
-      "GetFoodOutput.Nullable": {
+      "GetFoodOutput": {
         "type": "object",
         "properties": {
           "id": {
@@ -1982,7 +1982,7 @@
             "type": "string"
           }
         },
-        "nullable": true,
+        "nullable": false,
         "required": [
           "id",
           "name"

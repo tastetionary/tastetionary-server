@@ -1,20 +1,12 @@
-import { TestingModule } from '@nestjs/testing';
-import { appModuleFixture } from '@root/jest.setup';
-import { FoodRepository } from './food.repository';
-import { FoodCategory, FoodKeyword } from '../food.enum';
+import {
+  getFoodOptionsRecord,
+  getFoodsByConditions,
+} from '@domain/food/repository/food.repository';
+import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
 
 describe('Food repository', () => {
-  let repo: FoodRepository;
-  beforeAll(async () => {
-    const module = (await appModuleFixture(
-      [],
-      [FoodRepository],
-    )) as TestingModule;
-    repo = module.get(FoodRepository);
-  });
-
   it('should get food options', async () => {
-    const res = await repo.getFoodOptions();
+    const res = getFoodOptionsRecord();
     const expected = {
       categories: [
         {
@@ -131,7 +123,7 @@ describe('Food repository', () => {
     const categories = [FoodCategory.KOREAN, FoodCategory.CHINESE];
     const keywords = [FoodKeyword.SPICY, FoodKeyword.GREASY];
 
-    const res = await repo.getFoodsByCondition({ categories, keywords });
+    const res = getFoodsByConditions({ categories, keywords });
 
     const categoryResult = res.map((r) => r.category);
     const containsCategory = categoryResult.map((arr) =>
