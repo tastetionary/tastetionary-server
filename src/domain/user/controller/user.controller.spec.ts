@@ -99,7 +99,7 @@ describe('user controller', () => {
       .post('/v1/user')
       .send({
         userProperty: {},
-        areas: {
+        area: {
           latitude: 1,
           longitude: 1,
           address: 'test',

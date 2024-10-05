@@ -26,7 +26,7 @@ describe('user service', () => {
 
   const DTO: RegisterProfileRequest = {
     nickname: 'nickname',
-    areas: {
+    area: {
       latitude: 1,
       longitude: 1,
       address: 'test',
