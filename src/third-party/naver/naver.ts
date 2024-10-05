@@ -11,7 +11,6 @@ export async function getNaverUserInfo(token: string) {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('Naver user info:', userInfoResponse.data);
     return userInfoResponse.data;
   } catch (error) {
     console.error(

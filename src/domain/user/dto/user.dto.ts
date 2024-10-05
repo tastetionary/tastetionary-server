@@ -18,7 +18,7 @@ export interface RegisterProfileRequest {
    * user location data
    * @type AreaDto
    */
-  areas: AreaDto;
+  area: AreaDto;
 
   /**
    * account data
@@ -36,9 +36,8 @@ export interface RegisterProfileRequest {
    * user nickname
    * @type string
    */
-  nickname: string;
+  nickname?: string;
 }
-
 export interface AgreementDTO {
   /**
    * category for agreements, now only support 'PERSONAL_INFORMATION''

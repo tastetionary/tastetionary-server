@@ -29,15 +29,30 @@ export interface CreateAccountRequest {
   category: AccountCategory;
 }
 
-export interface CreateTokenRequest
-  extends Omit<CreateAccountRequest, 'authenticationId'> {}
-
-export interface SocialTokenRequest {
+export interface CreateTokenRequest {
   /**
-   * social token
+   * unique identification for accounts, such as email
    * @type string
    */
-  code: string;
+  identification?: string;
+
+  /**
+   * password for accounts, it should be one-way encrypted
+   * @type string
+   */
+  password?: string;
+
+  /**
+   * category for accounts, now only support 'EMAIL'
+   * @type string
+   */
+  category: AccountCategory;
+
+  /**
+   * authorization code for social login
+   * @type string
+   */
+  code?: string;
 }
 
 export interface TokenDTO {

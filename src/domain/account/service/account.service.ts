@@ -18,6 +18,10 @@ import * as jwt from 'jsonwebtoken';
 import { AccountCategory } from '@domain/account/account.enum';
 import bcrypt from 'bcrypt';
 import { pipe } from 'fp-ts/lib/function';
+import { getKakaoUserInfo } from '@src/third-party/kakao/kakao';
+import { getGoogleUserInfo } from '@src/third-party/google/google';
+import { getNaverUserInfo } from '@src/third-party/naver/naver';
+import { createUser } from '@domain/user/service/user.service';
 
 export type AccountEntity = Awaited<ReturnType<typeof getAccount>>;
 export async function getAccount(
@@ -93,15 +97,50 @@ async function encryptValue(value: string) {
 }
 
 export async function createToken(param: {
-  identification: string;
+  identification?: string;
   category: AccountCategory;
-  password: string;
+  password?: string;
+  code?: string;
 }) {
-  const entity = await getAccount(param.identification, param.category);
   if (param.category === AccountCategory.EMAIL) {
-    await checkPassword(entity, param.password);
+    if (!param.identification || !param.password) {
+      throw new CallerWrongUsageException(
+        ErrorSubCategoryEnum.INVALID_INPUT,
+        'Identification and password are required for EMAIL login.',
+      );
+    }
+  } else {
+    if (!param.code) {
+      throw new CallerWrongUsageException(
+        ErrorSubCategoryEnum.INVALID_INPUT,
+        'Authorization code is required for social login.',
+      );
+    }
   }
 
+  const userInfo = await getUserInfo(param.category, param.code!);
+  const identification =
+    param.category === AccountCategory.EMAIL
+      ? param.identification
+      : userInfo.id.toString();
+  const identificationRecord = await getIdentification(
+    identification,
+    param.category,
+  );
+  if (param.category !== AccountCategory.EMAIL && !identificationRecord) {
+    const user = await createUser();
+    await createAccount({
+      userId: user.id,
+      identification: identification,
+      category: param.category,
+      password: '',
+    });
+  }
+
+  const entity = await getAccount(identification, param.category);
+  if (param.category === AccountCategory.EMAIL) {
+    await checkPassword(entity, param.password!);
+  }
   const tokens = makeTokens({ userId: entity.userId });
   await saveToken({
     userId: entity.userId,
@@ -160,4 +199,17 @@ export async function removeAllAccount(userId: number) {
 
 export function findAccessToken(accessToken: string) {
   return pipe(accessToken, getToken);
+}
+
+async function getUserInfo(category: AccountCategory, code: string) {
+  switch (category) {
+    case AccountCategory.KAKAO:
+      return await getKakaoUserInfo(code);
+    case AccountCategory.GOOGLE:
+      return await getGoogleUserInfo(code);
+    case AccountCategory.NAVER:
+      return await getNaverUserInfo(code);
+    default:
+      throw new Error('Unsupported account category');
+  }
 }

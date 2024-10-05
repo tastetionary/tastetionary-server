@@ -10,7 +10,6 @@ export async function getKakaoUserInfo(code: string) {
         Authorization: `Bearer ${code}`,
       },
     });
-    console.log('Kakao user info:', userInfoResponse.data);
     return userInfoResponse.data;
   } catch (error) {
     console.error(

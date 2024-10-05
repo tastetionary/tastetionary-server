@@ -10,7 +10,6 @@ export async function getGoogleUserInfo(token: string) {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('Google user info:', userInfoResponse.data);
     return userInfoResponse.data;
   } catch (error) {
     console.error(

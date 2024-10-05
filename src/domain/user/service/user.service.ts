@@ -104,7 +104,7 @@ export async function createProfile(dto: RegisterProfileRequest) {
   const user = await createUser(dto.nickname);
 
   await createAgreements(user.id, dto.agreements);
-  await createAreas(user.id, dto.areas);
+  await createAreas(user.id, dto.area);
 
   return user;
 }
@@ -127,7 +127,7 @@ async function createAgreements(userId: number, dtoList: AgreementDTO[]) {
   await saveAgreements(params);
 }
 
-export async function createUser(nickname: string) {
+export async function createUser(nickname?: string) {
   const user = await saveUser({
     state: UserState.ACTIVE,
     nickname: nickname || createRandomNickname(),
