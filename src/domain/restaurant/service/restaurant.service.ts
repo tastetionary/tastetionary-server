@@ -12,9 +12,13 @@ import {
   getReviewsByConditions,
   getReviewsByUserId,
   getUserReviewCount,
+  RestaurantReviewReactionSummaryRecord,
   RestaurantReviewRecord,
+  RestaurantReviewRxnDistinctCnt,
   saveExternalRestaurantInformation,
   saveReview,
+  saveReviewReaction,
+  deleteReviewReaction,
   saveReviewReport,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
@@ -37,11 +41,15 @@ import {
   searchAreas,
   searchProfile,
 } from '@domain/user/service/user.service';
+import { REACTION_TYPE } from '@prisma/client';
 import { sendDiscordMessage } from '@thirdParty/discord/discord';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
 
-export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
+export function aggregateRestaurantReview(
+  reviews: RestaurantReviewRecord[],
+  userID?: number,
+) {
   const groupedReview = fx.groupBy(
     (r) => r.external_restaurant_information_id.toString(),
     reviews,
@@ -57,6 +65,8 @@ export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
     aggregatePrice: {},
     revisitRatio: 0,
     totalCount: randomReviews.length,
+    userReaction: null,
+    reviewReactionCnt: {} as RestaurantReviewRxnDistinctCnt,
   };
 
   fx.pipe(
@@ -67,6 +77,14 @@ export function aggregateRestaurantReview(reviews: RestaurantReviewRecord[]) {
       data.opinions.push(review.opinion ?? '');
       data.keywords.push(...review.keywords);
       data.prices.push(review.price);
+      data.reviewReactionCnt = getRestaurantRxnDistinctCnt(
+        review?.reactions || [],
+      );
+      if (userID != null)
+        data.userReaction = getUserReviewReaction(
+          review?.reactions || [],
+          userID,
+        );
       return data;
     }),
     fx.map((data) => {
@@ -274,7 +292,10 @@ export async function getNearyByRestaurants(param: {
   });
 }
 
-export async function getRestaurantReviews(restaurantId: bigint) {
+export async function getRestaurantReviews(
+  restaurantId: bigint,
+  userId?: number,
+) {
   const reviews = await getReviewsByConditions({
     restaurantIds: [restaurantId],
   });
@@ -308,6 +329,7 @@ export async function getRestaurantReviews(restaurantId: bigint) {
 
   const data = await Promise.all(
     reviews.map(async (review) => {
+      const { reactions = [], ...record } = review;
       const profile = await searchProfile(review.userId);
       const count = await getUserReviewCount(review.userId);
       return {
@@ -316,8 +338,10 @@ export async function getRestaurantReviews(restaurantId: bigint) {
           nickname: profile.user.nickname,
           reviews: count,
         },
-        ...review,
+        ...record,
         keywords: attachEmoji(review.keywords),
+        reviewReactionCnt: getRestaurantRxnDistinctCnt(reactions),
+        userReaction: userId ? getUserReviewReaction(reactions, userId) : null,
       };
     }),
   );
@@ -376,6 +400,34 @@ export async function reportRestaurantReview(param: {
   await saveReviewReport(param);
 }
 
+export async function upsertRestaurantReviewRxn(param: {
+  reviewId: number;
+  restaurantId: number;
+  userId: number;
+  reactionType: REACTION_TYPE | null;
+}) {
+  const review = await getReviewById(param.reviewId);
+  if (!review) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.NO_DATA,
+      `no review data ${param.reviewId}`,
+    );
+  }
+
+  if (param.reactionType == null) {
+    await deleteReviewReaction({
+      userId: param.userId,
+      reviewId: param.reviewId,
+    });
+  } else {
+    await saveReviewReaction({
+      userId: param.userId,
+      reviewId: param.reviewId,
+      reactionType: param.reactionType,
+    });
+  }
+}
+
 function calcRevisitRatio(opinions: string[], standard = 'Y') {
   const standardCount = opinions.filter((op) => op === standard).length;
   return parseFloat(((standardCount / opinions.length) * 100).toFixed(1));
@@ -407,6 +459,26 @@ function getDiscordContentsForm(
   };
 
   return contents;
+}
+
+function getRestaurantRxnDistinctCnt(
+  reactions: RestaurantReviewReactionSummaryRecord[],
+): RestaurantReviewRxnDistinctCnt {
+  const map: RestaurantReviewRxnDistinctCnt = Object.values(
+    REACTION_TYPE,
+  ).reduce(
+    (map, key) => ({ ...map, [key]: 0 }),
+    {} as RestaurantReviewRxnDistinctCnt,
+  );
+  reactions.forEach(({ reactionType }) => map[reactionType]++);
+  return map;
+}
+
+function getUserReviewReaction(
+  reactions: RestaurantReviewReactionSummaryRecord[],
+  userID: number,
+): REACTION_TYPE | null {
+  return reactions.find((rxn) => rxn.userId === userID)?.reactionType ?? null;
 }
 
 export const _private = {

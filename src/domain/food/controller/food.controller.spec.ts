@@ -1,15 +1,13 @@
 import { TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { appModuleFixture, createUserToken } from '@root/jest.setup';
-import { FoodService } from '@domain/food/service/food.service';
+import { appModuleFixture } from '@root/jest.setup';
 import { FoodModule } from '@domain/food/food.module';
 import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
-import { ConfigurationService } from '@domain/configuration/configuration.service';
+import * as foodService from '@domain/food/service/food.service';
 
 describe('food controller', () => {
   let app: INestApplication;
-  let service: FoodService;
 
   beforeAll(async () => {
     const module = (await appModuleFixture(
@@ -18,7 +16,6 @@ describe('food controller', () => {
       [FoodModule],
     )) as TestingModule;
     app = module.createNestApplication();
-    service = module.get(FoodService);
     await app.init();
   });
 
@@ -32,7 +29,7 @@ describe('food controller', () => {
   };
 
   it('should return 200', async () => {
-    jest.spyOn(service, 'getRecommendedFood').mockImplementation(async () => {
+    jest.spyOn(foodService, 'getRecommendedFood').mockImplementation(() => {
       const mock = {
         id: 1,
         name: 'Mock Food',

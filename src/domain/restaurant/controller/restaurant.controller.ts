@@ -7,6 +7,8 @@ import {
   Request,
   Param,
   Query,
+  Body,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -20,10 +22,13 @@ import {
   RestaurantReviewDTO,
   ReviewAggregateData,
   ReviewReportDTO,
+  PutRestaurantReviewReactionDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
   ExternalRestaurantInformationRecord,
+  RestaurantReviewReactionRecord,
   RestaurantReviewRecord,
+  RestaurantReviewRxnDistinctCnt,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
@@ -37,7 +42,9 @@ import {
   registerReview,
   reportReview,
   getNearByRestaurants,
+  reactToRestaurantReview,
 } from '@domain/restaurant/facade/restaurant.facade';
+import { REACTION_TYPE } from '@prisma/client';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -104,6 +111,7 @@ export interface RestaurantReview
     | 'userId'
     | 'category'
     | 'price'
+    | 'reactions'
   > {
   id: string;
   external_restaurant_information_id: string;
@@ -112,7 +120,15 @@ export interface RestaurantReview
     nickname: string;
     reviews: number;
   };
+  reviewReactionCnt: RestaurantReviewRxnDistinctCnt;
+  userReaction: REACTION_TYPE | null;
 }
+
+export interface UserReaction
+  extends Omit<
+    RestaurantReviewReactionRecord,
+    'id' | 'createdAt' | 'updatedAt'
+  > {}
 
 export interface GetRestaurantReviewOutput {
   /**
@@ -231,10 +247,12 @@ export class RestaurantController {
   @HttpCode(200)
   @TypedRoute.Get('/:restaurantId/review')
   async getReviews(
+    @Request() req,
     @Param('restaurantId') restaurantId: string,
   ): Promise<BaseResponseDto<GetRestaurantReviewOutput>> {
     const res = await getReviews({
       restaurantId: BigInt(restaurantId),
+      userId: req.user.userId,
     });
 
     const { keywordReviews, data } = res;
@@ -305,5 +323,28 @@ export class RestaurantController {
     return new BaseResponseDto({
       state: 'success',
     });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary upsert/delete review reaction
+   * @security bearer
+   */
+  @UseGuards(AuthGuard)
+  @HttpCode(201)
+  @TypedRoute.Put(':restaurantId/review/:reviewId/react')
+  async putReviewReaction(
+    @Request() req,
+    @Param('reviewId', ParseIntPipe) reviewId: number,
+    @Param('restaurantId', ParseIntPipe) restaurantId: number,
+    @Body() body: PutRestaurantReviewReactionDTO,
+  ): Promise<BaseResponseDto<object>> {
+    reactToRestaurantReview({
+      userId: req.user.userId,
+      restaurantId,
+      reviewId,
+      reactionType: body.reaction_type,
+    }).catch(() => {});
+    return new BaseResponseDto({ state: 'success' });
   }
 }

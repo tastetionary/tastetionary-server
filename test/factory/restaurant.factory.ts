@@ -2,6 +2,7 @@ import { define, extend, random } from 'cooky-cutter';
 import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
 import {
   ExternalRestaurantInformationRecord,
+  RestaurantReviewReactionSummaryRecord,
   RestaurantReviewRecord,
 } from '@domain/restaurant/repository/restaurant.repository';
 
@@ -33,10 +34,9 @@ export function restaurantReviewRecordFactory(param: {
   category?: RestaurantCategory;
   keywords?: string[];
   price?: number;
-  like?: number;
-  dislike?: number;
   summary?: string;
   opinion?: string;
+  reactions?: RestaurantReviewReactionSummaryRecord[]
 }) {
   return extend<model, RestaurantReviewRecord>(baseModel, {
     external_restaurant_information_id: param.id || BigInt(random()),
@@ -48,8 +48,7 @@ export function restaurantReviewRecordFactory(param: {
       return param.keywords || ['깨끗해요'];
     },
     price: param.price || 10_000,
-    like: param.like || 0,
-    dislike: param.dislike || 0,
+    reactions: param.reactions || new Array(0),
     createdAt: () => new Date(),
     updatedAt: () => new Date(),
   })();
