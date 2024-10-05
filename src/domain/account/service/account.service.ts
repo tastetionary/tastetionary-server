@@ -102,6 +102,7 @@ export async function createToken(param: {
   password?: string;
   code?: string;
 }) {
+  let userInfo;
   if (param.category === AccountCategory.EMAIL) {
     if (!param.identification || !param.password) {
       throw new CallerWrongUsageException(
@@ -116,9 +117,9 @@ export async function createToken(param: {
         'Authorization code is required for social login.',
       );
     }
+    userInfo = await getUserInfo(param.category, param.code);
   }
 
-  const userInfo = await getUserInfo(param.category, param.code!);
   const identification =
     param.category === AccountCategory.EMAIL
       ? param.identification
