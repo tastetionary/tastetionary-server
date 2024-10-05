@@ -61,11 +61,3 @@ export interface TokenDTO {
   accessTokenExpiredAt: Date;
   refreshTokenExpiredAt: Date;
 }
-
-export interface SocialTokenDTO {
-  accessToken?: string;
-  refreshToken?: string;
-  accessTokenExpiredAt?: Date;
-  refreshTokenExpiredAt?: Date;
-  state?: string;
-}
