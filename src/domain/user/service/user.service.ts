@@ -9,6 +9,7 @@ import {
   WithdrawalTypeEnum,
   OpinionCategory,
   UserState,
+  PreferenceCategory,
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
@@ -35,6 +36,10 @@ import {
   AuthenticationCategory,
   AuthenticationState,
 } from '@domain/authentication/authentication.enum';
+import {
+  getPreferencesByUserId,
+  savePreference,
+} from '../repository/preference.repository';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -149,6 +154,18 @@ export async function changeCompany(userId: number, dto: CompanyDto) {
 export async function changeArea(userId: number, dto: AreaDto) {
   await deleteAreas({ userId });
   await createAreas(userId, dto);
+}
+
+export async function searchPreference(userId: number) {
+  return await getPreferencesByUserId(userId);
+}
+
+export async function createPreference(
+  userId: number,
+  restaurantId: number,
+  category: PreferenceCategory,
+) {
+  return await savePreference({ userId, restaurantId, category });
 }
 
 function createRandomNickname() {

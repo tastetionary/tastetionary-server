@@ -91,4 +91,15 @@ export class UserController {
     await withdrawProfile(req.user.userId, dto.type);
     return new BaseResponseDto({ state: 'success' });
   }
+
+  /**
+   * @tag user
+   * @summary get preferences
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Get('/preferences')
+  async getPreferences(@Request() req): Promise<BaseResponseDto<object>> {
+    return new BaseResponseDto({ state: 'success' });
+  }
 }

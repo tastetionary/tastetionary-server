@@ -3,6 +3,7 @@ import {
   changeUserState,
   createProfile,
   createUserOpinion,
+  searchPreference,
   searchProfile,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
@@ -66,4 +67,8 @@ export async function withdrawProfile(
   await removeAllAccount(userId);
   await removeAllToken(userId);
   await removeAllAuth(userId);
+}
+
+export async function getPreferences(userId: number) {
+  return searchPreference(userId);
 }

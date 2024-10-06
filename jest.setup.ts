@@ -101,6 +101,7 @@ type tableNames =
   | 'agreements'
   | 'user_areas'
   | 'user_tokens'
+  | 'user_preferences'
   | 'restaurant_reviews'
   | 'authentications'
   | 'authentication_histories'
