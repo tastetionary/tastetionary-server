@@ -314,61 +314,6 @@
         "x-nestia-method": "POST"
       }
     },
-    "/v1/authentication/company": {
-      "post": {
-        "tags": [
-          "authentication"
-        ],
-        "parameters": [],
-        "requestBody": {
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReCreateProgressRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-nestia-encrypted": false
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto_lt_CreateAuthenticationResponse_gt_"
-                }
-              }
-            },
-            "x-nestia-encrypted": false
-          }
-        },
-        "x-nestia-namespace": "v1.authentication.company.reCreateCompanyAuthentication",
-        "x-nestia-jsDocTags": [
-          {
-            "name": "tag",
-            "text": [
-              {
-                "text": "authentication",
-                "kind": "text"
-              }
-            ]
-          },
-          {
-            "name": "summary",
-            "text": [
-              {
-                "text": "reCreate company authentication, it will delete company type auth if data exists",
-                "kind": "text"
-              }
-            ]
-          }
-        ],
-        "x-nestia-method": "POST"
-      }
-    },
     "/v1/authentication/status/done": {
       "post": {
         "tags": [
@@ -1363,8 +1308,8 @@
                 ]
               }
             ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
+            "x-typia-required": false,
+            "x-typia-optional": true,
             "type": "string"
           },
           "password": {
@@ -1380,12 +1325,15 @@
                 ]
               }
             ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
+            "x-typia-required": false,
+            "x-typia-optional": true,
             "type": "string"
           },
           "category": {
-            "description": "category for accounts, now only support 'EMAIL'",
+            "$ref": "#/components/schemas/AccountCategory"
+          },
+          "code": {
+            "description": "authorization code for social login",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
@@ -1397,21 +1345,25 @@
                 ]
               }
             ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "enum": [
-              "email"
-            ]
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
           }
         },
         "nullable": false,
         "required": [
-          "identification",
-          "password",
           "category"
         ],
         "x-typia-jsDocTags": []
+      },
+      "AccountCategory": {
+        "type": "string",
+        "enum": [
+          "email",
+          "kakao",
+          "naver",
+          "google"
+        ]
       },
       "BaseResponseDto_lt_TokenDTO_gt_": {
         "type": "object",
@@ -1529,7 +1481,6 @@
         "type": "string",
         "enum": [
           "account",
-          "company",
           "password"
         ]
       },
@@ -1580,7 +1531,7 @@
                 "name": "deprecated",
                 "text": [
                   {
-                    "text": "authentication category, such as account, company, optional param",
+                    "text": "authentication category, such as account, optional param",
                     "kind": "text"
                   }
                 ]
@@ -1600,7 +1551,6 @@
             "type": "string",
             "enum": [
               "account",
-              "company",
               "password"
             ]
           }
@@ -1753,54 +1703,6 @@
         "nullable": false,
         "required": [
           "authenticationId"
-        ],
-        "x-typia-jsDocTags": []
-      },
-      "ReCreateProgressRequest": {
-        "type": "object",
-        "properties": {
-          "identification": {
-            "description": "unique identification for authentication, such as test@gmail.com",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
-          },
-          "type": {
-            "description": "authentication type, such as email",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "AuthenticationType",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "enum": [
-              "email"
-            ]
-          }
-        },
-        "nullable": false,
-        "required": [
-          "identification",
-          "type"
         ],
         "x-typia-jsDocTags": []
       },
@@ -3403,10 +3305,7 @@
       "RegisterProfileRequest": {
         "type": "object",
         "properties": {
-          "userProperty": {
-            "$ref": "#/components/schemas/UserPropertyDto"
-          },
-          "areas": {
+          "area": {
             "$ref": "#/components/schemas/AreaDto"
           },
           "account": {
@@ -3431,108 +3330,30 @@
             "items": {
               "$ref": "#/components/schemas/AgreementDTO"
             }
+          },
+          "nickname": {
+            "description": "user nickname",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
           }
         },
         "nullable": false,
         "required": [
-          "userProperty",
-          "areas",
+          "area",
           "account",
           "agreements"
-        ],
-        "x-typia-jsDocTags": []
-      },
-      "UserPropertyDto": {
-        "type": "object",
-        "properties": {
-          "companyData": {
-            "$ref": "#/components/schemas/CompanyDto"
-          }
-        },
-        "nullable": false,
-        "x-typia-jsDocTags": []
-      },
-      "CompanyDto": {
-        "type": "object",
-        "properties": {
-          "authenticationId": {
-            "description": "authentication id which is done",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "number",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "number"
-          },
-          "companyName": {
-            "description": "company name, it will come with company authentication\nexample: google",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
-          },
-          "identification": {
-            "description": "string to identify unique, like email. it is coupled by category",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string"
-          },
-          "category": {
-            "description": "identification category, available use: email",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "enum": [
-              "email"
-            ]
-          }
-        },
-        "nullable": false,
-        "required": [
-          "authenticationId",
-          "companyName",
-          "identification",
-          "category"
         ],
         "x-typia-jsDocTags": []
       },
@@ -3654,24 +3475,7 @@
             "type": "string"
           },
           "category": {
-            "description": "category for accounts, now only support 'EMAIL'",
-            "x-typia-jsDocTags": [
-              {
-                "name": "type",
-                "text": [
-                  {
-                    "text": "string",
-                    "kind": "text"
-                  }
-                ]
-              }
-            ],
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "enum": [
-              "email"
-            ]
+            "$ref": "#/components/schemas/AccountCategory"
           }
         },
         "nullable": false,
@@ -3861,18 +3665,11 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "string"
-          },
-          "companyEmail": {
-            "x-typia-required": true,
-            "x-typia-optional": false,
-            "type": "string",
-            "nullable": true
           }
         },
         "nullable": false,
         "required": [
-          "accountEmail",
-          "companyEmail"
+          "accountEmail"
         ],
         "x-typia-jsDocTags": []
       },

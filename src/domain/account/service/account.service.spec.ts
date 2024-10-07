@@ -12,6 +12,7 @@ import { getIdentification } from '@domain/account/repository/account.repository
 import { getTokenByUserId } from '@domain/account/repository/user-token.repository';
 import prismaClient from '@common/database/prisma';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
+import * as kakao from '@thirdParty/kakao/kakao';
 
 describe('account service', () => {
   beforeEach(async () => {
@@ -26,6 +27,20 @@ describe('account service', () => {
     const userId = 666;
     await createAccount({ userId, ...dto });
 
+    const token = await createToken(dto);
+    const res = await findAccessToken(token.accessToken)();
+    expect(res).toBeRight();
+  });
+
+  it('should return value', async () => {
+    const dto = {
+      code: '123',
+      category: AccountCategory.KAKAO,
+    };
+    const mockKakao = jest.spyOn(kakao, 'getKakaoUserInfo');
+    mockKakao.mockResolvedValue({
+      id: 123,
+    });
     const token = await createToken(dto);
     const res = await findAccessToken(token.accessToken)();
     expect(res).toBeRight();

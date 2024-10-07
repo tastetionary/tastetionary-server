@@ -10,7 +10,6 @@ import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
-  CreateAccountRequest,
   CreateTokenRequest,
   ResetPasswordRequest,
   TokenDTO,

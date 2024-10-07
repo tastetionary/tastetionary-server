@@ -1,9 +1,7 @@
 import {
   AgreementDTO,
   AreaDto,
-  CompanyDto,
   RegisterProfileRequest,
-  UserPropertyDto,
 } from '@domain/user/dto/user.dto';
 import {
   WithdrawalTypeEnum,
@@ -93,7 +91,6 @@ async function searchAuthList(userId: number) {
     AuthenticationState.DONE,
   );
   const data = {
-    company: transformRecordToEntity(authList, AuthenticationCategory.COMPANY),
     account: transformRecordToEntity(authList, AuthenticationCategory.ACCOUNT),
   };
 
@@ -104,10 +101,10 @@ async function searchAuthList(userId: number) {
 }
 
 export async function createProfile(dto: RegisterProfileRequest) {
-  const user = await createUser(dto.userProperty);
+  const user = await createUser(dto.nickname);
 
   await createAgreements(user.id, dto.agreements);
-  await createAreas(user.id, dto.areas);
+  await createAreas(user.id, dto.area);
 
   return user;
 }
@@ -130,20 +127,14 @@ async function createAgreements(userId: number, dtoList: AgreementDTO[]) {
   await saveAgreements(params);
 }
 
-export async function createUser(dto: UserPropertyDto) {
+export async function createUser(nickname?: string) {
   const user = await saveUser({
     state: UserState.ACTIVE,
-    nickname: createRandomNickname(),
-    property: { companyName: dto.companyData?.companyName ?? null },
+    nickname: nickname || createRandomNickname(),
+    property: {},
   });
 
   return user;
-}
-
-export async function changeCompany(userId: number, dto: CompanyDto) {
-  return await updateUserById(userId, {
-    property: { companyName: dto.companyName },
-  });
 }
 
 export async function changeArea(userId: number, dto: AreaDto) {

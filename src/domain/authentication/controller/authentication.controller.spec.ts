@@ -44,7 +44,6 @@ describe('authentication controller', () => {
 
     it.each([
       [AuthenticationCategory.ACCOUNT],
-      [AuthenticationCategory.COMPANY],
       [AuthenticationCategory.PASSWORD],
     ])(
       '/authentication/public/{$category} should return 200',
@@ -86,32 +85,6 @@ describe('authentication controller', () => {
 
     expect(spy).toHaveBeenCalledWith({
       ...data,
-      userId,
-    });
-    assertStatusCode(res, 200);
-  });
-
-  it('/authentication/{$category} should return 200', async () => {
-    const key = configService.getTokenData().accessTokenSecret;
-    const userId = 123;
-    const token = createUserToken(userId, key, {
-      expiresIn: '10h',
-    });
-    const spy = jest.spyOn(facade, 'beginAuthProgress');
-    spy.mockResolvedValue({ id: 1, expiredAt: new Date() });
-
-    const data = {
-      identification: 'test@email.com',
-      type: AuthenticationType.EMAIL,
-    };
-    const res = await request(app.getHttpServer())
-      .post('/v1/authentication/company')
-      .set('Authorization', `Bearer ${token}`)
-      .send(data);
-
-    expect(spy).toHaveBeenCalledWith({
-      ...data,
-      category: 'company',
       userId,
     });
     assertStatusCode(res, 200);

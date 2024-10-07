@@ -32,7 +32,7 @@ export interface CreateProgressRequest {
 
   /**
    * @deprecated
-   * authentication category, such as account, company, optional param
+   * authentication category, such as account, optional param
    * @type AuthenticationCategory
    */
   category?: AuthenticationCategory;

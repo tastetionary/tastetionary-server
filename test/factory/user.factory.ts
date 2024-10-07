@@ -40,7 +40,6 @@ export function userEntityFactory(param?: { state?: UserState }) {
 export function authEntityFactory(param: {
   userId?: number;
   accountState?: AuthenticationState;
-  companyState?: AuthenticationState;
 }) {
   return define<AuthEntity>({
     account: () => {
@@ -49,16 +48,6 @@ export function authEntityFactory(param: {
         category: AuthenticationCategory.ACCOUNT,
         type: AuthenticationType.EMAIL,
         state: param.accountState || AuthenticationState.DONE,
-        userId: param.userId || random(),
-        identification: `${random()}@ide.com`,
-      };
-    },
-    company: () => {
-      return {
-        id: random(),
-        category: AuthenticationCategory.COMPANY,
-        type: AuthenticationType.EMAIL,
-        state: param.companyState || AuthenticationState.DONE,
         userId: param.userId || random(),
         identification: `${random()}@ide.com`,
       };

@@ -31,14 +31,13 @@ describe('user facade', () => {
     });
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
     const dto: RegisterProfileRequest = {
-      userProperty: {},
-      areas: 
-        {
-          latitude: 1,
-          longitude: 1,
-          address: 'test',
-        },
-      
+      nickname: 'nickname',
+      area: {
+        latitude: 1,
+        longitude: 1,
+        address: 'test',
+      },
+
       account: {
         authenticationId: accAuthId,
         identification,
@@ -64,17 +63,7 @@ describe('user facade', () => {
   it('registerProfile should create profile and auth list', async () => {
     const createIde = (category: string) =>
       `${category}_${new Date().getMilliseconds()}`;
-
-    const com = createIde('company');
     const acc = createIde('account');
-    const comAuth = await createProgressAuthentication({
-      identification: com,
-      category: AuthenticationCategory.COMPANY,
-      type: AuthenticationType.EMAIL,
-      code: '1234',
-    });
-    const comAuthId = (await changeAuthenticationAsDone(comAuth.id, '1234')).id;
-
     const accAuth = await createProgressAuthentication({
       identification: acc,
       category: AuthenticationCategory.ACCOUNT,
@@ -84,19 +73,12 @@ describe('user facade', () => {
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
 
     const dto: RegisterProfileRequest = {
-      userProperty: {
-        companyData: {
-          authenticationId: comAuthId,
-          companyName: 'test',
-          identification: com,
-          category: 'email',
-        },
+      nickname: 'nickname',
+      area: {
+        latitude: 1,
+        longitude: 1,
+        address: 'test',
       },
-      areas: {
-          latitude: 1,
-          longitude: 1,   
-          address: 'test',
-        },
       account: {
         identification: acc,
         password: 'pwd',
@@ -115,12 +97,5 @@ describe('user facade', () => {
 
     const profile = await getProfile(user.id);
     expect(profile).not.toBeNull();
-
-    const auth = await getAuthentication(
-      com,
-      AuthenticationCategory.COMPANY,
-      AuthenticationType.EMAIL,
-    );
-    expect(auth?.userId).toEqual(user.id);
   });
 });

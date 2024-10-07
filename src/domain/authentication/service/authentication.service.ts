@@ -194,26 +194,27 @@ function createExpiredAt(seconds = 180) {
   return currentDate;
 }
 
-export function validateDomainWhenCompanyCase(param: {
-  userId?: number;
-  identification: string;
-  category: AuthenticationCategory;
-  type: AuthenticationType;
-  env?: EnvironmentEnum;
-}) {
-  if (param.category !== AuthenticationCategory.COMPANY) {
-    return;
-  }
+// @deprecate
+// export function validateDomainWhenCompanyCase(param: {
+//   userId?: number;
+//   identification: string;
+//   category: AuthenticationCategory;
+//   type: AuthenticationType;
+//   env?: EnvironmentEnum;
+// }) {
+//   // if (param.category !== AuthenticationCategory.COMPANY) {
+//   //   return;
+//   // }
 
-  if (isGeneralEmailDomain(param.identification, param.env)) {
-    throw new CallerWrongDomainRuleException(
-      ErrorSubCategoryEnum.INVALID_INPUT,
-      'only company email can be used',
-      'change email domain',
-      { identification: param.identification },
-    );
-  }
-}
+//   if (isGeneralEmailDomain(param.identification, param.env)) {
+//     throw new CallerWrongDomainRuleException(
+//       ErrorSubCategoryEnum.INVALID_INPUT,
+//       'only company email can be used',
+//       'change email domain',
+//       { identification: param.identification },
+//     );
+//   }
+// }
 
 function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
   if (env != EnvironmentEnum.PRODUCTION) {

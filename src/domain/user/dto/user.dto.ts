@@ -1,8 +1,5 @@
 import typia from 'typia';
-import {
-  AgreementCategory,
-  WithdrawalTypeEnum,
-} from '@domain/user/user.enum';
+import { AgreementCategory, WithdrawalTypeEnum } from '@domain/user/user.enum';
 import { CreateAccountRequest } from '@domain/account/dto/account.dto';
 import { AreaEntity } from '@domain/user/service/user.service';
 
@@ -18,16 +15,10 @@ export interface WithdrawUserDto {
 
 export interface RegisterProfileRequest {
   /**
-   * user data, not essential
-   * @type Object
-   */
-  userProperty: UserPropertyDto;
-
-  /**
    * user location data
    * @type AreaDto
    */
-  areas: AreaDto;
+  area: AreaDto;
 
   /**
    * account data
@@ -40,8 +31,13 @@ export interface RegisterProfileRequest {
    * @type AgreementDTO[]
    */
   agreements: AgreementDTO[];
-}
 
+  /**
+   * user nickname
+   * @type string
+   */
+  nickname?: string;
+}
 export interface AgreementDTO {
   /**
    * category for agreements, now only support 'PERSONAL_INFORMATION''
@@ -79,41 +75,6 @@ export interface AreaDto {
   longitude: number;
 }
 
-export interface UserPropertyDto {
-  /**
-   * company data, not essential, when user authenticate with company
-   * @type CompanyDto
-   */
-  companyData?: CompanyDto;
-}
-
-export interface CompanyDto {
-  /**
-   * authentication id which is done
-   * @type number
-   */
-  authenticationId: number;
-
-  /**
-   * company name, it will come with company authentication
-   * example: google
-   * @type string
-   */
-  companyName: string;
-
-  /**
-   * string to identify unique, like email. it is coupled by category
-   * @type string
-   */
-  identification: string;
-
-  /**
-   * identification category, available use: email
-   * @type string
-   */
-  category: 'email';
-}
-
 export interface ProfileResponse {
   /**
    * userId
@@ -139,6 +100,5 @@ export interface ProfileResponse {
    */
   account: {
     accountEmail: string;
-    companyEmail: string | null;
   };
 }

@@ -57,7 +57,6 @@ export class UserController {
       area: profile.area,
       account: {
         accountEmail: profile.authList.account.identification,
-        companyEmail: profile.authList.company?.identification || null,
       },
     });
   }

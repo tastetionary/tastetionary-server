@@ -11,6 +11,7 @@ import { findAccessToken } from '@root/src/domain/account/service/account.servic
 import { pipe } from 'fp-ts/lib/function';
 import * as TE from 'fp-ts/TaskEither';
 import { EnvironmentEnum } from '@root/src/env.validation';
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   private readonly masterToken = 'master-tastionary';
