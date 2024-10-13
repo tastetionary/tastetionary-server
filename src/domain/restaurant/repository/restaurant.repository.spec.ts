@@ -2,6 +2,7 @@ import { truncateTables } from '@root/jest.setup';
 import {
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
+  getExternalRestaurantInformationById,
   getRestaurantOptionsRecord,
   getReviewById,
   getReviewReportById,
@@ -144,6 +145,27 @@ describe('Restaurant repository', () => {
     });
     const ids = res.map((r) => r.externalUUID);
     expect(ids).toEqual([1000n, 1001n]);
+  });
+
+  it('should return restaurants by id', async () => {
+    const latitude = 37.517331925853;
+    const longitude = 127.047377408384;
+
+    const data = [
+      {
+        externalUUID: 1000n,
+        name: 'test',
+        location: {
+          latitude,
+          longitude,
+        },
+        referenceLink: 'https://www.naver.com',
+      },
+    ];
+    await saveExternalRestaurantInformations(data);
+    const res = await getExternalRestaurantInformationById(1);
+    expect(res).not.toBeNull();
+    expect(res?.id).toBe(1);
   });
 
   it('should save external info', async () => {

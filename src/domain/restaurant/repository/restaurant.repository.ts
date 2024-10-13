@@ -160,6 +160,12 @@ export async function getExternalRestaurantInformation(externalUUid: bigint) {
   });
 }
 
+export async function getExternalRestaurantInformationById(id: number) {
+  return prismaClient.externalRestaurantInformations.findUnique({
+    where: { id },
+  });
+}
+
 export async function getReviewsByConditions(param: {
   restaurantIds?: bigint[];
   keywords?: string[];

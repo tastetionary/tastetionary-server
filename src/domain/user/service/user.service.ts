@@ -10,6 +10,7 @@ import {
   OpinionCategory,
   UserState,
   PreferenceCategory,
+  PreferenceCategoryToColumnMapping,
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
@@ -37,9 +38,11 @@ import {
   AuthenticationState,
 } from '@domain/authentication/authentication.enum';
 import {
+  deletePreferenceRestaurant,
   getPreferencesByUserId,
-  savePreference,
-} from '../repository/preference.repository';
+  savePreferenceRestaurant,
+} from '@domain/user/repository/preference.repository';
+import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -156,16 +159,59 @@ export async function changeArea(userId: number, dto: AreaDto) {
   await createAreas(userId, dto);
 }
 
-export async function searchPreference(userId: number) {
-  return await getPreferencesByUserId(userId);
+export async function getPreferenceRestaurant(
+  userId: number,
+  category: PreferenceCategory,
+) {
+  const preference = await getPreferencesByUserId(userId);
+  if (!preference) {
+    return [];
+  }
+
+  const restaurntIds = preference[PreferenceCategoryToColumnMapping[category]];
+  const res = await Promise.all(
+    restaurntIds.map(async (id) => {
+      return await findExternalRestaurantById(id);
+    }),
+  );
+
+  return res;
 }
 
-export async function createPreference(
+export async function createPreferenceRestaurant(
   userId: number,
   restaurantId: number,
   category: PreferenceCategory,
 ) {
-  return await savePreference({ userId, restaurantId, category });
+  const preference = await getPreferencesByUserId(userId);
+  if (preference) {
+    const column = PreferenceCategoryToColumnMapping[category];
+    const exist = preference[column].includes(restaurantId);
+
+    if (exist) {
+      return;
+    }
+  }
+
+  await savePreferenceRestaurant({ userId, restaurantId, category });
+}
+
+export async function deleteUserPreferenceRestaurant(
+  userId: number,
+  restaurantId: number,
+  category: PreferenceCategory,
+) {
+  const preference = await getPreferencesByUserId(userId);
+  if (!preference) {
+    return;
+  }
+
+  await deletePreferenceRestaurant({
+    userId,
+    restaurantId,
+    category,
+    preference,
+  });
 }
 
 function createRandomNickname() {

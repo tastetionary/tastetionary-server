@@ -6,9 +6,16 @@ import {
   _private,
   searchProfile,
   changeUserState,
+  createPreferenceRestaurant,
+  getPreferenceRestaurant,
+  deleteUserPreferenceRestaurant,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
-import { AgreementCategory, UserState } from '@domain/user/user.enum';
+import {
+  AgreementCategory,
+  PreferenceCategory,
+  UserState,
+} from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
 import { getProfile } from '@domain/user/facade/user.facade';
@@ -78,6 +85,36 @@ describe('user service', () => {
     expect(user).not.toBeNull();
     expect(user).toHaveProperty('state');
     expect(user).toHaveProperty('id');
+  });
+
+  it('should add preference restaurant', async () => {
+    const data = await createUser(DTO.userProperty);
+    await createPreferenceRestaurant(data.id, 1, PreferenceCategory.BOOKMARK);
+
+    const preference = await getPreferenceRestaurant(
+      data.id,
+      PreferenceCategory.BOOKMARK,
+    );
+    expect(preference).toHaveLength(1);
+    expect(preference[0].restaurantId).toEqual(1);
+  });
+
+  it('should delete preference restaurant', async () => {
+    const data = await createUser(DTO.userProperty);
+    await createPreferenceRestaurant(data.id, 1, PreferenceCategory.BOOKMARK);
+    await createPreferenceRestaurant(data.id, 2, PreferenceCategory.BOOKMARK);
+    await deleteUserPreferenceRestaurant(
+      data.id,
+      1,
+      PreferenceCategory.BOOKMARK,
+    );
+
+    const preference = await getPreferenceRestaurant(
+      data.id,
+      PreferenceCategory.BOOKMARK,
+    );
+    expect(preference).toHaveLength(1);
+    expect(preference[0].restaurantId).toEqual(2);
   });
 
   describe('[private] ', () => {

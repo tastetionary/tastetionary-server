@@ -1,8 +1,5 @@
 import typia from 'typia';
-import {
-  AgreementCategory,
-  WithdrawalTypeEnum,
-} from '@domain/user/user.enum';
+import { AgreementCategory, WithdrawalTypeEnum } from '@domain/user/user.enum';
 import { CreateAccountRequest } from '@domain/account/dto/account.dto';
 import { AreaEntity } from '@domain/user/service/user.service';
 
@@ -14,6 +11,14 @@ export interface WithdrawUserDto {
    * @type WithdrawalTypeEnum
    */
   type: WithdrawalTypeEnum;
+}
+
+export interface PreferneceDto {
+  /**
+   * restaurant id
+   * @type number
+   */
+  restaurantId: number;
 }
 
 export interface RegisterProfileRequest {

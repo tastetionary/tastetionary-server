@@ -8,9 +8,17 @@ export enum AgreementCategory {
 }
 
 export enum PreferenceCategory {
-  BookmarkRestaurantIds = 'bookmark_restaurant_ids',
-  ExcludeRestaurantIds = 'exclude_restaurant_ids',
+  BOOKMARK = 'bookmark',
+  EXCLUDED = 'excluded',
 }
+
+export const PreferenceCategoryToColumnMapping: Record<
+  PreferenceCategory,
+  string
+> = {
+  [PreferenceCategory.BOOKMARK]: 'bookmark_restaurant_ids',
+  [PreferenceCategory.EXCLUDED]: 'exclude_restaurant_ids',
+};
 
 /**
  * enum 대신할 type literal 시험 삼아 사용

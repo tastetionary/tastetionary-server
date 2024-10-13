@@ -1,5 +1,8 @@
 import prismaClient from '@root/src/common/database/prisma';
-import { PreferenceCategory } from '@domain/user/user.enum';
+import {
+  PreferenceCategory,
+  PreferenceCategoryToColumnMapping,
+} from '@domain/user/user.enum';
 import { UserPreferences } from '@prisma/client';
 
 export async function getPreferencesByUserId(userId: number) {
@@ -8,19 +11,20 @@ export async function getPreferencesByUserId(userId: number) {
   });
 }
 
-export async function savePreference(param: {
+export async function savePreferenceRestaurant(param: {
   userId: number;
   category: PreferenceCategory;
   restaurantId: number;
 }) {
-  return prismaClient.userPreferences.upsert({
+  const column = PreferenceCategoryToColumnMapping[param.category];
+  await prismaClient.userPreferences.upsert({
     where: { userId: param.userId },
     update: {
-      [param.category]: {
+      [column]: {
         push: param.restaurantId,
       },
     },
-    create: { userId: param.userId, [param.category]: [param.restaurantId] },
+    create: { userId: param.userId, [column]: [param.restaurantId] },
   });
 }
 
@@ -28,20 +32,21 @@ export async function deletePreferenceRestaurant(param: {
   userId: number;
   category: PreferenceCategory;
   restaurantId: number;
-  userPreferences: UserPreferences;
+  preference: UserPreferences;
 }) {
-  const updatedIds = param.userPreferences[param.category].filter(
+  const column = PreferenceCategoryToColumnMapping[param.category];
+  const updatedIds = param.preference[column].filter(
     (id: number) => id !== param.restaurantId,
   );
 
-  return prismaClient.userPreferences.update({
+  await prismaClient.userPreferences.update({
     where: { userId: param.userId },
-    data: { [param.category]: updatedIds },
+    data: { [column]: updatedIds },
   });
 }
 
 export async function deletePreference(userId: number) {
-  return prismaClient.userPreferences.delete({
+  await prismaClient.userPreferences.delete({
     where: { userId: userId },
   });
 }

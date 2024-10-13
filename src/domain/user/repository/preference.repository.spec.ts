@@ -4,7 +4,7 @@ import {
   deletePreference,
   deletePreferenceRestaurant,
   getPreferencesByUserId,
-  savePreference,
+  savePreferenceRestaurant,
 } from '@domain/user/repository/preference.repository';
 import { PreferenceCategory } from '@domain/user/user.enum';
 
@@ -16,10 +16,10 @@ describe('preference repository', () => {
   it('should save preferences', async () => {
     const data = {
       userId: 1,
-      category: PreferenceCategory.BookmarkRestaurantIds,
+      category: PreferenceCategory.BOOKMARK,
       restaurantId: 1,
     };
-    await savePreference(data);
+    await savePreferenceRestaurant(data);
 
     const preference = await getPreferencesByUserId(data.userId);
     expect(preference).not.toBeNull();
@@ -29,11 +29,11 @@ describe('preference repository', () => {
   it('should delete preferences restaurant', async () => {
     const data = {
       userId: 1,
-      category: PreferenceCategory.BookmarkRestaurantIds,
+      category: PreferenceCategory.BOOKMARK,
       restaurantId: 1,
     };
 
-    await savePreference(data);
+    await savePreferenceRestaurant(data);
     let preference = await getPreferencesByUserId(data.userId);
     expect(preference).not.toBeNull();
 
@@ -41,7 +41,7 @@ describe('preference repository', () => {
       userId: data.userId,
       category: data.category,
       restaurantId: data.restaurantId,
-      userPreferences: preference!,
+      preference: preference!,
     });
 
     preference = await getPreferencesByUserId(data.userId);
@@ -51,11 +51,11 @@ describe('preference repository', () => {
   it('should delete preferences restaurant', async () => {
     const data = {
       userId: 1,
-      category: PreferenceCategory.BookmarkRestaurantIds,
+      category: PreferenceCategory.BOOKMARK,
       restaurantId: 1,
     };
 
-    await savePreference(data);
+    await savePreferenceRestaurant(data);
     await deletePreference(data.userId);
 
     const preference = await getPreferencesByUserId(data.userId);
