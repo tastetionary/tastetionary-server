@@ -133,6 +133,8 @@ export class UserController {
         id: item.id.toString(),
         externalUUID: item.external_uuid.toString(),
         name: item.name,
+        address: item.address,
+        phone: item.phone,
       };
     });
 

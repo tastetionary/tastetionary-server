@@ -218,6 +218,8 @@ async function registerExternalRestaurantInformationWhenNoData(
       longitude: param.longitude,
     },
     referenceLink: param.referenceLink,
+    address: param.address,
+    phone: param.phone,
   });
 
   return await getExternalRestaurantInformation(BigInt(param.externalUUID));

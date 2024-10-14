@@ -80,6 +80,20 @@ export interface ExternalRestaurantInformationDTO {
    * @type string
    */
   referenceLink?: string;
+
+  /**
+   * phone number,
+   * example: "010-1234-5678"
+   * @type string
+   */
+  phone?: string;
+
+  /**
+   * address,
+   * example: "서울시 강남구"
+   * @type string
+   */
+  address?: string;
 }
 
 export interface AggregateReviewDTO {

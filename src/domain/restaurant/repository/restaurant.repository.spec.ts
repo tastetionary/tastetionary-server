@@ -126,6 +126,7 @@ describe('Restaurant repository', () => {
           longitude,
         },
         referenceLink: 'https://www.naver.com',
+        phone: '010-1234-5678',
       },
       {
         externalUUID: 1001n,
@@ -135,6 +136,7 @@ describe('Restaurant repository', () => {
           longitude,
         },
         referenceLink: 'https://www.naver.com',
+        address: 'test',
       },
     ];
     await saveExternalRestaurantInformations(data);
@@ -160,6 +162,8 @@ describe('Restaurant repository', () => {
           longitude,
         },
         referenceLink: 'https://www.naver.com',
+        address: 'test',
+        phone: '010-1234-5678',
       },
     ];
     await saveExternalRestaurantInformations(data);
@@ -177,6 +181,8 @@ describe('Restaurant repository', () => {
         longitude: 1,
       },
       referenceLink: 'https://www.naver.com',
+      address: 'test',
+      phone: '010-1234-5678',
     };
 
     await saveExternalRestaurantInformation(data);

@@ -47,6 +47,8 @@ export interface ExternalRestaurantInformationRecord {
   latitude: number;
   longitude: number;
   distance: number;
+  address?: string;
+  phone?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -127,6 +129,8 @@ export async function saveExternalRestaurantInformation(param: {
     longitude: number;
   };
   referenceLink?: string;
+  address?: string;
+  phone?: string;
 }) {
   await saveExternalRestaurantInformations([param]);
 }
@@ -140,6 +144,8 @@ export async function saveExternalRestaurantInformations(
       longitude: number;
     };
     referenceLink?: string;
+    address?: string;
+    phone?: string;
   }[],
 ) {
   const values = param.map(
@@ -147,10 +153,12 @@ export async function saveExternalRestaurantInformations(
       Prisma.sql`(${param.externalUUID}, ${param.name}, 
         st_point(${param.location.longitude},${param.location.latitude}), 
         ${param.referenceLink},
+        ${param.address},
+        ${param.phone},
         ${new Date()})`,
   );
   await prismaClient.$queryRaw`
-      INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, updated_at) 
+      INSERT INTO external_restaurant_informations (external_uuid, name, location, reference_link, address, phone, updated_at) 
       VALUES ${Prisma.join(values)}`;
 }
 
