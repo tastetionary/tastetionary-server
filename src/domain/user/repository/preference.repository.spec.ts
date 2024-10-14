@@ -6,7 +6,10 @@ import {
   getPreferencesByUserId,
   savePreferenceRestaurant,
 } from '@domain/user/repository/preference.repository';
-import { PreferenceCategory } from '@domain/user/user.enum';
+import {
+  PreferenceCategory,
+  PreferenceCategoryToColumnMapping,
+} from '@domain/user/user.enum';
 
 describe('preference repository', () => {
   beforeEach(async () => {
@@ -20,10 +23,11 @@ describe('preference repository', () => {
       restaurantId: 1,
     };
     await savePreferenceRestaurant(data);
+    const column = PreferenceCategoryToColumnMapping[data.category];
 
     const preference = await getPreferencesByUserId(data.userId);
     expect(preference).not.toBeNull();
-    expect(preference![data.category]).toEqual([data.restaurantId]);
+    expect(preference![column]).toEqual([data.restaurantId]);
   });
 
   it('should delete preferences restaurant', async () => {
@@ -43,9 +47,9 @@ describe('preference repository', () => {
       restaurantId: data.restaurantId,
       preference: preference!,
     });
-
+    const column = PreferenceCategoryToColumnMapping[data.category];
     preference = await getPreferencesByUserId(data.userId);
-    expect(preference![data.category]).toEqual([]);
+    expect(preference![column]).toEqual([]);
   });
 
   it('should delete preferences restaurant', async () => {

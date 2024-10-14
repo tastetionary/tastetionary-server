@@ -165,7 +165,7 @@ describe('Restaurant repository', () => {
     await saveExternalRestaurantInformations(data);
     const res = await getExternalRestaurantInformationById(1);
     expect(res).not.toBeNull();
-    expect(res?.id).toBe(1);
+    expect(res?.id).toBe(1n);
   });
 
   it('should save external info', async () => {

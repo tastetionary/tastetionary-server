@@ -88,11 +88,11 @@ describe('user service', () => {
   });
 
   it('should add preference restaurant', async () => {
-    const data = await createUser(DTO.userProperty);
-    await createPreferenceRestaurant(data.id, 1, PreferenceCategory.BOOKMARK);
+    const userId = 1;
+    await createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK);
 
     const preference = await getPreferenceRestaurant(
-      data.id,
+      userId,
       PreferenceCategory.BOOKMARK,
     );
     expect(preference).toHaveLength(1);
@@ -100,17 +100,17 @@ describe('user service', () => {
   });
 
   it('should delete preference restaurant', async () => {
-    const data = await createUser(DTO.userProperty);
-    await createPreferenceRestaurant(data.id, 1, PreferenceCategory.BOOKMARK);
-    await createPreferenceRestaurant(data.id, 2, PreferenceCategory.BOOKMARK);
+    const userId = 1;
+    await createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK);
+    await createPreferenceRestaurant(userId, 2, PreferenceCategory.BOOKMARK);
     await deleteUserPreferenceRestaurant(
-      data.id,
+      userId,
       1,
       PreferenceCategory.BOOKMARK,
     );
 
     const preference = await getPreferenceRestaurant(
-      data.id,
+      userId,
       PreferenceCategory.BOOKMARK,
     );
     expect(preference).toHaveLength(1);
