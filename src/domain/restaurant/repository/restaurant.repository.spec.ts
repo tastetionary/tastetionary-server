@@ -186,8 +186,74 @@ describe('Restaurant repository', () => {
     };
 
     await saveExternalRestaurantInformation(data);
-    const res = getExternalRestaurantInformation(data.externalUUID);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
     expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe(data.address);
+    expect(res?.phone).toBe(data.phone);
+    expect(res?.reference_link).toBe(data.referenceLink);
+  });
+
+  it('should save external info', async () => {
+    const data = {
+      externalUUID: 1n,
+      name: 'test',
+      location: {
+        latitude: 1,
+        longitude: 1,
+      },
+      referenceLink: 'https://www.naver.com',
+      phone: '010-1234-5678',
+    };
+
+    await saveExternalRestaurantInformation(data);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
+    expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe('');
+    expect(res?.phone).toBe(data.phone);
+    expect(res?.reference_link).toBe(data.referenceLink);
+  });
+
+  it('should save external info (phone number)', async () => {
+    const data = {
+      externalUUID: 1n,
+      name: 'test',
+      location: {
+        latitude: 1,
+        longitude: 1,
+      },
+      referenceLink: 'https://www.naver.com',
+      address: 'test',
+    };
+
+    await saveExternalRestaurantInformation(data);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
+    expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe(data.address);
+    expect(res?.phone).toBe('00-0000-0000');
+    expect(res?.reference_link).toBe(data.referenceLink);
+  });
+
+  it('should save external info (phone number)', async () => {
+    const data = {
+      externalUUID: 1n,
+      name: 'test',
+      location: {
+        latitude: 1,
+        longitude: 1,
+      },
+      referenceLink: 'https://www.naver.com',
+    };
+
+    await saveExternalRestaurantInformation(data);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
+    expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe('');
+    expect(res?.phone).toBe('00-0000-0000');
+    expect(res?.reference_link).toBe(data.referenceLink);
   });
 
   it('should save review ', async () => {
