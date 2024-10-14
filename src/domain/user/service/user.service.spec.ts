@@ -96,7 +96,7 @@ describe('user service', () => {
       PreferenceCategory.BOOKMARK,
     );
     expect(preference).toHaveLength(1);
-    expect(preference[0].restaurantId).toEqual(1);
+    expect(preference[0].id).toEqual(1);
   });
 
   it('should delete preference restaurant', async () => {
@@ -113,8 +113,9 @@ describe('user service', () => {
       userId,
       PreferenceCategory.BOOKMARK,
     );
+    console.log(preference);
     expect(preference).toHaveLength(1);
-    expect(preference[0].restaurantId).toEqual(2);
+    expect(preference[0].id).toEqual(2);
   });
 
   describe('[private] ', () => {

@@ -14,7 +14,10 @@ import * as userService from '@domain/user/service/user.service';
 import * as accountService from '@domain/account/service/account.service';
 import * as authService from '@domain/authentication/service/authentication.service';
 import * as facade from '@domain/user/facade/user.facade';
-import { profileEntityFactory } from '@root/test/factory/user.factory';
+import {
+  areaEntityFactory,
+  profileEntityFactory,
+} from '@root/test/factory/user.factory';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -69,6 +72,64 @@ describe('user controller', () => {
     expect(res.body.data).toHaveProperty('nickname');
     expect(res.body.data).toHaveProperty('area');
     expect(res.body.data).toHaveProperty('account');
+  });
+
+  it('preference category should return empty data', async () => {
+    const userId = 999;
+    jest
+      .spyOn(userService, 'getPreferenceRestaurant')
+      .mockReturnValueOnce(Promise.resolve([]));
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/user/preference/bookmark')
+      .set('Authorization', `Bearer ${token}`);
+
+    assertStatusCode(res, 200);
+  });
+
+  it('register prefernce should return success', async () => {
+    const userId = 999;
+    jest
+      .spyOn(userService, 'getPreferenceRestaurant')
+      .mockReturnValueOnce(Promise.resolve([]));
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .post('/v1/user/preference/bookmark')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        restaurantId: 1,
+      });
+
+    assertStatusCode(res, 200);
+  });
+
+  it('delete prefernce should return success', async () => {
+    const userId = 999;
+    const bookmarkId = 1;
+    jest
+      .spyOn(userService, 'getPreferenceRestaurant')
+      .mockReturnValueOnce(Promise.resolve([]));
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .delete(`/v1/user/preference/bookmark/${bookmarkId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    assertStatusCode(res, 200);
   });
 
   it('updateArea should return success', async () => {
