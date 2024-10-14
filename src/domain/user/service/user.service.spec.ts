@@ -18,6 +18,7 @@ import {
 } from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
+import * as restaurantService from '@domain/restaurant/service/restaurant.service';
 import { getProfile } from '@domain/user/facade/user.facade';
 
 describe('user service', () => {
@@ -90,13 +91,24 @@ describe('user service', () => {
   it('should add preference restaurant', async () => {
     const userId = 1;
     await createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK);
-
+    jest
+      .spyOn(restaurantService, 'findExternalRestaurantById')
+      .mockResolvedValue({
+        id: 1n,
+        name: 'name',
+        external_uuid: 123n,
+        address: 'address',
+        phone: 'phone',
+        reference_link: 'link',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
     const preference = await getPreferenceRestaurant(
       userId,
       PreferenceCategory.BOOKMARK,
     );
     expect(preference).toHaveLength(1);
-    expect(preference[0].id).toEqual(1);
+    expect(preference[0].id).toEqual(1n);
   });
 
   it('should delete preference restaurant', async () => {
@@ -108,6 +120,18 @@ describe('user service', () => {
       1,
       PreferenceCategory.BOOKMARK,
     );
+    jest
+      .spyOn(restaurantService, 'findExternalRestaurantById')
+      .mockResolvedValue({
+        id: 2n,
+        name: 'name',
+        external_uuid: 123n,
+        address: 'address',
+        phone: 'phone',
+        reference_link: 'link',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
     const preference = await getPreferenceRestaurant(
       userId,
@@ -115,7 +139,7 @@ describe('user service', () => {
     );
     console.log(preference);
     expect(preference).toHaveLength(1);
-    expect(preference[0].id).toEqual(2);
+    expect(preference[0].id).toEqual(2n);
   });
 
   describe('[private] ', () => {
