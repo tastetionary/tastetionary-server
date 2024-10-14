@@ -43,7 +43,7 @@ import {
   savePreferenceRestaurant,
 } from '@domain/user/repository/preference.repository';
 import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
-
+import { ConflictException } from '@common/exception/internal.exception';
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
   if (!user) {
@@ -189,7 +189,9 @@ export async function createPreferenceRestaurant(
     const exist = preference[column].includes(restaurantId);
 
     if (exist) {
-      return;
+      const categoryMsg =
+        category === PreferenceCategory.BOOKMARK ? '북마크에 추가된' : '제외된';
+      throw new ConflictException(`이미 ${categoryMsg} 식당입니다.`);
     }
   }
 

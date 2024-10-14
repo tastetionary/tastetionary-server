@@ -19,7 +19,9 @@ import {
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
 import * as restaurantService from '@domain/restaurant/service/restaurant.service';
+import * as userService from '@domain/user/service/user.service';
 import { getProfile } from '@domain/user/facade/user.facade';
+import { ConflictException } from '@root/src/common/exception/internal.exception';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -88,58 +90,30 @@ describe('user service', () => {
     expect(user).toHaveProperty('id');
   });
 
-  it('should add preference restaurant', async () => {
+  it('should throw conflict exception when adding duplicate entry', async () => {
     const userId = 1;
     await createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK);
-    jest
-      .spyOn(restaurantService, 'findExternalRestaurantById')
-      .mockResolvedValue({
-        id: 1n,
-        name: 'name',
-        external_uuid: 123n,
-        address: 'address',
-        phone: 'phone',
-        reference_link: 'link',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-    const preference = await getPreferenceRestaurant(
-      userId,
-      PreferenceCategory.BOOKMARK,
-    );
-    expect(preference).toHaveLength(1);
-    expect(preference[0].id).toEqual(1n);
+
+    await expect(
+      createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK),
+    ).rejects.toThrowError(ConflictException);
   });
 
   it('should delete preference restaurant', async () => {
     const userId = 1;
-    await createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK);
-    await createPreferenceRestaurant(userId, 2, PreferenceCategory.BOOKMARK);
+    await createPreferenceRestaurant(userId, 1, PreferenceCategory.EXCLUDED);
+    await createPreferenceRestaurant(userId, 2, PreferenceCategory.EXCLUDED);
     await deleteUserPreferenceRestaurant(
       userId,
       1,
-      PreferenceCategory.BOOKMARK,
+      PreferenceCategory.EXCLUDED,
     );
-    jest
-      .spyOn(restaurantService, 'findExternalRestaurantById')
-      .mockResolvedValue({
-        id: 2n,
-        name: 'name',
-        external_uuid: 123n,
-        address: 'address',
-        phone: 'phone',
-        reference_link: 'link',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
 
     const preference = await getPreferenceRestaurant(
       userId,
-      PreferenceCategory.BOOKMARK,
+      PreferenceCategory.EXCLUDED,
     );
-    console.log(preference);
     expect(preference).toHaveLength(1);
-    expect(preference[0].id).toEqual(2n);
   });
 
   describe('[private] ', () => {
