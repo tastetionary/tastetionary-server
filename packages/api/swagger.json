@@ -1343,6 +1343,184 @@
         ],
         "x-nestia-method": "DELETE"
       }
+    },
+    "/v1/user/preference/{category}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/PreferenceCategory"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_Array_lt_getPreferencesOutput_gt__gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.user.preference.getPreference",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "user",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "get preferences",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "GET"
+      },
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/PreferenceCategory"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferneceDto"
+              }
+            }
+          },
+          "required": true,
+          "x-nestia-encrypted": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.user.preference.registerPreference",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "user",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "add preference restaurant",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "POST"
+      }
+    },
+    "/v1/user/preference/{category}/{restaurantId}": {
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/PreferenceCategory"
+            },
+            "required": true
+          },
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "description": "",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto_lt_object_gt_"
+                }
+              }
+            },
+            "x-nestia-encrypted": false
+          }
+        },
+        "x-nestia-namespace": "v1.user.preference.deletePreference",
+        "x-nestia-jsDocTags": [
+          {
+            "name": "tag",
+            "text": [
+              {
+                "text": "user",
+                "kind": "text"
+              }
+            ]
+          },
+          {
+            "name": "summary",
+            "text": [
+              {
+                "text": "delete preference restaurant",
+                "kind": "text"
+              }
+            ]
+          }
+        ],
+        "x-nestia-method": "DELETE"
+      }
     }
   },
   "components": {
@@ -2322,6 +2500,16 @@
             "x-typia-optional": false,
             "type": "number"
           },
+          "address": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          },
+          "phone": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          },
           "createdAt": {
             "x-typia-required": false,
             "x-typia-optional": true,
@@ -2529,6 +2717,16 @@
             "x-typia-required": true,
             "x-typia-optional": false,
             "type": "number"
+          },
+          "address": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          },
+          "phone": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
           }
         },
         "nullable": false,
@@ -2814,6 +3012,40 @@
           },
           "referenceLink": {
             "description": "link to check,\nexample: \"https://www.naver.com/some-restaurant\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          },
+          "phone": {
+            "description": "phone number,\nexample: \"010-1234-5678\"",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "string",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          },
+          "address": {
+            "description": "address,\nexample: \"서울시 강남구\"",
             "x-typia-jsDocTags": [
               {
                 "name": "type",
@@ -3899,6 +4131,95 @@
           "low_reliability_contents",
           "want_to_delete_personal_information"
         ]
+      },
+      "PreferenceCategory": {
+        "type": "string",
+        "enum": [
+          "bookmark",
+          "excluded"
+        ]
+      },
+      "BaseResponseDto_lt_Array_lt_getPreferencesOutput_gt__gt_": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/getPreferencesOutput"
+            }
+          }
+        },
+        "nullable": false,
+        "required": [
+          "data"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "getPreferencesOutput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "externalUUID": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "name": {
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "string"
+          },
+          "address": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          },
+          "phone": {
+            "x-typia-required": false,
+            "x-typia-optional": true,
+            "type": "string"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "id",
+          "externalUUID",
+          "name"
+        ],
+        "x-typia-jsDocTags": []
+      },
+      "PreferneceDto": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "description": "restaurant id",
+            "x-typia-jsDocTags": [
+              {
+                "name": "type",
+                "text": [
+                  {
+                    "text": "number",
+                    "kind": "text"
+                  }
+                ]
+              }
+            ],
+            "x-typia-required": true,
+            "x-typia-optional": false,
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "restaurantId"
+        ],
+        "x-typia-jsDocTags": []
       }
     },
     "securitySchemes": {
