@@ -7,6 +7,8 @@ import {
   WithdrawalTypeEnum,
   OpinionCategory,
   UserState,
+  PreferenceCategory,
+  PreferenceCategoryToColumnMapping,
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
@@ -33,7 +35,13 @@ import {
   AuthenticationCategory,
   AuthenticationState,
 } from '@domain/authentication/authentication.enum';
-
+import {
+  deletePreferenceRestaurant,
+  getPreferencesByUserId,
+  savePreferenceRestaurant,
+} from '@domain/user/repository/preference.repository';
+import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
+import { ConflictException } from '@common/exception/internal.exception';
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
   if (!user) {
@@ -140,6 +148,63 @@ export async function createUser(nickname?: string) {
 export async function changeArea(userId: number, dto: AreaDto) {
   await deleteAreas({ userId });
   await createAreas(userId, dto);
+}
+
+export async function getPreferenceRestaurant(
+  userId: number,
+  category: PreferenceCategory,
+) {
+  const preference = await getPreferencesByUserId(userId);
+  if (!preference) {
+    return [];
+  }
+
+  const restaurntIds = preference[PreferenceCategoryToColumnMapping[category]];
+  const res = await Promise.all(
+    restaurntIds.map(async (id) => {
+      return await findExternalRestaurantById(id);
+    }),
+  );
+
+  return res;
+}
+
+export async function createPreferenceRestaurant(
+  userId: number,
+  restaurantId: number,
+  category: PreferenceCategory,
+) {
+  const preference = await getPreferencesByUserId(userId);
+  if (preference) {
+    const column = PreferenceCategoryToColumnMapping[category];
+    const exist = preference[column].includes(restaurantId);
+
+    if (exist) {
+      const categoryMsg =
+        category === PreferenceCategory.BOOKMARK ? '북마크에 추가된' : '제외된';
+      throw new ConflictException(`이미 ${categoryMsg} 식당입니다.`);
+    }
+  }
+
+  await savePreferenceRestaurant({ userId, restaurantId, category });
+}
+
+export async function deleteUserPreferenceRestaurant(
+  userId: number,
+  restaurantId: number,
+  category: PreferenceCategory,
+) {
+  const preference = await getPreferencesByUserId(userId);
+  if (!preference) {
+    return;
+  }
+
+  await deletePreferenceRestaurant({
+    userId,
+    restaurantId,
+    category,
+    preference,
+  });
 }
 
 function createRandomNickname() {

@@ -47,6 +47,8 @@ describe('restaurant service', () => {
     latitude: LATITUDE,
     longitude: LONGITUDE,
     referenceLink: 'https://www.naver.com',
+    address: 'test',
+    phone: '010-1234-5678',
   };
 
   describe('aggregateRestaurant', () => {

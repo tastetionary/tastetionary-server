@@ -53,11 +53,11 @@ model UserAreas {
 
 model UserPreferences {
   id                      Int      @id @default(autoincrement())
-  userId                  Int      @map("user_id")
+  userId                  Int      @unique @map("user_id")
   createdAt               DateTime @default(now()) @map("created_at")
   updatedAt               DateTime @updatedAt @map("updated_at")
-  bookmark_restaurant_ids Int[]    @map("bookmark_restaurant_ids")
-  exclude_restaurant_ids  Int[]    @map("exclude_restaurant_ids")
+  bookmark_restaurant_ids Int[]    @default([]) @map("bookmark_restaurant_ids")
+  exclude_restaurant_ids  Int[]    @default([]) @map("exclude_restaurant_ids")
 
   @@index([userId])
   @@index([bookmark_restaurant_ids], type: Gin)
@@ -112,6 +112,8 @@ model ExternalRestaurantInformations {
   id             BigInt                   @id @default(autoincrement())
   external_uuid  BigInt                   @unique @map("external_uuid")
   location       Unsupported("geography")
+  address        String                   @default("") @map("address") @db.VarChar(128)
+  phone          String                   @default("00-000-0000") @map("phone") @db.VarChar(20)
   reference_link String                   @map("reference_link") @db.VarChar(1024)
   createdAt      DateTime                 @default(now()) @map("created_at")
   updatedAt      DateTime                 @updatedAt @map("updated_at")

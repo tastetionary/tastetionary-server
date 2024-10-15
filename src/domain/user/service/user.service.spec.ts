@@ -6,12 +6,22 @@ import {
   _private,
   searchProfile,
   changeUserState,
+  createPreferenceRestaurant,
+  getPreferenceRestaurant,
+  deleteUserPreferenceRestaurant,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
-import { AgreementCategory, UserState } from '@domain/user/user.enum';
+import {
+  AgreementCategory,
+  PreferenceCategory,
+  UserState,
+} from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
+import * as restaurantService from '@domain/restaurant/service/restaurant.service';
+import * as userService from '@domain/user/service/user.service';
 import { getProfile } from '@domain/user/facade/user.facade';
+import { ConflictException } from '@root/src/common/exception/internal.exception';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -78,6 +88,32 @@ describe('user service', () => {
     expect(user).not.toBeNull();
     expect(user).toHaveProperty('state');
     expect(user).toHaveProperty('id');
+  });
+
+  it('should throw conflict exception when adding duplicate entry', async () => {
+    const userId = 1;
+    await createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK);
+
+    await expect(
+      createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK),
+    ).rejects.toThrowError(ConflictException);
+  });
+
+  it('should delete preference restaurant', async () => {
+    const userId = 1;
+    await createPreferenceRestaurant(userId, 1, PreferenceCategory.EXCLUDED);
+    await createPreferenceRestaurant(userId, 2, PreferenceCategory.EXCLUDED);
+    await deleteUserPreferenceRestaurant(
+      userId,
+      1,
+      PreferenceCategory.EXCLUDED,
+    );
+
+    const preference = await getPreferenceRestaurant(
+      userId,
+      PreferenceCategory.EXCLUDED,
+    );
+    expect(preference).toHaveLength(1);
   });
 
   describe('[private] ', () => {

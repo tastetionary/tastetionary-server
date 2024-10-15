@@ -20,6 +20,7 @@ import {
   saveReviewReaction,
   deleteReviewReaction,
   saveReviewReport,
+  getExternalRestaurantInformationById,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
@@ -217,12 +218,18 @@ async function registerExternalRestaurantInformationWhenNoData(
       longitude: param.longitude,
     },
     referenceLink: param.referenceLink,
+    address: param.address,
+    phone: param.phone,
   });
 
   return await getExternalRestaurantInformation(BigInt(param.externalUUID));
 }
 export async function findExternalRestaurant(uuid: number) {
   return getExternalRestaurantInformation(BigInt(uuid));
+}
+
+export async function findExternalRestaurantById(id: number) {
+  return getExternalRestaurantInformationById(id);
 }
 
 export async function getReviews(userId: number) {

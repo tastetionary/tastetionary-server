@@ -120,3 +120,9 @@ export class EmptyContentException extends HttpException {
     super(HttpException.createBody({ message }), HttpStatus.NO_CONTENT);
   }
 }
+
+export class ConflictException extends HttpException {
+  constructor(message: string) {
+    super(HttpException.createBody({ message }), HttpStatus.CONFLICT);
+  }
+}

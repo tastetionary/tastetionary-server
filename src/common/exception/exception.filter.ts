@@ -10,6 +10,7 @@ import * as Sentry from '@sentry/node';
 import {
   BaseException,
   CallerWrongUsageException,
+  ConflictException,
   EmptyContentException,
 } from '@common/exception/internal.exception';
 
@@ -44,6 +45,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
         console.error(e, `data: ${noContentReason}`);
         response.status(204).send();
       }
+      return;
+    }
+
+    if (exception instanceof ConflictException) {
+      response.status(409).json({
+        statusCode: 409,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        originMessage: exception.message,
+      });
       return;
     }
 

@@ -13,6 +13,14 @@ export interface WithdrawUserDto {
   type: WithdrawalTypeEnum;
 }
 
+export interface PreferneceDto {
+  /**
+   * restaurant id
+   * @type number
+   */
+  restaurantId: number;
+}
+
 export interface RegisterProfileRequest {
   /**
    * user location data

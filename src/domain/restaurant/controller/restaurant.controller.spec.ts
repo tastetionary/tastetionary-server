@@ -49,6 +49,8 @@ describe('restaurant controller', () => {
       latitude: 1,
       longitude: 1,
       referenceLink: 'https://www.naver.com',
+      address: 'test',
+      phone: '010-1234-5678',
     },
   };
 

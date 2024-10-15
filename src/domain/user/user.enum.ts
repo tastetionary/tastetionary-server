@@ -7,10 +7,18 @@ export enum AgreementCategory {
   PERSONAL_INFORMATION = 'personal_information',
 }
 
-// export enum AreaCategory {
-//   ACTIVITY_AREA = 'activity_area',
-//   DINING_AREA = 'dining_area',
-// }
+export enum PreferenceCategory {
+  BOOKMARK = 'bookmark',
+  EXCLUDED = 'excluded',
+}
+
+export const PreferenceCategoryToColumnMapping: Record<
+  PreferenceCategory,
+  string
+> = {
+  [PreferenceCategory.BOOKMARK]: 'bookmark_restaurant_ids',
+  [PreferenceCategory.EXCLUDED]: 'exclude_restaurant_ids',
+};
 
 /**
  * enum 대신할 type literal 시험 삼아 사용

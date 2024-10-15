@@ -2,6 +2,7 @@ import { truncateTables } from '@root/jest.setup';
 import {
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
+  getExternalRestaurantInformationById,
   getRestaurantOptionsRecord,
   getReviewById,
   getReviewReportById,
@@ -125,6 +126,7 @@ describe('Restaurant repository', () => {
           longitude,
         },
         referenceLink: 'https://www.naver.com',
+        phone: '010-1234-5678',
       },
       {
         externalUUID: 1001n,
@@ -134,6 +136,7 @@ describe('Restaurant repository', () => {
           longitude,
         },
         referenceLink: 'https://www.naver.com',
+        address: 'test',
       },
     ];
     await saveExternalRestaurantInformations(data);
@@ -146,7 +149,94 @@ describe('Restaurant repository', () => {
     expect(ids).toEqual([1000n, 1001n]);
   });
 
+  it('should return restaurants by id', async () => {
+    const latitude = 37.517331925853;
+    const longitude = 127.047377408384;
+
+    const data = [
+      {
+        externalUUID: 1000n,
+        name: 'test',
+        location: {
+          latitude,
+          longitude,
+        },
+        referenceLink: 'https://www.naver.com',
+        address: 'test',
+        phone: '010-1234-5678',
+      },
+    ];
+    await saveExternalRestaurantInformations(data);
+    const res = await getExternalRestaurantInformationById(1);
+    expect(res).not.toBeNull();
+    expect(res?.id).toBe(1n);
+  });
+
   it('should save external info', async () => {
+    const data = {
+      externalUUID: 1n,
+      name: 'test',
+      location: {
+        latitude: 1,
+        longitude: 1,
+      },
+      referenceLink: 'https://www.naver.com',
+      address: 'test',
+      phone: '010-1234-5678',
+    };
+
+    await saveExternalRestaurantInformation(data);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
+    expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe(data.address);
+    expect(res?.phone).toBe(data.phone);
+    expect(res?.reference_link).toBe(data.referenceLink);
+  });
+
+  it('should save external info', async () => {
+    const data = {
+      externalUUID: 1n,
+      name: 'test',
+      location: {
+        latitude: 1,
+        longitude: 1,
+      },
+      referenceLink: 'https://www.naver.com',
+      phone: '010-1234-5678',
+    };
+
+    await saveExternalRestaurantInformation(data);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
+    expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe('');
+    expect(res?.phone).toBe(data.phone);
+    expect(res?.reference_link).toBe(data.referenceLink);
+  });
+
+  it('should save external info (phone number)', async () => {
+    const data = {
+      externalUUID: 1n,
+      name: 'test',
+      location: {
+        latitude: 1,
+        longitude: 1,
+      },
+      referenceLink: 'https://www.naver.com',
+      address: 'test',
+    };
+
+    await saveExternalRestaurantInformation(data);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
+    expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe(data.address);
+    expect(res?.phone).toBe('00-0000-0000');
+    expect(res?.reference_link).toBe(data.referenceLink);
+  });
+
+  it('should save external info (phone number)', async () => {
     const data = {
       externalUUID: 1n,
       name: 'test',
@@ -158,8 +248,12 @@ describe('Restaurant repository', () => {
     };
 
     await saveExternalRestaurantInformation(data);
-    const res = getExternalRestaurantInformation(data.externalUUID);
+    const res = await getExternalRestaurantInformation(data.externalUUID);
     expect(res).not.toBeNull();
+    expect(res?.external_uuid).toBe(data.externalUUID);
+    expect(res?.address).toBe('');
+    expect(res?.phone).toBe('00-0000-0000');
+    expect(res?.reference_link).toBe(data.referenceLink);
   });
 
   it('should save review ', async () => {

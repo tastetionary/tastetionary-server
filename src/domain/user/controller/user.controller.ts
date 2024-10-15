@@ -5,23 +5,47 @@ import {
   UseFilters,
   UseGuards,
   Request,
+  Param,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import {
   AreaDto,
+  PreferneceDto,
   ProfileResponse,
   RegisterProfileRequest,
   WithdrawUserDto,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
-import { changeArea } from '@domain/user/service/user.service';
+import {
+  changeArea,
+  createPreferenceRestaurant,
+  getPreferenceRestaurant,
+  deleteUserPreferenceRestaurant,
+} from '@domain/user/service/user.service';
 import {
   getProfile,
   registerProfile,
   withdrawProfile,
 } from '@domain/user/facade/user.facade';
+import { PreferenceCategory } from '@domain/user/user.enum';
+import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
+export interface getPreferencesOutput
+  extends Omit<
+    ExternalRestaurantInformationRecord,
+    | 'id'
+    | 'externalUUID'
+    | 'latitude'
+    | 'longitude'
+    | 'createdAt'
+    | 'updatedAt'
+    | 'distance'
+    | 'referenceLink'
+  > {
+  id: string;
+  externalUUID: string;
+}
 
 @Controller('v1/user')
 @UseFilters(new HttpExceptionFilter())
@@ -88,6 +112,71 @@ export class UserController {
     @TypedBody() dto: WithdrawUserDto,
   ): Promise<BaseResponseDto<object>> {
     await withdrawProfile(req.user.userId, dto.type);
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag user
+   * @summary get preferences
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Get('preference/:category')
+  async getPreference(
+    @Param('category') category: PreferenceCategory,
+    @Request() req,
+  ): Promise<BaseResponseDto<getPreferencesOutput[]>> {
+    const data = await getPreferenceRestaurant(req.user.userId, category);
+    const result = data.map((item) => {
+      return {
+        id: item.id.toString(),
+        externalUUID: item.external_uuid.toString(),
+        name: item.name,
+        address: item.address,
+        phone: item.phone,
+      };
+    });
+
+    return new BaseResponseDto(result);
+  }
+
+  /**
+   * @tag user
+   * @summary add preference restaurant
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Post('/preference/:category')
+  async registerPreference(
+    @Param('category') category: PreferenceCategory,
+    @TypedBody() dto: PreferneceDto,
+    @Request() req,
+  ): Promise<BaseResponseDto<object>> {
+    await createPreferenceRestaurant(
+      req.user.userId,
+      dto.restaurantId,
+      category,
+    );
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag user
+   * @summary delete preference restaurant
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Delete('preference/:category/:restaurantId')
+  async deletePreference(
+    @Param('category') category: PreferenceCategory,
+    @Param('restaurantId') restaurantId: number,
+    @Request() req,
+  ): Promise<BaseResponseDto<object>> {
+    await deleteUserPreferenceRestaurant(
+      req.user.userId,
+      Number(restaurantId),
+      category,
+    );
     return new BaseResponseDto({ state: 'success' });
   }
 }
