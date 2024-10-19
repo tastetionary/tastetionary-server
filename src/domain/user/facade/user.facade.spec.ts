@@ -31,7 +31,7 @@ describe('user facade', () => {
     });
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
     const dto: RegisterProfileRequest = {
-      nickname: 'nickname',
+      nickname: 'nickname-1',
       area: {
         latitude: 1,
         longitude: 1,
@@ -73,7 +73,7 @@ describe('user facade', () => {
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
 
     const dto: RegisterProfileRequest = {
-      nickname: 'nickname',
+      nickname: 'nickname-2',
       area: {
         latitude: 1,
         longitude: 1,

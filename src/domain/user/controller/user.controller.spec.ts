@@ -158,6 +158,7 @@ describe('user controller', () => {
     jest.spyOn(accountService, 'createAccount').mockImplementation();
     jest.spyOn(authService, 'validateDoneIdentification').mockImplementation();
     jest.spyOn(authService, 'syncAuthentication').mockImplementation();
+    jest.spyOn(userService, 'validateNickName').mockImplementation();
     const res = await request(app.getHttpServer())
       .post('/v1/user')
       .send({
