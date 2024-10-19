@@ -10,7 +10,7 @@ Create .env file
 cp .env.sample .env
 ```
 
-## publish on npm 
+## publish on npm
 
 1. change version on package/api/package.json
 2. run cli

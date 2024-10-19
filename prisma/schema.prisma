@@ -226,6 +226,16 @@ model ReviewReports {
   @@map("review_reports")
 }
 
+model BannedWords {
+  id        Int      @id @default(autoincrement())
+  word      String   @map("word") @db.VarChar(128)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([word])
+  @@map("banned_words")
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model spatial_ref_sys {
   srid      Int     @id
