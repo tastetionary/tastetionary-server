@@ -7,9 +7,14 @@ import { sendEmail } from '@thirdParty/brevo/brevo';
 import { EnvironmentEnum } from '@root/src/env.validation';
 import * as fs from 'fs';
 import path from 'path';
-import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
+import {
+  CallerWrongDomainRuleException,
+  CallerWrongUsageException,
+} from '@common/exception/internal.exception';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { ConfigService } from '@nestjs/config';
+import { findAccount } from '@domain/account/service/account.service';
+import { AccountCategory } from '@domain/account/account.enum';
 
 export async function sendAuthenticationCodeToEmail(
   category: AuthenticationCategory,
@@ -21,6 +26,18 @@ export async function sendAuthenticationCodeToEmail(
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'not supported type, only support email type',
+    );
+  }
+
+  const accountEntity = await findAccount(
+    identification,
+    AccountCategory.EMAIL,
+  );
+  if (accountEntity) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'duplicated identification',
+      'already registered identification, change other identification',
     );
   }
 
