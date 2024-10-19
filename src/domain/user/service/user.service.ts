@@ -43,7 +43,6 @@ import {
   savePreferenceRestaurant,
 } from '@domain/user/repository/preference.repository';
 import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
-import { ConflictException } from '@common/exception/internal.exception';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 
@@ -244,6 +243,7 @@ export async function validateNickName(nickname: string) {
     );
   }
 }
+
 export async function validateNickNameDuplication(nickname: string) {
   const res = await getUserByNickname(nickname);
   return res !== undefined;
