@@ -22,9 +22,11 @@ import {
 import {
   getNicknamePartRecord,
   getUserById,
+  getUserByNickname,
   saveOpinion,
   saveUser,
   updateUserById,
+  validateInvalidNickName,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
 import {
@@ -42,6 +44,9 @@ import {
 } from '@domain/user/repository/preference.repository';
 import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
 import { ConflictException } from '@common/exception/internal.exception';
+import * as TE from 'fp-ts/TaskEither';
+import { pipe } from 'fp-ts/lib/function';
+
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
   if (!user) {
@@ -138,7 +143,7 @@ async function createAgreements(userId: number, dtoList: AgreementDTO[]) {
 export async function createUser(nickname?: string) {
   const user = await saveUser({
     state: UserState.ACTIVE,
-    nickname: nickname || createRandomNickname(),
+    nickname: nickname || (await createUniqueNickName()),
     property: {},
   });
 
@@ -182,7 +187,10 @@ export async function createPreferenceRestaurant(
     if (exist) {
       const categoryMsg =
         category === PreferenceCategory.BOOKMARK ? '북마크에 추가된' : '제외된';
-      throw new ConflictException(`이미 ${categoryMsg} 식당입니다.`);
+      throw new CallerWrongUsageException(
+        ErrorSubCategoryEnum.INVALID_INPUT,
+        `이미 ${categoryMsg} 식당입니다.`,
+      );
     }
   }
 
@@ -205,6 +213,47 @@ export async function deleteUserPreferenceRestaurant(
     category,
     preference,
   });
+}
+
+export async function validateNickName(nickname: string) {
+  await pipe(
+    nickname,
+    validateInvalidNickName,
+    TE.chain((isValid) => {
+      if (!isValid) {
+        throw new CallerWrongUsageException(
+          ErrorSubCategoryEnum.INVALID_INPUT,
+          'invalid nickname',
+        );
+      }
+      return TE.right(true);
+    }),
+    TE.mapError(() => {
+      throw new CallerWrongUsageException(
+        ErrorSubCategoryEnum.INVALID_INPUT,
+        'invalid nickname',
+      );
+    }),
+  )();
+
+  const duplicate = await validateNickNameDuplication(nickname);
+  if (duplicate) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'duplicated nickname',
+    );
+  }
+}
+export async function validateNickNameDuplication(nickname: string) {
+  const res = await getUserByNickname(nickname);
+  return res !== undefined;
+}
+
+async function createUniqueNickName() {
+  const nickname = createRandomNickname();
+  const exist = await getUserByNickname(nickname);
+
+  return exist ? createUniqueNickName() : nickname;
 }
 
 function createRandomNickname() {

@@ -8,7 +8,6 @@ import prismaClient from '@root/src/common/database/prisma';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { ErrorContents } from '@common/exception/internal.exception';
 import * as TE from 'fp-ts/TaskEither';
-import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import { ErrorSubCategoryEnum } from '@root/src/common/exception/enum';
 
@@ -124,7 +123,7 @@ export function getNicknamePartRecord(): nicknamePartsRecord {
   return nicknameSource;
 }
 
-export function checkBannedWords(
+export function validateInvalidNickName(
   nickname: string,
 ): TE.TaskEither<ErrorContents, boolean> {
   return pipe(
@@ -145,7 +144,7 @@ export function checkBannedWords(
 
         const similarMatch: string[] = await prismaClient.$queryRaw`
           SELECT * FROM banned_words
-          WHERE similarity(${nickname}, word) > 0.5
+          WHERE similarity(${nickname}, word) > 0.3
         `;
 
         if (similarMatch.length > 0) {
