@@ -20,13 +20,13 @@ import {
   saveArea,
 } from '@domain/user/repository/area.repository';
 import {
+  checkNickNameValidity,
   getNicknamePartRecord,
   getUserById,
   getUserByNickname,
   saveOpinion,
   saveUser,
   updateUserById,
-  validateInvalidNickName,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
 import {
@@ -217,7 +217,7 @@ export async function deleteUserPreferenceRestaurant(
 export async function validateNickName(nickname: string) {
   await pipe(
     nickname,
-    validateInvalidNickName,
+    checkNickNameValidity,
     TE.chain((isValid) => {
       if (!isValid) {
         throw new CallerWrongUsageException(

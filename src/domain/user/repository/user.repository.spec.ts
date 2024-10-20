@@ -2,13 +2,13 @@ import { truncateTables } from '@root/jest.setup';
 import { UserState, WithdrawalTypeEnum } from '@domain/user/user.enum';
 import prismaClient from '@root/src/common/database/prisma';
 import {
-  validateInvalidNickName,
   getOpinionsByUserId,
   getUsers,
   saveOpinion,
   saveUser,
   saveUsers,
   updateUserById,
+  checkNickNameValidity,
 } from '@domain/user/repository/user.repository';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
@@ -65,7 +65,7 @@ describe('user repository', () => {
       .fn()
       .mockResolvedValue([{ word: 'banned' }]);
     const res = await pipe(
-      validateInvalidNickName('banned nickname'),
+      checkNickNameValidity('banned nickname'),
       TE.match(
         (error) => {
           console.log(error);
@@ -83,7 +83,7 @@ describe('user repository', () => {
       .fn()
       .mockResolvedValue(['similar banned word']);
     const res = await pipe(
-      validateInvalidNickName('invalid nickname'),
+      checkNickNameValidity('invalid nickname'),
       TE.match(
         (error) => {
           console.log(error);
@@ -100,7 +100,7 @@ describe('user repository', () => {
     prismaClient.$queryRaw = jest.fn().mockResolvedValue([]);
 
     const res = await pipe(
-      validateInvalidNickName('valid nickname'),
+      checkNickNameValidity('valid nickname'),
       TE.match(
         (error) => {
           console.log(error);

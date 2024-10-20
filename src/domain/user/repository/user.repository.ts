@@ -123,7 +123,7 @@ export function getNicknamePartRecord(): nicknamePartsRecord {
   return nicknameSource;
 }
 
-export function validateInvalidNickName(
+export function checkNickNameValidity(
   nickname: string,
 ): TE.TaskEither<ErrorContents, boolean> {
   return pipe(
