@@ -10,6 +10,16 @@ export interface ErrorContents {
   hint?: string;
 }
 
+export interface BadRequestExceptionResponse {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  category?: ErrorCategoryEnum;
+  additionalData?: any;
+  originMessage: string;
+  input?: any;
+}
+
 type loggedData = { [key: string]: any };
 export class BaseException extends HttpException {
   private readonly _category: ErrorCategoryEnum;

@@ -9,7 +9,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
-import { TypedBody, TypedParam, TypedQuery, TypedRoute } from '@nestia/core';
+import { TypedBody, TypedRoute, TypedException } from '@nestia/core';
+
 import {
   AreaDto,
   PreferneceDto,
@@ -33,6 +34,15 @@ import {
 } from '@domain/user/facade/user.facade';
 import { PreferenceCategory } from '@domain/user/user.enum';
 import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
+import {
+  BadRequestExceptionResponse,
+  CallerWrongUsageException,
+} from '@root/src/common/exception/internal.exception';
+import {
+  ErrorCategoryEnum,
+  ErrorSubCategoryEnum,
+} from '@root/src/common/exception/enum';
+
 export interface getPreferencesOutput
   extends Omit<
     ExternalRestaurantInformationRecord,
@@ -72,6 +82,26 @@ export class UserController {
    */
   @HttpCode(200)
   @TypedRoute.Get('/nickname/validation')
+  @TypedException<BadRequestExceptionResponse>({
+    status: 400,
+    description: 'invalid nickname',
+    examples: {
+      'duplicate nickname': {
+        statusCode: 400,
+        timestamp: new Date().toISOString(),
+        path: '/v1/user/nickname/validation',
+        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+        originMessage: 'duplicate nickname',
+      },
+      'invalid nickname': {
+        statusCode: 400,
+        timestamp: new Date().toISOString(),
+        path: '/v1/user/nickname/validation',
+        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+        originMessage: 'invalid nickname',
+      },
+    },
+  })
   async validateNickName(
     @Query('name') nickname: string,
   ): Promise<BaseResponseDto<object>> {
