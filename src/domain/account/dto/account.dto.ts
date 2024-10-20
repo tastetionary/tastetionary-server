@@ -61,3 +61,15 @@ export interface TokenDTO {
   accessTokenExpiredAt: Date;
   refreshTokenExpiredAt: Date;
 }
+
+export interface SocialLoginInfo {
+  id: string;
+  email: string;
+  gender?: string;
+  // TODO:
+  // kakao: age_range: 20~29
+  // google?
+  // naver?
+  // apple?
+  age?: number;
+}

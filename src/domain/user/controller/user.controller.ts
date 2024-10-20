@@ -34,10 +34,7 @@ import {
 } from '@domain/user/facade/user.facade';
 import { PreferenceCategory } from '@domain/user/user.enum';
 import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
-import {
-  BadRequestExceptionResponse,
-  CallerWrongUsageException,
-} from '@root/src/common/exception/internal.exception';
+import { BadRequestExceptionResponse } from '@root/src/common/exception/internal.exception';
 import {
   ErrorCategoryEnum,
   ErrorSubCategoryEnum,

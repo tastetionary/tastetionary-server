@@ -39,7 +39,8 @@ describe('account service', () => {
     };
     const mockKakao = jest.spyOn(kakao, 'getKakaoUserInfo');
     mockKakao.mockResolvedValue({
-      id: 123,
+      id: '123',
+      email: 'test@email.com',
     });
     const token = await createToken(dto);
     const res = await findAccessToken(token.accessToken)();
