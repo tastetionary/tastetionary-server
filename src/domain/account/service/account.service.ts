@@ -123,7 +123,7 @@ export async function createToken(param: {
   const identification =
     param.category === AccountCategory.EMAIL
       ? param.identification
-      : userInfo.id.toString();
+      : userInfo.email;
   const identificationRecord = await getIdentification(
     identification,
     param.category,
