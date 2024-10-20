@@ -3,6 +3,7 @@ import {
   createProfile,
   createUserOpinion,
   searchProfile,
+  validateNickName,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
@@ -26,6 +27,10 @@ export async function getProfile(userId: number) {
 }
 
 export async function registerProfile(dto: RegisterProfileRequest) {
+  if (dto.nickname) {
+    await validateNickName(dto.nickname);
+  }
+
   await validateDoneIdentification({
     identification: dto.account.identification,
     authenticationId: dto.account.authenticationId,

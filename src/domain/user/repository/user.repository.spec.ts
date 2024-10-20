@@ -8,7 +8,11 @@ import {
   saveUser,
   saveUsers,
   updateUserById,
+  checkNickNameValidity,
 } from '@domain/user/repository/user.repository';
+import * as TE from 'fp-ts/TaskEither';
+import { pipe } from 'fp-ts/lib/function';
+import { error } from 'console';
 
 describe('user repository', () => {
   beforeEach(async () => {
@@ -54,5 +58,58 @@ describe('user repository', () => {
     await saveUsers(data);
     const res = await getUsers({});
     expect(res.length).toEqual(data.length);
+  });
+
+  it('should return false if there is banned word', async () => {
+    prismaClient.bannedWords.findMany = jest
+      .fn()
+      .mockResolvedValue([{ word: 'banned' }]);
+    const res = await pipe(
+      checkNickNameValidity('banned nickname'),
+      TE.match(
+        (error) => {
+          console.log(error);
+          throw error;
+        },
+        (success: boolean) => success,
+      ),
+    )();
+    expect(res).toBe(false);
+  });
+
+  it('should return false if word has similiarity', async () => {
+    prismaClient.bannedWords.findMany = jest.fn().mockResolvedValue([]);
+    prismaClient.$queryRaw = jest
+      .fn()
+      .mockResolvedValue(['similar banned word']);
+    const res = await pipe(
+      checkNickNameValidity('invalid nickname'),
+      TE.match(
+        (error) => {
+          console.log(error);
+          throw error;
+        },
+        (success: boolean) => success,
+      ),
+    )();
+    expect(res).toBe(false);
+  });
+
+  it('should return true if there is no banned word', async () => {
+    prismaClient.bannedWords.findMany = jest.fn().mockResolvedValue([]);
+    prismaClient.$queryRaw = jest.fn().mockResolvedValue([]);
+
+    const res = await pipe(
+      checkNickNameValidity('valid nickname'),
+      TE.match(
+        (error) => {
+          console.log(error);
+          throw error;
+        },
+        (success: boolean) => success,
+      ),
+    )();
+
+    expect(res).toBe(true);
   });
 });

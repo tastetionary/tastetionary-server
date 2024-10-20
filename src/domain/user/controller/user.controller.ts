@@ -6,9 +6,10 @@ import {
   UseGuards,
   Request,
   Param,
+  Query,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
-import { TypedBody, TypedRoute } from '@nestia/core';
+import { TypedBody, TypedParam, TypedQuery, TypedRoute } from '@nestia/core';
 import {
   AreaDto,
   PreferneceDto,
@@ -23,6 +24,7 @@ import {
   createPreferenceRestaurant,
   getPreferenceRestaurant,
   deleteUserPreferenceRestaurant,
+  validateNickName,
 } from '@domain/user/service/user.service';
 import {
   getProfile,
@@ -61,6 +63,19 @@ export class UserController {
     @TypedBody() dto: RegisterProfileRequest,
   ): Promise<BaseResponseDto<object>> {
     await registerProfile(dto);
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag user
+   * @summary 닉네임 체크
+   */
+  @HttpCode(200)
+  @TypedRoute.Get('/nickname/validation')
+  async validateNickName(
+    @Query('name') nickname: string,
+  ): Promise<BaseResponseDto<object>> {
+    await validateNickName(nickname);
     return new BaseResponseDto({ state: 'success' });
   }
 

@@ -18,6 +18,8 @@ import {
   areaEntityFactory,
   profileEntityFactory,
 } from '@root/test/factory/user.factory';
+import { CallerWrongUsageException } from '@common/exception/internal.exception';
+import { ErrorSubCategoryEnum } from '@common/exception/enum';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -155,7 +157,8 @@ describe('user controller', () => {
     jest.spyOn(userService, 'createUser').mockImplementation();
     jest.spyOn(accountService, 'createAccount').mockImplementation();
     jest.spyOn(authService, 'validateDoneIdentification').mockImplementation();
-
+    jest.spyOn(authService, 'syncAuthentication').mockImplementation();
+    jest.spyOn(userService, 'validateNickName').mockImplementation();
     const res = await request(app.getHttpServer())
       .post('/v1/user')
       .send({
@@ -180,6 +183,33 @@ describe('user controller', () => {
       });
 
     assertStatusCode(res, 200);
+  });
+
+  it('valid nickname should return success', async () => {
+    jest.spyOn(userService, 'validateNickName').mockResolvedValueOnce();
+    const nickname = 'valid nickname';
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/user/nickname/validation')
+      .query({ name: nickname });
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('invalid nickname should return success', async () => {
+    jest
+      .spyOn(userService, 'validateNickName')
+      .mockRejectedValueOnce(
+        new CallerWrongUsageException(
+          ErrorSubCategoryEnum.INVALID_INPUT,
+          'invalid nickname',
+        ),
+      );
+    const nickname = 'valid nickname';
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/user/nickname/validation')
+      .query({ name: nickname });
+    expect(res.statusCode).toEqual(400);
   });
 
   it('wrong input should return bad request', async () => {

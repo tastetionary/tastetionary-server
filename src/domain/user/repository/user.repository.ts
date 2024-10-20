@@ -6,6 +6,10 @@ import {
 import { Prisma } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
+import { ErrorContents } from '@common/exception/internal.exception';
+import * as TE from 'fp-ts/TaskEither';
+import { pipe } from 'fp-ts/lib/function';
+import { ErrorSubCategoryEnum } from '@root/src/common/exception/enum';
 
 export interface UserRecord {
   id: number;
@@ -38,6 +42,11 @@ export async function saveUsers(
 
 export async function getUserById(id: number) {
   const user = await getUsers({ ids: [id] }, 1);
+  return user[0];
+}
+
+export async function getUserByNickname(nickname: string) {
+  const user = await getUsers({ nicknames: [nickname] }, 1);
   return user[0];
 }
 
@@ -112,4 +121,46 @@ interface nicknamePartsRecord {
 
 export function getNicknamePartRecord(): nicknamePartsRecord {
   return nicknameSource;
+}
+
+export function checkNickNameValidity(
+  nickname: string,
+): TE.TaskEither<ErrorContents, boolean> {
+  return pipe(
+    TE.tryCatch(
+      async () => {
+        const bannedWords = await prismaClient.bannedWords.findMany({
+          where: {
+            word: {
+              contains: nickname,
+              mode: 'insensitive',
+            },
+          },
+        });
+
+        if (bannedWords.length > 0) {
+          return false;
+        }
+
+        const similarMatch: string[] = await prismaClient.$queryRaw`
+          SELECT * FROM banned_words
+          WHERE similarity(${nickname}, word) > 0.3
+        `;
+
+        if (similarMatch.length > 0) {
+          return false;
+        }
+
+        return true;
+      },
+      () => ({
+        subCategory: ErrorSubCategoryEnum.INVALID_INPUT,
+        message: 'failed to check banned words',
+      }),
+    ),
+    TE.mapLeft(() => ({
+      subCategory: ErrorSubCategoryEnum.INVALID_INPUT,
+      message: 'failed to check banned words',
+    })),
+  );
 }

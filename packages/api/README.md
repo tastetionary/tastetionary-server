@@ -1,9 +1,9 @@
 ## Description
 
-SDK for client about taste-dict
+SDK for client about tastetionary
 
 ## install
 
 ```
-npm install @homekeeper89/taste_dict@latest
+npm install @taehoya/tastetionary@latest
 ```

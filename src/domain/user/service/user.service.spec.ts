@@ -9,6 +9,7 @@ import {
   createPreferenceRestaurant,
   getPreferenceRestaurant,
   deleteUserPreferenceRestaurant,
+  validateNickName,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
@@ -21,7 +22,7 @@ import prismaClient from '@common/database/prisma';
 import * as restaurantService from '@domain/restaurant/service/restaurant.service';
 import * as userService from '@domain/user/service/user.service';
 import { getProfile } from '@domain/user/facade/user.facade';
-import { ConflictException } from '@root/src/common/exception/internal.exception';
+import { CallerWrongUsageException } from '@root/src/common/exception/internal.exception';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -96,7 +97,7 @@ describe('user service', () => {
 
     await expect(
       createPreferenceRestaurant(userId, 1, PreferenceCategory.BOOKMARK),
-    ).rejects.toThrowError(ConflictException);
+    ).rejects.toThrowError(CallerWrongUsageException);
   });
 
   it('should delete preference restaurant', async () => {
@@ -114,6 +115,13 @@ describe('user service', () => {
       PreferenceCategory.EXCLUDED,
     );
     expect(preference).toHaveLength(1);
+  });
+
+  it('should throw caller wrong usage exception nickname', async () => {
+    await createUser(DTO.nickname);
+    await expect(validateNickName(DTO.nickname!)).rejects.toThrowError(
+      CallerWrongUsageException,
+    );
   });
 
   describe('[private] ', () => {
