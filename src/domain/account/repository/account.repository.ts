@@ -61,6 +61,10 @@ export async function getAccount(param: {
   return prismaClient.accounts.findFirst({ where: param });
 }
 
+export async function getAccountByUserId(userId: number) {
+  return prismaClient.accounts.findFirst({ where: { userId } });
+}
+
 export async function updateAccountById(
   id: number,
   param: {

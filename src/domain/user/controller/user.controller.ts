@@ -122,7 +122,7 @@ export class UserController {
       nickname: profile.user.nickname,
       area: profile.area,
       account: {
-        accountEmail: profile.authList.account.identification,
+        accountEmail: profile.account.identification,
       },
     });
   }

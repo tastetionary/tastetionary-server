@@ -4,6 +4,7 @@ import prismaClient from '@common/database/prisma';
 import {
   deleteAccountByUserId,
   getAccount,
+  getAccountByUserId,
   getToken,
   saveAccount,
   saveAccounts,
@@ -99,6 +100,20 @@ describe('account repository', () => {
       identification: data[0].identification,
       password: data[0].password,
     });
+    expect(account).not.toBeNull();
+  });
+
+  it('should save accounts', async () => {
+    const data = [
+      {
+        userId: 1,
+        category: AccountCategory.EMAIL,
+        identification: 'some@email.com',
+        password: 'one-way-decoded-password',
+      },
+    ];
+    await saveAccounts(data);
+    const account = await getAccountByUserId(data[0].userId);
     expect(account).not.toBeNull();
   });
 });

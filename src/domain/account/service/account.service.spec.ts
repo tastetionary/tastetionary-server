@@ -6,6 +6,7 @@ import {
   getAccount,
   removeAllAccount,
   findAccessToken,
+  searchAccount,
 } from '@domain/account/service/account.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import { getIdentification } from '@domain/account/repository/account.repository';
@@ -130,6 +131,19 @@ describe('account service', () => {
     await createAccount({ userId, ...dto });
 
     const res = await getIdentification(dto.identification, dto.category);
+    expect(res).not.toBeNull();
+  });
+
+  it('should save account', async () => {
+    const dto = {
+      identification: 'test',
+      password: 'pwd',
+      category: AccountCategory.EMAIL,
+    };
+    const userId = 666;
+    await createAccount({ userId, ...dto });
+
+    const res = await searchAccount(userId);
     expect(res).not.toBeNull();
   });
 });
