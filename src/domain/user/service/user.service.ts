@@ -65,7 +65,7 @@ export async function searchProfile(userId: number) {
 }
 
 export type UserEntity = Awaited<ReturnType<typeof searchUser>>;
-async function searchUser(userId: number) {
+export async function searchUser(userId: number) {
   const user = await getUserById(userId);
   return {
     ...user,
