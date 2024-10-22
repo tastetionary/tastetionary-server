@@ -10,6 +10,8 @@ import {
   AuthenticationState,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
+import { AccountEntity } from '@root/src/domain/account/service/account.service';
+import { AccountCategory } from '@root/src/domain/account/account.enum';
 type model = { id: number };
 const baseModel = define<model>({
   id: random,
@@ -17,13 +19,13 @@ const baseModel = define<model>({
 
 export function profileEntityFactory() {
   const user = userEntityFactory();
-  const authList = authEntityFactory({ userId: user.id });
+  const account = accountEntityFactory({ userId: user.id });
   const area = areaEntityFactory({ userId: user.id });
 
   return {
     user,
     area,
-    authList,
+    account,
   };
 }
 
@@ -52,6 +54,22 @@ export function authEntityFactory(param: {
         identification: `${random()}@ide.com`,
       };
     },
+  })();
+}
+
+export function accountEntityFactory(param: {
+  userId?: number;
+  identification?: string;
+  password?: string;
+}) {
+  return define<AccountEntity>({
+    id: random(),
+    userId: param.userId || random(),
+    identification: param.identification || `${random()}@ide.com`,
+    password: param.password || 'password',
+    category: AccountCategory.EMAIL,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   })();
 }
 

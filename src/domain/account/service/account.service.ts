@@ -5,6 +5,7 @@ import { CallerWrongUsageException } from '@common/exception/internal.exception'
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   deleteAccountByUserId,
+  getAccountByUserId,
   getIdentification,
   getToken,
   saveAccount,
@@ -52,6 +53,18 @@ export async function findAccount(
   } catch (error) {
     return null;
   }
+}
+
+export async function searchAccount(userId: number) {
+  const data = await getAccountByUserId(userId);
+  if (!data) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'no data',
+    );
+  }
+
+  return data;
 }
 
 export async function createAccount(param: {

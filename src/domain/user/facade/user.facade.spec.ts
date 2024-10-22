@@ -5,6 +5,7 @@ import {
   AgreementCategory,
   UserState,
 } from '@domain/user/user.enum';
+import { searchUser } from '@domain/user/service/user.service';
 import {
   getProfile,
   registerProfile,
@@ -31,7 +32,7 @@ describe('user facade', () => {
     });
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
     const dto: RegisterProfileRequest = {
-      nickname: 'nickname-1',
+      nickname: `nickname_${new Date().getMilliseconds()}`,
       area: {
         latitude: 1,
         longitude: 1,
@@ -53,11 +54,9 @@ describe('user facade', () => {
     };
 
     const user = await registerProfile(dto);
-
     await withdrawProfile(user.id, WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE);
-
-    const profile = await getProfile(user.id);
-    expect(profile.user.state).toEqual(UserState.WITHDRAWAL);
+    const res = await searchUser(user.id);
+    expect(res.state).toEqual(UserState.WITHDRAWAL);
   });
 
   it('registerProfile should create profile and auth list', async () => {
@@ -73,7 +72,7 @@ describe('user facade', () => {
     const accAuthId = (await changeAuthenticationAsDone(accAuth.id, '1234')).id;
 
     const dto: RegisterProfileRequest = {
-      nickname: 'nickname-2',
+      nickname: `nickname_${new Date().getMilliseconds()}`,
       area: {
         latitude: 1,
         longitude: 1,

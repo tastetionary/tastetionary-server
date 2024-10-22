@@ -8,7 +8,17 @@ export enum AgreementCategory {
 }
 
 export enum PreferenceCategory {
+  /**
+   * 북마크 식당
+   * @type string
+   * @example 'bookmark'
+   */
   BOOKMARK = 'bookmark',
+  /**
+   * 제외 식당
+   * @type string
+   * @example 'excluded'
+   */
   EXCLUDED = 'excluded',
 }
 

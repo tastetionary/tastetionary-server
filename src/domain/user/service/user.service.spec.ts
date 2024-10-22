@@ -19,10 +19,9 @@ import {
 } from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
-import * as restaurantService from '@domain/restaurant/service/restaurant.service';
-import * as userService from '@domain/user/service/user.service';
 import { getProfile } from '@domain/user/facade/user.facade';
-import { CallerWrongUsageException } from '@root/src/common/exception/internal.exception';
+import { CallerWrongUsageException } from '@common/exception/internal.exception';
+import { createAccount } from '@domain/account/service/account.service';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -58,6 +57,8 @@ describe('user service', () => {
 
   it('should change user state', async () => {
     const user = await createProfile(DTO);
+    const userId = user.id;
+    await createAccount({ userId, ...DTO.account });
     const expected = UserState.WITHDRAWAL;
     await changeUserState(user.id, expected);
 
@@ -67,6 +68,8 @@ describe('user service', () => {
 
   it('should change area', async () => {
     const user = await createProfile(DTO);
+    const userId = user.id;
+    await createAccount({ userId, ...DTO.account });
     await changeArea(user.id, {
       address: 'update activity',
       latitude: 100,
@@ -79,6 +82,8 @@ describe('user service', () => {
 
   it('should return user entity and essential field', async () => {
     const user = await createUser(DTO.nickname);
+    const userId = user.id;
+    await createAccount({ userId, ...DTO.account });
     const profileEntity = await searchProfile(user.id);
     expect(profileEntity).toHaveProperty('user');
   });

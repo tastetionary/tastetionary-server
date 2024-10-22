@@ -45,6 +45,7 @@ import {
 import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
+import { searchAccount } from '@domain/account/service/account.service';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -55,16 +56,16 @@ export async function searchProfile(userId: number) {
     );
   }
   const area = await searchAreas(userId);
-  const authList = await searchAuthList(userId);
+  const account = await searchAccount(userId);
   return {
     user,
     area,
-    authList,
+    account,
   };
 }
 
 export type UserEntity = Awaited<ReturnType<typeof searchUser>>;
-async function searchUser(userId: number) {
+export async function searchUser(userId: number) {
   const user = await getUserById(userId);
   return {
     ...user,
