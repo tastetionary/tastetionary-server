@@ -10,6 +10,7 @@ import {
   getPreferenceRestaurant,
   deleteUserPreferenceRestaurant,
   validateNickName,
+  isRestaurantInUserPreferences,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
 import {
@@ -31,6 +32,7 @@ describe('user service', () => {
       'accounts',
       'authentications',
       'authentication_histories',
+      'user_preferences',
     ]);
   });
 
@@ -120,6 +122,35 @@ describe('user service', () => {
       PreferenceCategory.EXCLUDED,
     );
     expect(preference).toHaveLength(1);
+  });
+
+  it('should validate preference restaurant', async () => {
+    const userId = 1;
+    const restaurantId = 1;
+    await createPreferenceRestaurant(
+      userId,
+      restaurantId,
+      PreferenceCategory.BOOKMARK,
+    );
+
+    const res = await isRestaurantInUserPreferences(
+      userId,
+      PreferenceCategory.BOOKMARK,
+      restaurantId,
+    );
+    expect(res).toEqual(true);
+  });
+
+  it('should validate preference restaurant', async () => {
+    const userId = 1;
+    const restaurantId = 1;
+
+    const res = await isRestaurantInUserPreferences(
+      userId,
+      PreferenceCategory.EXCLUDED,
+      restaurantId,
+    );
+    expect(res).toBeFalsy();
   });
 
   it('should throw caller wrong usage exception nickname', async () => {

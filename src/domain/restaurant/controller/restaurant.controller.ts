@@ -81,6 +81,8 @@ export interface GetRestaurantsOutput
   extends Omit<ExternalRestaurantInformationRecord, 'id' | 'externalUUID'> {
   id: string;
   externalUUID: string;
+  bookmark: boolean;
+  exclude: boolean;
   /**
    * aggregate data from review, if not reviewed, it will be null
    * @type AggregateReviewDTO
@@ -176,6 +178,8 @@ export class RestaurantController {
     return new BaseResponseDto({
       id: id.toString(),
       externalUUID: externalUUID.toString(),
+      bookmark: data.bookmark,
+      exclude: data.exclude,
       ...rest,
       aggregateReviews: data.aggregateReviews,
     });

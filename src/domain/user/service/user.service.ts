@@ -174,6 +174,20 @@ export async function getPreferenceRestaurant(
   return res;
 }
 
+export async function isRestaurantInUserPreferences(
+  userId: number,
+  category: PreferenceCategory,
+  restaurantId: number,
+) {
+  const preference = await getPreferencesByUserId(userId);
+  if (!preference) {
+    return false;
+  }
+
+  const restaurntIds = preference[PreferenceCategoryToColumnMapping[category]];
+  return restaurntIds.includes(restaurantId);
+}
+
 export async function createPreferenceRestaurant(
   userId: number,
   restaurantId: number,
