@@ -10,7 +10,10 @@ import {
 } from '@domain/restaurant/service/restaurant.service';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
-import { searchAreas } from '@domain/user/service/user.service';
+import {
+  isRestaurantInUserPreferences,
+  searchAreas,
+} from '@domain/user/service/user.service';
 import {
   ExternalRestaurantInformationDTO,
   RestaurantReviewDTO,
@@ -20,6 +23,7 @@ import {
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import { REACTION_TYPE } from '@prisma/client';
+import { PreferenceCategory } from '@domain/user/user.enum';
 
 export async function getRecommendations(param: {
   userId: number;
@@ -38,7 +42,23 @@ export async function getRecommendations(param: {
     );
   }
 
-  return getRecommendedRestaurant({ userAreas, ...param });
+  const res = await getRecommendedRestaurant({ userAreas, ...param });
+  const isBookmarked = await isRestaurantInUserPreferences(
+    param.userId,
+    PreferenceCategory.BOOKMARK,
+    Number(res.restaurant.id),
+  );
+  const isExcluded = await isRestaurantInUserPreferences(
+    param.userId,
+    PreferenceCategory.EXCLUDED,
+    Number(res.restaurant.id),
+  );
+
+  return {
+    ...res,
+    bookmark: isBookmarked,
+    exclude: isExcluded,
+  };
 }
 
 export async function getNearByRestaurants(param: {
