@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { UnauthorizedException } from '@nestjs/common';
+import { SocialLoginInfo } from '@domain/account/dto/account.dto';
 
 // https://developers.naver.com/docs/login/profile/profile.md
 export async function getNaverUserInfo(code: string) {
@@ -11,7 +12,13 @@ export async function getNaverUserInfo(code: string) {
         Authorization: `Bearer ${token}`,
       },
     });
-    return userInfoResponse.data;
+
+    const res: SocialLoginInfo = {
+      email: userInfoResponse.data.response.email,
+      id: userInfoResponse.data.response.id,
+    };
+
+    return res;
   } catch (error) {
     console.error(
       'Error fetching Naver user info:',
@@ -25,7 +32,9 @@ async function getAccessToken(code: string) {
   const tokenUrl = 'https://nid.naver.com/oauth2.0/token';
   const data = {
     grant_type: 'authorization_code',
-    client_id: process.env.NAVER_CLINET_ID,
+    client_id: process.env.NAVER_CLIENT_ID,
+    redirect_uri: process.env.NAVER_REDIRECT_URI,
+    client_secret: process.env.NAVER_CLIENT_SECRET,
     code: code,
   };
 
