@@ -41,6 +41,7 @@ async function getAccessToken(code: string) {
 
     return response.data.access_token;
   } catch (error) {
+    console.error(error);
     throw new UnauthorizedException(
       'Failed to get access token from google: ' + error,
     );
