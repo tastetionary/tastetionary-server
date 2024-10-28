@@ -352,12 +352,13 @@ export class RestaurantController {
     @Request() req,
     @Query('reviewer_id', ParseIntPipe) reviewer_id: number,
   ): Promise<BaseResponseDto<ReviewsByUser>> {
-    const reviews = await getReviewsByUserId({
+    const { user, reviews } = await getReviewsByUserId({
       reviewerId: reviewer_id,
       userId: req.user.userId,
     });
 
     return new BaseResponseDto({
+      user,
       reviews,
     });
   }
