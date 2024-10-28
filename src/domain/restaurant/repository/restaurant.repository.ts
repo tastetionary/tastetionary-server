@@ -23,6 +23,11 @@ export interface RestaurantReviewRecord {
   reactions?: RestaurantReviewReactionSummaryRecord[];
 }
 
+/**
+ * Distinct number of reactions for each reaction type (L: '도움이 돼요', D: '도움이 안돼요')
+ * example: { [REACTION_TYPE.L]: 10, [REACTION_TYPE.D]: 2 }
+ * @type Record<REACTION_TYPE, number>
+ */
 export type RestaurantReviewRxnDistinctCnt = Record<REACTION_TYPE, number>;
 
 export interface RestaurantReviewReactionRecord {
@@ -184,6 +189,7 @@ export async function getReviewsByConditions(param: {
   keywords?: string[];
   ltePrice?: number;
   categories?: RestaurantCategory[];
+  reviewerId?: number;
 }): Promise<RestaurantReviewRecord[]> {
   const condition = {};
 
@@ -205,6 +211,10 @@ export async function getReviewsByConditions(param: {
     condition['category'] = {
       in: param.categories,
     };
+  }
+
+  if (param.reviewerId) {
+    condition['userId'] = { eq: param.reviewerId };
   }
 
   const res = await prismaClient.restaurantReviews.findMany({

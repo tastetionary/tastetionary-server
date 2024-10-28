@@ -7,6 +7,7 @@ import {
   getRestaurantReviews,
   reportRestaurantReview,
   upsertRestaurantReviewRxn,
+  getRestaurantReviewsByUserId,
 } from '@domain/restaurant/service/restaurant.service';
 import { ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
@@ -100,6 +101,13 @@ export async function getReviews(param: {
   userId?: number;
 }) {
   return await getRestaurantReviews(param.restaurantId, param.userId);
+}
+
+export async function getReviewsByUserId(param: {
+  reviewerId: number;
+  userId: number;
+}) {
+  return await getRestaurantReviewsByUserId(param.reviewerId, param.userId);
 }
 
 export async function reportReview(param: {

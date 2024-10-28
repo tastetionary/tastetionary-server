@@ -363,6 +363,24 @@ export async function getRestaurantReviews(
   };
 }
 
+export async function getRestaurantReviewsByUserId(
+  reviewerId: number,
+  userId?: number,
+) {
+  const reviews = await getReviewsByConditions({
+    reviewerId,
+  });
+
+  return reviews.map(async (review) => {
+    const { reactions = [], ...record } = review;
+    return {
+      ...record,
+      reviewReactionCnt: getRestaurantRxnDistinctCnt(reactions),
+      userReaction: userId ? getUserReviewReaction(reactions, userId) : null,
+    };
+  });
+}
+
 export function getSearchOptions() {
   return getRestaurantOptionsRecord();
 }
