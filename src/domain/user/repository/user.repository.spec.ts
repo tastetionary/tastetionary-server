@@ -23,7 +23,10 @@ describe('user repository', () => {
     const data = {
       userId: 99,
       category: 'withdrawal' as const,
-      type: WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
+      types: [
+        WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
+        WithdrawalTypeEnum.INCONVENIENT_USAGE,
+      ],
       opinion: 'kk',
     };
 

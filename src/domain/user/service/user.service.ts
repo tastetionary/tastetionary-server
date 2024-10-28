@@ -289,7 +289,7 @@ export async function changeUserState(userId: number, state: UserState) {
 export async function createUserOpinion(params: {
   userId: number;
   category: OpinionCategory;
-  type: WithdrawalTypeEnum;
+  types: WithdrawalTypeEnum[];
   opinion?: string;
 }) {
   await saveOpinion(params);

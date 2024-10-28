@@ -48,7 +48,7 @@ describe('user controller', () => {
     const res = await request(app.getHttpServer())
       .delete('/v1/user')
       .send({
-        type: WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
+        types: [WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE],
         opinion: 'good bye',
       })
       .set('Authorization', `Bearer ${token}`);

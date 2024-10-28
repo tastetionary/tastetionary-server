@@ -74,7 +74,7 @@ export interface UserOpinion {
   id: number;
   userId: number;
   category: string;
-  type: string;
+  types: string[];
   opinion: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -83,7 +83,7 @@ export interface UserOpinion {
 export async function saveOpinion(param: {
   userId: number;
   category: OpinionCategory;
-  type: WithdrawalTypeEnum;
+  types: WithdrawalTypeEnum[];
   opinion?: string;
 }): Promise<UserOpinion> {
   return prismaClient.userOpinions.create({ data: param });
