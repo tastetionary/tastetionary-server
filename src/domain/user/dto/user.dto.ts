@@ -10,7 +10,7 @@ export interface WithdrawUserDto {
    * user data, not essential
    * @type WithdrawalTypeEnum
    */
-  type: WithdrawalTypeEnum;
+  types: WithdrawalTypeEnum[];
 }
 
 export interface PreferneceDto {

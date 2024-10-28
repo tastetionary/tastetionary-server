@@ -194,7 +194,7 @@ model UserOpinions {
   /// 의견 수집 이벤트, 탈퇴시, 가입시 등
   category  String   @map("category") @db.VarChar(32)
   /// 의견 1차 분류
-  type      String   @map("type") @db.VarChar(64)
+  types     String[] @default([]) @map("type") @db.VarChar(64)
   /// 상세의견
   opinion   String?  @map("opinion") @db.VarChar(1024)
   createdAt DateTime @default(now()) @map("created_at")
@@ -203,8 +203,7 @@ model UserOpinions {
   @@unique([userId, category])
   @@index([userId])
   @@index([category])
-  @@index([type])
-  @@index([category, type])
+  @@index([types])
   @@map("user_opinions")
 }
 

@@ -54,7 +54,10 @@ describe('user facade', () => {
     };
 
     const user = await registerProfile(dto);
-    await withdrawProfile(user.id, WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE);
+    await withdrawProfile(user.id, [
+      WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
+      WithdrawalTypeEnum.INFREQUENTLY_USE,
+    ]);
     const res = await searchUser(user.id);
     expect(res.state).toEqual(UserState.WITHDRAWAL);
   });

@@ -47,9 +47,9 @@ export async function registerProfile(dto: RegisterProfileRequest) {
 
 export async function withdrawProfile(
   userId: number,
-  type: WithdrawalTypeEnum,
+  types: WithdrawalTypeEnum[],
 ) {
-  await createUserOpinion({ userId, category: 'withdrawal', type });
+  await createUserOpinion({ userId, category: 'withdrawal', types });
   await changeUserState(userId, UserState.WITHDRAWAL);
   await removeAllAccount(userId);
   await removeAllToken(userId);
