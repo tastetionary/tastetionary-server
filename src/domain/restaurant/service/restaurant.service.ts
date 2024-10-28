@@ -364,13 +364,13 @@ export async function getRestaurantReviewsByUserId(
   reviewerId: number,
   userId?: number,
 ) {
-  const [reviews, user] = await Promise.all([
+  const [reviewRecords, user] = await Promise.all([
     getReviewsByConditions({ reviewerId }),
     getReviewerSummary(reviewerId),
   ]);
 
   return {
-    reviews: reviews.map(async (review) => {
+    reviews: reviewRecords.map((review) => {
       const { reactions = [], ...record } = review;
       return {
         ...record,

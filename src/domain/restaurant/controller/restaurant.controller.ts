@@ -175,9 +175,9 @@ export interface ReviewsByUser {
   /**
    * List of reviews posted by the reviewer
    * example: []
-   * @type Array<Exclude<RestaurantReview, 'user'>>
+   * @type Array<Omit<RestaurantReview, 'user'>>
    */
-  reviews: Array<Exclude<RestaurantReview, 'user'>>;
+  reviews: Array<Omit<RestaurantReview, 'user'>>;
 }
 
 export interface UserReaction
@@ -348,9 +348,9 @@ export class RestaurantController {
   @UseGuards(AuthGuard)
   @HttpCode(200)
   @TypedRoute.Get('/reviewer/:reviewer_id/review')
-  async getMyReviews(
+  async getRestaurantReviewsByUserId(
     @Request() req,
-    @Query('reviewer_id', ParseIntPipe) reviewer_id: number,
+    @Param('reviewer_id', ParseIntPipe) reviewer_id: number,
   ): Promise<BaseResponseDto<ReviewsByUser>> {
     const { user, reviews } = await getReviewsByUserId({
       reviewerId: reviewer_id,
@@ -359,7 +359,12 @@ export class RestaurantController {
 
     return new BaseResponseDto({
       user,
-      reviews,
+      reviews: reviews.map((review) => ({
+        ...review,
+        id: review.id.toString(),
+        external_restaurant_information_id:
+          review.external_restaurant_information_id.toString(),
+      })),
     });
   }
 
