@@ -60,8 +60,6 @@ $ npm install
 
 ## DB migration
 
-.env is for database only
-
 ### run migrate
 
 ```bash
