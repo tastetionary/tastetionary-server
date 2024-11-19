@@ -209,16 +209,6 @@ jobs:
         run: |
           npm install
 
-      - name: Copy source code to server
-        uses: appleboy/scp-action@v0.1.1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          source: "."
-          target: "/home/${{ secrets.SSH_USERNAME }}/app"
-
       - name: SSH and run migrations
         uses: appleboy/ssh-action@master
         with:
@@ -232,7 +222,7 @@ jobs:
             npx prisma migrate deploy
             echo "migrations completed!"
             echo "cleaning up files..."
-            rm -rf /home/${{ secrets.SSH_USERNAME }}/app
+            rm -rf tastetionary-server
             echo "source code removed!"
 
       - name: SSH and run docker container
