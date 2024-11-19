@@ -214,9 +214,16 @@ describe('user controller', () => {
 
   it('update nickname request with valid value should return success', async () => {
     jest.spyOn(userService, 'updateProfile').mockResolvedValueOnce();
+    jest.spyOn(userService, 'validateNickName').mockResolvedValueOnce();
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(122, key, {
+      expiresIn: '10h',
+    });
 
     const res = await request(app.getHttpServer())
       .put('/v1/user/profile')
+      .set('Authorization', `Bearer ${token}`)
       .send({ nickname: 'valid' });
     expect(res.statusCode).toEqual(200);
   });

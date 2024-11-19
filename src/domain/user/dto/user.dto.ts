@@ -120,7 +120,7 @@ export interface UpdateProfileRequestDto {
    * @type string
    * @minLength 3
    * @maxLength 10
-   * @pattern /^[\p{Script=Hangul}\p{Script=Latin}0-9]{3,10}$/u
+   * @pattern ^[ㄱ-ㅎ가-힣a-zA-Z0-9]{3,10}$
    */
   nickname?: string;
 }
