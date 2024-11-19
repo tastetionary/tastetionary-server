@@ -3,7 +3,7 @@ import {
   OpinionCategory,
   UserState,
 } from '@domain/user/user.enum';
-import { Prisma } from '@prisma/client';
+import { Prisma, Users } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
 import { ErrorContents } from '@common/exception/internal.exception';
@@ -27,6 +27,16 @@ export async function saveUser(param: {
   property: Record<string, any>;
 }) {
   return prismaClient.users.create({ data: param });
+}
+
+export async function updateUser(param: {
+  userId: number;
+  data: Partial<{ nickname: string }>;
+}) {
+  return prismaClient.users.update({
+    where: { id: param.userId },
+    data: param.data,
+  });
 }
 
 export async function saveUsers(
