@@ -1,11 +1,15 @@
 import { AccountCategory } from '@domain/account/account.enum';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
+import * as userService from '@domain/user/service/user.service';
 import {
   WithdrawalTypeEnum,
   AgreementCategory,
   UserState,
 } from '@domain/user/user.enum';
-import { searchUser } from '@domain/user/service/user.service';
+import {
+  validateNickName,
+  searchUser,
+} from '@domain/user/service/user.service';
 import {
   getProfile,
   registerProfile,
@@ -52,7 +56,7 @@ describe('user facade', () => {
         },
       ],
     };
-
+    jest.spyOn(userService, 'validateNickName').mockResolvedValueOnce();
     const user = await registerProfile(dto);
     await withdrawProfile(user.id, [
       WithdrawalTypeEnum.FOUND_SIMILAR_SERVICE,
@@ -94,7 +98,7 @@ describe('user facade', () => {
         },
       ],
     };
-
+    jest.spyOn(userService, 'validateNickName').mockResolvedValueOnce();
     const user = await registerProfile(dto);
 
     const profile = await getProfile(user.id);
