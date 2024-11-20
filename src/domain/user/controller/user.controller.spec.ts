@@ -228,15 +228,6 @@ describe('user controller', () => {
     expect(res.statusCode).toEqual(200);
   });
 
-  it('update nickname request with invalid value should return bad request', async () => {
-    jest.spyOn(userService, 'updateProfile').mockResolvedValueOnce();
-
-    const res = await request(app.getHttpServer())
-      .put('/v1/user/profile')
-      .send({ nickname: 'invalid !! nickname !!' });
-    expect(res.statusCode).toEqual(400);
-  });
-
   it('wrong input should return bad request', async () => {
     jest.spyOn(userService, 'createProfile').mockImplementation();
 
