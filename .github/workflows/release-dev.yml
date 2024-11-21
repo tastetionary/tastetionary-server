@@ -8,6 +8,31 @@ on:
       - develop
 
 jobs:
+  migration-test:
+    runs-on: self-hosted
+    if: always()
+    needs: [ build_and_push_test, build_and_push ]
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: SSH and run migrations
+        run : |
+          echo "running migrations..."
+          npx prisma migrate deploy
+          echo "migrations completed!"
+
   test:
     runs-on: ubuntu-latest
     strategy:
