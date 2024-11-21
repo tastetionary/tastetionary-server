@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
+          npm ci
       - name: Run tests
         run: |
           cp .env.sample .env
@@ -207,7 +207,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
+          npm ci
 
       - name: SSH and run migrations
         run : |
