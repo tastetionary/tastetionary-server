@@ -8,21 +8,6 @@ on:
       - develop
 
 jobs:
-  migration-test:
-    runs-on: self-hosted
-    env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: 'true'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: SSH and run migrations
-        run : |
-          echo "DATABASE_URL=${{ secrets.DATABASE_DEV_URL }}" >> .env
-          echo "running migrations..."
-          npx prisma migrate deploy
-          echo "migrations completed!"
-
   test:
     runs-on: ubuntu-latest
     strategy:
