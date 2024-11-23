@@ -18,6 +18,7 @@ jobs:
 
       - name: SSH and run migrations
         run : |
+          echo "DATABASE_URL=${{ secrets.DATABASE_DEV_URL }}" >> .env
           echo "running migrations..."
           npx prisma migrate deploy
           echo "migrations completed!"
