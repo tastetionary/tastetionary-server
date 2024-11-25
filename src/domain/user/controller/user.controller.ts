@@ -80,6 +80,7 @@ export class UserController {
    * @summary update user's profile info
    */
   @HttpCode(200)
+  @UseGuards(AuthGuard)
   @TypedRoute.Put('/profile')
   @TypedException<BadRequestExceptionResponse>({
     status: 400,
