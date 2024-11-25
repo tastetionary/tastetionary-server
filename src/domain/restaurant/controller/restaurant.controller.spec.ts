@@ -319,4 +319,20 @@ describe('restaurant controller', () => {
 
     assertStatusCode(res, 201);
   });
+
+  it('/reviewer/:reviewer_id/review should return 200', async () => {
+    const userId = 123;
+    jest
+      .spyOn(restaurantService, 'getRestaurantReviewsByUserId')
+      .mockResolvedValueOnce({
+        reviews: [],
+        user: { id: 123, reviews: 0, nickname: 'test' },
+      });
+
+    const res = await request(app.getHttpServer())
+      .get(`/v1/restaurant/reviewer/${userId}/review`)
+      .set('Authorization', 'Bearer master-tastionary');
+
+    assertStatusCode(res, 200);
+  });
 });

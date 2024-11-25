@@ -9,6 +9,7 @@ import {
   getReviews,
   getSearchOptions,
   getRestaurantReviews,
+  getRestaurantReviewsByUserId,
   _private,
 } from '@domain/restaurant/service/restaurant.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
@@ -212,6 +213,20 @@ describe('restaurant service', () => {
       const res = await getRestaurantReviews(restaurantId);
       expect(res).not.toBeNull();
       expect(res.data).toHaveLength(1);
+    });
+  });
+
+  describe('getRestaurantReviewsByUserId', () => {
+    it("should get my reviews using the reviewer's user id", async () => {
+      const profile = profileEntityFactory();
+      const reviewerId = profile.user.id;
+      const review = restaurantReviewRecordFactory({ userId: reviewerId });
+      jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValue([review]);
+      jest.spyOn(userService, 'searchProfile').mockResolvedValueOnce(profile);
+
+      const res = await getRestaurantReviewsByUserId(999, 999);
+      expect(res).not.toBeNull();
+      expect(res.reviews).toHaveLength(1);
     });
   });
 });
