@@ -16,6 +16,7 @@ import {
   PreferneceDto,
   ProfileResponse,
   RegisterProfileRequest,
+  UpdateProfileRequestDto,
   WithdrawUserDto,
 } from '@domain/user/dto/user.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
@@ -26,6 +27,7 @@ import {
   getPreferenceRestaurant,
   deleteUserPreferenceRestaurant,
   validateNickName,
+  updateProfile,
 } from '@domain/user/service/user.service';
 import {
   getProfile,
@@ -75,6 +77,50 @@ export class UserController {
 
   /**
    * @tag user
+   * @summary update user's profile info
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Put('/profile')
+  @TypedException<BadRequestExceptionResponse>({
+    status: 400,
+    description: 'invalid nickname',
+    examples: {
+      'duplicate nickname': {
+        statusCode: 400,
+        timestamp: new Date().toISOString(),
+        path: '/v1/user/nickname/validation',
+        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+        originMessage: 'duplicate nickname',
+      },
+      'invalid nickname': {
+        statusCode: 400,
+        timestamp: new Date().toISOString(),
+        path: '/v1/user/nickname/validation',
+        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+        originMessage: 'invalid nickname',
+      },
+      'invalid nickname(range or forbidden characters)': {
+        statusCode: 400,
+        timestamp: new Date().toISOString(),
+        path: '/v1/user/nickname/validation',
+        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+        originMessage:
+          'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
+      },
+    },
+  })
+  async updateProfile(
+    @Request() req,
+    @TypedBody() dto: UpdateProfileRequestDto,
+  ): Promise<BaseResponseDto<object>> {
+    if (dto.nickname) await validateNickName(dto.nickname);
+    await updateProfile(req.user.userId, dto);
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag user
    * @summary 닉네임 체크
    */
   @HttpCode(200)
@@ -96,6 +142,14 @@ export class UserController {
         path: '/v1/user/nickname/validation',
         category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
         originMessage: 'invalid nickname',
+      },
+      'invalid nickname(range or forbidden characters)': {
+        statusCode: 400,
+        timestamp: new Date().toISOString(),
+        path: '/v1/user/nickname/validation',
+        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+        originMessage:
+          'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
       },
     },
   })

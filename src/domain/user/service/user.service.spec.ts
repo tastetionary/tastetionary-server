@@ -153,9 +153,27 @@ describe('user service', () => {
     expect(res).toBeFalsy();
   });
 
-  it('should throw caller wrong usage exception nickname', async () => {
+  it('should throw caller wrong usage exception nickname when the value already exists', async () => {
     await createUser(DTO.nickname);
     await expect(validateNickName(DTO.nickname!)).rejects.toThrowError(
+      CallerWrongUsageException,
+    );
+  });
+
+  it('should throw caller wrong usage exception nickname when the value length < 3', async () => {
+    await expect(validateNickName('no')).rejects.toThrowError(
+      CallerWrongUsageException,
+    );
+  });
+
+  it('should throw caller wrong usage exception nickname when the value length > 10', async () => {
+    await expect(validateNickName('longerThan10')).rejects.toThrowError(
+      CallerWrongUsageException,
+    );
+  });
+
+  it('should throw caller wrong usage exception nickname when the value contains characters other than korean/english/numbers', async () => {
+    await expect(validateNickName('특수!문자?')).rejects.toThrowError(
       CallerWrongUsageException,
     );
   });

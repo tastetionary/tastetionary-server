@@ -2,6 +2,7 @@ import {
   AgreementDTO,
   AreaDto,
   RegisterProfileRequest,
+  UpdateProfileRequestDto,
 } from '@domain/user/dto/user.dto';
 import {
   WithdrawalTypeEnum,
@@ -26,6 +27,7 @@ import {
   getUserByNickname,
   saveOpinion,
   saveUser,
+  updateUser,
   updateUserById,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
@@ -120,6 +122,13 @@ export async function createProfile(dto: RegisterProfileRequest) {
   await createAreas(user.id, dto.area);
 
   return user;
+}
+
+export async function updateProfile(
+  userId: number,
+  dto: UpdateProfileRequestDto,
+) {
+  await updateUser({ userId, data: dto });
 }
 
 async function createAreas(userId: number, dto: AreaDto) {
@@ -230,6 +239,15 @@ export async function deleteUserPreferenceRestaurant(
 }
 
 export async function validateNickName(nickname: string) {
+  const nickNameRegExp = /^[\p{Script=Hangul}\p{Script=Latin}0-9]{3,10}$/u;
+
+  if (!nickNameRegExp.test(nickname)) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
+    );
+  }
+
   await pipe(
     nickname,
     checkNickNameValidity,

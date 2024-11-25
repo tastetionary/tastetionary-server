@@ -41,8 +41,10 @@ export interface RegisterProfileRequest {
   agreements: AgreementDTO[];
 
   /**
-   * user nickname
+   * user nickname (customized by user)
    * @type string
+   * @minLength 3
+   * @maxLength 10
    */
   nickname?: string;
 }
@@ -109,4 +111,14 @@ export interface ProfileResponse {
   account: {
     accountEmail: string;
   };
+}
+
+export interface UpdateProfileRequestDto {
+  /**
+   * user nickname (customized by user)
+   * @type string
+   * @minLength 3
+   * @maxLength 10
+   */
+  nickname?: string;
 }
