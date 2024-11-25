@@ -1,3 +1,4 @@
+import { ReviewerSummary } from '@domain/restaurant/controller/restaurant.controller';
 import {
   AggregateReviewDTO,
   ExternalRestaurantInformationDTO,
@@ -337,14 +338,10 @@ export async function getRestaurantReviews(
   const data = await Promise.all(
     reviews.map(async (review) => {
       const { reactions = [], ...record } = review;
-      const profile = await searchProfile(review.userId);
-      const count = await getUserReviewCount(review.userId);
+      const user = await getReviewerSummary(review.userId);
+
       return {
-        user: {
-          id: profile.user.id,
-          nickname: profile.user.nickname,
-          reviews: count,
-        },
+        user,
         ...record,
         keywords: attachEmoji(review.keywords),
         reviewReactionCnt: getRestaurantRxnDistinctCnt(reactions),
@@ -360,6 +357,40 @@ export async function getRestaurantReviews(
       keywordCounts: keywordList,
     },
     data,
+  };
+}
+
+export async function getRestaurantReviewsByUserId(
+  reviewerId: number,
+  userId?: number,
+) {
+  const [reviewRecords, user] = await Promise.all([
+    getReviewsByConditions({ reviewerId }),
+    getReviewerSummary(reviewerId),
+  ]);
+
+  return {
+    reviews: reviewRecords.map((review) => {
+      const { reactions = [], ...record } = review;
+      return {
+        ...record,
+        reviewReactionCnt: getRestaurantRxnDistinctCnt(reactions),
+        userReaction: userId ? getUserReviewReaction(reactions, userId) : null,
+      };
+    }),
+    user,
+  };
+}
+
+async function getReviewerSummary(userId: number): Promise<ReviewerSummary> {
+  const [profile, count] = await Promise.all([
+    searchProfile(userId),
+    getUserReviewCount(userId),
+  ]);
+  return {
+    id: profile.user.id,
+    nickname: profile.user.nickname,
+    reviews: count,
   };
 }
 

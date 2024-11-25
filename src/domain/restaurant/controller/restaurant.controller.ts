@@ -43,6 +43,7 @@ import {
   reportReview,
   getNearByRestaurants,
   reactToRestaurantReview,
+  getReviewsByUserId,
 } from '@domain/restaurant/facade/restaurant.facade';
 import { REACTION_TYPE } from '@prisma/client';
 
@@ -105,6 +106,29 @@ export interface GetNearByRestaurantsOutput
   aggregateReviews: ReviewAggregateData;
 }
 
+export interface ReviewerSummary {
+  /**
+   * Reviewer's User ID
+   * example: 1
+   * @type number
+   */
+  id: number;
+
+  /**
+   * user's nickname
+   * example: text_nickname
+   * @type string
+   */
+  nickname: string;
+
+  /**
+   * Number of total reviews by the user
+   * example: 20
+   * @type number
+   */
+  reviews: number;
+}
+
 export interface RestaurantReview
   extends Omit<
     RestaurantReviewRecord,
@@ -117,13 +141,43 @@ export interface RestaurantReview
   > {
   id: string;
   external_restaurant_information_id: string;
-  user: {
-    id: number;
-    nickname: string;
-    reviews: number;
-  };
+
+  /**
+   * Reviewer's Info
+   * example: { id: 1, nickname: 'test_nickname', reviews: 20 }
+   * @type ReviewerSummary
+   */
+  user: ReviewerSummary;
+
+  /**
+   * Distinct number of review reactions for each reaction type (L: '도움이 돼요', D: '도움이 안돼요')
+   * example: { [REACTION_TYPE.L]: 10, [REACTION_TYPE.D]: 2 }
+   * @type RestaurantReviewRxnDistinctCnt
+   */
   reviewReactionCnt: RestaurantReviewRxnDistinctCnt;
+
+  /**
+   * Current's user's existing reaction type to the review
+   * example: REACTION_TYPE.L
+   * @type REACTION_TYPE | null
+   */
   userReaction: REACTION_TYPE | null;
+}
+
+export interface ReviewsByUser {
+  /**
+   * Reviewer's Info
+   * example: { id: 1, nickname: 'test_nickname', reviews: 20 }
+   * @type ReviewerSummary
+   */
+  user: ReviewerSummary;
+
+  /**
+   * List of reviews posted by the reviewer
+   * example: []
+   * @type Array<Omit<RestaurantReview, 'user'>>
+   */
+  reviews: Array<Omit<RestaurantReview, 'user'>>;
 }
 
 export interface UserReaction
@@ -133,6 +187,19 @@ export interface UserReaction
   > {}
 
 export interface GetRestaurantReviewOutput {
+  /**
+   * keyword reviews
+   * @type KeywordReviews
+   */
+  keywordReviews: KeywordReviews;
+  /**
+   * restaurant reviews
+   * @type RestaurantReview
+   */
+  reviews: RestaurantReview[];
+}
+
+export interface GetReviewsByUserIdOutput {
   /**
    * keyword reviews
    * @type KeywordReviews
@@ -270,6 +337,34 @@ export class RestaurantController {
     return new BaseResponseDto({
       keywordReviews,
       reviews: reviews,
+    });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary get reviews by user id
+   * @security bearer
+   */
+  @UseGuards(AuthGuard)
+  @HttpCode(200)
+  @TypedRoute.Get('/reviewer/:reviewer_id/review')
+  async getRestaurantReviewsByUserId(
+    @Request() req,
+    @Param('reviewer_id', ParseIntPipe) reviewer_id: number,
+  ): Promise<BaseResponseDto<ReviewsByUser>> {
+    const { user, reviews } = await getReviewsByUserId({
+      reviewerId: reviewer_id,
+      userId: req.user.userId,
+    });
+
+    return new BaseResponseDto({
+      user,
+      reviews: reviews.map((review) => ({
+        ...review,
+        id: review.id.toString(),
+        external_restaurant_information_id:
+          review.external_restaurant_information_id.toString(),
+      })),
     });
   }
 
