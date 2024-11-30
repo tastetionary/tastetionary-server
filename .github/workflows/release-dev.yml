@@ -200,13 +200,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: SSH and run migrations
-        run : |
-          echo "DATABASE_URL=${{ secrets.DATABASE_DEV_URL }}" >> .env
-          echo "running migrations..."
-          npx prisma migrate deploy
-          echo "migrations completed!"
-
       - name: SSH and run docker container
         uses: appleboy/ssh-action@master
         with:
