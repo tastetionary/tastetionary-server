@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import {
   ErrorCategoryEnum,
+  ErrorCodeEnum,
   ErrorSubCategoryEnum,
 } from '@common/exception/enum';
 
 export interface ErrorContents {
   subCategory: ErrorSubCategoryEnum;
   message: string;
+  errorCode: ErrorCodeEnum;
   hint?: string;
 }
 
@@ -25,15 +27,17 @@ export class BaseException extends HttpException {
   private readonly _category: ErrorCategoryEnum;
   private readonly _hint?: string;
   private readonly _loggedData?: loggedData;
+  private readonly _errorCode?: ErrorCodeEnum;
   constructor(
     category: ErrorCategoryEnum,
     name: ErrorSubCategoryEnum,
     message: string,
+    errorCode: ErrorCodeEnum,
     hint?: string,
     loggedData?: loggedData,
   ) {
     super(
-      HttpException.createBody({ category, name, message }),
+      HttpException.createBody({ category, name, errorCode, message }),
       HttpStatus.BAD_REQUEST,
     );
     this.name = name;
@@ -41,6 +45,7 @@ export class BaseException extends HttpException {
     this._category = category;
     this._hint = hint;
     this._loggedData = loggedData;
+    this._errorCode = errorCode;
   }
 
   get category(): ErrorCategoryEnum {
@@ -54,6 +59,10 @@ export class BaseException extends HttpException {
   get loggedData(): loggedData | undefined {
     return this._loggedData;
   }
+
+  get errorCode(): ErrorCodeEnum | undefined {
+    return this._errorCode;
+  }
 }
 
 export class CallerWrongUsageException extends BaseException {
@@ -62,11 +71,13 @@ export class CallerWrongUsageException extends BaseException {
     message: string,
     hint?: string,
     loggedData?: loggedData,
+    errorCode: ErrorCodeEnum = ErrorCodeEnum.INVALID_INPUT,
   ) {
     super(
       ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
       name,
       message,
+      errorCode,
       hint,
       loggedData,
     );
@@ -79,11 +90,13 @@ export class CallerWrongDomainRuleException extends BaseException {
     message: string,
     hint?: string,
     loggedData?: loggedData,
+    errorCode: ErrorCodeEnum = ErrorCodeEnum.RESOURCE_NOT_FOUND,
   ) {
     super(
       ErrorCategoryEnum.CALLER_WRONG_DOMAIN_ERROR,
       name,
       message,
+      errorCode,
       hint,
       loggedData,
     );
@@ -96,11 +109,13 @@ export class SupplierSystemException extends BaseException {
     message: string,
     hint?: string,
     loggedData?: loggedData,
+    errorCode: ErrorCodeEnum = ErrorCodeEnum.RESOURCE_NOT_FOUND,
   ) {
     super(
       ErrorCategoryEnum.SUPPLIER_SYSTEM_ERROR,
       name,
       message,
+      errorCode,
       hint,
       loggedData,
     );
@@ -113,11 +128,13 @@ export class InternalDomainException extends BaseException {
     message: string,
     hint?: string,
     loggedData?: loggedData,
+    errorCode: ErrorCodeEnum = ErrorCodeEnum.INTERNAL_SERVER_ERROR,
   ) {
     super(
       ErrorCategoryEnum.INTERNAL_DOMAIN_ERROR,
       name,
       message,
+      errorCode,
       hint,
       loggedData,
     );
