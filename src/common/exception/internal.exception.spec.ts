@@ -13,6 +13,7 @@ describe('exception', () => {
     const error = new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'message',
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
       'hint',
       {
         userId: 'userId',
