@@ -5,7 +5,10 @@ import {
 } from '@domain/authentication/authentication.enum';
 import { Prisma } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
-import { ErrorSubCategoryEnum } from '@root/src/common/exception/enum';
+import {
+  ErrorCodeEnum,
+  ErrorSubCategoryEnum,
+} from '@root/src/common/exception/enum';
 import { InternalDomainException } from '@root/src/common/exception/internal.exception';
 import * as E from 'fp-ts/Either';
 export interface AuthenticationHistoryRecord {
@@ -179,12 +182,17 @@ export async function deleteAuthenticationByUserId(userId: number) {
         new InternalDomainException(
           ErrorSubCategoryEnum.INTERNAL_ERROR,
           e.message,
+          ErrorCodeEnum.INTERNAL_SERVER_ERROR,
           e.code,
         ),
       );
     }
     return E.left(
-      new InternalDomainException(ErrorSubCategoryEnum.INTERNAL_ERROR, e),
+      new InternalDomainException(
+        ErrorSubCategoryEnum.INTERNAL_ERROR,
+        e,
+        ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+      ),
     );
   }
 }
