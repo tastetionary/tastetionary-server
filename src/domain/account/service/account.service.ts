@@ -2,7 +2,7 @@ import { add } from 'date-fns';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   deleteAccountByUserId,
   getAccountByUserId,
@@ -34,6 +34,7 @@ export async function getAccount(
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'no data',
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
     );
   }
   const { category, ...rest } = data;
@@ -61,6 +62,7 @@ export async function searchAccount(userId: number) {
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'no data',
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
     );
   }
 
@@ -77,8 +79,8 @@ export async function createAccount(param: {
   if (accountEntity) {
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
-      'duplicated identification',
-      'already registered identification, change other identification',
+      'duplicate identification',
+      ErrorCodeEnum.DUPLICATE_IDENTIFICATION,
     );
   }
 
@@ -121,6 +123,7 @@ export async function createToken(param: {
       throw new CallerWrongUsageException(
         ErrorSubCategoryEnum.INVALID_INPUT,
         'Identification and password are required for EMAIL login.',
+        ErrorCodeEnum.MISSING_REQUIRED_FIELD,
       );
     }
   } else {
@@ -128,6 +131,7 @@ export async function createToken(param: {
       throw new CallerWrongUsageException(
         ErrorSubCategoryEnum.INVALID_INPUT,
         'Authorization code is required for social login.',
+        ErrorCodeEnum.MISSING_REQUIRED_FIELD,
       );
     }
     userInfo = await getUserInfo(param.category, param.code);
@@ -173,6 +177,7 @@ async function checkPassword(entity: AccountEntity, password: string) {
   throw new CallerWrongUsageException(
     ErrorSubCategoryEnum.INVALID_INPUT,
     'identification or password is not matched',
+    ErrorCodeEnum.INVALID_CREDENTIALS,
   );
 }
 
@@ -224,6 +229,10 @@ async function getUserInfo(category: AccountCategory, code: string) {
     case AccountCategory.NAVER:
       return await getNaverUserInfo(code);
     default:
-      throw new Error('Unsupported account category');
+      throw new CallerWrongUsageException(
+        ErrorSubCategoryEnum.INVALID_INPUT,
+        'Unsupported account category',
+        ErrorCodeEnum.INVALID_AUTH_TYPE,
+      );
   }
 }
