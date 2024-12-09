@@ -8,7 +8,6 @@ import {
 export interface ErrorContents {
   subCategory: ErrorSubCategoryEnum;
   message: string;
-  errorCode: ErrorCodeEnum;
   hint?: string;
 }
 
@@ -18,6 +17,7 @@ export interface BadRequestExceptionResponse {
   path: string;
   category?: ErrorCategoryEnum;
   additionalData?: any;
+  errorCode: ErrorCodeEnum;
   originMessage: string;
   input?: any;
 }
@@ -69,9 +69,9 @@ export class CallerWrongUsageException extends BaseException {
   constructor(
     name: ErrorSubCategoryEnum,
     message: string,
+    errorCode: ErrorCodeEnum,
     hint?: string,
     loggedData?: loggedData,
-    errorCode: ErrorCodeEnum = ErrorCodeEnum.INVALID_INPUT,
   ) {
     super(
       ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
@@ -88,9 +88,9 @@ export class CallerWrongDomainRuleException extends BaseException {
   constructor(
     name: ErrorSubCategoryEnum,
     message: string,
+    errorCode: ErrorCodeEnum,
     hint?: string,
     loggedData?: loggedData,
-    errorCode: ErrorCodeEnum = ErrorCodeEnum.RESOURCE_NOT_FOUND,
   ) {
     super(
       ErrorCategoryEnum.CALLER_WRONG_DOMAIN_ERROR,
@@ -107,9 +107,9 @@ export class SupplierSystemException extends BaseException {
   constructor(
     name: ErrorSubCategoryEnum,
     message: string,
+    errorCode: ErrorCodeEnum,
     hint?: string,
     loggedData?: loggedData,
-    errorCode: ErrorCodeEnum = ErrorCodeEnum.RESOURCE_NOT_FOUND,
   ) {
     super(
       ErrorCategoryEnum.SUPPLIER_SYSTEM_ERROR,
@@ -126,9 +126,9 @@ export class InternalDomainException extends BaseException {
   constructor(
     name: ErrorSubCategoryEnum,
     message: string,
+    errorCode: ErrorCodeEnum,
     hint?: string,
     loggedData?: loggedData,
-    errorCode: ErrorCodeEnum = ErrorCodeEnum.INTERNAL_SERVER_ERROR,
   ) {
     super(
       ErrorCategoryEnum.INTERNAL_DOMAIN_ERROR,
@@ -145,11 +145,5 @@ export class InternalDomainException extends BaseException {
 export class EmptyContentException extends HttpException {
   constructor(message: string) {
     super(HttpException.createBody({ message }), HttpStatus.NO_CONTENT);
-  }
-}
-
-export class ConflictException extends HttpException {
-  constructor(message: string) {
-    super(HttpException.createBody({ message }), HttpStatus.CONFLICT);
   }
 }

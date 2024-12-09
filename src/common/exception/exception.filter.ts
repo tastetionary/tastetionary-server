@@ -48,16 +48,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    if (exception instanceof ConflictException) {
-      response.status(409).json({
-        statusCode: 409,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        originMessage: exception.message,
-      });
-      return;
-    }
-
     if (exception instanceof BaseException) {
       const status = exception.getStatus();
 
