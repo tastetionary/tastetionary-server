@@ -19,7 +19,7 @@ import {
   profileEntityFactory,
 } from '@root/test/factory/user.factory';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 
 describe('user controller', () => {
   let app: INestApplication;
@@ -202,6 +202,7 @@ describe('user controller', () => {
         new CallerWrongUsageException(
           ErrorSubCategoryEnum.INVALID_INPUT,
           'invalid nickname',
+          ErrorCodeEnum.INVALID_NICKNAME,
         ),
       );
     const nickname = 'valid nickname';
