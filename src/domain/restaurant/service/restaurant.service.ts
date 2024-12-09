@@ -449,10 +449,10 @@ export async function upsertRestaurantReviewRxn(param: {
 }) {
   const review = await getReviewById(param.reviewId);
   if (!review) {
-    throw new CallerWrongUsageException(
+    throw new InternalDomainException(
       ErrorSubCategoryEnum.NO_DATA,
       `no review data ${param.reviewId}`,
-      ErrorCodeEnum.NO_REVIEW_DATA,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
     );
   }
 

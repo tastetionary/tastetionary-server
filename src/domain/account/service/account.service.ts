@@ -232,7 +232,7 @@ async function getUserInfo(category: AccountCategory, code: string) {
       throw new CallerWrongUsageException(
         ErrorSubCategoryEnum.INVALID_INPUT,
         'Unsupported account category',
-        ErrorCodeEnum.INVALID_AUTH_TYPE,
+        ErrorCodeEnum.INVALID_SOCIAL_AUTH_TYPE,
       );
   }
 }

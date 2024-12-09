@@ -212,8 +212,8 @@ export async function createPreferenceRestaurant(
         category === PreferenceCategory.BOOKMARK ? '북마크에 추가된' : '제외된';
       const errorCode =
         category === PreferenceCategory.BOOKMARK
-          ? ErrorCodeEnum.DUPLICATE_RESTAURANT_NAME
-          : ErrorCodeEnum.DUPLICATE_RESTAURANT_NAME;
+          ? ErrorCodeEnum.PREFERRED_RESTAURANT
+          : ErrorCodeEnum.EXCLUDED_RESTAURANT;
       throw new CallerWrongUsageException(
         ErrorSubCategoryEnum.INVALID_INPUT,
         `이미 ${message} 식당입니다.`,
