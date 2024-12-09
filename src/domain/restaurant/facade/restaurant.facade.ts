@@ -9,7 +9,7 @@ import {
   upsertRestaurantReviewRxn,
   getRestaurantReviewsByUserId,
 } from '@domain/restaurant/service/restaurant.service';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
 import {
   isRestaurantInUserPreferences,
@@ -38,8 +38,8 @@ export async function getRecommendations(param: {
   if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
-      'no dining area',
-      'should register first',
+      'no area',
+      ErrorCodeEnum.MISSING_USER_AREA,
     );
   }
 
@@ -72,8 +72,8 @@ export async function getNearByRestaurants(param: {
   if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
-      'no dining area',
-      'should register first',
+      'no area',
+      ErrorCodeEnum.MISSING_USER_AREA,
     );
   }
 
@@ -89,7 +89,8 @@ export async function registerReview(param: {
   if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
-      'can not register review, should register activity area',
+      'can not register review, should register area',
+      ErrorCodeEnum.MISSING_USER_AREA,
     );
   }
 
