@@ -29,16 +29,18 @@ export async function sendAuthenticationCodeToEmail(
     );
   }
 
-  const accountEntity = await findAccount(
-    identification,
-    AccountCategory.EMAIL,
-  );
-  if (accountEntity) {
-    throw new CallerWrongUsageException(
-      ErrorSubCategoryEnum.INVALID_INPUT,
-      'duplicated identification',
-      'already registered identification, change other identification',
+  if (category == AuthenticationCategory.ACCOUNT) {
+    const accountEntity = await findAccount(
+      identification,
+      AccountCategory.EMAIL,
     );
+    if (accountEntity) {
+      throw new CallerWrongUsageException(
+        ErrorSubCategoryEnum.INVALID_INPUT,
+        'duplicated identification',
+        'already registered identification, change other identification',
+      );
+    }
   }
 
   const authCode = createDigitCode(6, env);
