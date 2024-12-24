@@ -1,7 +1,7 @@
 import { AccountCategory } from '@domain/account/account.enum';
 import { Prisma } from '@prisma/client';
 import prismaClient from '@common/database/prisma';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   ErrorContents,
   InternalDomainException,
@@ -88,12 +88,17 @@ export async function deleteAccountByUserId(userId: number) {
         new InternalDomainException(
           ErrorSubCategoryEnum.INTERNAL_ERROR,
           e.message,
+          ErrorCodeEnum.INTERNAL_SERVER_ERROR,
           e.code,
         ),
       );
     }
     return E.left(
-      new InternalDomainException(ErrorSubCategoryEnum.INTERNAL_ERROR, e),
+      new InternalDomainException(
+        ErrorSubCategoryEnum.INTERNAL_ERROR,
+        e,
+        ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+      ),
     );
   }
 }

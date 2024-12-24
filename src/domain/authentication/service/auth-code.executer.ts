@@ -11,7 +11,7 @@ import {
   CallerWrongDomainRuleException,
   CallerWrongUsageException,
 } from '@common/exception/internal.exception';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import { ConfigService } from '@nestjs/config';
 import { findAccount } from '@domain/account/service/account.service';
 import { AccountCategory } from '@domain/account/account.enum';
@@ -26,6 +26,7 @@ export async function sendAuthenticationCodeToEmail(
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'not supported type, only support email type',
+      ErrorCodeEnum.INVALID_AUTH_TYPE,
     );
   }
 
@@ -38,7 +39,7 @@ export async function sendAuthenticationCodeToEmail(
       throw new CallerWrongUsageException(
         ErrorSubCategoryEnum.INVALID_INPUT,
         'duplicated identification',
-        'already registered identification, change other identification',
+        ErrorCodeEnum.DUPLICATE_IDENTIFICATION,
       );
     }
   }

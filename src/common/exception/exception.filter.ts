@@ -10,9 +10,9 @@ import * as Sentry from '@sentry/node';
 import {
   BaseException,
   CallerWrongUsageException,
-  ConflictException,
   EmptyContentException,
 } from '@common/exception/internal.exception';
+import { ErrorCodeEnum } from '@common/exception/enum';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -48,16 +48,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    if (exception instanceof ConflictException) {
-      response.status(409).json({
-        statusCode: 409,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        originMessage: exception.message,
-      });
-      return;
-    }
-
     if (exception instanceof BaseException) {
       const status = exception.getStatus();
 
@@ -66,6 +56,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
         path: request.url,
         category: exception.category,
+        errorCode: exception.errorCode || ErrorCodeEnum.INTERNAL_SERVER_ERROR,
         additionalData: exception.loggedData,
         originMessage: exception.message,
       };

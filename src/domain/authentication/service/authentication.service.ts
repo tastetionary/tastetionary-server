@@ -9,7 +9,7 @@ import {
   CallerWrongDomainRuleException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   deleteAuthenticationByUserId,
   deleteAuthentications,
@@ -33,6 +33,7 @@ export async function validateDoneIdentification(param: {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'no data',
+      ErrorCodeEnum.INVALID_AUTH_CODE,
     );
   }
 
@@ -40,6 +41,7 @@ export async function validateDoneIdentification(param: {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'not matched data',
+      ErrorCodeEnum.INVALID_AUTH_CODE,
     );
   }
 
@@ -68,6 +70,7 @@ export async function findValidAuth(historyId: number, code: string) {
     throw new InternalDomainException(
       ErrorSubCategoryEnum.NO_DATA,
       `history: ${historyId} not found, check history id`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
     );
   }
 
@@ -75,6 +78,7 @@ export async function findValidAuth(historyId: number, code: string) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       `given digit code: ${code} not matched with database code, check code`,
+      ErrorCodeEnum.INVALID_AUTH_CODE,
     );
   }
 
@@ -82,6 +86,7 @@ export async function findValidAuth(historyId: number, code: string) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'expired auth, start new process',
+      ErrorCodeEnum.AUTH_CODE_EXPRIED,
     );
   }
 
@@ -95,6 +100,7 @@ export async function findValidAuth(historyId: number, code: string) {
     throw new InternalDomainException(
       ErrorSubCategoryEnum.NO_DATA,
       `auth not found from given history id, ${historyId}, check authentication on history`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
     );
   }
   return authRecord;

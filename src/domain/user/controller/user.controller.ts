@@ -9,7 +9,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
-import { TypedBody, TypedRoute, TypedException } from '@nestia/core';
+import {
+  TypedBody,
+  TypedRoute,
+  TypedException,
+  TypedParam,
+} from '@nestia/core';
 
 import {
   AreaDto,
@@ -36,11 +41,8 @@ import {
 } from '@domain/user/facade/user.facade';
 import { PreferenceCategory } from '@domain/user/user.enum';
 import { ExternalRestaurantInformationRecord } from '@domain/restaurant/repository/restaurant.repository';
-import { BadRequestExceptionResponse } from '@root/src/common/exception/internal.exception';
-import {
-  ErrorCategoryEnum,
-  ErrorSubCategoryEnum,
-} from '@root/src/common/exception/enum';
+import { BadRequestExceptionResponse } from '@common/exception/internal.exception';
+import { ErrorCategoryEnum, ErrorCodeEnum } from '@common/exception/enum';
 
 export interface getPreferencesOutput
   extends Omit<
@@ -90,6 +92,7 @@ export class UserController {
         statusCode: 400,
         timestamp: new Date().toISOString(),
         path: '/v1/user/nickname/validation',
+        errorCode: ErrorCodeEnum.DUPLICATE_NIKCNAME,
         category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
         originMessage: 'duplicate nickname',
       },
@@ -97,6 +100,7 @@ export class UserController {
         statusCode: 400,
         timestamp: new Date().toISOString(),
         path: '/v1/user/nickname/validation',
+        errorCode: ErrorCodeEnum.INVALID_NICKNAME,
         category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
         originMessage: 'invalid nickname',
       },
@@ -104,6 +108,7 @@ export class UserController {
         statusCode: 400,
         timestamp: new Date().toISOString(),
         path: '/v1/user/nickname/validation',
+        errorCode: ErrorCodeEnum.INVALID_NICKNAME_FORMAT,
         category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
         originMessage:
           'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
@@ -134,12 +139,14 @@ export class UserController {
         timestamp: new Date().toISOString(),
         path: '/v1/user/nickname/validation',
         category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+        errorCode: ErrorCodeEnum.DUPLICATE_NIKCNAME,
         originMessage: 'duplicate nickname',
       },
       'invalid nickname': {
         statusCode: 400,
         timestamp: new Date().toISOString(),
         path: '/v1/user/nickname/validation',
+        errorCode: ErrorCodeEnum.INVALID_NICKNAME,
         category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
         originMessage: 'invalid nickname',
       },
@@ -147,6 +154,7 @@ export class UserController {
         statusCode: 400,
         timestamp: new Date().toISOString(),
         path: '/v1/user/nickname/validation',
+        errorCode: ErrorCodeEnum.INVALID_NICKNAME_FORMAT,
         category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
         originMessage:
           'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
@@ -214,12 +222,15 @@ export class UserController {
   /**
    * @tag user
    * @summary get preferences
+   * @description get preference restaurant
+   * @param category
+   * @return BaseResponseDto<getPreferencesOutput[]>
    */
   @HttpCode(200)
   @UseGuards(AuthGuard)
   @TypedRoute.Get('preference/:category')
   async getPreference(
-    @Param('category') category: PreferenceCategory,
+    @TypedParam('category') category: PreferenceCategory,
     @Request() req,
   ): Promise<BaseResponseDto<getPreferencesOutput[]>> {
     const data = await getPreferenceRestaurant(req.user.userId, category);

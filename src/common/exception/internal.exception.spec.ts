@@ -1,5 +1,6 @@
 import {
   ErrorCategoryEnum,
+  ErrorCodeEnum,
   ErrorSubCategoryEnum,
 } from '@common/exception/enum';
 import {
@@ -12,6 +13,7 @@ describe('exception', () => {
     const error = new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'message',
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
       'hint',
       {
         userId: 'userId',
@@ -28,6 +30,7 @@ describe('exception', () => {
       ErrorCategoryEnum.CALLER_WRONG_DOMAIN_ERROR,
       ErrorSubCategoryEnum.INVALID_INPUT,
       'message',
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
       'hint',
       { userId: 'userId' },
     );

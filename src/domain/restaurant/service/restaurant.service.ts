@@ -37,7 +37,7 @@ import {
   EmptyContentException,
   InternalDomainException,
 } from '@common/exception/internal.exception';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
   AreaEntity,
   searchAreas,
@@ -164,7 +164,8 @@ export async function createReview(param: {
   if (!userAreas) {
     throw new CallerWrongDomainRuleException(
       ErrorSubCategoryEnum.NO_DATA,
-      'can not register review, should register activity area',
+      'can not register review, should register area',
+      ErrorCodeEnum.MISSING_USER_AREA,
     );
   }
 
@@ -176,6 +177,7 @@ export async function createReview(param: {
     throw new InternalDomainException(
       ErrorSubCategoryEnum.NO_DATA,
       `no data or can not register about uuid: ${param.externalDto.externalUUID}`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
     );
   }
 
@@ -417,9 +419,10 @@ export async function reportRestaurantReview(param: {
 }) {
   const review = await getReviewById(param.reviewId);
   if (!review) {
-    throw new CallerWrongUsageException(
+    throw new InternalDomainException(
       ErrorSubCategoryEnum.NO_DATA,
       `no review data ${param.reviewId}`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
     );
   }
 
@@ -446,9 +449,10 @@ export async function upsertRestaurantReviewRxn(param: {
 }) {
   const review = await getReviewById(param.reviewId);
   if (!review) {
-    throw new CallerWrongUsageException(
+    throw new InternalDomainException(
       ErrorSubCategoryEnum.NO_DATA,
       `no review data ${param.reviewId}`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
     );
   }
 

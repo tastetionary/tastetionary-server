@@ -13,9 +13,8 @@ import {
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import {
-  AreaRecord,
   deleteAreas,
   getAreasByUserId,
   saveArea,
@@ -55,6 +54,7 @@ export async function searchProfile(userId: number) {
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.NO_DATA,
       `user not found: ${userId}`,
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
     );
   }
   const area = await searchAreas(userId);
@@ -208,11 +208,16 @@ export async function createPreferenceRestaurant(
     const exist = preference[column].includes(restaurantId);
 
     if (exist) {
-      const categoryMsg =
+      const message =
         category === PreferenceCategory.BOOKMARK ? '북마크에 추가된' : '제외된';
+      const errorCode =
+        category === PreferenceCategory.BOOKMARK
+          ? ErrorCodeEnum.PREFERRED_RESTAURANT
+          : ErrorCodeEnum.EXCLUDED_RESTAURANT;
       throw new CallerWrongUsageException(
         ErrorSubCategoryEnum.INVALID_INPUT,
-        `이미 ${categoryMsg} 식당입니다.`,
+        `이미 ${message} 식당입니다.`,
+        errorCode,
       );
     }
   }
@@ -245,6 +250,7 @@ export async function validateNickName(nickname: string) {
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
+      ErrorCodeEnum.INVALID_NICKNAME_FORMAT,
     );
   }
 
@@ -256,6 +262,7 @@ export async function validateNickName(nickname: string) {
         throw new CallerWrongUsageException(
           ErrorSubCategoryEnum.INVALID_INPUT,
           'invalid nickname',
+          ErrorCodeEnum.INVALID_NICKNAME,
         );
       }
       return TE.right(true);
@@ -264,6 +271,7 @@ export async function validateNickName(nickname: string) {
       throw new CallerWrongUsageException(
         ErrorSubCategoryEnum.INVALID_INPUT,
         'invalid nickname',
+        ErrorCodeEnum.INVALID_NICKNAME,
       );
     }),
   )();
@@ -272,7 +280,8 @@ export async function validateNickName(nickname: string) {
   if (duplicate) {
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
-      'duplicated nickname',
+      'duplicate nickname',
+      ErrorCodeEnum.DUPLICATE_NIKCNAME,
     );
   }
 }

@@ -1,4 +1,4 @@
-import { ErrorSubCategoryEnum } from '@common/exception/enum';
+import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { TestingModule } from '@nestjs/testing';
 import { REACTION_TYPE } from '@prisma/client';
@@ -302,6 +302,7 @@ describe('restaurant controller', () => {
         new CallerWrongUsageException(
           ErrorSubCategoryEnum.NO_DATA,
           `no review data ${reviewId}`,
+          ErrorCodeEnum.INTERNAL_SERVER_ERROR,
         ),
       );
 
