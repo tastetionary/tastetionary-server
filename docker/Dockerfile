@@ -4,7 +4,12 @@ WORKDIR /usr/src/app
 COPY package*.json .
 COPY prisma ./prisma/
 
-RUN apk update && apk add bash 
+RUN apk update && apk add --no-cache \
+    bash \
+    openssl \
+    ca-certificates \
+    libressl-dev
+
 RUN npm ci
 RUN npx prisma generate
 
