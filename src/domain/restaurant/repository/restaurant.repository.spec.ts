@@ -17,6 +17,7 @@ import {
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
+  RestaurantPrice,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
@@ -37,6 +38,7 @@ describe('Restaurant repository', () => {
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
         price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,
@@ -58,6 +60,7 @@ describe('Restaurant repository', () => {
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
         price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,
@@ -86,6 +89,7 @@ describe('Restaurant repository', () => {
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
         price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,
@@ -96,6 +100,7 @@ describe('Restaurant repository', () => {
 
     const cleanRes = await getReviewsByConditions({
       keywords: ['clean'],
+      priceRange: [RestaurantPrice.UNDER_10000],
     });
     expect(cleanRes).toHaveLength(1);
 
@@ -263,6 +268,7 @@ describe('Restaurant repository', () => {
         keywords: ['clean'],
         category: RestaurantCategory.ASIAN,
         price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,

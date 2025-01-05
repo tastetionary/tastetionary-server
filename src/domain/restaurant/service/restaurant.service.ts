@@ -27,6 +27,7 @@ import {
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantKeywordEmoji,
+  RestaurantPrice,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
@@ -107,6 +108,7 @@ export async function getRecommendedRestaurant(param: {
   ltePrice: number;
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
+  priceRange?: RestaurantPrice[];
 }) {
   const restaurants = await getRestaurantsByDistance({
     ...param,
@@ -121,6 +123,7 @@ export async function getRecommendedRestaurant(param: {
     keywords: detachEmoji(param.keywords),
     ltePrice: param.ltePrice,
     categories: param.categories,
+    priceRange: param.priceRange,
   });
   if (targetReviews.length == 0) {
     throw new EmptyContentException(
@@ -426,6 +429,13 @@ export async function reportRestaurantReview(param: {
     );
   }
 
+  const { prices, ...rest } = review;
+  const priceEnum = prices.map((price) => {
+    return Object.values(RestaurantPrice).find(
+      (key) => key == price,
+    ) as RestaurantPrice;
+  });
+
   const discordConfig = new ConfigurationService(
     new ConfigService(),
   ).getDiscordConfig();
@@ -433,6 +443,7 @@ export async function reportRestaurantReview(param: {
     {
       ...review,
       category: review.category as RestaurantCategory,
+      prices: priceEnum,
     },
     param.userId,
     param.category,

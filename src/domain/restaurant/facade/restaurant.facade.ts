@@ -21,6 +21,7 @@ import {
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
   RestaurantCategory,
+  RestaurantPrice,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import { REACTION_TYPE } from '@prisma/client';
@@ -33,6 +34,7 @@ export async function getRecommendations(param: {
   ltePrice: number;
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
+  priceRange?: RestaurantPrice[];
 }) {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas) {

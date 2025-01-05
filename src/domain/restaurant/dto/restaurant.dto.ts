@@ -31,6 +31,12 @@ export interface RestaurantReviewDTO {
   price: number;
 
   /**
+   * example: 10000
+   * @type number
+   */
+  prices: RestaurantPrice[];
+
+  /**
    * one-line summary
    * example: "never go again"
    * @type string
