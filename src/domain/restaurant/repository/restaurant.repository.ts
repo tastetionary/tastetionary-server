@@ -86,7 +86,8 @@ export async function saveReviews(
   }[],
 ) {
   const data: any[] = params.map((param) => {
-    const { externalRestaurantInformationId, ...rest } = param;
+    const { prices, externalRestaurantInformationId, ...rest } = param;
+    rest['prices'] = [...new Set(prices)];
     rest['external_restaurant_information_id'] =
       externalRestaurantInformationId;
     return rest;
@@ -222,7 +223,7 @@ export async function getReviewsByConditions(param: {
   ltePrice?: number;
   categories?: RestaurantCategory[];
   reviewerId?: number;
-  priceRange?: RestaurantPrice[];
+  prices?: RestaurantPrice[];
 }): Promise<RestaurantReviewRecord[]> {
   const condition = {};
 
@@ -236,9 +237,9 @@ export async function getReviewsByConditions(param: {
     condition['keywords'] = { hasSome: param.keywords };
   }
 
-  if (param.priceRange && param.priceRange.length > 0) {
-    condition['price'] = {
-      hasSome: param.priceRange,
+  if (param.prices && param.prices.length > 0) {
+    condition['prices'] = {
+      hasSome: param.prices,
     };
   }
 
