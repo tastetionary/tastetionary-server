@@ -107,7 +107,7 @@ describe('restaurant controller', () => {
           summaries: [''],
           opinions: [''],
           keywords: [''],
-          prices: [10],
+          prices: [RestaurantPrice.UNDER_10000],
           aggregatePrice: { '10': 10 },
           revisitRatio: 10,
           totalCount: 10,
@@ -129,6 +129,7 @@ describe('restaurant controller', () => {
         category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000],
       });
 
     assertStatusCode(res, 200);
