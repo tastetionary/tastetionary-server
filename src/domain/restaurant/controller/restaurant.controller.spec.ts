@@ -11,7 +11,10 @@ import {
 } from '@root/jest.setup';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantPrice,
+} from '@domain/restaurant/restaurant.enum';
 import * as restaurantService from '@domain/restaurant/service/restaurant.service';
 import * as userService from '@domain/user/service/user.service';
 import { areaEntityFactory } from '@root/test/factory/user.factory';
@@ -40,6 +43,7 @@ describe('restaurant controller', () => {
       category: RestaurantCategory.ASIAN,
       keywords: ['key'],
       price: 10_000,
+      prices: [RestaurantPrice.UNDER_10000],
       summary: 'one-line summary',
       opinion: 'N',
     },
@@ -73,6 +77,7 @@ describe('restaurant controller', () => {
         excludeIds: [],
         category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
+        prices: [RestaurantPrice.UNDER_10000],
         price: 10_000,
       });
 

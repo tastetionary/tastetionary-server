@@ -236,6 +236,7 @@ export class RestaurantController {
       userId,
       maxDistanceMeter: maxDistanceMeter,
       ltePrice: input.price,
+      prices: input.prices,
       keywords: input.keywords,
       categories: input.category,
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),

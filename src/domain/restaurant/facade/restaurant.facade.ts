@@ -32,6 +32,7 @@ export async function getRecommendations(param: {
   maxDistanceMeter: number;
   keywords: string[];
   ltePrice: number;
+  prices: RestaurantPrice[];
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
   priceRange?: RestaurantPrice[];
