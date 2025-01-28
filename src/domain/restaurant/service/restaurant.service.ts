@@ -24,6 +24,7 @@ import {
   getExternalRestaurantInformationById,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
+  PriceMapping,
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantKeywordEmoji,
@@ -79,7 +80,7 @@ export function aggregateRestaurantReview(
       data.summaries.push(review.summary);
       data.opinions.push(review.opinion ?? '');
       data.keywords.push(...review.keywords);
-      data.prices.push(review.price);
+      data.prices.push(...review.prices);
       data.reviewReactionCnt = getRestaurantRxnDistinctCnt(
         review?.reactions || [],
       );
@@ -108,7 +109,7 @@ export async function getRecommendedRestaurant(param: {
   ltePrice: number;
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
-  priceRange?: RestaurantPrice[];
+  prices?: RestaurantPrice[];
 }) {
   const restaurants = await getRestaurantsByDistance({
     ...param,
@@ -123,7 +124,7 @@ export async function getRecommendedRestaurant(param: {
     keywords: detachEmoji(param.keywords),
     ltePrice: param.ltePrice,
     categories: param.categories,
-    priceRange: param.priceRange,
+    prices: param.prices,
   });
   if (targetReviews.length == 0) {
     throw new EmptyContentException(
@@ -284,7 +285,7 @@ export async function getNearyByRestaurants(param: {
       .map((r) => r.opinion)
       .filter((opinion) => opinion !== null) as string[];
     const revisitRatio = calcRevisitRatio(opinions);
-    const prices = aggregatePrice(groupReviews.map((r) => r.price));
+    const prices = aggregatePrice(groupReviews.flatMap((r) => r.prices));
     const numReviews = groupReviews.length;
 
     const data = {
@@ -485,15 +486,19 @@ function calcRevisitRatio(opinions: string[], standard = 'Y') {
   const standardCount = opinions.filter((op) => op === standard).length;
   return parseFloat(((standardCount / opinions.length) * 100).toFixed(1));
 }
-function aggregatePrice(prices: number[]) {
+
+function aggregatePrice(prices: RestaurantPrice[]) {
   const data: { [index: string]: number } = {};
 
   prices.forEach((price) => {
-    data[price.toString()] = (data[price.toString()] || 0) + 1;
+    data[price] = (data[price] || 0) + 1;
   });
 
-  const uniquePrices = [...new Set(prices)];
-  data['avg'] = fx.average(uniquePrices);
+  const sum = prices.reduce((sum, price) => sum + PriceMapping[price], 0);
+  const avg = sum / prices.length;
+  const roundAvg = Math.round(avg / 1000) * 1000;
+  data['avg'] = roundAvg;
+
   return data;
 }
 

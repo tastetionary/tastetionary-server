@@ -107,7 +107,7 @@ export interface AggregateReviewDTO {
   summaries: string[];
   opinions: string[];
   keywords: string[];
-  prices: number[];
+  prices: RestaurantPrice[];
   aggregatePrice: { [index: string]: number };
   revisitRatio: number;
   totalCount: number;
