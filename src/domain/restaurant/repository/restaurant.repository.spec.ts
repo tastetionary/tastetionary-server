@@ -8,12 +8,14 @@ import {
   getReviewReportById,
   getReviewsByConditions,
   getReviewsByUserId,
+  getReviewsOrderedByCreatedTime,
   getUserReviewCount,
   saveExternalRestaurantInformation,
   saveExternalRestaurantInformations,
   saveReview,
   saveReviewReport,
   saveReviewReports,
+  saveReviews,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
@@ -275,6 +277,40 @@ describe('Restaurant repository', () => {
     expect(res).toHaveLength(1);
     const count = await getUserReviewCount(data[0].userId);
     expect(count).toBe(1);
+  });
+
+  it('should return review order by created time', async () => {
+    const data = [
+      {
+        userId: 1,
+        keywords: ['clean'],
+        category: RestaurantCategory.ASIAN,
+        price: 10_000,
+        summary: 'never come again',
+        opinion: 'no',
+        externalRestaurantInformationId: 1n,
+      },
+      {
+        userId: 1,
+        keywords: ['clean'],
+        category: RestaurantCategory.ASIAN,
+        price: 10_000,
+        summary: 'never come again',
+        opinion: 'no',
+        externalRestaurantInformationId: 2n,
+      },
+    ];
+
+    const count = 3;
+
+    await saveReview(data[0]);
+    await saveReview(data[1]);
+
+    const res = await getReviewsOrderedByCreatedTime(count);
+
+    expect(res).not.toBeNull();
+    expect(res).toHaveLength(2);
+    expect(res[0].external_restaurant_information_id).toEqual(2n);
   });
 
   it('should get restaurant options', async () => {
