@@ -11,6 +11,7 @@ import {
   getRestaurantReviews,
   getRestaurantReviewsByUserId,
   _private,
+  getRecentReviews,
 } from '@domain/restaurant/service/restaurant.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
 import prismaClient from '@root/src/common/database/prisma';
@@ -30,6 +31,8 @@ describe('restaurant service', () => {
       'restaurant_reviews',
       'external_restaurant_informations',
     ]);
+
+    jest.clearAllMocks();
   });
 
   const LATITUDE = 37.517331925853;
@@ -213,6 +216,31 @@ describe('restaurant service', () => {
       const res = await getRestaurantReviews(restaurantId);
       expect(res).not.toBeNull();
       expect(res.data).toHaveLength(1);
+    });
+  });
+
+  describe('getRecentReviews', () => {
+    it('should get recent reviews', async () => {
+      const userId = 999;
+      const review = restaurantReviewRecordFactory({ userId });
+      const count = 3;
+      jest
+        .spyOn(repo, 'getReviewsOrderedByCreatedTime')
+        .mockResolvedValueOnce([review, review, review]);
+      jest.spyOn(repo, 'getExternalRestaurantInformation').mockResolvedValue({
+        id: BigInt(1),
+        external_uuid: BigInt(1),
+        address: 'test-address',
+        phone: 'test-phone',
+        reference_link: 'test-reference-link',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        name: 'test-name',
+      });
+
+      const res = await getRecentReviews(count);
+      expect(res).not.toBeNull();
+      expect(res).toHaveLength(3);
     });
   });
 
