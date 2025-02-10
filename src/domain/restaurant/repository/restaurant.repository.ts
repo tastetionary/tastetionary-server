@@ -184,6 +184,24 @@ export async function getExternalRestaurantInformationById(id: number) {
   });
 }
 
+export async function getReviewsOrderedByCreatedTime(
+  count: number,
+): Promise<RestaurantReviewRecord[]> {
+  const res = await prismaClient.restaurantReviews.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: count,
+  });
+
+  return res.map((r) => {
+    const { category, ...rest } = r;
+    const enumCategory = Object.values(RestaurantCategory).find(
+      (key) => key == category,
+    ) as RestaurantCategory;
+
+    return { ...rest, category: enumCategory };
+  });
+}
+
 export async function getReviewsByConditions(param: {
   restaurantIds?: bigint[];
   keywords?: string[];
