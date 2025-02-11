@@ -46,6 +46,7 @@ import {
   getReviewsByUserId,
 } from '@domain/restaurant/facade/restaurant.facade';
 import { REACTION_TYPE } from '@prisma/client';
+import { getRecentReviews } from '@domain/restaurant/service/restaurant.service';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -211,6 +212,12 @@ export interface GetReviewsByUserIdOutput {
   reviews: RestaurantReview[];
 }
 
+export interface GetRecentReviewOuptut
+  extends Array<
+    Pick<ExternalRestaurantInformationDTO, 'address' | 'name'> &
+      Pick<RestaurantReviewRecord, 'summary'>
+  > {}
+
 @Controller('v1/restaurant')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
@@ -282,6 +289,21 @@ export class RestaurantController {
         aggregateReviews: d.aggregateReviews,
       };
     });
+
+    return new BaseResponseDto(result);
+  }
+
+  /**
+   * @tag restaurant
+   * @summary get recent reviews
+   */
+  @HttpCode(200)
+  @TypedRoute.Get('/review/recent')
+  async getRecentRestaurantReviews(): Promise<
+    BaseResponseDto<GetRecentReviewOuptut>
+  > {
+    const count = 3;
+    const result = await getRecentReviews(count);
 
     return new BaseResponseDto(result);
   }

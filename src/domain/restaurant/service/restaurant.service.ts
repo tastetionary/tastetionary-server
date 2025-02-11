@@ -22,6 +22,7 @@ import {
   deleteReviewReaction,
   saveReviewReport,
   getExternalRestaurantInformationById,
+  getReviewsOrderedByCreatedTime,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -239,6 +240,32 @@ export async function findExternalRestaurantById(id: number) {
 
 export async function getReviews(userId: number) {
   return getReviewsByUserId(userId);
+}
+
+export async function getRecentReviews(count: number) {
+  const reviews = await getReviewsOrderedByCreatedTime(count);
+
+  return Promise.all(
+    reviews.map(async (review) => {
+      const { external_restaurant_information_id: externalUUID, summary } =
+        review;
+      const externalInfo = await getExternalRestaurantInformation(externalUUID);
+
+      if (!externalInfo) {
+        throw new InternalDomainException(
+          ErrorSubCategoryEnum.NO_DATA,
+          `no data or can not register about uuid: ${externalUUID}`,
+          ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return {
+        summary,
+        name: externalInfo.name,
+        address: externalInfo.address,
+      };
+    }),
+  );
 }
 
 export async function getNearyByRestaurants(param: {
