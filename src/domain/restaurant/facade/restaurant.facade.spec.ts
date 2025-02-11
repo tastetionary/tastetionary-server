@@ -23,7 +23,6 @@ describe('facade', () => {
           userId,
           maxDistanceMeter: 100,
           keywords: ['clean'],
-          ltePrice: 10_000,
           prices: [RestaurantPrice.OVER_20000],
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
