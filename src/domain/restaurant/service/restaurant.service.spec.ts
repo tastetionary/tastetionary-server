@@ -1,5 +1,8 @@
 import { truncateTables } from '@root/jest.setup';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantPrice,
+} from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
 import {
   aggregateRestaurantReview,
@@ -40,7 +43,7 @@ describe('restaurant service', () => {
   const DTO = {
     category: RestaurantCategory.ASIAN,
     keywords: ['clean🥰'],
-    price: 10_000,
+    prices: [RestaurantPrice.UNDER_10000],
     summary: 'never come again',
     opinion: 'N',
   };
@@ -66,7 +69,7 @@ describe('restaurant service', () => {
           summary: 'asian',
           opinion: 'Y',
           keywords: ['clean'],
-          price: 10_000,
+          prices: [RestaurantPrice.UNDER_10000],
           like: 0,
           dislike: 0,
         },
@@ -78,7 +81,7 @@ describe('restaurant service', () => {
           summary: 'buffet',
           opinion: 'N',
           keywords: ['kind'],
-          price: 15_000,
+          prices: [RestaurantPrice.UNDER_16000],
           like: 0,
           dislike: 0,
         },
@@ -90,25 +93,40 @@ describe('restaurant service', () => {
           summary: 'buffet',
           opinion: 'N',
           keywords: ['kind'],
-          price: 15_000,
+          prices: [RestaurantPrice.OVER_20000],
           like: 0,
           dislike: 0,
         },
       ];
 
       const res = aggregateRestaurantReview(reviews);
-      expect(res.data.aggregatePrice.avg).toBe(12_500);
+      expect(res.data.aggregatePrice.avg).toBe(15000);
       expect(res.data.revisitRatio).toBe(33.3);
 
       expect(res.data.keywords.length).toBe(2);
     });
 
     it('aggregatePrice, should return expected', () => {
-      const res = _private.aggregatePrice([10000, 15000]);
-      expect(res).toEqual({ 10000: 1, 15000: 1, avg: 12500 });
+      const res = _private.aggregatePrice([
+        RestaurantPrice.UNDER_10000,
+        RestaurantPrice.OVER_20000,
+      ]);
+      expect(res).toEqual({
+        [RestaurantPrice.UNDER_10000]: 1,
+        [RestaurantPrice.OVER_20000]: 1,
+        avg: 15000,
+      });
 
-      const resTwo = _private.aggregatePrice([10000, 10000, 15000]);
-      expect(resTwo).toEqual({ 10000: 2, 15000: 1, avg: 12500 });
+      const resTwo = _private.aggregatePrice([
+        RestaurantPrice.UNDER_10000,
+        RestaurantPrice.UNDER_10000,
+        RestaurantPrice.UNDER_16000,
+      ]);
+      expect(resTwo).toEqual({
+        [RestaurantPrice.UNDER_10000]: 2,
+        [RestaurantPrice.UNDER_16000]: 1,
+        avg: 8000,
+      });
     });
   });
 
@@ -127,7 +145,6 @@ describe('restaurant service', () => {
         userAreas: areaEntityFactory({ userId }),
         maxDistanceMeter: maxDistance,
         keywords: ['clean'],
-        ltePrice: 10_000,
         categories: [RestaurantCategory.ASIAN],
         excludeRestaurantIds: [],
       });
@@ -144,7 +161,6 @@ describe('restaurant service', () => {
           userAreas: areaEntityFactory({ userId }),
           maxDistanceMeter: maxDistance,
           keywords: [],
-          ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),
@@ -160,7 +176,6 @@ describe('restaurant service', () => {
           userAreas: entity,
           maxDistanceMeter: 1000,
           keywords: [],
-          ltePrice: 10_000,
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),

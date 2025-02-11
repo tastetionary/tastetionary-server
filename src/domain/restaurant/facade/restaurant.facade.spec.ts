@@ -9,7 +9,10 @@ import {
 } from '@domain/restaurant/facade/restaurant.facade';
 import * as userService from '@domain/user/service/user.service';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
-import { RestaurantCategory } from '@domain/restaurant/restaurant.enum';
+import {
+  RestaurantCategory,
+  RestaurantPrice,
+} from '@domain/restaurant/restaurant.enum';
 
 describe('facade', () => {
   describe('getRecommendations', () => {
@@ -20,7 +23,7 @@ describe('facade', () => {
           userId,
           maxDistanceMeter: 100,
           keywords: ['clean'],
-          ltePrice: 10_000,
+          prices: [RestaurantPrice.OVER_20000],
           categories: [RestaurantCategory.ASIAN],
           excludeRestaurantIds: [],
         }),

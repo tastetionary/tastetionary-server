@@ -25,9 +25,11 @@ import {
   getReviewsOrderedByCreatedTime,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
+  PriceMapping,
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantKeywordEmoji,
+  RestaurantPrice,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import * as fx from '@fxts/core';
@@ -79,7 +81,7 @@ export function aggregateRestaurantReview(
       data.summaries.push(review.summary);
       data.opinions.push(review.opinion ?? '');
       data.keywords.push(...review.keywords);
-      data.prices.push(review.price);
+      data.prices.push(...review.prices);
       data.reviewReactionCnt = getRestaurantRxnDistinctCnt(
         review?.reactions || [],
       );
@@ -105,9 +107,9 @@ export async function getRecommendedRestaurant(param: {
   userAreas: AreaEntity;
   maxDistanceMeter: number;
   keywords: string[];
-  ltePrice: number;
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
+  prices?: RestaurantPrice[];
 }) {
   const restaurants = await getRestaurantsByDistance({
     ...param,
@@ -120,8 +122,8 @@ export async function getRecommendedRestaurant(param: {
   const targetReviews = await getReviewsByConditions({
     restaurantIds: ids,
     keywords: detachEmoji(param.keywords),
-    ltePrice: param.ltePrice,
     categories: param.categories,
+    prices: param.prices,
   });
   if (targetReviews.length == 0) {
     throw new EmptyContentException(
@@ -308,7 +310,7 @@ export async function getNearyByRestaurants(param: {
       .map((r) => r.opinion)
       .filter((opinion) => opinion !== null) as string[];
     const revisitRatio = calcRevisitRatio(opinions);
-    const prices = aggregatePrice(groupReviews.map((r) => r.price));
+    const prices = aggregatePrice(groupReviews.flatMap((r) => r.prices));
     const numReviews = groupReviews.length;
 
     const data = {
@@ -453,6 +455,13 @@ export async function reportRestaurantReview(param: {
     );
   }
 
+  const { prices, ...rest } = review;
+  const priceEnum = prices.map((price) => {
+    return Object.values(RestaurantPrice).find(
+      (key) => key == price,
+    ) as RestaurantPrice;
+  });
+
   const discordConfig = new ConfigurationService(
     new ConfigService(),
   ).getDiscordConfig();
@@ -460,6 +469,7 @@ export async function reportRestaurantReview(param: {
     {
       ...review,
       category: review.category as RestaurantCategory,
+      prices: priceEnum,
     },
     param.userId,
     param.category,
@@ -501,15 +511,19 @@ function calcRevisitRatio(opinions: string[], standard = 'Y') {
   const standardCount = opinions.filter((op) => op === standard).length;
   return parseFloat(((standardCount / opinions.length) * 100).toFixed(1));
 }
-function aggregatePrice(prices: number[]) {
+
+function aggregatePrice(prices: RestaurantPrice[]) {
   const data: { [index: string]: number } = {};
 
   prices.forEach((price) => {
-    data[price.toString()] = (data[price.toString()] || 0) + 1;
+    data[price] = (data[price] || 0) + 1;
   });
 
-  const uniquePrices = [...new Set(prices)];
-  data['avg'] = fx.average(uniquePrices);
+  const sum = prices.reduce((sum, price) => sum + PriceMapping[price], 0);
+  const avg = sum / prices.length;
+  const roundAvg = Math.round(avg / 1000) * 1000;
+  data['avg'] = roundAvg;
+
   return data;
 }
 
@@ -524,7 +538,7 @@ function getDiscordContentsForm(
 ) {
   const contents = {
     title: '식당 리뷰 신고',
-    description: `유저 아이디: ${userId} \n 신고 카테고리: ${category} \n 리뷰 아이디: ${review.id} \n 리뷰 내용: ${review.summary} \n 리뷰 카테고리: ${review.category} \n 리뷰 키워드: ${review.keywords} \n 리뷰 가격: ${review.price} \n 리뷰 의견: ${review.opinion} \n 리뷰 생성일: ${review.createdAt}`,
+    description: `유저 아이디: ${userId} \n 신고 카테고리: ${category} \n 리뷰 아이디: ${review.id} \n 리뷰 내용: ${review.summary} \n 리뷰 카테고리: ${review.category} \n 리뷰 키워드: ${review.keywords} \n 리뷰 가격: ${review.prices} \n 리뷰 의견: ${review.opinion} \n 리뷰 생성일: ${review.createdAt}`,
   };
 
   return contents;

@@ -17,7 +17,7 @@ export interface RestaurantReviewRecord {
   summary: string;
   opinion: string | null;
   keywords: string[];
-  price: number;
+  prices: RestaurantPrice[];
   createdAt?: Date;
   updatedAt?: Date;
   reactions?: RestaurantReviewReactionSummaryRecord[];
@@ -62,7 +62,7 @@ export async function saveReview(param: {
   userId: number;
   keywords: string[];
   category: RestaurantCategory;
-  price: number;
+  prices: RestaurantPrice[];
   summary: string;
   opinion?: string;
   externalRestaurantInformationId: bigint;
@@ -75,14 +75,15 @@ export async function saveReviews(
     userId: number;
     keywords: string[];
     category: RestaurantCategory;
-    price: number;
+    prices: RestaurantPrice[];
     summary: string;
     opinion?: string;
     externalRestaurantInformationId: bigint;
   }[],
 ) {
   const data: any[] = params.map((param) => {
-    const { externalRestaurantInformationId, ...rest } = param;
+    const { prices, externalRestaurantInformationId, ...rest } = param;
+    rest['prices'] = [...new Set(prices)];
     rest['external_restaurant_information_id'] =
       externalRestaurantInformationId;
     return rest;
@@ -91,7 +92,23 @@ export async function saveReviews(
 }
 
 export async function getReviewsByUserId(userId: number) {
-  return prismaClient.restaurantReviews.findMany({ where: { userId } });
+  const res = await prismaClient.restaurantReviews.findMany({
+    where: { userId },
+  });
+  return res.map((r) => {
+    const { category, prices, ...rest } = r;
+    const enumCategory = Object.values(RestaurantCategory).find(
+      (key) => key == category,
+    ) as RestaurantCategory;
+
+    const enumPrice = prices.map((price) => {
+      return Object.values(RestaurantPrice).find(
+        (key) => key == price,
+      ) as RestaurantPrice;
+    });
+
+    return { ...rest, category: enumCategory, prices: enumPrice };
+  });
 }
 
 export async function getUserReviewCount(userId: number) {
@@ -99,7 +116,19 @@ export async function getUserReviewCount(userId: number) {
 }
 
 export async function getReviewById(id: number) {
-  return prismaClient.restaurantReviews.findUnique({ where: { id } });
+  const res = await prismaClient.restaurantReviews.findUnique({
+    where: { id },
+  });
+  if (!res) return null;
+
+  const { prices, ...rest } = res;
+  const enumPrices = prices.map((price) => {
+    return Object.values(RestaurantPrice).find(
+      (key) => key == price,
+    ) as RestaurantPrice;
+  });
+
+  return { ...rest, prices: enumPrices };
 }
 
 export async function saveReviewReport(param: {
@@ -193,21 +222,27 @@ export async function getReviewsOrderedByCreatedTime(
   });
 
   return res.map((r) => {
-    const { category, ...rest } = r;
+    const { category, prices, ...rest } = r;
     const enumCategory = Object.values(RestaurantCategory).find(
       (key) => key == category,
     ) as RestaurantCategory;
 
-    return { ...rest, category: enumCategory };
+    const enumPrice = prices.map((price) => {
+      return Object.values(RestaurantPrice).find(
+        (key) => key == price,
+      ) as RestaurantPrice;
+    });
+
+    return { ...rest, category: enumCategory, prices: enumPrice };
   });
 }
 
 export async function getReviewsByConditions(param: {
   restaurantIds?: bigint[];
   keywords?: string[];
-  ltePrice?: number;
   categories?: RestaurantCategory[];
   reviewerId?: number;
+  prices?: RestaurantPrice[];
 }): Promise<RestaurantReviewRecord[]> {
   const condition = {};
 
@@ -221,8 +256,10 @@ export async function getReviewsByConditions(param: {
     condition['keywords'] = { hasSome: param.keywords };
   }
 
-  if (param.ltePrice) {
-    condition['price'] = { lte: param.ltePrice };
+  if (param.prices && param.prices.length > 0) {
+    condition['prices'] = {
+      hasSome: param.prices,
+    };
   }
 
   if (param.categories) {
@@ -248,12 +285,18 @@ export async function getReviewsByConditions(param: {
   });
 
   return res.map((r) => {
-    const { category, ...rest } = r;
+    const { category, prices, ...rest } = r;
     const enumCategory = Object.values(RestaurantCategory).find(
       (key) => key == category,
     ) as RestaurantCategory;
 
-    return { ...rest, category: enumCategory };
+    const enumPrice = prices.map((price) => {
+      return Object.values(RestaurantPrice).find(
+        (key) => key == price,
+      ) as RestaurantPrice;
+    });
+
+    return { ...rest, category: enumCategory, prices: enumPrice };
   });
 }
 

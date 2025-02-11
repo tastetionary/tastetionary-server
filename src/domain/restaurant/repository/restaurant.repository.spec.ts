@@ -19,6 +19,7 @@ import {
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
+  RestaurantPrice,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
@@ -38,7 +39,7 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,
@@ -59,7 +60,7 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000, RestaurantPrice.UNDER_13000],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,
@@ -70,13 +71,13 @@ describe('Restaurant repository', () => {
 
     const res = await getReviewsByConditions({
       keywords: [],
-      ltePrice: 12_000,
+      prices: [RestaurantPrice.UNDER_13000, RestaurantPrice.UNDER_20000],
     });
     expect(res).toHaveLength(1);
 
     const wrongRes = await getReviewsByConditions({
       keywords: [],
-      ltePrice: 9_000,
+      prices: [RestaurantPrice.OVER_20000, RestaurantPrice.UNDER_16000],
     });
     expect(wrongRes).toHaveLength(0);
   });
@@ -87,7 +88,7 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
+        prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,
@@ -98,6 +99,7 @@ describe('Restaurant repository', () => {
 
     const cleanRes = await getReviewsByConditions({
       keywords: ['clean'],
+      prices: [RestaurantPrice.UNDER_10000],
     });
     expect(cleanRes).toHaveLength(1);
 
@@ -264,7 +266,11 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
+        prices: [
+          RestaurantPrice.UNDER_10000,
+          RestaurantPrice.UNDER_13000,
+          RestaurantPrice.UNDER_10000,
+        ],
         summary: 'never come again',
         opinion: 'no',
         externalRestaurantInformationId: 1n,
@@ -285,18 +291,18 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
         summary: 'never come again',
         opinion: 'no',
+        prices: [RestaurantPrice.UNDER_10000],
         externalRestaurantInformationId: 1n,
       },
       {
         userId: 1,
         keywords: ['clean'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
         summary: 'never come again',
         opinion: 'no',
+        prices: [RestaurantPrice.UNDER_10000],
         externalRestaurantInformationId: 2n,
       },
     ];
@@ -422,23 +428,23 @@ describe('Restaurant repository', () => {
       prices: [
         {
           id: 0,
-          name: '~10,000원',
+          name: '10,000원 미만',
         },
         {
           id: 1,
-          name: '~11,000원',
+          name: '10,000원 이상 ~ 13,0000원 미만',
         },
         {
           id: 2,
-          name: '~12,000원',
+          name: '13,000원 이상 ~ 16,000원 미만',
         },
         {
           id: 3,
-          name: '~13,000원',
+          name: '16,000원 이상 ~ 20,000원 미만',
         },
         {
           id: 4,
-          name: '13,000원~',
+          name: '20,000원 이상',
         },
       ],
     };

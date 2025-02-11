@@ -72,7 +72,7 @@ model RestaurantReviews {
   summary                            String                      @map("summary") @db.VarChar(128) /// 한줄 요약
   opinion                            String?                     @map("opinion") @db.VarChar(16) // 최종 의견,
   keywords                           String[]                    @map("keywords") @db.Text // tags
-  price                              Int                         @map("price") @db.Integer // 가격
+  prices                             String[]                    @map("prices") @db.Text // 가격
   createdAt                          DateTime                    @default(now()) @map("created_at")
   updatedAt                          DateTime                    @updatedAt @map("updated_at")
   /// 외부 API 를 통해 가져온 식당 uuid
@@ -83,7 +83,6 @@ model RestaurantReviews {
   @@index([external_restaurant_information_id])
   @@index([external_restaurant_information_id, userId])
   @@index([keywords], type: Gin)
-  @@index([price])
   @@map("restaurant_reviews")
 }
 

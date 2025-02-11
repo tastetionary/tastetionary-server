@@ -25,10 +25,10 @@ export interface RestaurantReviewDTO {
   keywords: string[];
 
   /**
-   * example: 10000
-   * @type number
+   * example: 10,000원 미만
+   * @type RestaurantPrice
    */
-  price: number;
+  prices: RestaurantPrice[];
 
   /**
    * one-line summary
@@ -101,7 +101,7 @@ export interface AggregateReviewDTO {
   summaries: string[];
   opinions: string[];
   keywords: string[];
-  prices: number[];
+  prices: RestaurantPrice[];
   aggregatePrice: { [index: string]: number };
   revisitRatio: number;
   totalCount: number;

@@ -137,7 +137,6 @@ export interface RestaurantReview
     | 'external_restaurant_information_id'
     | 'userId'
     | 'category'
-    | 'price'
     | 'reactions'
   > {
   id: string;
@@ -242,7 +241,7 @@ export class RestaurantController {
     const data = await getRecommendations({
       userId,
       maxDistanceMeter: maxDistanceMeter,
-      ltePrice: input.price,
+      prices: input.prices,
       keywords: input.keywords,
       categories: input.category,
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),

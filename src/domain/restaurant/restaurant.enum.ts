@@ -27,12 +27,20 @@ export enum RestaurantKeyword {
 }
 
 export enum RestaurantPrice {
-  UNDER_10000 = '~10,000원',
-  UNDER_11000 = '~11,000원',
-  UNDER_12000 = '~12,000원',
-  UNDER_13000 = '~13,000원',
-  OVER_13000 = '13,000원~',
+  UNDER_10000 = '10,000원 미만',
+  UNDER_13000 = '10,000원 이상 ~ 13,0000원 미만',
+  UNDER_16000 = '13,000원 이상 ~ 16,000원 미만',
+  UNDER_20000 = '16,000원 이상 ~ 20,000원 미만',
+  OVER_20000 = '20,000원 이상',
 }
+
+export const PriceMapping: Record<RestaurantPrice, number> = {
+  [RestaurantPrice.UNDER_10000]: 5000,
+  [RestaurantPrice.UNDER_13000]: 11500,
+  [RestaurantPrice.UNDER_16000]: 14500,
+  [RestaurantPrice.UNDER_20000]: 18000,
+  [RestaurantPrice.OVER_20000]: 25000,
+};
 
 export const RestaurantCategoryIcons: Record<RestaurantCategory, string> = {
   [RestaurantCategory.ALL]: 'menu_all',
