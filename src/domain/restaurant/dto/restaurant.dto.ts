@@ -31,8 +31,8 @@ export interface RestaurantReviewDTO {
   price: number;
 
   /**
-   * example: 10000
-   * @type number
+   * example: 10,000원 미만
+   * @type RestaurantPrice
    */
   prices: RestaurantPrice[];
 
