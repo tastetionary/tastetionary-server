@@ -8,7 +8,6 @@ import {
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
-import { keys } from '@fxts/core';
 
 export interface RestaurantReviewRecord {
   id: number;
@@ -18,7 +17,6 @@ export interface RestaurantReviewRecord {
   summary: string;
   opinion: string | null;
   keywords: string[];
-  price: number;
   prices: RestaurantPrice[];
   createdAt?: Date;
   updatedAt?: Date;
@@ -64,7 +62,6 @@ export async function saveReview(param: {
   userId: number;
   keywords: string[];
   category: RestaurantCategory;
-  price: number;
   prices: RestaurantPrice[];
   summary: string;
   opinion?: string;
@@ -79,7 +76,6 @@ export async function saveReviews(
     keywords: string[];
     category: RestaurantCategory;
     prices: RestaurantPrice[];
-    price: number;
     summary: string;
     opinion?: string;
     externalRestaurantInformationId: bigint;
@@ -220,7 +216,6 @@ export async function getExternalRestaurantInformationById(id: number) {
 export async function getReviewsByConditions(param: {
   restaurantIds?: bigint[];
   keywords?: string[];
-  ltePrice?: number;
   categories?: RestaurantCategory[];
   reviewerId?: number;
   prices?: RestaurantPrice[];

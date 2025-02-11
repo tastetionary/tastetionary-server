@@ -106,7 +106,6 @@ export async function getRecommendedRestaurant(param: {
   userAreas: AreaEntity;
   maxDistanceMeter: number;
   keywords: string[];
-  ltePrice: number;
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
   prices?: RestaurantPrice[];
@@ -122,7 +121,6 @@ export async function getRecommendedRestaurant(param: {
   const targetReviews = await getReviewsByConditions({
     restaurantIds: ids,
     keywords: detachEmoji(param.keywords),
-    ltePrice: param.ltePrice,
     categories: param.categories,
     prices: param.prices,
   });
@@ -513,7 +511,7 @@ function getDiscordContentsForm(
 ) {
   const contents = {
     title: '식당 리뷰 신고',
-    description: `유저 아이디: ${userId} \n 신고 카테고리: ${category} \n 리뷰 아이디: ${review.id} \n 리뷰 내용: ${review.summary} \n 리뷰 카테고리: ${review.category} \n 리뷰 키워드: ${review.keywords} \n 리뷰 가격: ${review.price} \n 리뷰 의견: ${review.opinion} \n 리뷰 생성일: ${review.createdAt}`,
+    description: `유저 아이디: ${userId} \n 신고 카테고리: ${category} \n 리뷰 아이디: ${review.id} \n 리뷰 내용: ${review.summary} \n 리뷰 카테고리: ${review.category} \n 리뷰 키워드: ${review.keywords} \n 리뷰 가격: ${review.prices} \n 리뷰 의견: ${review.opinion} \n 리뷰 생성일: ${review.createdAt}`,
   };
 
   return contents;

@@ -37,7 +37,6 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
         prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
@@ -59,7 +58,6 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
         prices: [RestaurantPrice.UNDER_10000, RestaurantPrice.UNDER_13000],
         summary: 'never come again',
         opinion: 'no',
@@ -77,7 +75,6 @@ describe('Restaurant repository', () => {
 
     const wrongRes = await getReviewsByConditions({
       keywords: [],
-      ltePrice: 9_000,
       prices: [RestaurantPrice.OVER_20000, RestaurantPrice.UNDER_16000],
     });
     expect(wrongRes).toHaveLength(0);
@@ -89,7 +86,6 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean', 'good', 'test', 'abc'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
         prices: [RestaurantPrice.UNDER_10000],
         summary: 'never come again',
         opinion: 'no',
@@ -268,7 +264,6 @@ describe('Restaurant repository', () => {
         userId: 1,
         keywords: ['clean'],
         category: RestaurantCategory.ASIAN,
-        price: 10_000,
         prices: [
           RestaurantPrice.UNDER_10000,
           RestaurantPrice.UNDER_13000,

@@ -25,12 +25,6 @@ export interface RestaurantReviewDTO {
   keywords: string[];
 
   /**
-   * example: 10000
-   * @type number
-   */
-  price: number;
-
-  /**
    * example: 10,000원 미만
    * @type RestaurantPrice
    */

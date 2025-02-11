@@ -42,7 +42,6 @@ describe('restaurant controller', () => {
     review: {
       category: RestaurantCategory.ASIAN,
       keywords: ['key'],
-      price: 10_000,
       prices: [RestaurantPrice.UNDER_10000],
       summary: 'one-line summary',
       opinion: 'N',
@@ -78,7 +77,6 @@ describe('restaurant controller', () => {
         category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         prices: [RestaurantPrice.UNDER_10000],
-        price: 10_000,
       });
 
     assertStatusCode(res, 204);
@@ -128,7 +126,6 @@ describe('restaurant controller', () => {
         excludeIds: [],
         category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
-        price: 10_000,
         prices: [RestaurantPrice.UNDER_10000],
       });
 

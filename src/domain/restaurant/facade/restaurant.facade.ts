@@ -31,11 +31,9 @@ export async function getRecommendations(param: {
   userId: number;
   maxDistanceMeter: number;
   keywords: string[];
-  ltePrice: number;
   prices: RestaurantPrice[];
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
-  priceRange?: RestaurantPrice[];
 }) {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas) {
