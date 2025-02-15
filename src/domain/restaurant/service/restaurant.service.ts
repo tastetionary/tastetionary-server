@@ -249,7 +249,9 @@ export async function getRecentReviews(count: number) {
     reviews.map(async (review) => {
       const { external_restaurant_information_id: externalUUID, summary } =
         review;
-      const externalInfo = await getExternalRestaurantInformation(externalUUID);
+      const externalInfo = await getExternalRestaurantInformationById(
+        Number(externalUUID),
+      );
 
       if (!externalInfo) {
         throw new InternalDomainException(
