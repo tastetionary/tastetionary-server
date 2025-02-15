@@ -242,16 +242,18 @@ describe('restaurant service', () => {
       jest
         .spyOn(repo, 'getReviewsOrderedByCreatedTime')
         .mockResolvedValueOnce([review, review, review]);
-      jest.spyOn(repo, 'getExternalRestaurantInformation').mockResolvedValue({
-        id: BigInt(1),
-        external_uuid: BigInt(1),
-        address: 'test-address',
-        phone: 'test-phone',
-        reference_link: 'test-reference-link',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        name: 'test-name',
-      });
+      jest
+        .spyOn(repo, 'getExternalRestaurantInformationById')
+        .mockResolvedValue({
+          id: BigInt(1),
+          external_uuid: BigInt(1),
+          address: 'test-address',
+          phone: 'test-phone',
+          reference_link: 'test-reference-link',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          name: 'test-name',
+        });
 
       const res = await getRecentReviews(count);
       expect(res).not.toBeNull();
