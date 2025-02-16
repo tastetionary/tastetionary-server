@@ -35,7 +35,7 @@ export enum RestaurantPrice {
 }
 
 export const PriceMapping: Record<RestaurantPrice, number> = {
-  [RestaurantPrice.UNDER_10000]: 5000,
+  [RestaurantPrice.UNDER_10000]: 7500,
   [RestaurantPrice.UNDER_13000]: 11500,
   [RestaurantPrice.UNDER_16000]: 14500,
   [RestaurantPrice.UNDER_20000]: 18000,
