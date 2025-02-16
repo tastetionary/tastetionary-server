@@ -517,8 +517,12 @@ function calcRevisitRatio(opinions: string[], standard = 'Y') {
 function aggregatePrice(prices: RestaurantPrice[]) {
   const data: { [index: string]: number } = {};
 
+  Object.values(RestaurantPrice).forEach((price) => {
+    data[price] = 0;
+  });
+
   prices.forEach((price) => {
-    data[price] = (data[price] || 0) + 1;
+    data[price] = data[price] + 1;
   });
 
   const sum = prices.reduce((sum, price) => sum + PriceMapping[price], 0);

@@ -100,7 +100,7 @@ describe('restaurant service', () => {
       ];
 
       const res = aggregateRestaurantReview(reviews);
-      expect(res.data.aggregatePrice.avg).toBe(15000);
+      expect(res.data.aggregatePrice.avg).toBe(16000);
       expect(res.data.revisitRatio).toBe(33.3);
 
       expect(res.data.keywords.length).toBe(2);
@@ -113,8 +113,11 @@ describe('restaurant service', () => {
       ]);
       expect(res).toEqual({
         [RestaurantPrice.UNDER_10000]: 1,
+        [RestaurantPrice.UNDER_13000]: 0,
+        [RestaurantPrice.UNDER_16000]: 0,
+        [RestaurantPrice.UNDER_20000]: 0,
         [RestaurantPrice.OVER_20000]: 1,
-        avg: 15000,
+        avg: 16000,
       });
 
       const resTwo = _private.aggregatePrice([
@@ -124,8 +127,11 @@ describe('restaurant service', () => {
       ]);
       expect(resTwo).toEqual({
         [RestaurantPrice.UNDER_10000]: 2,
+        [RestaurantPrice.UNDER_13000]: 0,
         [RestaurantPrice.UNDER_16000]: 1,
-        avg: 8000,
+        [RestaurantPrice.UNDER_20000]: 0,
+        [RestaurantPrice.OVER_20000]: 0,
+        avg: 10000,
       });
     });
   });
