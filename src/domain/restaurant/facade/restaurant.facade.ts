@@ -56,8 +56,13 @@ export async function getRecommendations(param: {
     Number(res.restaurant.id),
   );
 
+  const reviews = (
+    await getRestaurantReviews(res.restaurant.id, param.userId)
+  ).data.slice(0, 3);
+
   return {
     ...res,
+    reviews: reviews,
     bookmark: isBookmarked,
     exclude: isExcluded,
   };

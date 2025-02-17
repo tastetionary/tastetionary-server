@@ -90,6 +90,8 @@ export interface GetRestaurantsOutput
    * @type AggregateReviewDTO
    */
   aggregateReviews: AggregateReviewDTO | null;
+
+  reviews: RestaurantReview[];
 }
 
 export interface GetNearByRestaurantsOutput
@@ -247,7 +249,18 @@ export class RestaurantController {
       excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
     });
 
+    const reviews = data.reviews.map((d) => {
+      const { id, external_restaurant_information_id, ...rest } = d;
+      return {
+        id: id.toString(),
+        external_restaurant_information_id:
+          external_restaurant_information_id.toString(),
+        ...rest,
+      };
+    });
+
     const { id, externalUUID, ...rest } = data.restaurant;
+
     return new BaseResponseDto({
       id: id.toString(),
       externalUUID: externalUUID.toString(),
@@ -255,6 +268,7 @@ export class RestaurantController {
       exclude: data.exclude,
       ...rest,
       aggregateReviews: data.aggregateReviews,
+      reviews: reviews,
     });
   }
 
