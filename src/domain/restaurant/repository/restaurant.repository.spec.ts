@@ -432,7 +432,7 @@ describe('Restaurant repository', () => {
         },
         {
           id: 1,
-          name: '10,000원 이상 ~ 13,0000원 미만',
+          name: '10,000원 이상 ~ 13,000원 미만',
         },
         {
           id: 2,
