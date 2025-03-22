@@ -23,6 +23,7 @@ import {
   saveReviewReport,
   getExternalRestaurantInformationById,
   getReviewsOrderedByCreatedTime,
+  getReviewsCount,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -336,12 +337,16 @@ export async function getNearyByRestaurants(param: {
 export async function getRestaurantReviews(
   restaurantId: bigint,
   userId?: number,
+  page?: number,
+  limit?: number,
 ) {
   const reviews = await getReviewsByConditions({
     restaurantIds: [restaurantId],
+    page: page,
+    limit: limit,
   });
-  const total = reviews.length;
 
+  const total = await getReviewsCount({ restaurantIds: [restaurantId] });
   const keywordsWithEmojis = reviews.flatMap((review) =>
     attachEmoji(review.keywords),
   );
@@ -390,6 +395,7 @@ export async function getRestaurantReviews(
       keywordCounts: keywordList,
     },
     data,
+    totalCount: total,
   };
 }
 

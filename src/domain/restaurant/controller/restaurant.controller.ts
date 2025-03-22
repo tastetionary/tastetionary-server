@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
+import { PageResponseDto } from '@common/dto/pagination.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
@@ -355,10 +356,14 @@ export class RestaurantController {
   async getReviews(
     @Request() req,
     @Param('restaurantId') restaurantId: string,
-  ): Promise<BaseResponseDto<GetRestaurantReviewOutput>> {
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 10,
+  ): Promise<PageResponseDto<GetRestaurantReviewOutput>> {
     const res = await getReviews({
       restaurantId: BigInt(restaurantId),
       userId: req.user.userId,
+      page,
+      limit,
     });
 
     const { keywordReviews, data } = res;
@@ -369,10 +374,14 @@ export class RestaurantController {
         review.external_restaurant_information_id.toString(),
     }));
 
-    return new BaseResponseDto({
-      keywordReviews,
-      reviews: reviews,
-    });
+    return new PageResponseDto(
+      {
+        keywordReviews,
+        reviews: reviews,
+      },
+      limit,
+      res.totalCount,
+    );
   }
 
   /**
