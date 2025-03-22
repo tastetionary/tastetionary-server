@@ -243,8 +243,21 @@ export async function getReviewsByConditions(param: {
   categories?: RestaurantCategory[];
   reviewerId?: number;
   prices?: RestaurantPrice[];
+  page?: number;
+  limit?: number;
 }): Promise<RestaurantReviewRecord[]> {
   const condition = {};
+  const query: any = {
+    where: condition,
+    include: {
+      reactions: {
+        select: {
+          userId: true,
+          reactionType: true,
+        },
+      },
+    },
+  };
 
   if (param.restaurantIds && param.restaurantIds.length >= 1) {
     condition['external_restaurant_information_id'] = {
@@ -272,17 +285,14 @@ export async function getReviewsByConditions(param: {
     condition['userId'] = { eq: param.reviewerId };
   }
 
-  const res = await prismaClient.restaurantReviews.findMany({
-    where: condition,
-    include: {
-      reactions: {
-        select: {
-          userId: true,
-          reactionType: true,
-        },
-      },
-    },
-  });
+  if (param.page && param.limit) {
+    query.skip = (param.page - 1) * param.limit;
+    query.take = param.limit;
+  }
+
+  const res = await prismaClient.restaurantReviews.findMany(query);
+  console.log(query);
+  console.log(res);
 
   return res.map((r) => {
     const { category, prices, ...rest } = r;
