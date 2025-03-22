@@ -291,9 +291,6 @@ export async function getReviewsByConditions(param: {
   }
 
   const res = await prismaClient.restaurantReviews.findMany(query);
-  console.log(query);
-  console.log(res);
-
   return res.map((r) => {
     const { category, prices, ...rest } = r;
     const enumCategory = Object.values(RestaurantCategory).find(
@@ -308,6 +305,46 @@ export async function getReviewsByConditions(param: {
 
     return { ...rest, category: enumCategory, prices: enumPrice };
   });
+}
+
+export async function getReviewsCount(param: {
+  restaurantIds?: bigint[];
+  keywords?: string[];
+  categories?: RestaurantCategory[];
+  reviewerId?: number;
+  prices?: RestaurantPrice[];
+  page?: number;
+  limit?: number;
+}) {
+  const condition = {};
+
+  if (param.restaurantIds && param.restaurantIds.length >= 1) {
+    condition['external_restaurant_information_id'] = {
+      in: param.restaurantIds,
+    };
+  }
+
+  if (param.keywords && param.keywords.length >= 1) {
+    condition['keywords'] = { hasSome: param.keywords };
+  }
+
+  if (param.prices && param.prices.length > 0) {
+    condition['prices'] = {
+      hasSome: param.prices,
+    };
+  }
+
+  if (param.categories) {
+    condition['category'] = {
+      in: param.categories,
+    };
+  }
+
+  if (param.reviewerId) {
+    condition['userId'] = { eq: param.reviewerId };
+  }
+
+  return await prismaClient.restaurantReviews.count({ where: condition });
 }
 
 function getRestaurantRxnDistinctCnt(
