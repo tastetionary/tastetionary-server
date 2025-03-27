@@ -8,7 +8,6 @@ import {
   getReviewReportById,
   getReviewsByConditions,
   getReviewsByUserId,
-  getReviewsCount,
   getReviewsOrderedByCreatedTime,
   getUserReviewCount,
   saveExternalRestaurantInformation,
@@ -116,69 +115,6 @@ describe('Restaurant repository', () => {
 
     const allRes = await getReviewsByConditions({});
     expect(allRes).toHaveLength(1);
-  });
-
-  it('should return restaurants counts by keywords', async () => {
-    const data = [
-      {
-        userId: 1,
-        keywords: ['clean', 'good', 'test', 'abc'],
-        category: RestaurantCategory.ASIAN,
-        prices: [RestaurantPrice.UNDER_10000, RestaurantPrice.UNDER_13000],
-        summary: 'never come again',
-        opinion: 'no',
-        externalRestaurantInformationId: 1n,
-      },
-    ];
-
-    await saveReview(data[0]);
-
-    const res = await getReviewsCount({
-      keywords: [],
-      prices: [RestaurantPrice.UNDER_13000, RestaurantPrice.UNDER_20000],
-    });
-    expect(res).toEqual(1);
-
-    const wrongRes = await getReviewsCount({
-      keywords: [],
-      prices: [RestaurantPrice.OVER_20000, RestaurantPrice.UNDER_16000],
-    });
-    expect(wrongRes).toEqual(1);
-  });
-
-  it('should return restaurants counts by keywords', async () => {
-    const data = [
-      {
-        userId: 1,
-        keywords: ['clean', 'good', 'test', 'abc'],
-        category: RestaurantCategory.ASIAN,
-        prices: [RestaurantPrice.UNDER_10000],
-        summary: 'never come again',
-        opinion: 'no',
-        externalRestaurantInformationId: 1n,
-      },
-    ];
-
-    await saveReview(data[0]);
-
-    const cleanRes = await getReviewsCount({
-      keywords: ['clean'],
-      prices: [RestaurantPrice.UNDER_10000],
-    });
-    expect(cleanRes).toEqual(1);
-
-    const onlyOneRes = await getReviewsCount({
-      keywords: ['clean', 'never'],
-    });
-    expect(onlyOneRes).toEqual(1);
-
-    const nothingRes = await getReviewsCount({
-      keywords: ['nothing'],
-    });
-    expect(nothingRes).toEqual(0);
-
-    const allRes = await getReviewsCount({});
-    expect(allRes).toEqual(1);
   });
 
   it('should return restaurants by condition', async () => {
