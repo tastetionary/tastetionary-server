@@ -23,7 +23,6 @@ import {
   saveReviewReport,
   getExternalRestaurantInformationById,
   getReviewsOrderedByCreatedTime,
-  getReviewsCount,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -337,16 +336,17 @@ export async function getNearyByRestaurants(param: {
 export async function getRestaurantReviews(
   restaurantId: bigint,
   userId?: number,
-  page?: number,
-  limit?: number,
+  page: number = 1,
+  limit: number = 10,
 ) {
   const reviews = await getReviewsByConditions({
     restaurantIds: [restaurantId],
-    page: page,
-    limit: limit,
   });
 
-  const total = await getReviewsCount({ restaurantIds: [restaurantId] });
+  const total = reviews.length;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const paginatedReviews = reviews.slice(startIndex, endIndex);
   const keywordsWithEmojis = reviews.flatMap((review) =>
     attachEmoji(review.keywords),
   );
@@ -374,7 +374,7 @@ export async function getRestaurantReviews(
   const revisitRatio = calcRevisitRatio(filteredOpinions);
 
   const data = await Promise.all(
-    reviews.map(async (review) => {
+    paginatedReviews.map(async (review) => {
       const { reactions = [], ...record } = review;
       const user = await getReviewerSummary(review.userId);
 
