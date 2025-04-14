@@ -244,7 +244,8 @@ export async function deleteUserPreferenceRestaurant(
 }
 
 export async function validateNickName(nickname: string) {
-  const nickNameRegExp = /^[\p{Script=Hangul}\p{Script=Latin}0-9]{3,10}$/u;
+  const nickNameRegExp =
+    /^[\p{Script=Hangul}\p{Script=Latin}0-9](?:[ ]?[\p{Script=Hangul}\p{Script=Latin}0-9]){2,9}$/u;
 
   if (!nickNameRegExp.test(nickname)) {
     throw new CallerWrongUsageException(
