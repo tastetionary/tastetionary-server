@@ -185,6 +185,7 @@ describe('restaurant controller', () => {
             revisitRatio: 0,
           },
           data: [],
+          totalCount: 1,
         };
       });
 
