@@ -30,7 +30,7 @@ describe('account controller', () => {
     jest.spyOn(facade, 'resetPassword').mockReturnValue(Promise.resolve('abc'));
 
     const res = await request(app.getHttpServer())
-      .put('/v1/account/password')
+      .put('/v1/account/password/reset')
       .send({
         code: '1'.repeat(6),
         historyId: 1,

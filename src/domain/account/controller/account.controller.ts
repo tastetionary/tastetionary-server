@@ -54,9 +54,9 @@ export class AccountController {
 
   /**
    * @tag account
-   * @summary update password, need authentication code and id and identification
+   * @summary reset password, need authentication code and id and identification
    */
-  @TypedRoute.Put('/password')
+  @TypedRoute.Put('/password/reset')
   @HttpCode(200)
   async resetPassword(
     @TypedBody() req: ResetPasswordRequest,
