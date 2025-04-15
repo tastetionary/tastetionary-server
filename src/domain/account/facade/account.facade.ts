@@ -4,6 +4,7 @@ import {
 } from '@domain/authentication/service/authentication.service';
 import { AccountCategory } from '@domain/account/account.enum';
 import {
+  changePassword,
   findAccount,
   getAccount,
   sendPasswordToEmail,
@@ -52,7 +53,6 @@ export async function resetPassword(historyId: number, code: string) {
     );
   }
 
-  // for clear history
   await resetNotRegisteredUserAuth(
     account.identification,
     AuthenticationCategory.PASSWORD,

@@ -3,6 +3,20 @@ import { DoneProgressRequest } from '@domain/authentication/dto/authentication.d
 
 export interface ResetPasswordRequest extends DoneProgressRequest {}
 
+export interface ChangePasswordRequest {
+  /**
+   * The user's current (old) password
+   * @type string
+   */
+  currentPassword: string;
+
+  /**
+   * The new password the user wants to set
+   * @type string
+   */
+  newPassword: string;
+}
+
 export interface CreateAccountRequest {
   /**
    * authentication id which is done

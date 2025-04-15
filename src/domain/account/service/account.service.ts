@@ -69,7 +69,11 @@ export async function searchAccount(userId: number) {
     );
   }
 
-  return data;
+  const { category, ...rest } = data;
+  return {
+    cateogry: data.category as AccountCategory,
+    ...rest,
+  };
 }
 
 export async function createAccount(param: {
@@ -93,6 +97,36 @@ export async function createAccount(param: {
     category: param.category,
     identification: param.identification,
     password,
+  });
+}
+
+export async function changePassword(
+  userId: number,
+  currentPassword: string,
+  newPassword: string,
+) {
+  const account = await searchAccount(userId);
+
+  if (account.cateogry == AccountCategory.EMAIL) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'account not found with email',
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
+    );
+  }
+
+  if (account.password === currentPassword) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'invalid input from user',
+      ErrorCodeEnum.INVALID_VALUE,
+    );
+  }
+
+  await updatePassword({
+    accountId: account.id,
+    identification: account.identification,
+    password: newPassword,
   });
 }
 
