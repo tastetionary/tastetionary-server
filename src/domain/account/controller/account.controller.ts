@@ -61,7 +61,7 @@ export class AccountController {
   async resetPassword(
     @TypedBody() req: ResetPasswordRequest,
   ): Promise<BaseResponseDto<object>> {
-    const newPassword = await resetPassword(req.historyId, req.code);
-    return new BaseResponseDto({ state: 'success', password: newPassword });
+    await resetPassword(req.historyId, req.code);
+    return new BaseResponseDto({ state: 'success' });
   }
 }
