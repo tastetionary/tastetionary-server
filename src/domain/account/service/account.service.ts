@@ -71,7 +71,7 @@ export async function searchAccount(userId: number) {
 
   const { category, ...rest } = data;
   return {
-    cateogry: data.category as AccountCategory,
+    category: category as AccountCategory,
     ...rest,
   };
 }
@@ -107,7 +107,7 @@ export async function changePassword(
 ) {
   const account = await searchAccount(userId);
 
-  if (account.cateogry == AccountCategory.EMAIL) {
+  if (account.category == AccountCategory.EMAIL) {
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'account not found with email',
