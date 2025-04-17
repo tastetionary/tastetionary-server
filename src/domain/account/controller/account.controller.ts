@@ -10,12 +10,14 @@ import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
+  ChangePasswordRequest,
   CreateTokenRequest,
   ResetPasswordRequest,
   TokenDTO,
 } from '@domain/account/dto/account.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import {
+  changePassword,
   createToken,
   removeAllToken,
 } from '@domain/account/service/account.service';
@@ -54,14 +56,30 @@ export class AccountController {
 
   /**
    * @tag account
-   * @summary update password, need authentication code and id and identification
+   * @summary reset password, need authentication code and id and identification
    */
-  @TypedRoute.Put('/password')
+  @TypedRoute.Put('/password/reset')
   @HttpCode(200)
   async resetPassword(
     @TypedBody() req: ResetPasswordRequest,
   ): Promise<BaseResponseDto<object>> {
-    const newPassword = await resetPassword(req.historyId, req.code);
-    return new BaseResponseDto({ state: 'success', password: newPassword });
+    await resetPassword(req.historyId, req.code);
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  /**
+   * @tag account
+   * @summary update password, need new password, old password
+   */
+  @TypedRoute.Put('/password')
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  async updatePassword(
+    @Request() req,
+    @TypedBody() dto: ChangePasswordRequest,
+  ): Promise<BaseResponseDto<object>> {
+    const userId = req.user.userId;
+    await changePassword(userId, dto.password);
+    return new BaseResponseDto({ state: 'success' });
   }
 }

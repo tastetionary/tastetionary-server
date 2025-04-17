@@ -23,6 +23,9 @@ import { getKakaoUserInfo } from '@src/third-party/kakao/kakao';
 import { getGoogleUserInfo } from '@src/third-party/google/google';
 import { getNaverUserInfo } from '@src/third-party/naver/naver';
 import { createUser } from '@domain/user/service/user.service';
+import { sendEmail } from '@thirdParty/brevo/brevo';
+import * as fs from 'fs';
+import path from 'path';
 
 export type AccountEntity = Awaited<ReturnType<typeof getAccount>>;
 export async function getAccount(
@@ -66,7 +69,11 @@ export async function searchAccount(userId: number) {
     );
   }
 
-  return data;
+  const { category, ...rest } = data;
+  return {
+    category: category as AccountCategory,
+    ...rest,
+  };
 }
 
 export async function createAccount(param: {
@@ -90,6 +97,24 @@ export async function createAccount(param: {
     category: param.category,
     identification: param.identification,
     password,
+  });
+}
+
+export async function changePassword(userId: number, newPassword: string) {
+  const account = await searchAccount(userId);
+
+  if (account.category == AccountCategory.EMAIL) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'account not found with email',
+      ErrorCodeEnum.ACCOUNT_NOT_FOUND,
+    );
+  }
+
+  await updatePassword({
+    accountId: account.id,
+    identification: account.identification,
+    password: newPassword,
   });
 }
 
@@ -235,4 +260,43 @@ async function getUserInfo(category: AccountCategory, code: string) {
         ErrorCodeEnum.INVALID_SOCIAL_AUTH_TYPE,
       );
   }
+}
+
+export async function sendPasswordToEmail(
+  identification: string,
+  password: string,
+) {
+  const accountEntity = await findAccount(
+    identification,
+    AccountCategory.EMAIL,
+  );
+  if (!accountEntity) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'not supported type, only support email type',
+      ErrorCodeEnum.DUPLICATE_IDENTIFICATION,
+    );
+  }
+  const contents = getEmailContentsForm(password, identification);
+
+  const config = new ConfigurationService(new ConfigService()).getBrevoConfig();
+  const res = await sendEmail(contents, config);
+
+  return { isSendingSuccess: res };
+}
+
+function getEmailContentsForm(password: string, identification: string) {
+  const htmlContentFile = path.resolve(
+    __dirname,
+    process.cwd() + '/src/domain/account/resource/password/index.html',
+  );
+  let htmlContent = fs.readFileSync(htmlContentFile, 'utf8');
+  htmlContent = htmlContent.replace('{{verificationCode}}', password);
+
+  const contents = {
+    subject: '임시 비밀번호',
+    htmlContent: htmlContent,
+    to: [{ email: identification }],
+  };
+  return contents;
 }

@@ -14,6 +14,7 @@ import {
 import { resetPassword } from '@domain/account/facade/account.facade';
 import { truncateTables } from '@root/jest.setup';
 import prismaClient from '@common/database/prisma';
+import * as brevo from '@thirdParty/brevo/brevo';
 
 describe('facade', () => {
   describe('resetPassword', () => {
@@ -48,6 +49,8 @@ describe('facade', () => {
         type: AuthenticationType.EMAIL,
       };
       const history = await createProgressAuthentication(data);
+      const mockSendEmail = jest.spyOn(brevo, 'sendEmail');
+      mockSendEmail.mockResolvedValue(Promise.resolve(true));
 
       const newPassword = await resetPassword(history.id, code);
 

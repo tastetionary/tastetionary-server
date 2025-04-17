@@ -26,14 +26,34 @@ describe('account controller', () => {
     await app.init();
   });
 
-  it('/password should success', async () => {
+  it('/password/reset should success', async () => {
     jest.spyOn(facade, 'resetPassword').mockReturnValue(Promise.resolve('abc'));
 
     const res = await request(app.getHttpServer())
-      .put('/v1/account/password')
+      .put('/v1/account/password/reset')
       .send({
         code: '1'.repeat(6),
         historyId: 1,
+        password: 'pwd',
+      });
+
+    assertStatusCode(res, 200);
+  });
+
+  it('/password should success', async () => {
+    jest
+      .spyOn(accountService, 'changePassword')
+      .mockReturnValue(Promise.resolve());
+
+    const userId = 123;
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+    const res = await request(app.getHttpServer())
+      .put('/v1/account/password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
         password: 'pwd',
       });
 
