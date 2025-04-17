@@ -100,11 +100,7 @@ export async function createAccount(param: {
   });
 }
 
-export async function changePassword(
-  userId: number,
-  currentPassword: string,
-  newPassword: string,
-) {
+export async function changePassword(userId: number, newPassword: string) {
   const account = await searchAccount(userId);
 
   if (account.category == AccountCategory.EMAIL) {
@@ -112,14 +108,6 @@ export async function changePassword(
       ErrorSubCategoryEnum.INVALID_INPUT,
       'account not found with email',
       ErrorCodeEnum.ACCOUNT_NOT_FOUND,
-    );
-  }
-
-  if (account.password === currentPassword) {
-    throw new CallerWrongUsageException(
-      ErrorSubCategoryEnum.INVALID_INPUT,
-      'invalid input from user',
-      ErrorCodeEnum.INVALID_VALUE,
     );
   }
 
