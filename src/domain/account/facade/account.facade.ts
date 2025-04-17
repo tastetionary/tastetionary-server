@@ -25,12 +25,7 @@ export async function resetPassword(historyId: number, code: string) {
   const auth = await findValidAuth(historyId, code);
   const account = await getAccount(auth.identification, AccountCategory.EMAIL);
 
-  const accountEntity = await findAccount(
-    account.identification,
-    AccountCategory.EMAIL,
-  );
-
-  if (!accountEntity) {
+  if (!account) {
     return;
   }
 

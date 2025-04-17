@@ -8,7 +8,7 @@ export interface ChangePasswordRequest {
    * The new password the user wants to set
    * @type string
    */
-  newPassword: string;
+  password: string;
 }
 
 export interface CreateAccountRequest {
