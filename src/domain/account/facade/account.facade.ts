@@ -29,11 +29,11 @@ export async function resetPassword(historyId: number, code: string) {
     return;
   }
 
-  const newPassword = generatePassword(10);
+  const newPassword = SHA256(generatePassword(10)).toString();
   await updatePassword({
     accountId: account.id,
     identification: account.identification,
-    password: SHA256(newPassword).toString(),
+    password: newPassword,
   });
 
   const { isSendingSuccess } = await sendPasswordToEmail(
