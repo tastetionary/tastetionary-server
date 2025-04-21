@@ -29,17 +29,18 @@ export async function resetPassword(historyId: number, code: string) {
     return;
   }
 
-  const newPassword = SHA256(generatePassword(10)).toString();
+  const newPassword = generatePassword(10);
   await updatePassword({
     accountId: account.id,
     identification: account.identification,
-    password: newPassword,
+    password: SHA256(newPassword).toString(),
   });
 
   const { isSendingSuccess } = await sendPasswordToEmail(
     account.identification,
     newPassword,
   );
+
   if (!isSendingSuccess) {
     throw new SupplierSystemException(
       ErrorSubCategoryEnum.UNEXPECTED_STATUS,
@@ -53,8 +54,6 @@ export async function resetPassword(historyId: number, code: string) {
     AuthenticationCategory.PASSWORD,
     AuthenticationType.EMAIL,
   );
-
-  return newPassword;
 }
 
 function generatePassword(length: number): string {
