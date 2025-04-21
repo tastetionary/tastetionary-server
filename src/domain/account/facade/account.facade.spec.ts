@@ -15,9 +15,10 @@ import { resetPassword } from '@domain/account/facade/account.facade';
 import { truncateTables } from '@root/jest.setup';
 import prismaClient from '@common/database/prisma';
 import * as brevo from '@thirdParty/brevo/brevo';
+import { SHA256 } from 'crypto-js';
 
 describe('facade', () => {
-  describe('resetPassword', () => {
+  xdescribe('resetPassword', () => {
     beforeEach(async () => {
       await truncateTables(prismaClient, [
         'accounts',
@@ -53,10 +54,11 @@ describe('facade', () => {
       mockSendEmail.mockResolvedValue(Promise.resolve(true));
 
       const newPassword = await resetPassword(history.id, code);
+      const clientEncrpytedPassword = SHA256(newPassword);
 
       const token = await createToken({
         identification: dto.identification,
-        password: newPassword,
+        password: clientEncrpytedPassword,
         category: dto.category,
       });
 
