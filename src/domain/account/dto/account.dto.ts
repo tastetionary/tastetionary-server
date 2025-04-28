@@ -68,6 +68,7 @@ export interface TokenDTO {
   refreshToken: string;
   accessTokenExpiredAt: Date;
   refreshTokenExpiredAt: Date;
+  requirePassChange: boolean;
 }
 
 export interface SocialLoginInfo {
