@@ -64,6 +64,7 @@ describe('account repository', () => {
     const updateData = {
       identification: 'new-identification',
       password: 'new-password',
+      requirePassChange: true,
     };
 
     const updatedAccount = await updateAccountById(account.id, updateData);

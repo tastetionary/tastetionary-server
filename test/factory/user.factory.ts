@@ -68,6 +68,7 @@ export function accountEntityFactory(param: {
     identification: param.identification || `${random()}@ide.com`,
     password: param.password || 'password',
     category: AccountCategory.EMAIL,
+    requirePassChange: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   })();

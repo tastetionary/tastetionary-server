@@ -100,7 +100,11 @@ export async function createAccount(param: {
   });
 }
 
-export async function changePassword(userId: number, newPassword: string) {
+export async function changePassword(
+  userId: number,
+  newPassword: string,
+  requirePassChange: boolean,
+) {
   const account = await searchAccount(userId);
 
   if (account.category == AccountCategory.EMAIL) {
@@ -115,6 +119,7 @@ export async function changePassword(userId: number, newPassword: string) {
     accountId: account.id,
     identification: account.identification,
     password: newPassword,
+    requirePassChange,
   });
 }
 
@@ -122,11 +127,13 @@ export async function updatePassword(param: {
   accountId: number;
   identification: string;
   password: string;
+  requirePassChange: boolean;
 }) {
   const password = await encryptValue(param.password);
   await updateAccountById(param.accountId, {
     identification: param.identification,
     password,
+    requirePassChange: param.requirePassChange,
   });
 
   return password;
@@ -190,7 +197,10 @@ export async function createToken(param: {
     ...tokens,
   });
 
-  return tokens;
+  return {
+    ...tokens,
+    requirePassChange: entity.requirePassChange,
+  };
 }
 
 async function checkPassword(entity: AccountEntity, password: string) {

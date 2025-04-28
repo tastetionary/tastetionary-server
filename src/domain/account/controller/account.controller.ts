@@ -79,7 +79,7 @@ export class AccountController {
     @TypedBody() dto: ChangePasswordRequest,
   ): Promise<BaseResponseDto<object>> {
     const userId = req.user.userId;
-    await changePassword(userId, dto.password);
+    await changePassword(userId, dto.password, true);
     return new BaseResponseDto({ state: 'success' });
   }
 }

@@ -70,6 +70,7 @@ export async function updateAccountById(
   param: {
     identification: string;
     password: string;
+    requirePassChange: boolean;
   },
 ) {
   return prismaClient.accounts.update({

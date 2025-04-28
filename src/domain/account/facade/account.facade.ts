@@ -34,6 +34,7 @@ export async function resetPassword(historyId: number, code: string) {
     accountId: account.id,
     identification: account.identification,
     password: SHA256(newPassword).toString(),
+    requirePassChange: true,
   });
 
   const { isSendingSuccess } = await sendPasswordToEmail(

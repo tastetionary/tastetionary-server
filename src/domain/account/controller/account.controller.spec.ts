@@ -84,6 +84,7 @@ describe('account controller', () => {
         refreshToken: '',
         accessTokenExpiredAt: new Date(),
         refreshTokenExpiredAt: new Date(),
+        requirePassChange: false,
       };
     });
 
