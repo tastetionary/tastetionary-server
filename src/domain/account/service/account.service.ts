@@ -106,11 +106,10 @@ export async function changePassword(
   requirePassChange: boolean,
 ) {
   const account = await searchAccount(userId);
-
-  if (account.category == AccountCategory.EMAIL) {
+  if (account.category != AccountCategory.EMAIL) {
     throw new CallerWrongUsageException(
       ErrorSubCategoryEnum.INVALID_INPUT,
-      'account not found with email',
+      `account not found with email`,
       ErrorCodeEnum.ACCOUNT_NOT_FOUND,
     );
   }
