@@ -231,6 +231,13 @@ export interface ReviewReportDTO {
    * @type ReviewReportCategory
    */
   category: ReviewReportCategory;
+
+  /**
+   * report image
+   * example: "image.jpg"
+   * @type Express.Multer.File
+   */
+  image?: Express.Multer.File;
 }
 
 export interface KeywordReviews {

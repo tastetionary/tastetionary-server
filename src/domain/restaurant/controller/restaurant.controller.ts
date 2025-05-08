@@ -9,6 +9,9 @@ import {
   Query,
   Body,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -41,13 +44,17 @@ import {
   getRecommendations,
   getReviews,
   registerReview,
-  reportReview,
   getNearByRestaurants,
   reactToRestaurantReview,
   getReviewsByUserId,
 } from '@domain/restaurant/facade/restaurant.facade';
 import { REACTION_TYPE } from '@prisma/client';
-import { getRecentReviews } from '@domain/restaurant/service/restaurant.service';
+import {
+  getRecentReviews,
+  reportRestaurantReview,
+} from '@domain/restaurant/service/restaurant.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { validateImageFile, validateContent } from '@common/util';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -453,16 +460,22 @@ export class RestaurantController {
   @UseGuards(AuthGuard)
   @TypedRoute.Post('/review/report')
   @HttpCode(201)
+  @UseInterceptors(FileInterceptor('image'))
   async reportReview(
     @Request() req,
-    @TypedBody() dto: ReviewReportDTO,
+    @Body() dto: ReviewReportDTO,
+    @UploadedFile() file?: Express.Multer.File,
   ): Promise<BaseResponseDto<object>> {
+    file && validateImageFile(file);
+    validateContent(dto.content);
+
     const userId = req.user.userId;
-    await reportReview({
-      reviewId: dto.reviewId,
+    await reportRestaurantReview({
+      reviewId: Number(dto.reviewId),
       userId,
       content: dto.content,
       category: dto.category as ReviewReportCategory,
+      image: file,
     });
 
     return new BaseResponseDto({

@@ -136,6 +136,7 @@ export async function saveReviewReport(param: {
   reviewId: number;
   category: ReviewReportCategory;
   content: string;
+  imageUrl?: string;
 }) {
   await saveReviewReports([param]);
 }
@@ -146,6 +147,7 @@ export async function saveReviewReports(
     reviewId: number;
     category: ReviewReportCategory;
     content: string;
+    imageUrl?: string;
   }[],
 ) {
   await prismaClient.reviewReports.createMany({ data: params });

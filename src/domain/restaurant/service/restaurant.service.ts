@@ -50,6 +50,8 @@ import { REACTION_TYPE } from '@prisma/client';
 import { sendDiscordMessage } from '@thirdParty/discord/discord';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
+import { uploadFileToS3 } from '@root/src/third-party/aws/aws';
+import { getFileUrl } from '@root/src/third-party/aws/aws';
 
 export function aggregateRestaurantReview(
   reviews: RestaurantReviewRecord[],
@@ -453,6 +455,7 @@ export async function reportRestaurantReview(param: {
   userId: number;
   content: string;
   category: ReviewReportCategory;
+  image?: Express.Multer.File;
 }) {
   const review = await getReviewById(param.reviewId);
   if (!review) {
@@ -483,7 +486,25 @@ export async function reportRestaurantReview(param: {
     param.category,
   );
   await sendDiscordMessage(discordContent, discordConfig);
-  await saveReviewReport(param);
+
+  const imageUrl = param.image
+    ? getFileUrl(
+        await (() => {
+          const timestamp = Date.now();
+          const key = `review-reports/${param.userId}_${timestamp}_${param.image.originalname}`;
+          uploadFileToS3(key, param.image);
+          return key;
+        })(),
+      )
+    : undefined;
+
+  await saveReviewReport({
+    userId: param.userId,
+    reviewId: param.reviewId,
+    category: param.category,
+    content: param.content,
+    imageUrl,
+  });
 }
 
 export async function upsertRestaurantReviewRxn(param: {
