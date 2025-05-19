@@ -271,7 +271,7 @@ export async function getReviewsByConditions(param: {
   }
 
   if (param.reviewerId) {
-    condition['userId'] = { eq: param.reviewerId };
+    condition['userId'] = { equals: param.reviewerId };
   }
 
   const res = await prismaClient.restaurantReviews.findMany({
