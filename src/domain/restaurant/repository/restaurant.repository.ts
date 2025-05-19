@@ -407,3 +407,9 @@ export async function deleteReviewReaction(params: {
     },
   });
 }
+
+export async function deleteReviewById(reviewId: number) {
+  return await prismaClient.restaurantReviews.delete({
+    where: { id: reviewId },
+  });
+}

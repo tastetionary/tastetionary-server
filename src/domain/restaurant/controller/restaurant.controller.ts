@@ -11,7 +11,6 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
-  BadRequestException,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -50,6 +49,7 @@ import {
 } from '@domain/restaurant/facade/restaurant.facade';
 import { REACTION_TYPE } from '@prisma/client';
 import {
+  deleteRestaurnatReview,
   getRecentReviews,
   reportRestaurantReview,
 } from '@domain/restaurant/service/restaurant.service';
@@ -434,6 +434,30 @@ export class RestaurantController {
       categories: res.categories,
       keywords: res.keywords,
       prices: res.prices,
+    });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary delete review
+   * @security bearer
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Delete('/review/:reviewId')
+  async deleteReview(
+    @Request() req,
+    @Param('reviewId') reviewId: string,
+  ): Promise<BaseResponseDto<object>> {
+    const userId = req.user.userId;
+
+    await deleteRestaurnatReview({
+      reviewId: Number(reviewId),
+      userId: userId,
+    });
+
+    return new BaseResponseDto({
+      state: 'success',
     });
   }
 

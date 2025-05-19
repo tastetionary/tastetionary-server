@@ -23,6 +23,7 @@ import {
   saveReviewReport,
   getExternalRestaurantInformationById,
   getReviewsOrderedByCreatedTime,
+  deleteReviewById,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -602,3 +603,27 @@ export const _private = {
   aggregatePrice,
   getDiscordContentsForm,
 };
+
+export async function deleteRestaurnatReview(param: {
+  reviewId: number;
+  userId: number;
+}) {
+  const review = await getReviewById(param.reviewId);
+  if (!review) {
+    throw new InternalDomainException(
+      ErrorSubCategoryEnum.NO_DATA,
+      `no review data ${param.reviewId}`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  if (review.userId !== param.userId) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.UNEXPECTED_STATUS,
+      '리뷰 삭제 권한이 없습니다.',
+      ErrorCodeEnum.FORBIDDEN,
+    );
+  }
+
+  await deleteReviewById(param.reviewId);
+}
