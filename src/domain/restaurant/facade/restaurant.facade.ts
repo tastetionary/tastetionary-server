@@ -124,15 +124,6 @@ export async function getReviewsByUserId(param: {
   return await getRestaurantReviewsByUserId(param.reviewerId, param.userId);
 }
 
-export async function reportReview(param: {
-  reviewId: number;
-  userId: number;
-  content: string;
-  category: ReviewReportCategory;
-}) {
-  await reportRestaurantReview(param);
-}
-
 export async function reactToRestaurantReview(param: {
   reviewId: number;
   restaurantId: number;
