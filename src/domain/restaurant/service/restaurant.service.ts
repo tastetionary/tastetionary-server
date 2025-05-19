@@ -23,6 +23,7 @@ import {
   saveReviewReport,
   getExternalRestaurantInformationById,
   getReviewsOrderedByCreatedTime,
+  deleteReviewById,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -410,15 +411,36 @@ export async function getRestaurantReviewsByUserId(
     getReviewerSummary(reviewerId),
   ]);
 
-  return {
-    reviews: reviewRecords.map((review) => {
+  const reviews = await Promise.all(
+    reviewRecords.map(async (review) => {
       const { reactions = [], ...record } = review;
+      const restaurant = await getExternalRestaurantInformationById(
+        Number(record.external_restaurant_information_id),
+      );
+
+      if (!restaurant) {
+        throw new InternalDomainException(
+          ErrorSubCategoryEnum.NO_DATA,
+          `no restaurant data for ${record.id}`,
+          ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+        );
+      }
+
       return {
         ...record,
+        restaurant: {
+          id: restaurant.id,
+          name: restaurant.name,
+          address: restaurant.address,
+        },
         reviewReactionCnt: getRestaurantRxnDistinctCnt(reactions),
         userReaction: userId ? getUserReviewReaction(reactions, userId) : null,
       };
     }),
+  );
+
+  return {
+    reviews,
     user,
   };
 }
@@ -595,6 +617,30 @@ function getUserReviewReaction(
   userID: number,
 ): REACTION_TYPE | null {
   return reactions.find((rxn) => rxn.userId === userID)?.reactionType ?? null;
+}
+
+export async function deleteRestaurnatReview(param: {
+  reviewId: number;
+  userId: number;
+}) {
+  const review = await getReviewById(param.reviewId);
+  if (!review) {
+    throw new InternalDomainException(
+      ErrorSubCategoryEnum.NO_DATA,
+      `no review data ${param.reviewId}`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  if (review.userId !== param.userId) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.UNEXPECTED_STATUS,
+      '리뷰 삭제 권한이 없습니다.',
+      ErrorCodeEnum.FORBIDDEN,
+    );
+  }
+
+  await deleteReviewById(param.reviewId);
 }
 
 export const _private = {

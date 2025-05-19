@@ -268,7 +268,7 @@ describe('restaurant service', () => {
   });
 
   describe('getRestaurantReviewsByUserId', () => {
-    it("should get my reviews using the reviewer's user id", async () => {
+    it('should get my reviews using the reviewer user id', async () => {
       const profile = profileEntityFactory();
       const reviewerId = profile.user.id;
       const review = restaurantReviewRecordFactory({ userId: reviewerId });

@@ -11,7 +11,6 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
-  BadRequestException,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -50,6 +49,7 @@ import {
 } from '@domain/restaurant/facade/restaurant.facade';
 import { REACTION_TYPE } from '@prisma/client';
 import {
+  deleteRestaurnatReview,
   getRecentReviews,
   reportRestaurantReview,
 } from '@domain/restaurant/service/restaurant.service';
@@ -99,7 +99,7 @@ export interface GetRestaurantsOutput
    */
   aggregateReviews: AggregateReviewDTO | null;
 
-  reviews: RestaurantReview[];
+  reviews: Array<Omit<RestaurantReview, 'restaurant'>>;
 }
 
 export interface GetNearByRestaurantsOutput
@@ -115,6 +115,29 @@ export interface GetNearByRestaurantsOutput
    * @type ReviewAggregateData
    */
   aggregateReviews: ReviewAggregateData;
+}
+
+export interface MinimumExternalRestaurantInformation {
+  /**
+   * 식당 ID
+   * @example 1
+   * @type: string
+   */
+  id: string;
+
+  /**
+   * 식당 이름
+   * @example "맛있는 식당"
+   * @type: string
+   */
+  name: string;
+
+  /**
+   * 식당 주소
+   * @example "서울시 강남구 테헤란로 123"
+   * @type string
+   */
+  address: string;
 }
 
 export interface ReviewerSummary {
@@ -158,6 +181,13 @@ export interface RestaurantReview
    * @type ReviewerSummary
    */
   user: ReviewerSummary;
+
+  /**
+   * Restaurant Info
+   * example: { id: 1, name: '맛있는 식당', address: '서울시 강남구 테헤란로 123'}
+   * @type MinimumExternalRestaurantInformation
+   */
+  restaurant: MinimumExternalRestaurantInformation;
 
   /**
    * Distinct number of review reactions for each reaction type (L: '도움이 돼요', D: '도움이 안돼요')
@@ -206,7 +236,7 @@ export interface GetRestaurantReviewOutput {
    * restaurant reviews
    * @type RestaurantReview
    */
-  reviews: RestaurantReview[];
+  reviews: Array<Omit<RestaurantReview, 'restaurant'>>;
 }
 
 export interface GetReviewsByUserIdOutput {
@@ -376,12 +406,14 @@ export class RestaurantController {
     });
 
     const { keywordReviews, data } = res;
-    const reviews: RestaurantReview[] = data.map((review) => ({
-      ...review,
-      id: review.id.toString(),
-      external_restaurant_information_id:
-        review.external_restaurant_information_id.toString(),
-    }));
+    const reviews: Array<Omit<RestaurantReview, 'restaurant'>> = data.map(
+      (review) => ({
+        ...review,
+        id: review.id.toString(),
+        external_restaurant_information_id:
+          review.external_restaurant_information_id.toString(),
+      }),
+    );
 
     return new PageResponseDto(
       {
@@ -417,6 +449,10 @@ export class RestaurantController {
         id: review.id.toString(),
         external_restaurant_information_id:
           review.external_restaurant_information_id.toString(),
+        restaurant: {
+          ...review.restaurant,
+          id: review.restaurant.id.toString(),
+        },
       })),
     });
   }
@@ -434,6 +470,30 @@ export class RestaurantController {
       categories: res.categories,
       keywords: res.keywords,
       prices: res.prices,
+    });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary delete review
+   * @security bearer
+   */
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @TypedRoute.Delete('/review/:reviewId')
+  async deleteReview(
+    @Request() req,
+    @Param('reviewId') reviewId: string,
+  ): Promise<BaseResponseDto<object>> {
+    const userId = req.user.userId;
+
+    await deleteRestaurnatReview({
+      reviewId: Number(reviewId),
+      userId: userId,
+    });
+
+    return new BaseResponseDto({
+      state: 'success',
     });
   }
 
