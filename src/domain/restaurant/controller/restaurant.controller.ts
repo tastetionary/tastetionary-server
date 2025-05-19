@@ -99,7 +99,7 @@ export interface GetRestaurantsOutput
    */
   aggregateReviews: AggregateReviewDTO | null;
 
-  reviews: RestaurantReview[];
+  reviews: Array<Omit<RestaurantReview, 'restaurant'>>;
 }
 
 export interface GetNearByRestaurantsOutput
@@ -115,6 +115,29 @@ export interface GetNearByRestaurantsOutput
    * @type ReviewAggregateData
    */
   aggregateReviews: ReviewAggregateData;
+}
+
+export interface MinimumExternalRestaurantInformation {
+  /**
+   * 식당 ID
+   * @example 1
+   * @type: string
+   */
+  id: string;
+
+  /**
+   * 식당 이름
+   * @example "맛있는 식당"
+   * @type: string
+   */
+  name: string;
+
+  /**
+   * 식당 주소
+   * @example "서울시 강남구 테헤란로 123"
+   * @type string
+   */
+  address: string;
 }
 
 export interface ReviewerSummary {
@@ -158,6 +181,13 @@ export interface RestaurantReview
    * @type ReviewerSummary
    */
   user: ReviewerSummary;
+
+  /**
+   * Restaurant Info
+   * example: { id: 1, name: '맛있는 식당', address: '서울시 강남구 테헤란로 123'}
+   * @type MinimumExternalRestaurantInformation
+   */
+  restaurant: MinimumExternalRestaurantInformation;
 
   /**
    * Distinct number of review reactions for each reaction type (L: '도움이 돼요', D: '도움이 안돼요')
@@ -206,7 +236,7 @@ export interface GetRestaurantReviewOutput {
    * restaurant reviews
    * @type RestaurantReview
    */
-  reviews: RestaurantReview[];
+  reviews: Array<Omit<RestaurantReview, 'restaurant'>>;
 }
 
 export interface GetReviewsByUserIdOutput {
@@ -376,12 +406,14 @@ export class RestaurantController {
     });
 
     const { keywordReviews, data } = res;
-    const reviews: RestaurantReview[] = data.map((review) => ({
-      ...review,
-      id: review.id.toString(),
-      external_restaurant_information_id:
-        review.external_restaurant_information_id.toString(),
-    }));
+    const reviews: Array<Omit<RestaurantReview, 'restaurant'>> = data.map(
+      (review) => ({
+        ...review,
+        id: review.id.toString(),
+        external_restaurant_information_id:
+          review.external_restaurant_information_id.toString(),
+      }),
+    );
 
     return new PageResponseDto(
       {
@@ -417,6 +449,10 @@ export class RestaurantController {
         id: review.id.toString(),
         external_restaurant_information_id:
           review.external_restaurant_information_id.toString(),
+        restaurant: {
+          ...review.restaurant,
+          id: review.restaurant.id.toString(),
+        },
       })),
     });
   }

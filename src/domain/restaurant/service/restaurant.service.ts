@@ -411,15 +411,36 @@ export async function getRestaurantReviewsByUserId(
     getReviewerSummary(reviewerId),
   ]);
 
-  return {
-    reviews: reviewRecords.map((review) => {
+  const reviews = await Promise.all(
+    reviewRecords.map(async (review) => {
       const { reactions = [], ...record } = review;
+      const restaurant = await getExternalRestaurantInformationById(
+        Number(record.external_restaurant_information_id),
+      );
+
+      if (!restaurant) {
+        throw new InternalDomainException(
+          ErrorSubCategoryEnum.NO_DATA,
+          `no restaurant data for ${record.id}`,
+          ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+        );
+      }
+
       return {
         ...record,
+        restaurant: {
+          id: restaurant.id,
+          name: restaurant.name,
+          address: restaurant.address,
+        },
         reviewReactionCnt: getRestaurantRxnDistinctCnt(reactions),
         userReaction: userId ? getUserReviewReaction(reactions, userId) : null,
       };
     }),
+  );
+
+  return {
+    reviews,
     user,
   };
 }
@@ -598,12 +619,6 @@ function getUserReviewReaction(
   return reactions.find((rxn) => rxn.userId === userID)?.reactionType ?? null;
 }
 
-export const _private = {
-  registerExternalRestaurantInformationWhenNoData,
-  aggregatePrice,
-  getDiscordContentsForm,
-};
-
 export async function deleteRestaurnatReview(param: {
   reviewId: number;
   userId: number;
@@ -627,3 +642,9 @@ export async function deleteRestaurnatReview(param: {
 
   await deleteReviewById(param.reviewId);
 }
+
+export const _private = {
+  registerExternalRestaurantInformationWhenNoData,
+  aggregatePrice,
+  getDiscordContentsForm,
+};
