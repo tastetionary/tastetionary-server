@@ -517,6 +517,7 @@ export class RestaurantController {
   /**
    * @tag restaurant
    * @summary report restaurant review
+   * @security bearer
    */
   @UseGuards(AuthGuard)
   @TypedRoute.Post('/review/report')

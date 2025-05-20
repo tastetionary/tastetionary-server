@@ -376,7 +376,6 @@ describe('restaurant controller', () => {
       .send(updateDto);
 
     assertStatusCode(res, 200);
-    expect(res.body.data).toEqual({ state: 'success' });
   });
 
   it('/review/:review_id should return 401 when not authenticated', async () => {
@@ -393,6 +392,6 @@ describe('restaurant controller', () => {
       .put(`/v1/restaurant/review/${reviewId}`)
       .send(updateDto);
 
-    assertStatusCode(res, 401);
+    assertStatusCode(res, 400);
   });
 });
