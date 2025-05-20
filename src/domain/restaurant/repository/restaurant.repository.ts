@@ -424,7 +424,7 @@ export async function updateReviewById(param: {
   opinion?: string;
   externalRestaurantInformationId: bigint;
 }) {
-  const { prices, externalRestaurantInformationId, ...rest } = param;
+  const { prices, externalRestaurantInformationId, reviewId, ...rest } = param;
   const data = {
     ...rest,
     prices: [...new Set(prices)],
@@ -433,7 +433,7 @@ export async function updateReviewById(param: {
 
   return await prismaClient.restaurantReviews.update({
     where: {
-      id: param.reviewId,
+      id: reviewId,
     },
     data,
   });

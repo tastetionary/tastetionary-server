@@ -349,4 +349,50 @@ describe('restaurant controller', () => {
 
     assertStatusCode(res, 200);
   });
+
+  it('/review/:review_id should return 200', async () => {
+    const userId = 123;
+    const reviewId = 123;
+    const updateDto = {
+      category: RestaurantCategory.BUFFET,
+      keywords: ['clean🥰', 'kind💕'],
+      prices: [RestaurantPrice.UNDER_16000],
+      summary: 'updated summary',
+      opinion: 'Y',
+    };
+
+    jest
+      .spyOn(restaurantService, 'updateReview')
+      .mockImplementationOnce(async () => {});
+
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
+    const res = await request(app.getHttpServer())
+      .put(`/v1/restaurant/review/${reviewId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updateDto);
+
+    assertStatusCode(res, 200);
+    expect(res.body.data).toEqual({ state: 'success' });
+  });
+
+  it('/review/:review_id should return 401 when not authenticated', async () => {
+    const reviewId = 123;
+    const updateDto = {
+      category: RestaurantCategory.BUFFET,
+      keywords: ['clean🥰'],
+      prices: [RestaurantPrice.UNDER_16000],
+      summary: 'updated summary',
+      opinion: 'Y',
+    };
+
+    const res = await request(app.getHttpServer())
+      .put(`/v1/restaurant/review/${reviewId}`)
+      .send(updateDto);
+
+    assertStatusCode(res, 401);
+  });
 });

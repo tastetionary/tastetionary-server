@@ -52,6 +52,7 @@ import {
   deleteRestaurnatReview,
   getRecentReviews,
   reportRestaurantReview,
+  updateReview,
 } from '@domain/restaurant/service/restaurant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { validateImageFile, validateContent } from '@common/util';
@@ -563,6 +564,23 @@ export class RestaurantController {
       reviewId,
       reactionType: body.reaction_type,
     }).catch(() => {});
+    return new BaseResponseDto({ state: 'success' });
+  }
+
+  @UseGuards(AuthGuard)
+  @HttpCode(200)
+  @TypedRoute.Put('/review/:reviewId')
+  async updateRestaurantReview(
+    @Request() req,
+    @Param('reviewId') reviewId: string,
+    @TypedBody() input: RestaurantReviewDTO,
+  ): Promise<BaseResponseDto<object>> {
+    const userId = req.user.userId;
+    await updateReview({
+      userId,
+      reviewId: Number(reviewId),
+      dto: input,
+    });
     return new BaseResponseDto({ state: 'success' });
   }
 }
