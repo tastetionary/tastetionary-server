@@ -24,6 +24,7 @@ import {
   getExternalRestaurantInformationById,
   getReviewsOrderedByCreatedTime,
   deleteReviewById,
+  updateReviewById,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -641,6 +642,38 @@ export async function deleteRestaurnatReview(param: {
   }
 
   await deleteReviewById(param.reviewId);
+}
+
+export async function updateReview(param: {
+  userId: number;
+  reviewId: number;
+  dto: RestaurantReviewDTO;
+}) {
+  const review = await getReviewById(param.reviewId);
+  if (!review) {
+    throw new InternalDomainException(
+      ErrorSubCategoryEnum.NO_DATA,
+      `no review data ${param.reviewId}`,
+      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  if (review.userId !== param.userId) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.UNEXPECTED_STATUS,
+      '리뷰 수정 권한이 없습니다.',
+      ErrorCodeEnum.FORBIDDEN,
+    );
+  }
+
+  const keywords = detachEmoji(param.dto.keywords);
+  param.dto.keywords = keywords;
+  await updateReviewById({
+    reviewId: param.reviewId,
+    userId: param.userId,
+    externalRestaurantInformationId: review.external_restaurant_information_id,
+    ...param.dto,
+  });
 }
 
 export const _private = {

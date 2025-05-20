@@ -413,3 +413,28 @@ export async function deleteReviewById(reviewId: number) {
     where: { id: reviewId },
   });
 }
+
+export async function updateReviewById(param: {
+  reviewId: number;
+  userId: number;
+  keywords: string[];
+  category: RestaurantCategory;
+  prices: RestaurantPrice[];
+  summary: string;
+  opinion?: string;
+  externalRestaurantInformationId: bigint;
+}) {
+  const { prices, externalRestaurantInformationId, reviewId, ...rest } = param;
+  const data = {
+    ...rest,
+    prices: [...new Set(prices)],
+    external_restaurant_information_id: externalRestaurantInformationId,
+  };
+
+  return await prismaClient.restaurantReviews.update({
+    where: {
+      id: reviewId,
+    },
+    data,
+  });
+}

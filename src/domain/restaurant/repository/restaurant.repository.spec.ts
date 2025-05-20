@@ -16,6 +16,7 @@ import {
   saveReviewReport,
   saveReviewReports,
   saveReviews,
+  updateReviewById,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
@@ -283,6 +284,67 @@ describe('Restaurant repository', () => {
     expect(res).toHaveLength(1);
     const count = await getUserReviewCount(data[0].userId);
     expect(count).toBe(1);
+  });
+
+  it('should update review ', async () => {
+    const data = [
+      {
+        userId: 1,
+        keywords: ['clean'],
+        category: RestaurantCategory.ASIAN,
+        prices: [
+          RestaurantPrice.UNDER_10000,
+          RestaurantPrice.UNDER_13000,
+          RestaurantPrice.UNDER_10000,
+        ],
+        summary: 'never come again',
+        opinion: 'no',
+        externalRestaurantInformationId: 1n,
+      },
+    ];
+
+    await saveReview(data[0]);
+
+    const res = await getReviewsByUserId(data[0].userId);
+    expect(res).toHaveLength(1);
+    const count = await getUserReviewCount(data[0].userId);
+    expect(count).toBe(1);
+
+    const updateData = {
+      reviewId: res[0].id,
+      userId: data[0].userId,
+      keywords: ['clean', 'kind'],
+      category: RestaurantCategory.BUFFET,
+      prices: [RestaurantPrice.UNDER_16000],
+      summary: 'updated summary',
+      opinion: 'Y',
+      externalRestaurantInformationId: data[0].externalRestaurantInformationId,
+    };
+
+    await updateReviewById(updateData);
+
+    const updatedReview = await getReviewById(res[0].id);
+    expect(updatedReview).not.toBeNull();
+    expect(updatedReview?.category).toBe(RestaurantCategory.BUFFET);
+    expect(updatedReview?.summary).toBe('updated summary');
+    expect(updatedReview?.opinion).toBe('Y');
+    expect(updatedReview?.keywords).toEqual(['clean', 'kind']);
+    expect(updatedReview?.prices).toEqual([RestaurantPrice.UNDER_16000]);
+  });
+
+  it('should throw error when updating non-existent review', async () => {
+    const updateData = {
+      reviewId: 99999,
+      userId: 1,
+      keywords: ['clean'],
+      category: RestaurantCategory.ASIAN,
+      prices: [RestaurantPrice.UNDER_10000],
+      summary: 'test',
+      opinion: 'Y',
+      externalRestaurantInformationId: 1n,
+    };
+
+    await expect(updateReviewById(updateData)).rejects.toThrow();
   });
 
   it('should return review order by created time', async () => {
