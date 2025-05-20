@@ -15,6 +15,7 @@ import {
   getRestaurantReviewsByUserId,
   _private,
   getRecentReviews,
+  updateReview,
 } from '@domain/restaurant/service/restaurant.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
 import prismaClient from '@root/src/common/database/prisma';
@@ -26,6 +27,10 @@ import {
   restaurantReviewRecordFactory,
 } from '@root/test/factory/restaurant.factory';
 import { profileEntityFactory } from '@root/test/factory/user.factory';
+import {
+  InternalDomainException,
+  CallerWrongUsageException,
+} from '@common/exception/internal.exception';
 
 describe('restaurant service', () => {
   beforeEach(async () => {
@@ -212,6 +217,94 @@ describe('restaurant service', () => {
 
       expect(res).toHaveLength(1);
       expect(res[0].keywords).toEqual(['clean']);
+    });
+  });
+
+  describe('updateReview', () => {
+    it('should update review and detach emoji', async () => {
+      const userId = 99;
+      const entity = areaEntityFactory({ userId });
+      jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
+
+      await createReview({
+        userId,
+        externalDto: EXTERNAL_DTO,
+        dto: DTO,
+      });
+      const reviews = await getReviews(userId);
+      expect(reviews).toHaveLength(1);
+
+      const updateDto = {
+        category: RestaurantCategory.BUFFET,
+        keywords: ['clean🥰', 'kind💕'],
+        prices: [RestaurantPrice.UNDER_16000],
+        summary: 'updated summary',
+        opinion: 'Y',
+      };
+
+      await updateReview({
+        userId,
+        reviewId: reviews[0].id,
+        dto: updateDto,
+      });
+
+      const updatedReviews = await getReviews(userId);
+      expect(updatedReviews).toHaveLength(1);
+      expect(updatedReviews[0].category).toBe(RestaurantCategory.BUFFET);
+      expect(updatedReviews[0].keywords).toEqual(['clean', 'kind']);
+      expect(updatedReviews[0].prices).toEqual([RestaurantPrice.UNDER_16000]);
+      expect(updatedReviews[0].summary).toBe('updated summary');
+      expect(updatedReviews[0].opinion).toBe('Y');
+    });
+
+    it('should throw error when review does not exist', async () => {
+      const userId = 99;
+      const updateDto = {
+        category: RestaurantCategory.BUFFET,
+        keywords: ['clean🥰'],
+        prices: [RestaurantPrice.UNDER_16000],
+        summary: 'updated summary',
+        opinion: 'Y',
+      };
+
+      await expect(
+        updateReview({
+          userId,
+          reviewId: 99999,
+          dto: updateDto,
+        }),
+      ).rejects.toThrow(InternalDomainException);
+    });
+
+    it('should throw error when user is not the owner', async () => {
+      const userId = 99;
+      const otherUserId = 100;
+      const entity = areaEntityFactory({ userId });
+      jest.spyOn(userService, 'searchAreas').mockResolvedValueOnce(entity);
+
+      await createReview({
+        userId,
+        externalDto: EXTERNAL_DTO,
+        dto: DTO,
+      });
+      const reviews = await getReviews(userId);
+      expect(reviews).toHaveLength(1);
+
+      const updateDto = {
+        category: RestaurantCategory.BUFFET,
+        keywords: ['clean🥰'],
+        prices: [RestaurantPrice.UNDER_16000],
+        summary: 'updated summary',
+        opinion: 'Y',
+      };
+
+      await expect(
+        updateReview({
+          userId: otherUserId,
+          reviewId: reviews[0].id,
+          dto: updateDto,
+        }),
+      ).rejects.toThrow(CallerWrongUsageException);
     });
   });
 
