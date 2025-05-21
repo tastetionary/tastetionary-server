@@ -187,6 +187,29 @@ export interface RestaurantPriceOption {
   name: RestaurantPrice;
 }
 
+export interface RestaurantReportOption {
+  /**
+   * food price id
+   * example: 0
+   * @type number
+   */
+  id: number;
+
+  /**
+   * report option key (enum key)
+   * example: "WRONG_ADDRESS"
+   * @type string
+   */
+  key: string;
+
+  /**
+   * report
+   * example: "가게 주소가 달라요."
+   * @type ReviewReportCategory
+   */
+  label: ReviewReportCategory;
+}
+
 export interface GetRestaurantFilterOption {
   /**
    * restaurant categories
@@ -209,7 +232,6 @@ export interface GetRestaurantFilterOption {
    */
   prices: RestaurantPriceOption[];
 }
-
 export interface ReviewReportDTO {
   /**
    * review id

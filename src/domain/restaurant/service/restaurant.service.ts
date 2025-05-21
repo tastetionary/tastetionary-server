@@ -25,6 +25,7 @@ import {
   getReviewsOrderedByCreatedTime,
   deleteReviewById,
   updateReviewById,
+  getReportOptionRecord,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -471,6 +472,10 @@ export function getReviewOptions() {
     keywords: options.keywords,
     prices: options.prices,
   };
+}
+
+export function getReportOptions() {
+  return getReportOptionRecord();
 }
 
 export async function reportRestaurantReview(param: {

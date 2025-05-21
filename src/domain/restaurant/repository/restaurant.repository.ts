@@ -378,6 +378,14 @@ export function getRestaurantOptionsRecord() {
   };
 }
 
+export function getReportOptionRecord() {
+  return Object.entries(ReviewReportCategory).map(([key, value], index) => ({
+    id: index,
+    key,
+    label: value,
+  }));
+}
+
 export async function saveReviewReaction(params: {
   userId: number;
   reviewId: number;

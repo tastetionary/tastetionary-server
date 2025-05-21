@@ -26,6 +26,7 @@ import {
   ReviewAggregateData,
   ReviewReportDTO,
   PutRestaurantReviewReactionDTO,
+  RestaurantReportOption,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
   ExternalRestaurantInformationRecord,
@@ -46,6 +47,7 @@ import {
   getNearByRestaurants,
   reactToRestaurantReview,
   getReviewsByUserId,
+  getRestaurantReportOptions,
 } from '@domain/restaurant/facade/restaurant.facade';
 import { REACTION_TYPE } from '@prisma/client';
 import {
@@ -512,6 +514,18 @@ export class RestaurantController {
       keywords: res.keywords,
       prices: res.prices,
     });
+  }
+
+  /**
+   * @tag restaurant
+   * @summary get restaurant report option
+   */
+  @TypedRoute.Get('/review/report/option')
+  @HttpCode(200)
+  getReportOptions(): BaseResponseDto<Array<RestaurantReportOption>> {
+    const res = getRestaurantReportOptions();
+
+    return new BaseResponseDto(res);
   }
 
   /**
