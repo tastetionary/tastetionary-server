@@ -280,6 +280,14 @@ describe('restaurant controller', () => {
     expect(res.statusCode).toEqual(200);
   });
 
+  it('/review/report/option, should return 200', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/v1/restaurant/review/report/option')
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+  });
+
   it('/:restaurantId/review/:reviewId/react, should return 201', async () => {
     const userId = 123;
     const restaurantId = 1n;

@@ -3,6 +3,7 @@ import {
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
   getExternalRestaurantInformationById,
+  getReportOptionRecord,
   getRestaurantOptionsRecord,
   getReviewById,
   getReviewReportById,
@@ -514,11 +515,44 @@ describe('Restaurant repository', () => {
     expect(res).toEqual(expected);
   });
 
+  it('should get review report options', async () => {
+    const res = await getReportOptionRecord();
+    const expected = [
+      {
+        id: 0,
+        key: 'WRONG_ADDRESS',
+        label: '가게 주소가 달라요.',
+      },
+      {
+        id: 1,
+        key: 'WRONG_PRICE',
+        label: '음식 가격대가 달라요.',
+      },
+      {
+        id: 2,
+        key: 'STRANGE_PHOTO',
+        label: '가게 사진이 이상해요.',
+      },
+      {
+        id: 3,
+        key: 'STORE_CLOSED',
+        label: '가게가 폐업했어요.',
+      },
+      {
+        id: 4,
+        key: 'ETC',
+        label: '기타 다른 신고 사항이 있어요.',
+      },
+    ];
+
+    expect(res).toEqual(expected);
+  });
+
   it('should save review report', async () => {
     const data = {
       userId: 1,
       reviewId: 1,
-      category: ReviewReportCategory.ADVERTISEMENT,
+      category: ReviewReportCategory.ETC,
       content: 'test-content',
     };
 
@@ -532,7 +566,7 @@ describe('Restaurant repository', () => {
       {
         userId: 1,
         reviewId: 1,
-        category: ReviewReportCategory.ADVERTISEMENT,
+        category: ReviewReportCategory.STORE_CLOSED,
         content: 'test-content',
       },
     ];

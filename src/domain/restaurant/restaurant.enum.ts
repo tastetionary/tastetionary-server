@@ -71,10 +71,9 @@ export const RestaurantKeywordEmoji: Record<RestaurantKeyword, string> = {
 };
 
 export enum ReviewReportCategory {
-  INAPPROPRIATE_CONTENT = '부적절한 내용',
-  SPAM = '스팸',
-  HATE_SPEECH = '혐오 발언',
-  ADVERTISEMENT = '광고',
-  FALSE_INFO = '허위 정보',
-  ETC = '기타',
+  WRONG_ADDRESS = '가게 주소가 달라요.',
+  WRONG_PRICE = '음식 가격대가 달라요.',
+  STRANGE_PHOTO = '가게 사진이 이상해요.',
+  STORE_CLOSED = '가게가 폐업했어요.',
+  ETC = '기타 다른 신고 사항이 있어요.',
 }

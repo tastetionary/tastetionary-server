@@ -8,6 +8,7 @@ import {
   reportRestaurantReview,
   upsertRestaurantReviewRxn,
   getRestaurantReviewsByUserId,
+  getReportOptions,
 } from '@domain/restaurant/service/restaurant.service';
 import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
@@ -139,4 +140,8 @@ export function getFilterOptions() {
 
 export function getReviewFilterOptions() {
   return getReviewOptions();
+}
+
+export function getRestaurantReportOptions() {
+  return getReportOptions();
 }
