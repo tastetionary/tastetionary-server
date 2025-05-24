@@ -73,7 +73,6 @@ describe('restaurant controller', () => {
       .post('/v1/restaurant/recommendation')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        excludeIds: [],
         category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         prices: [RestaurantPrice.UNDER_10000],
