@@ -25,7 +25,6 @@ describe('facade', () => {
           keywords: ['clean'],
           prices: [RestaurantPrice.OVER_20000],
           categories: [RestaurantCategory.ASIAN],
-          excludeRestaurantIds: [],
         }),
       ).rejects.toThrowError(CallerWrongDomainRuleException);
     });

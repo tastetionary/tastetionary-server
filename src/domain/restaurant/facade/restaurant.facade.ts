@@ -13,6 +13,7 @@ import {
 import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
 import {
+  getPreferenceRestaurant,
   isRestaurantInUserPreferences,
   searchAreas,
 } from '@domain/user/service/user.service';
@@ -34,7 +35,6 @@ export async function getRecommendations(param: {
   keywords: string[];
   prices: RestaurantPrice[];
   categories: RestaurantCategory[];
-  excludeRestaurantIds: bigint[];
 }) {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas) {
@@ -44,8 +44,19 @@ export async function getRecommendations(param: {
       ErrorCodeEnum.MISSING_USER_AREA,
     );
   }
+  const excludeRestaurants = await getPreferenceRestaurant(
+    param.userId,
+    PreferenceCategory.EXCLUDED,
+  );
+  const excludeRestaurantIds = excludeRestaurants.map(
+    (restaurant) => restaurant.id,
+  );
 
-  const res = await getRecommendedRestaurant({ userAreas, ...param });
+  const res = await getRecommendedRestaurant({
+    userAreas,
+    excludeRestaurantIds,
+    ...param,
+  });
   const isBookmarked = await isRestaurantInUserPreferences(
     param.userId,
     PreferenceCategory.BOOKMARK,

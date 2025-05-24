@@ -81,13 +81,6 @@ export interface GetRestaurantInput
    * @type RestaurantCategory
    */
   category: RestaurantCategory[];
-
-  /**
-   * already recommended restaurant ids, it will be ignored
-   * example: 10000
-   * @type number
-   */
-  excludeIds: number[];
 }
 
 export interface GetRestaurantsOutput
@@ -95,7 +88,6 @@ export interface GetRestaurantsOutput
   id: string;
   externalUUID: string;
   bookmark: boolean;
-  exclude: boolean;
   /**
    * aggregate data from review, if not reviewed, it will be null
    * @type AggregateReviewDTO
@@ -287,7 +279,6 @@ export class RestaurantController {
       prices: input.prices,
       keywords: input.keywords,
       categories: input.category,
-      excludeRestaurantIds: input.excludeIds.map((id) => BigInt(id)),
     });
 
     const reviews = data.reviews.map((d) => {
@@ -306,7 +297,6 @@ export class RestaurantController {
       id: id.toString(),
       externalUUID: externalUUID.toString(),
       bookmark: data.bookmark,
-      exclude: data.exclude,
       ...rest,
       aggregateReviews: data.aggregateReviews,
       reviews: reviews,
