@@ -1,3 +1,4 @@
+import { RedisModule } from '@common/redis/redis.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { LoggingModule } from '@src/common/logging/logging.module';
@@ -20,6 +21,7 @@ import { AuthenticationModule } from '@domain/authentication/authentication.modu
       validate,
     }),
     LoggingModule,
+    RedisModule,
   ],
 })
 export class AppModule {}
