@@ -20,7 +20,7 @@ export function getFoodsByConditions(param: {
   return filteredItems;
 }
 
-function getFoodRecord() {
+export function getFoodRecord() {
   return foodSource;
 }
 

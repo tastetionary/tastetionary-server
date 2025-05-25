@@ -1,16 +1,27 @@
 import {
   getFoodOptionsRecord,
   getFoodsByConditions,
+  getFoodRecord,
 } from '@domain/food/repository/food.repository';
 import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
 import { getRandomItem } from '@root/src/common/util';
-
 import { EmptyContentException } from '@root/src/common/exception/internal.exception';
+import { RedisService } from '@common/redis/redis.service';
+import { GetFoodOutput } from '@domain/food/dto/food.dto';
 
-export function getRecommendedFood(param: {
-  keywords: FoodKeyword[];
-  categories: FoodCategory[];
-}) {
+export interface FoodRecommendation {
+  id: number;
+  count: number;
+  lastRecommendedAt: number;
+}
+
+export async function getRecommendedFood(
+  redisService: RedisService,
+  param: {
+    keywords: FoodKeyword[];
+    categories: FoodCategory[];
+  },
+) {
   const foods = getFoodsByConditions({
     keywords: param.keywords,
     categories: param.categories,
@@ -20,9 +31,86 @@ export function getRecommendedFood(param: {
     throw new EmptyContentException('검색 조건에 부합 되는 음식이 없습니다.');
   }
 
-  return getRandomItem(foods);
+  const recommendedFood = getRandomItem(foods);
+  await saveFoodRecommendation(redisService, recommendedFood.id);
+
+  return recommendedFood;
 }
 
 export function getFoodOptions() {
   return getFoodOptionsRecord();
+}
+
+async function saveFoodRecommendation(
+  redisService: RedisService,
+  foodId: number,
+): Promise<void> {
+  const redisKey = 'food:recommendations';
+  const recommendations = await redisService.get(redisKey);
+  const now = Date.now();
+
+  let updatedRecommendations: FoodRecommendation[];
+  if (recommendations) {
+    const parsedRecommendations = JSON.parse(
+      recommendations,
+    ) as FoodRecommendation[];
+    const existingRecommendation = parsedRecommendations.find(
+      (rec) => rec.id === foodId,
+    );
+
+    if (existingRecommendation) {
+      updatedRecommendations = parsedRecommendations.map((rec) =>
+        rec.id === foodId
+          ? { ...rec, count: rec.count + 1, lastRecommendedAt: now }
+          : rec,
+      );
+    } else {
+      updatedRecommendations = [
+        ...parsedRecommendations,
+        {
+          id: foodId,
+          count: 1,
+          lastRecommendedAt: now,
+        },
+      ];
+    }
+  } else {
+    updatedRecommendations = [
+      {
+        id: foodId,
+        count: 1,
+        lastRecommendedAt: now,
+      },
+    ];
+  }
+
+  await redisService.set(redisKey, JSON.stringify(updatedRecommendations));
+  await redisService.expire(redisKey, 86400);
+}
+
+export async function getRecentFoodRecommendations(
+  redisService: RedisService,
+): Promise<GetFoodOutput[]> {
+  const redisKey = 'food:recommendations';
+  const recommendations = await redisService.get(redisKey);
+
+  if (!recommendations) {
+    return [];
+  }
+
+  const parsedRecommendations = JSON.parse(
+    recommendations,
+  ) as FoodRecommendation[];
+  const foodSource = getFoodRecord();
+
+  return parsedRecommendations
+    .sort((a, b) => b.lastRecommendedAt - a.lastRecommendedAt)
+    .slice(0, 8)
+    .map((rec) => {
+      const food = foodSource.data.find((f) => f.id === rec.id);
+      return {
+        id: rec.id,
+        name: food?.name || '',
+      };
+    });
 }

@@ -55,4 +55,8 @@ export class ConfigurationService {
       webHookUrl: this.configService.get('DISCORD_WEBHOOK_URL'),
     };
   }
+
+  getRedisConfig() {
+    return this.configService.get<string>('REDIS_URL');
+  }
 }
