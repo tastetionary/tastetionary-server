@@ -20,7 +20,7 @@ describe('food controller', () => {
   });
 
   beforeEach(async () => {
-    await jest.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   const DATA = {
@@ -29,15 +29,17 @@ describe('food controller', () => {
   };
 
   it('should return 200', async () => {
-    jest.spyOn(foodService, 'getRecommendedFood').mockImplementation(() => {
-      const mock = {
-        id: 1,
-        name: 'Mock Food',
-        category: ['Mock Category'],
-        keyword: ['Mock Keyword'],
-      };
-      return mock;
-    });
+    jest
+      .spyOn(foodService, 'getRecommendedFood')
+      .mockImplementation(async () => {
+        const mock = {
+          id: 1,
+          name: 'Mock Food',
+          category: ['Mock Category'],
+          keyword: ['Mock Keyword'],
+        };
+        return mock;
+      });
 
     const res = await request(app.getHttpServer())
       .post('/v1/food/recommendation')

@@ -22,7 +22,7 @@
     "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "NODE_ENV=test jest --testPathPattern='/src/'",
-    "test:seq": "NODE_ENV=test ENV=test jest --runInBand --testPathPattern='/src/' --bail=false",
+    "test:seq": "NODE_ENV=test ENV=test jest --runInBand --testPathPattern='/src/' --bail --forceExit",
     "test:seq:failed": "NODE_ENV=test ENV=test jest --runInBand NODE_ENV=test ENV=test --testPathPattern='/src/' --bail=false --onlyFailures",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
