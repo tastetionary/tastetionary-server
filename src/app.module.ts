@@ -8,6 +8,7 @@ import { UserModule } from '@domain/user/user.module';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { FoodModule } from '@domain/food/food.module';
 import { AuthenticationModule } from '@domain/authentication/authentication.module';
+
 @Module({
   imports: [
     ConfigurationModule,
