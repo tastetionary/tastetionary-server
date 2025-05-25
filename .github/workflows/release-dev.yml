@@ -171,6 +171,7 @@ jobs:
           echo "AWS_S3_SECRET_KEY=${{ secrets.AWS_S3_SECRET_KEY }}" >> .env
           echo "AWS_S3_REGION=${{ secrets.AWS_S3_REGION }}" >> .env
           echo "AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}" >> .env
+          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
