@@ -65,3 +65,10 @@ export enum WithdrawalTypeEnum {
    */
   WANT_TO_DELETE_PERSONAL_INFORMATION = 'want_to_delete_personal_information',
 }
+
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
+
+export const isAdmin = (role: UserRole): boolean => role === UserRole.ADMIN;
