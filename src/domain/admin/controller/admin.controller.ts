@@ -5,22 +5,24 @@ import {
   UseFilters,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
-import { TypedBody, TypedRoute } from '@nestia/core';
+import { TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { RolesGuard } from '@common/auth/roles.guard';
 import { RequireAdmin } from '@common/auth/require-admin.decorator';
-import {
-  getAllRestaurantReviews,
-  getAllReviewReports,
-} from '@domain/restaurant/service/restaurant.service';
+import { getReviews } from '@domain/restaurant/facade/restaurant.facade';
 import { getAllUsers } from '@domain/user/service/user.service';
-import { AreaDto, ProfileResponse } from '@domain/user/dto/user.dto';
-import { AuthenticationCategory } from '@domain/authentication/authentication.enum';
+import { ProfileResponse } from '@domain/user/dto/user.dto';
 import { UserRole } from '@domain/user/user.enum';
-import { AccountCategory } from '../../account/account.enum';
+import { AccountCategory } from '@domain/account/account.enum';
+import {
+  PageRequestParams,
+  PageResponseDto,
+} from '@root/src/common/dto/pagination.dto';
+import { RestaurantReview } from '@domain/restaurant/controller/restaurant.controller';
 
 interface ExtendedAccount {
   identification: string;
@@ -69,23 +71,36 @@ export class AdminController {
   @UseGuards(AuthGuard, RolesGuard)
   @RequireAdmin()
   @HttpCode(200)
-  @TypedRoute.Get('/restaurant-reviews')
-  async getAllRestaurantReviews(): Promise<BaseResponseDto<any>> {
-    const reviews = await getAllRestaurantReviews();
-    return new BaseResponseDto(reviews);
-  }
+  @TypedRoute.Get('/restaurant/review')
+  async getAllRestaurantReviews(
+    @Request() req,
+    @Query() query: PageRequestParams,
+  ): Promise<PageResponseDto<any>> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
 
-  /**
-   * @tag admin
-   * @summary 모든 리뷰 신고 조회 (관리자 전용)
-   * @security bearer
-   */
-  @UseGuards(AuthGuard, RolesGuard)
-  @RequireAdmin()
-  @HttpCode(200)
-  @TypedRoute.Get('/review-reports')
-  async getAllReviewReports(): Promise<BaseResponseDto<any>> {
-    const reports = await getAllReviewReports();
-    return new BaseResponseDto(reports);
+    const res = await getReviews({
+      page,
+      limit,
+    });
+
+    const { keywordReviews, data } = res;
+    const reviews: Array<Omit<RestaurantReview, 'restaurant'>> = data.map(
+      (review) => ({
+        ...review,
+        id: review.id.toString(),
+        external_restaurant_information_id:
+          review.external_restaurant_information_id.toString(),
+      }),
+    );
+
+    return new PageResponseDto(
+      {
+        keywordReviews,
+        reviews: reviews,
+      },
+      Number(limit),
+      res.totalCount,
+    );
   }
 }

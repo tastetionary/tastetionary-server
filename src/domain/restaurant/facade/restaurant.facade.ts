@@ -181,7 +181,7 @@ export async function registerReview(param: {
 }
 
 export async function getReviews(param: {
-  restaurantId: bigint;
+  restaurantId?: bigint;
   userId?: number;
   page?: number;
   limit?: number;
