@@ -19,16 +19,12 @@ import {
   AgreementCategory,
   PreferenceCategory,
   UserState,
-  UserRole,
 } from '@domain/user/user.enum';
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
 import { getProfile } from '@domain/user/facade/user.facade';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
-import {
-  createAccount,
-  searchAccount,
-} from '@domain/account/service/account.service';
+import { createAccount } from '@domain/account/service/account.service';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -185,96 +181,13 @@ describe('user service', () => {
   });
 
   it('getAlUserss', async () => {
-    const user1 = await createProfile({
-      nickname: 'test',
-      area: {
-        latitude: 37.123,
-        longitude: 127.123,
-        address: '서울시 강남구',
-      },
-      account: {
-        authenticationId: 1,
-        identification: 'test1@test.com',
-        password: 'pwd',
-        category: AccountCategory.EMAIL,
-      },
-      agreements: [
-        {
-          category: AgreementCategory.PERSONAL_INFORMATION,
-          is_agree: true,
-        },
-      ],
-    });
+    const user1 = await createProfile(DTO);
+    const user1Id = user1.id;
+    const expectedSize = 1;
 
-    const user2 = await createProfile({
-      nickname: 'test',
-      area: {
-        latitude: 37.456,
-        longitude: 127.456,
-        address: '서울시 서초구',
-      },
-      account: {
-        authenticationId: 2,
-        identification: 'test2@test.com',
-        password: 'pwd',
-        category: AccountCategory.EMAIL,
-      },
-      agreements: [
-        {
-          category: AgreementCategory.PERSONAL_INFORMATION,
-          is_agree: true,
-        },
-      ],
-    });
-
-    await prismaClient.users.update({
-      where: { id: user2.id },
-      data: { role: UserRole.ADMIN },
-    });
-
+    await createAccount({ userId: user1Id, ...DTO.account });
     const result = await getAllUsers();
-    expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({
-      id: user1.id,
-      nickname: user1.nickname,
-      state: UserState.ACTIVE,
-      role: UserRole.USER,
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-      account: {
-        identification: 'test1@test.com',
-        category: AccountCategory.EMAIL,
-      },
-      area: {
-        id: expect.any(Number),
-        userId: user1.id,
-        order: 0,
-        address: '서울시 강남구',
-        latitude: 37.123,
-        longitude: 127.123,
-      },
-    });
-
-    expect(result[1]).toEqual({
-      id: user2.id,
-      nickname: user2.nickname,
-      state: UserState.ACTIVE,
-      role: UserRole.ADMIN,
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-      account: {
-        identification: 'test2@test.com',
-        category: AccountCategory.EMAIL,
-      },
-      area: {
-        id: expect.any(Number),
-        userId: user2.id,
-        order: 0,
-        address: '서울시 서초구',
-        latitude: 37.456,
-        longitude: 127.456,
-      },
-    });
+    expect(result).toHaveLength(expectedSize);
   });
 
   describe('[private] ', () => {

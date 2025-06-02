@@ -12,6 +12,7 @@ import {
 } from '@domain/authentication/authentication.enum';
 import { AccountEntity } from '@root/src/domain/account/service/account.service';
 import { AccountCategory } from '@root/src/domain/account/account.enum';
+import { UserRole } from '@domain/user/user.enum';
 type model = { id: number };
 const baseModel = define<model>({
   id: random,
@@ -34,6 +35,7 @@ export function userEntityFactory(param?: { state?: UserState }) {
     nickname: (i) => `${i}-nickname`,
     state: param?.state ?? UserState.ACTIVE,
     property: {},
+    role: UserRole.USER,
     createdAt: () => new Date(),
     updatedAt: () => new Date(),
   })();
