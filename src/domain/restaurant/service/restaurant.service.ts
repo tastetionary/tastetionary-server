@@ -26,6 +26,7 @@ import {
   deleteReviewById,
   updateReviewById,
   getReportOptionRecord,
+  markReviewAsDeleted,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
@@ -646,7 +647,7 @@ export async function deleteRestaurnatReview(param: {
     );
   }
 
-  await deleteReviewById(param.reviewId);
+  await markReviewAsDeleted(param.reviewId);
 }
 
 export async function updateReview(param: {
