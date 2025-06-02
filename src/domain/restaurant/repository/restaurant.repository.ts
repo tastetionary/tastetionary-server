@@ -115,9 +115,17 @@ export async function getUserReviewCount(userId: number) {
   return prismaClient.restaurantReviews.count({ where: { userId } });
 }
 
-export async function getReviewById(id: number) {
+export async function getReviewById(
+  id: number,
+  includeDeleted: boolean = false,
+) {
+  const where = { id };
+  if (!includeDeleted) {
+    where['deletedAt'] = null;
+  }
+
   const res = await prismaClient.restaurantReviews.findUnique({
-    where: { id },
+    where,
   });
   if (!res) return null;
 
@@ -245,8 +253,10 @@ export async function getReviewsByConditions(param: {
   categories?: RestaurantCategory[];
   reviewerId?: number;
   prices?: RestaurantPrice[];
+  includeDeleted?: boolean;
 }): Promise<RestaurantReviewRecord[]> {
   const condition = {};
+  const includeDeleted = param.includeDeleted ?? false;
 
   if (param.restaurantIds && param.restaurantIds.length >= 1) {
     condition['external_restaurant_information_id'] = {
@@ -272,6 +282,10 @@ export async function getReviewsByConditions(param: {
 
   if (param.reviewerId) {
     condition['userId'] = { equals: param.reviewerId };
+  }
+
+  if (!includeDeleted) {
+    condition['deletedAt'] = null;
   }
 
   const res = await prismaClient.restaurantReviews.findMany({
@@ -413,6 +427,13 @@ export async function deleteReviewReaction(params: {
     where: {
       userId_reviewId: { userId: params.userId, reviewId: params.reviewId },
     },
+  });
+}
+
+export async function markReviewAsDeleted(reviewId: number) {
+  return await prismaClient.restaurantReviews.update({
+    where: { id: reviewId },
+    data: { deletedAt: new Date() },
   });
 }
 

@@ -48,7 +48,10 @@ import {
 import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
-import { searchAccount } from '@domain/account/service/account.service';
+import {
+  searchAccount,
+  createAccount,
+} from '@domain/account/service/account.service';
 import { AccountCategory } from '@domain/account/account.enum';
 
 export async function searchProfile(userId: number) {
