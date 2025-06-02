@@ -339,13 +339,13 @@ export async function getNearyByRestaurants(param: {
 }
 
 export async function getRestaurantReviews(
-  restaurantId: bigint,
+  restaurantId?: bigint,
   userId?: number,
   page: number = 1,
   limit: number = 10,
 ) {
   const reviews = await getReviewsByConditions({
-    restaurantIds: [restaurantId],
+    restaurantIds: restaurantId ? [restaurantId] : [],
   });
 
   const total = reviews.length;

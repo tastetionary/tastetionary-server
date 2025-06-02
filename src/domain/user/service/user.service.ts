@@ -10,6 +10,7 @@ import {
   UserState,
   PreferenceCategory,
   PreferenceCategoryToColumnMapping,
+  UserRole,
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
@@ -28,6 +29,7 @@ import {
   saveUser,
   updateUser,
   updateUserById,
+  getUsers,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
 import {
@@ -47,6 +49,7 @@ import { findExternalRestaurantById } from '@domain/restaurant/service/restauran
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 import { searchAccount } from '@domain/account/service/account.service';
+import { AccountCategory } from '@domain/account/account.enum';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -327,3 +330,43 @@ export const _private = {
   createRandomNickname,
   createUser,
 };
+
+export async function getAllUsers() {
+  const users = await getUsers({}, 1000);
+
+  const usersWithDetails = await Promise.all(
+    users.map(async (user) => {
+      const [account, area] = await Promise.all([
+        searchAccount(user.id),
+        searchAreas(user.id),
+      ]);
+
+      return {
+        id: user.id,
+        nickname: user.nickname,
+        state: user.state as unknown as UserState,
+        role: user.role as unknown as UserRole,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        account: account
+          ? {
+              identification: account.identification,
+              category: account.category as AccountCategory,
+            }
+          : null,
+        area: area
+          ? {
+              id: area.id,
+              userId: area.userId,
+              order: area.order,
+              address: area.address,
+              latitude: area.latitude,
+              longitude: area.longitude,
+            }
+          : null,
+      };
+    }),
+  );
+
+  return usersWithDetails;
+}
