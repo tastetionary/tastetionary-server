@@ -575,6 +575,11 @@ export class RestaurantController {
     return new BaseResponseDto({ state: 'success' });
   }
 
+  /**
+   * @tag restaurant
+   * @summary update review
+   * @security bearer
+   */
   @UseGuards(AuthGuard)
   @HttpCode(200)
   @TypedRoute.Put('/review/:reviewId')
