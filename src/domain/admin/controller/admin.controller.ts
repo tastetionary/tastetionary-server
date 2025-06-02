@@ -37,7 +37,7 @@ interface UserWithExtendedAccount extends Omit<ProfileResponse, 'account'> {
   account: ExtendedAccount | null;
 }
 
-interface AdminUserListResponse {
+export interface AdminUserListResponse {
   users: UserWithExtendedAccount[];
   total: number;
 }
