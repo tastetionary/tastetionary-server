@@ -227,6 +227,7 @@ export async function getReviewsOrderedByCreatedTime(
   count: number,
 ): Promise<RestaurantReviewRecord[]> {
   const res = await prismaClient.restaurantReviews.findMany({
+    where: { deletedAt: null },
     orderBy: { createdAt: 'desc' },
     take: count,
   });
