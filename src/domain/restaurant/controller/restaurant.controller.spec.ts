@@ -399,6 +399,6 @@ describe('restaurant controller', () => {
       .put(`/v1/restaurant/review/${reviewId}`)
       .send(updateDto);
 
-    assertStatusCode(res, 400);
+    assertStatusCode(res, 401);
   });
 });
