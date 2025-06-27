@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as Sentry from '@sentry/node';
@@ -67,6 +68,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       // TODO modify detail property on env, when dev, return full response, but prod no
       response.status(status).json(detailResponse);
+      return;
+    }
+
+    if (exception instanceof UnauthorizedException) {
+      response.status(401).json({
+        statusCode: 401,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        additionalData: exception.getResponse(),
+        originMessage: exception.message,
+        input: request.body,
+      });
       return;
     }
 
