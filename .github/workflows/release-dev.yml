@@ -198,7 +198,7 @@ jobs:
 
   deploy:
     runs-on: self-hosted
-    if: always()
+    if: false
     needs: [ build_and_push_test, build_and_push ]
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: 'true'
