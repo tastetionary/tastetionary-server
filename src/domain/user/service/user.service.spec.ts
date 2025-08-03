@@ -187,7 +187,7 @@ describe('user service', () => {
 
     await createAccount({ userId: user1Id, ...DTO.account });
     const result = await getAllUsers();
-    expect(result).toHaveLength(expectedSize);
+    expect(result.users).toHaveLength(expectedSize);
   });
 
   describe('[private] ', () => {
