@@ -334,7 +334,43 @@ export const _private = {
   createUser,
 };
 
-export async function getAllUsers() {
+interface GetAllUsersParams {
+  search?: string;
+  nickname?: string;
+  identification?: string;
+  createdAt?: string;
+  state?: UserState;
+  page?: number;
+  limit?: number;
+}
+
+interface GetAllUsersResult {
+  users: Array<{
+    id: number;
+    nickname: string;
+    state: UserState;
+    role: UserRole;
+    createdAt: Date;
+    updatedAt: Date;
+    account: {
+      identification: string;
+      category: AccountCategory;
+    } | null;
+    area: {
+      id: number;
+      userId: number;
+      order: number;
+      address: string;
+      latitude: number;
+      longitude: number;
+    } | null;
+  }>;
+  total: number;
+}
+
+export async function getAllUsers(
+  params?: GetAllUsersParams,
+): Promise<GetAllUsersResult> {
   const users = await getUsers({}, 1000);
 
   const usersWithDetails = await Promise.all(
@@ -370,6 +406,102 @@ export async function getAllUsers() {
       };
     }),
   );
+  const filteredUsers = usersWithDetails
+    .filter((user) => {
+      if (params?.search) {
+        const searchTerm = params.search.toLowerCase();
+        return (
+          user.nickname?.toLowerCase().includes(searchTerm) ||
+          user.account?.identification?.toLowerCase().includes(searchTerm)
+        );
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.nickname) {
+        const nicknameTerm = params.nickname.toLowerCase();
+        return user.nickname?.toLowerCase().includes(nicknameTerm);
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.identification) {
+        const identificationTerm = params.identification.toLowerCase();
+        return user.account?.identification
+          ?.toLowerCase()
+          .includes(identificationTerm);
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.createdAt) {
+        const targetDate = new Date(params.createdAt);
+        const targetDateStr = targetDate.toISOString().split('T')[0];
+        const userDateStr = user.createdAt.toISOString().split('T')[0];
+        return userDateStr === targetDateStr;
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.state) {
+        return user.state === params.state;
+      }
+      return true;
+    });
 
-  return usersWithDetails;
+  const paginatedUsers =
+    params?.page && params?.limit
+      ? filteredUsers.slice(
+          (params.page - 1) * params.limit,
+          params.page * params.limit,
+        )
+      : filteredUsers;
+
+  const totalFilteredCount = usersWithDetails
+    .filter((user) => {
+      if (params?.search) {
+        const searchTerm = params.search.toLowerCase();
+        return (
+          user.nickname?.toLowerCase().includes(searchTerm) ||
+          user.account?.identification?.toLowerCase().includes(searchTerm)
+        );
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.nickname) {
+        const nicknameTerm = params.nickname.toLowerCase();
+        return user.nickname?.toLowerCase().includes(nicknameTerm);
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.identification) {
+        const identificationTerm = params.identification.toLowerCase();
+        return user.account?.identification
+          ?.toLowerCase()
+          .includes(identificationTerm);
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.createdAt) {
+        const targetDate = new Date(params.createdAt);
+        const targetDateStr = targetDate.toISOString().split('T')[0];
+        const userDateStr = user.createdAt.toISOString().split('T')[0];
+        return userDateStr === targetDateStr;
+      }
+      return true;
+    })
+    .filter((user) => {
+      if (params?.state) {
+        return user.state === params.state;
+      }
+      return true;
+    }).length;
+
+  return {
+    users: paginatedUsers,
+    total: totalFilteredCount,
+  };
 }

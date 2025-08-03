@@ -22,7 +22,7 @@ import { pipe } from 'fp-ts/lib/function';
 import { getKakaoUserInfo } from '@src/third-party/kakao/kakao';
 import { getGoogleUserInfo } from '@src/third-party/google/google';
 import { getNaverUserInfo } from '@src/third-party/naver/naver';
-import { createUser } from '@domain/user/service/user.service';
+import { createUser, searchUser } from '@domain/user/service/user.service';
 import { sendEmail } from '@thirdParty/brevo/brevo';
 import * as fs from 'fs';
 import path from 'path';
@@ -190,6 +190,35 @@ export async function createToken(param: {
   if (param.category === AccountCategory.EMAIL) {
     await checkPassword(entity, param.password!);
   }
+  const tokens = makeTokens({ userId: entity.userId });
+  await saveToken({
+    userId: entity.userId,
+    ...tokens,
+  });
+
+  return {
+    ...tokens,
+    requirePassChange: entity.requirePassChange,
+  };
+}
+
+export async function createAdminToken(param: {
+  identification: string;
+  password: string;
+}) {
+  const identification = param.identification;
+  const entity = await getAccount(identification, AccountCategory.EMAIL);
+  await checkPassword(entity, param.password!);
+
+  const user = await searchUser(entity.userId);
+  if (user.role !== 'ADMIN') {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'Admin access denied. Only administrators can access this endpoint.',
+      ErrorCodeEnum.FORBIDDEN,
+    );
+  }
+
   const tokens = makeTokens({ userId: entity.userId });
   await saveToken({
     userId: entity.userId,
