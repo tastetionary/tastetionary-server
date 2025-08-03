@@ -13,7 +13,10 @@ import { BaseResponseDto } from '@common/dto/base.dto';
 import { AuthGuard } from '@common/auth/auth.guard';
 import { RolesGuard } from '@common/auth/roles.guard';
 import { RequireAdmin } from '@common/auth/require-admin.decorator';
-import { getReviews } from '@domain/restaurant/facade/restaurant.facade';
+import {
+  getReviews,
+  getFilteredReviews,
+} from '@domain/restaurant/facade/restaurant.facade';
 import { getAllUsers } from '@domain/user/service/user.service';
 import { ProfileResponse } from '@domain/user/dto/user.dto';
 import { UserRole, UserState } from '@domain/user/user.enum';
@@ -28,7 +31,15 @@ import {
   TokenDTO,
 } from '@domain/account/dto/account.dto';
 import { createAdminToken } from '@domain/account/service/account.service';
-import { IsOptional, IsString, IsEnum, Matches } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsEnum,
+  Matches,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
 import { IsValidDateFormat } from '@common/validators/date.validator';
 
 interface ExtendedAccount {
@@ -80,6 +91,35 @@ export class AdminUserQueryParams extends PageRequestParams {
   @IsOptional()
   @IsEnum(UserState)
   state?: UserState;
+}
+
+export class AdminRestaurantReviewQueryParams extends PageRequestParams {
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-zA-Z0-9가-힣\s]*$/, {
+    message: '식당명은 영문, 숫자, 한글, 공백만 허용됩니다.',
+  })
+  restaurantName?: string;
+
+  @IsOptional()
+  @IsValidDateFormat({
+    message: '등록일은 유효한 YYYY-MM-DD 형식이어야 합니다. (예: 2025-01-15)',
+  })
+  createdAt?: string;
+
+  @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(100)
+  @Max(50000)
+  radius?: number;
 }
 
 @Controller('v1/admin')
@@ -140,29 +180,32 @@ export class AdminController {
   @TypedRoute.Get('/restaurant/review')
   async getAllRestaurantReviews(
     @Request() req,
-    @Query() query: PageRequestParams,
+    @Query() query: AdminRestaurantReviewQueryParams,
   ): Promise<PageResponseDto<any>> {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
-    const res = await getReviews({
+    const res = await getFilteredReviews({
       page,
       limit,
+      restaurantName: query.restaurantName,
+      createdAt: query.createdAt,
+      latitude: query.latitude,
+      longitude: query.longitude,
+      radius: query.radius,
     });
 
-    const { keywordReviews, data } = res;
-    const reviews: Array<Omit<RestaurantReview, 'restaurant'>> = data.map(
-      (review) => ({
-        ...review,
-        id: review.id.toString(),
-        external_restaurant_information_id:
-          review.external_restaurant_information_id.toString(),
-      }),
-    );
+    const { data, totalCount } = res;
+    const reviews = data.map((review) => ({
+      ...review,
+      id: review.id.toString(),
+      external_restaurant_information_id:
+        review.external_restaurant_information_id.toString(),
+    }));
 
     return new PageResponseDto(
       {
-        keywordReviews,
+        totalCount,
         reviews: reviews,
       },
       Number(limit),
