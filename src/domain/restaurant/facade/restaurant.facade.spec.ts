@@ -13,20 +13,20 @@ import {
   RestaurantCategory,
   RestaurantPrice,
 } from '@domain/restaurant/restaurant.enum';
-import { RedisService } from '@common/redis/redis.service';
+import * as redisOperations from '@common/redis/redis.operations';
 
-const mockRedisService = {
-  get: jest.fn(),
-  set: jest.fn(),
-  expire: jest.fn(),
-} as unknown as RedisService;
+jest.mock('@common/redis/redis.operations', () => ({
+  redisGet: jest.fn(),
+  redisSet: jest.fn(),
+  redisExpire: jest.fn(),
+}));
 
 describe('facade', () => {
   describe('getRecommendations', () => {
     it('with not area user should throw error', async () => {
       const userId = 99;
       await expect(
-        getRecommendations(mockRedisService, {
+        getRecommendations({
           userId,
           maxDistanceMeter: 100,
           keywords: ['clean'],

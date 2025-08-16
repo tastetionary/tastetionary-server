@@ -5,16 +5,17 @@ import {
   getRecentFoodRecommendations,
   FoodRecommendation,
 } from '@domain/food/service/food.service';
-import { RedisService } from '@root/src/common/redis/redis.service';
+import {
+  redisGet,
+  redisSet,
+  redisExpire,
+} from '@common/redis/redis.operations';
 
-export async function getRecommendations(
-  redisService: RedisService,
-  param: {
-    keywords: FoodKeyword[];
-    categories: FoodCategory[];
-  },
-) {
-  return await getRecommendedFood(redisService, {
+export async function getRecommendations(param: {
+  keywords: FoodKeyword[];
+  categories: FoodCategory[];
+}) {
+  return await getRecommendedFood({
     keywords: param.keywords,
     categories: param.categories,
   });
@@ -24,6 +25,6 @@ export function getFilterOptions() {
   return getFoodOptions();
 }
 
-export async function getRecentRecommendations(redisService: RedisService) {
-  return getRecentFoodRecommendations(redisService);
+export async function getRecentRecommendations() {
+  return getRecentFoodRecommendations();
 }

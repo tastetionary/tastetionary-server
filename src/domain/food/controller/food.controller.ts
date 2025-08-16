@@ -19,15 +19,12 @@ import {
   getFilterOptions,
   getRecentRecommendations,
 } from '@domain/food/facade/food.facade';
-import { RedisService } from '@common/redis/redis.service';
 import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
 
 @Controller('v1/food')
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class FoodController {
-  constructor(private readonly redisService: RedisService) {}
-
   /**
    * @tag food
    * @summary get food recommentation
@@ -37,7 +34,7 @@ export class FoodController {
   async getRecommentation(
     @TypedBody() dto: FoodOption,
   ): Promise<BaseResponseDto<GetFoodOutput>> {
-    const res = await getRecommendations(this.redisService, {
+    const res = await getRecommendations({
       keywords: dto.keywords,
       categories: dto.categories,
     });
@@ -70,7 +67,7 @@ export class FoodController {
   @HttpCode(200)
   @TypedRoute.Get('/recent')
   async getRecentFood(): Promise<BaseResponseDto<Array<GetFoodOutput>>> {
-    const result = await getRecentRecommendations(this.redisService);
+    const result = await getRecentRecommendations();
 
     return new BaseResponseDto(result);
   }

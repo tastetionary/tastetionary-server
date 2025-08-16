@@ -6,7 +6,11 @@ import {
 import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
 import { getRandomItem } from '@root/src/common/util';
 import { EmptyContentException } from '@root/src/common/exception/internal.exception';
-import { RedisService } from '@common/redis/redis.service';
+import {
+  redisGet,
+  redisSet,
+  redisExpire,
+} from '@common/redis/redis.operations';
 import { GetFoodOutput } from '@domain/food/dto/food.dto';
 
 export interface FoodRecommendation {
@@ -15,13 +19,10 @@ export interface FoodRecommendation {
   lastRecommendedAt: number;
 }
 
-export async function getRecommendedFood(
-  redisService: RedisService,
-  param: {
-    keywords: FoodKeyword[];
-    categories: FoodCategory[];
-  },
-) {
+export async function getRecommendedFood(param: {
+  keywords: FoodKeyword[];
+  categories: FoodCategory[];
+}) {
   const foods = getFoodsByConditions({
     keywords: param.keywords,
     categories: param.categories,
@@ -32,7 +33,7 @@ export async function getRecommendedFood(
   }
 
   const recommendedFood = getRandomItem(foods);
-  await saveFoodRecommendation(redisService, recommendedFood.id);
+  await saveFoodRecommendation(recommendedFood.id);
 
   return recommendedFood;
 }
@@ -41,12 +42,9 @@ export function getFoodOptions() {
   return getFoodOptionsRecord();
 }
 
-async function saveFoodRecommendation(
-  redisService: RedisService,
-  foodId: number,
-): Promise<void> {
+async function saveFoodRecommendation(foodId: number): Promise<void> {
   const redisKey = 'food:recommendations';
-  const recommendations = await redisService.get(redisKey);
+  const recommendations = await redisGet(redisKey);
   const now = Date.now();
 
   let updatedRecommendations: FoodRecommendation[];
@@ -84,15 +82,13 @@ async function saveFoodRecommendation(
     ];
   }
 
-  await redisService.set(redisKey, JSON.stringify(updatedRecommendations));
-  await redisService.expire(redisKey, 86400);
+  await redisSet(redisKey, JSON.stringify(updatedRecommendations));
+  await redisExpire(redisKey, 86400);
 }
 
-export async function getRecentFoodRecommendations(
-  redisService: RedisService,
-): Promise<GetFoodOutput[]> {
+export async function getRecentFoodRecommendations(): Promise<GetFoodOutput[]> {
   const redisKey = 'food:recommendations';
-  const recommendations = await redisService.get(redisKey);
+  const recommendations = await redisGet(redisKey);
 
   if (!recommendations) {
     return [];
