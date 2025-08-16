@@ -58,7 +58,6 @@ import {
 } from '@domain/restaurant/service/restaurant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { validateImageFile, validateContent } from '@common/util';
-import { RedisService } from '@common/redis/redis.service';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -258,8 +257,6 @@ export interface GetRecentReviewOuptut
 @UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class RestaurantController {
-  constructor(private readonly redisService: RedisService) {}
-
   /**
    * @tag restaurant
    * @summary get restaurants by condition
@@ -276,7 +273,7 @@ export class RestaurantController {
     const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
-    const data = await getRecommendations(this.redisService, {
+    const data = await getRecommendations({
       userId,
       maxDistanceMeter: maxDistanceMeter,
       prices: input.prices,

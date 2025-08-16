@@ -35,23 +35,24 @@ import {
 } from '@domain/restaurant/restaurant.enum';
 import { REACTION_TYPE } from '@prisma/client';
 import { PreferenceCategory } from '@domain/user/user.enum';
-import { RedisService } from '@common/redis/redis.service';
+import {
+  redisGet,
+  redisSet,
+  redisExpire,
+} from '@common/redis/redis.operations';
 
 interface Recommendation {
   id: string;
   expiredAt: number;
 }
 
-export async function getRecommendations(
-  redisService: RedisService,
-  param: {
-    userId: number;
-    maxDistanceMeter: number;
-    keywords: string[];
-    prices: RestaurantPrice[];
-    categories: RestaurantCategory[];
-  },
-) {
+export async function getRecommendations(param: {
+  userId: number;
+  maxDistanceMeter: number;
+  keywords: string[];
+  prices: RestaurantPrice[];
+  categories: RestaurantCategory[];
+}) {
   const userAreas = await searchAreas(param.userId);
   if (!userAreas) {
     throw new CallerWrongDomainRuleException(
@@ -62,10 +63,7 @@ export async function getRecommendations(
   }
 
   const redisKey = `user:${param.userId}:recommendations`;
-  const recentRecommendations = await getRecentRecommendations(
-    redisService,
-    redisKey,
-  );
+  const recentRecommendations = await getRecentRecommendations(redisKey);
   const recentIds = recentRecommendations.map((rec) => BigInt(rec.id));
 
   const excludeRestaurants = await getPreferenceRestaurant(
@@ -83,11 +81,7 @@ export async function getRecommendations(
     ...param,
   });
 
-  await saveNewRecommendation(
-    redisService,
-    redisKey,
-    res.restaurant.id.toString(),
-  );
+  await saveNewRecommendation(redisKey, res.restaurant.id.toString());
   const isBookmarked = await isRestaurantInUserPreferences(
     param.userId,
     PreferenceCategory.BOOKMARK,
@@ -112,10 +106,9 @@ export async function getRecommendations(
 }
 
 async function getRecentRecommendations(
-  redisService: RedisService,
   redisKey: string,
 ): Promise<Recommendation[]> {
-  const recommendations = await redisService.get(redisKey);
+  const recommendations = await redisGet(redisKey);
   if (!recommendations) return [];
 
   const parsedRecommendations = JSON.parse(recommendations) as Recommendation[];
@@ -126,19 +119,18 @@ async function getRecentRecommendations(
   );
 
   if (validRecommendations.length !== parsedRecommendations.length) {
-    await redisService.set(redisKey, JSON.stringify(validRecommendations));
-    await redisService.expire(redisKey, 5 * 60);
+    await redisSet(redisKey, JSON.stringify(validRecommendations));
+    await redisExpire(redisKey, 5 * 60);
   }
 
   return validRecommendations;
 }
 
 async function saveNewRecommendation(
-  redisService: RedisService,
   redisKey: string,
   restaurantId: string,
 ): Promise<void> {
-  const recommendations = await redisService.get(redisKey);
+  const recommendations = await redisGet(redisKey);
   const newRecommendation: Recommendation = {
     id: restaurantId,
     expiredAt: Date.now() + 5 * 60 * 1000,
@@ -148,8 +140,8 @@ async function saveNewRecommendation(
     ? [...JSON.parse(recommendations), newRecommendation]
     : [newRecommendation];
 
-  await redisService.set(redisKey, JSON.stringify(updatedRecommendations));
-  await redisService.expire(redisKey, 5 * 60);
+  await redisSet(redisKey, JSON.stringify(updatedRecommendations));
+  await redisExpire(redisKey, 5 * 60);
 }
 
 export async function getNearByRestaurants(param: {
