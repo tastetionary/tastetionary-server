@@ -205,11 +205,10 @@ export class AdminController {
 
     return new PageResponseDto(
       {
-        totalCount,
         reviews: reviews,
       },
       Number(limit),
-      res.totalCount,
+      totalCount,
     );
   }
 }

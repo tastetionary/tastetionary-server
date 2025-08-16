@@ -40,6 +40,7 @@ import {
   redisSet,
   redisExpire,
 } from '@common/redis/redis.operations';
+import { cons } from 'fp-ts/lib/ReadonlyNonEmptyArray';
 
 interface Recommendation {
   id: string;
@@ -269,30 +270,50 @@ export async function getFilteredReviews(param: {
       );
     }
 
+    if (param.restaurantName) {
+      const restaurantIdsToFilter = new Set<bigint>();
+      for (const review of data) {
+        const restaurant = await getExternalRestaurantInformationById(
+          Number(review.external_restaurant_information_id),
+        );
+        if (
+          restaurant?.name
+            ?.toLowerCase()
+            .includes(param.restaurantName.toLowerCase())
+        ) {
+          restaurantIdsToFilter.add(review.external_restaurant_information_id);
+        }
+      }
+      data = data.filter((review) =>
+        restaurantIdsToFilter.has(review.external_restaurant_information_id),
+      );
+    }
+
     return data;
   })();
 
   const totalCount = filteredData.length;
 
-  const page = param.page ?? 1;
-  const limit = param.limit ?? 10;
+  const page = Math.max(1, param.page ?? 1);
+  const limit = Math.max(1, Math.min(100, param.limit ?? 10));
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
   const paginatedData = filteredData.slice(startIndex, endIndex);
   const restaurantDistanceMap = new Map();
   if (param.latitude && param.longitude) {
     nearbyRestaurants.forEach((restaurant) => {
-      restaurantDistanceMap.set(restaurant.id, restaurant.distance / 1000); // 미터를 km로 변환
+      restaurantDistanceMap.set(restaurant.id, restaurant.distance / 1000);
     });
   }
 
   const detailedReviews = await Promise.all(
     paginatedData.map(async (review) => {
       const { reactions = [], ...record } = review;
-      const userProfile = await searchProfile(review.userId);
+      const userProfile = await searchProfile(review.userId).catch(() => null);
       const restaurant = await getExternalRestaurantInformationById(
         Number(review.external_restaurant_information_id),
       );
+
       const distance =
         restaurantDistanceMap.get(review.external_restaurant_information_id) ||
         0;
@@ -310,9 +331,9 @@ export async function getFilteredReviews(param: {
           : null,
         user: {
           id: review.userId,
-          identification: userProfile.account.identification,
-          createdAt: userProfile.account.createdAt,
-          nickname: userProfile.user.nickname,
+          identification: userProfile?.account?.identification || 'Unknown',
+          createdAt: userProfile?.account?.createdAt || new Date(),
+          nickname: userProfile?.user?.nickname || 'Unknown User',
           reviews: userReviewCount,
         },
         keywords: review.keywords,
