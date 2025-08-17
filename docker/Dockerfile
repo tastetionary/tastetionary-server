@@ -1,22 +1,19 @@
 FROM node:18-alpine
-
 WORKDIR /usr/src/app
-COPY package*.json .
+
+RUN apk update && apk add --no-cache bash openssl ca-certificates
+
+COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN apk update && apk add --no-cache \
-    bash \
-    openssl \
-    ca-certificates \
-    libressl-dev
+
+RUN which npm && npm --version
 
 RUN npm ci
 RUN npx prisma generate
 
 COPY . .
+RUN npm run build
 
 EXPOSE 8080
-
-
-# ENTRYPOINT ["node"]
-CMD ["npm", "run", "start:dev"]
+CMD ["node", "dist/src/main.js"]
