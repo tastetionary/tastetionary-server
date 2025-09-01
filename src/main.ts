@@ -34,6 +34,13 @@ async function bootstrap() {
   const sentryDsn = config.get<string>('SENTRY_DSN') as string;
   const env = config.get<string>('ENV') as string;
   initSentry(sentryDsn, env);
+
+  app.enableCors({
+    origin: ['https://tastetionary.vercel.app/', 'http://localhost:3000'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   await app.listen(port);
 }
 
