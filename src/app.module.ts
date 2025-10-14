@@ -19,6 +19,7 @@ import { AdminModule } from '@domain/admin/admin.module';
     AuthenticationModule,
     AdminModule,
     ConfigModule.forRoot({
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
       cache: true,
       isGlobal: true,
       validate,
