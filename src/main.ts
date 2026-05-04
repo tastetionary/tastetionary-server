@@ -37,11 +37,11 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'https://tastetionary.vercel.app/',
+      'https://tastetionary.vercel.app',
       'http://localhost:3000',
-      'https://tastetionary.com/',
+      'https://tastetionary.com',
     ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELET,OPTIONS',
+    methods: 'GET,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
