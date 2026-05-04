@@ -36,7 +36,11 @@ async function bootstrap() {
   initSentry(sentryDsn, env);
 
   app.enableCors({
-    origin: ['https://tastetionary.vercel.app/', 'http://localhost:3000'],
+    origin: [
+      'https://tastetionary.vercel.app/',
+      'http://localhost:3000',
+      'https://tastetionary.com/',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELET,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
