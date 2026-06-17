@@ -2,22 +2,32 @@ import {
   PostgreSqlContainer,
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
+import { RedisContainer, StartedRedisContainer } from '@testcontainers/redis';
 import { execSync } from 'child_process';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
 
 declare global {
   // eslint-disable-next-line no-var
   var __POSTGRES_CONTAINER__: StartedPostgreSqlContainer;
+  // eslint-disable-next-line no-var
+  var __REDIS_CONTAINER__: StartedRedisContainer;
 }
 
 export default async function globalSetup(): Promise<void> {
-  const container = await new PostgreSqlContainer('postgis/postgis')
-    .withDatabase('taste')
-    .withUsername('postgres')
-    .withPassword('postgres')
-    .start();
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
-  process.env.DATABASE_URL = container.getConnectionUri();
+  const [pgContainer, redisContainer] = await Promise.all([
+    new PostgreSqlContainer('postgis/postgis')
+      .withDatabase('taste')
+      .withUsername('postgres')
+      .withPassword('postgres')
+      .start(),
+    new RedisContainer('redis:7-alpine').start(),
+  ]);
+
+  process.env.DATABASE_URL = pgContainer.getConnectionUri();
+  process.env.REDIS_URL = redisContainer.getConnectionUrl();
 
   execSync('npx prisma migrate deploy', {
     env: { ...process.env },
@@ -25,5 +35,6 @@ export default async function globalSetup(): Promise<void> {
     stdio: 'inherit',
   });
 
-  global.__POSTGRES_CONTAINER__ = container;
+  global.__POSTGRES_CONTAINER__ = pgContainer;
+  global.__REDIS_CONTAINER__ = redisContainer;
 }

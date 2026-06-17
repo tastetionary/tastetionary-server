@@ -2,22 +2,30 @@ import { createClient, RedisClientType } from 'redis';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { ConfigService } from '@nestjs/config';
 
-let redisClient: RedisClientType | null = null;
+type RedisClientInstance = ReturnType<typeof createClient>;
+
+let redisClient: RedisClientInstance | null = null;
 
 export async function getRedisClient(): Promise<RedisClientType> {
   if (!redisClient) {
     const configService = new ConfigurationService(new ConfigService());
-    redisClient = createClient({
-      url: configService.getRedisConfig(),
-    });
-    await redisClient.connect();
+    const client = createClient({ url: configService.getRedisConfig() });
+    client.on('error', () => {});
+    await client.connect();
+    redisClient = client;
+
+    const singletons: Array<() => Promise<void>> =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((global as any).__REDIS_SINGLETON_CLOSERS__ ??= []);
+    singletons.push(() => client.disconnect());
   }
-  return redisClient;
+  return redisClient as RedisClientType;
 }
 
 export async function closeRedisClient(): Promise<void> {
-  if (redisClient) {
-    await redisClient.quit();
+  const client = redisClient;
+  if (client) {
     redisClient = null;
+    await client.disconnect();
   }
 }

@@ -1,8 +1,8 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  globalSetup: '<rootDir>/test/global-setup.ts',
-  globalTeardown: '<rootDir>/test/global-teardown.ts',
+  globalSetup: '<rootDir>/test/global-setup.js',
+  globalTeardown: '<rootDir>/test/global-teardown.js',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', '@relmify/jest-fp-ts'],
   moduleNameMapper: {
     '^@root/(.*)$': '<rootDir>/$1',

@@ -34,6 +34,10 @@ describe('restaurant controller', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
