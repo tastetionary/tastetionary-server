@@ -1,4 +1,5 @@
 import { truncateTables } from '@root/jest.setup';
+import { loadFixture } from '@root/test/utils/db-test-helper';
 import { AccountCategory } from '@domain/account/account.enum';
 import prismaClient from '@common/database/prisma';
 import {
@@ -29,47 +30,50 @@ describe('account repository', () => {
     )();
   });
 
-  it('should delete account', async () => {
-    const userId = 1;
-    const data = {
-      userId,
-      category: AccountCategory.EMAIL,
-      identification: 'some@email.com',
-      password: 'one-way-decoded-password',
-    };
-    await saveAccount(data);
-
-    await deleteAccountByUserId(userId);
-
-    const account = await getAccount({
-      identification: data.identification,
-      password: data.password,
+  describe('deleteAccountByUserId', () => {
+    beforeEach(async () => {
+      await loadFixture(
+        prismaClient,
+        'test/fixtures/account/account-setup.sql',
+      );
     });
-    expect(account).toBeNull();
+
+    it('should delete account', async () => {
+      const userId = 1;
+      await deleteAccountByUserId(userId);
+
+      const account = await getAccount({
+        identification: 'some@email.com',
+        password: 'one-way-decoded-password',
+      });
+      expect(account).toBeNull();
+    });
   });
 
-  it('should update account', async () => {
-    const data = {
-      userId: 1,
-      category: AccountCategory.EMAIL,
-      identification: 'some@email.com',
-      password: 'one-way-decoded-password',
-    };
-    await saveAccount(data);
-    const account = (await getAccount({
-      identification: data.identification,
-      password: data.password,
-    })) as { id: number };
+  describe('updateAccountById', () => {
+    beforeEach(async () => {
+      await loadFixture(
+        prismaClient,
+        'test/fixtures/account/account-setup.sql',
+      );
+    });
 
-    const updateData = {
-      identification: 'new-identification',
-      password: 'new-password',
-      requirePassChange: true,
-    };
+    it('should update account', async () => {
+      const account = (await getAccount({
+        identification: 'some@email.com',
+        password: 'one-way-decoded-password',
+      })) as { id: number };
 
-    const updatedAccount = await updateAccountById(account.id, updateData);
-    expect(updatedAccount.identification).toBe(updateData.identification);
-    expect(updatedAccount.password).toBe(updateData.password);
+      const updateData = {
+        identification: 'new-identification',
+        password: 'new-password',
+        requirePassChange: true,
+      };
+
+      const updatedAccount = await updateAccountById(account.id, updateData);
+      expect(updatedAccount.identification).toBe(updateData.identification);
+      expect(updatedAccount.password).toBe(updateData.password);
+    });
   });
 
   it('should save account', async () => {
@@ -87,7 +91,7 @@ describe('account repository', () => {
     expect(account).not.toBeNull();
   });
 
-  it('should save accounts', async () => {
+  it('should save accounts and get by identification', async () => {
     const data = [
       {
         userId: 1,
@@ -104,7 +108,7 @@ describe('account repository', () => {
     expect(account).not.toBeNull();
   });
 
-  it('should save accounts', async () => {
+  it('should save accounts and get by userId', async () => {
     const data = [
       {
         userId: 1,

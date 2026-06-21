@@ -1,4 +1,5 @@
 import { truncateTables } from '@root/jest.setup';
+import { loadFixture } from '@root/test/utils/db-test-helper';
 import { UserState, WithdrawalTypeEnum } from '@domain/user/user.enum';
 import prismaClient from '@root/src/common/database/prisma';
 import {
@@ -36,17 +37,20 @@ describe('user repository', () => {
     expect(res.length).toEqual(1);
   });
 
-  it('should update user', async () => {
-    const data = { nickname: 'test', state: UserState.ACTIVE, property: {} };
-    await saveUser(data);
+  describe('updateUserById', () => {
+    beforeEach(async () => {
+      await loadFixture(prismaClient, 'test/fixtures/user/user-update.sql');
+    });
 
-    let user = (await getUsers({}))[0];
-    const updateData = { nickname: 'test2', state: 'test2' };
-    await updateUserById(user.id, updateData);
+    it('should update user', async () => {
+      const user = (await getUsers({}))[0];
+      const updateData = { nickname: 'test2', state: 'test2' };
+      await updateUserById(user.id, updateData);
 
-    user = (await getUsers({}))[0];
-    expect(user.nickname).toEqual(updateData.nickname);
-    expect(user.state).toEqual(updateData.state);
+      const updatedUser = (await getUsers({}))[0];
+      expect(updatedUser.nickname).toEqual(updateData.nickname);
+      expect(updatedUser.state).toEqual(updateData.state);
+    });
   });
 
   it('should save user', async () => {
