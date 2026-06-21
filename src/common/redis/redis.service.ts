@@ -1,11 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { RedisClientType } from 'redis';
 
 @Injectable()
-export class RedisService {
+export class RedisService implements OnModuleDestroy {
   constructor(
     @Inject('redisClient') private readonly redisPubClient: RedisClientType,
   ) {}
+
+  async onModuleDestroy(): Promise<void> {
+    await this.redisPubClient.quit();
+  }
 
   async get(key: string): Promise<string | null> {
     return this.redisPubClient.get(key);

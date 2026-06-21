@@ -19,6 +19,10 @@ describe('food controller', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   beforeEach(async () => {
     jest.clearAllMocks();
   });
