@@ -1,0 +1,86 @@
+### Admin Token 생성
+POST http://localhost:3000/v1/admin/tokens
+Content-Type: application/json
+
+{
+  "identification": "admin@example.com",
+  "password": "adminpassword"
+}
+
+### 모든 회원 조회 (기본)
+GET http://localhost:3000/v1/admin/users
+Authorization: Bearer {{adminToken}}
+
+### 모든 회원 조회 (페이지네이션)
+GET http://localhost:3000/v1/admin/users?page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+### 회원 검색 (통합 검색)
+GET http://localhost:3000/v1/admin/users?search=완벽한
+Authorization: Bearer {{adminToken}}
+
+### 회원 검색 (닉네임만)
+GET http://localhost:3000/v1/admin/users?nickname=완벽한
+Authorization: Bearer {{adminToken}}
+
+### 회원 검색 (아이디/이메일만)
+GET http://localhost:3000/v1/admin/users?identification=example
+Authorization: Bearer {{adminToken}}
+
+### 회원 검색 (가입일 - 올바른 형식)
+GET http://localhost:3000/v1/admin/users?createdAt=2025-01-15
+Authorization: Bearer {{adminToken}}
+
+### 회원 검색 (가입일 - 잘못된 형식 - 400 에러 예상)
+GET http://localhost:3000/v1/admin/users?createdAt=2025/01/15
+Authorization: Bearer {{adminToken}}
+
+### 회원 검색 (닉네임 - 특수문자 포함 - 400 에러 예상)
+GET http://localhost:3000/v1/admin/users?nickname=user@123
+Authorization: Bearer {{adminToken}}
+
+### 회원 검색 (아이디 - 한글 포함 - 400 에러 예상)
+GET http://localhost:3000/v1/admin/users?identification=사용자@email.com
+Authorization: Bearer {{adminToken}}
+
+### 상태별 필터링 (활성 사용자)
+GET http://localhost:3000/v1/admin/users?state=active
+Authorization: Bearer {{adminToken}}
+
+### 역할별 필터링 (일반 사용자)
+GET http://localhost:3000/v1/admin/users?role=USER
+Authorization: Bearer {{adminToken}}
+
+### 복합 필터링 (닉네임 + 상태 + 역할)
+GET http://localhost:3000/v1/admin/users?nickname=완벽한&state=active&role=USER&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### 복합 필터링 (아이디 + 가입일 + 상태)
+GET http://localhost:3000/v1/admin/users?identification=example&createdAt=2025-01-15&state=active&page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+### ===== Restaurant Review Filtering =====
+
+### 식당 리뷰 필터링 (등록일)
+GET http://localhost:3000/v1/admin/restaurant/review?createdAt=2025-01-15
+Authorization: Bearer {{adminToken}}
+
+### 식당 리뷰 필터링 (등록일 + 페이지네이션)
+GET http://localhost:3000/v1/admin/restaurant/review?createdAt=2025-01-15&page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+### 식당 리뷰 필터링 (잘못된 날짜 형식 - 400 에러 예상)
+GET http://localhost:3000/v1/admin/restaurant/review?createdAt=2025/01/15
+Authorization: Bearer {{adminToken}}
+
+### 식당 리뷰 필터링 (좌표 기반 - PostGIS 사용)
+GET http://localhost:3000/v1/admin/restaurant/review?latitude=37.5665&longitude=126.9780&radius=3000
+Authorization: Bearer {{adminToken}}
+
+### 식당 리뷰 필터링 (좌표 기반 - 기본 반경 5km)
+GET http://localhost:3000/v1/admin/restaurant/review?latitude=37.5665&longitude=126.9780
+Authorization: Bearer {{adminToken}}
+
+### 식당 리뷰 필터링 (복합 필터링)
+GET http://localhost:3000/v1/admin/restaurant/review?createdAt=2025-01-15&latitude=37.5665&longitude=126.9780&radius=3000&page=1&limit=5
+Authorization: Bearer {{adminToken}} 

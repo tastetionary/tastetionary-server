@@ -117,7 +117,7 @@ npm run test
 npm run test:e2e
 ```
 
-### Integration tests (VS Code)
+## Manual API Testing (VS Code REST Client)
 
 Install the [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension, then:
 
@@ -133,6 +133,9 @@ Install the [REST Client](https://marketplace.visualstudio.com/items?itemName=hu
 }
 ```
 2. Open any `.http` file in `intergration_test/` and click **Send Request**.
+3. shift + cmd + P and find `Rest Client: Switch Environment` and select local(or other env)
+4. move to any other \*.http in http/ and click
+   (before click, server should be running)
 
 ## Project Structure
 
