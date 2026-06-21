@@ -168,14 +168,13 @@ packages/
 
 ## CI/CD
 
-GitHub Actions pipelines run on every push and pull request:
+GitHub Actions pipelines:
 
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
-| `unit-test.yml` | push / PR | Jest unit tests |
-| `e2e-test.yml` | push / PR | End-to-end API tests |
-| `release-dev.yml` | merge to develop | Build and deploy to dev server |
-| `release-prod.yml` | merge to main | Build and deploy to production |
+| `unit-test.yml` | PR to main / develop | Jest unit tests |
+| `e2e-test.yml` | PR to main / develop | End-to-end API tests |
+| `deploy-dev.yml` | push to develop | Run tests → deploy to Railway on success |
 
 ## API Reference
 

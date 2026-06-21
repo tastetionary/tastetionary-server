@@ -1,8 +1,6 @@
 name: server-e2e-tests
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
     branches: [main, develop]
 
