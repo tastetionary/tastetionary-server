@@ -30,7 +30,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "NODE_ENV=test jest src/**/**/*.controller.spec.ts src/app.controller.spec.ts",
+    "test:e2e": "NODE_ENV=test jest --testPathPattern='test/e2e' --forceExit",
     "prepare": "husky install",
     "husky": "npx husky install && npx husky add .husky/pre-commit",
     "postinstall": "ts-patch install"

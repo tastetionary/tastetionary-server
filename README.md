@@ -174,7 +174,10 @@ GitHub Actions pipelines:
 |----------|---------|-------------|
 | `unit-test.yml` | PR to main / develop | Jest unit tests |
 | `e2e-test.yml` | PR to main / develop | End-to-end API tests |
-| `deploy-dev.yml` | push to develop | Run tests → deploy to Railway on success |
+| `codeql.yml` | PR to main / develop | CodeQL static analysis |
+| `deploy-dev.yml` | push to develop | lint → codeql → test → trivy scan → Railway deploy |
+| `trivy-scheduled.yml` | every Monday 00:00 UTC | Weekly Docker image vulnerability scan |
+| `dependabot.yml` | every Monday | Auto PRs for npm / GitHub Actions / Docker updates |
 
 ## API Reference
 
