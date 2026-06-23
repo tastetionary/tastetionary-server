@@ -7,10 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  USER
-  ADMIN
-}
 model Users {
   id                        Int                         @id @default(autoincrement())
   nickname                  String                      @map("nickname") @db.VarChar(128)
@@ -19,7 +15,6 @@ model Users {
   createdAt                 DateTime                    @default(now()) @map("created_at")
   updatedAt                 DateTime                    @updatedAt @map("updated_at")
   RestaurantReviewReactions RestaurantReviewReactions[]
-  role                      UserRole                    @default(USER)
 
   @@index([nickname])
   @@index([state])
