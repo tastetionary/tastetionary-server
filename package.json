@@ -58,7 +58,7 @@
     "@sentry/profiling-node": "^1.2.1",
     "@types/bcrypt": "^5.0.0",
     "@types/multer": "^1.4.12",
-    "axios": "^1.7.7",
+    "axios": "^1.18.1",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -109,12 +109,36 @@
     "source-map-support": "^0.5.21",
     "supertest": "^6.3.3",
     "testcontainers": "^10.28.0",
-    "ts-jest": "^29.1.0",
+    "ts-jest": "^29.4.11",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "ts-patch": "^3.0.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6"
+  },
+  "overrides": {
+    "@babel/traverse": "^7.29.7",
+    "fast-xml-parser": "^4.5.6",
+    "handlebars": "^4.7.9",
+    "request": {
+      "form-data": "^2.5.4"
+    },
+    "@types/request": {
+      "form-data": "^2.5.4"
+    },
+    "mailgun-js": {
+      "form-data": "^2.5.4"
+    },
+    "@types/mailgun-js": {
+      "form-data": "^2.5.4"
+    },
+    "discord-webhook-node": {
+      "form-data": "^3.0.4"
+    },
+    "superagent": {
+      "form-data": "^4.0.6"
+    },
+    "netmask": "^2.0.2"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
