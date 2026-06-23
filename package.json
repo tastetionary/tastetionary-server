@@ -84,8 +84,8 @@
     "@nestjs/swagger": "^7.1.11",
     "@nestjs/testing": "^10.0.0",
     "@relmify/jest-fp-ts": "^2.1.1",
-    "@testcontainers/postgresql": "^10.28.0",
-    "@testcontainers/redis": "^10.28.0",
+    "@testcontainers/postgresql": "^12.0.3",
+    "@testcontainers/redis": "^12.0.3",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
@@ -108,7 +108,7 @@
     "rimraf": "^6.0.0",
     "source-map-support": "^0.5.21",
     "supertest": "^6.3.3",
-    "testcontainers": "^10.28.0",
+    "testcontainers": "^12.0.3",
     "ts-jest": "^29.4.11",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
@@ -132,7 +132,13 @@
     "superagent": {
       "form-data": "^4.0.6"
     },
-    "netmask": "^2.0.2"
+    "netmask": "^2.0.2",
+    "glob": "^10.5.0",
+    "lodash": "^4.18.0",
+    "multer": "^2.2.0",
+    "picomatch": "^4.0.4",
+    "tar": "^7.5.11",
+    "tmp": "^0.2.6"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
