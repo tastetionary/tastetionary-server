@@ -10,7 +10,6 @@ import {
   UserState,
   PreferenceCategory,
   PreferenceCategoryToColumnMapping,
-  UserRole,
 } from '@domain/user/user.enum';
 import { getRandomItem } from '@common/util';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
@@ -29,7 +28,6 @@ import {
   saveUser,
   updateUser,
   updateUserById,
-  getUsers,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
 import {
@@ -48,11 +46,7 @@ import {
 import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
-import {
-  searchAccount,
-  createAccount,
-} from '@domain/account/service/account.service';
-import { AccountCategory } from '@domain/account/account.enum';
+import { searchAccount } from '@domain/account/service/account.service';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -89,7 +83,7 @@ const transformRecordToEntity = <T extends AuthenticationRecord>(
   if (!record) {
     return null;
   }
-  const { category, ...data } = record;
+  const { category: _category, ...data } = record;
   return {
     ...data,
   };
@@ -333,175 +327,3 @@ export const _private = {
   createRandomNickname,
   createUser,
 };
-
-interface GetAllUsersParams {
-  search?: string;
-  nickname?: string;
-  identification?: string;
-  createdAt?: string;
-  state?: UserState;
-  page?: number;
-  limit?: number;
-}
-
-interface GetAllUsersResult {
-  users: Array<{
-    id: number;
-    nickname: string;
-    state: UserState;
-    role: UserRole;
-    createdAt: Date;
-    updatedAt: Date;
-    account: {
-      identification: string;
-      category: AccountCategory;
-    } | null;
-    area: {
-      id: number;
-      userId: number;
-      order: number;
-      address: string;
-      latitude: number;
-      longitude: number;
-    } | null;
-  }>;
-  total: number;
-}
-
-export async function getAllUsers(
-  params?: GetAllUsersParams,
-): Promise<GetAllUsersResult> {
-  const users = await getUsers({}, 1000);
-
-  const usersWithDetails = await Promise.all(
-    users.map(async (user) => {
-      const [account, area] = await Promise.all([
-        searchAccount(user.id),
-        searchAreas(user.id),
-      ]);
-
-      return {
-        id: user.id,
-        nickname: user.nickname,
-        state: user.state as unknown as UserState,
-        role: user.role as unknown as UserRole,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        account: account
-          ? {
-              identification: account.identification,
-              category: account.category as AccountCategory,
-            }
-          : null,
-        area: area
-          ? {
-              id: area.id,
-              userId: area.userId,
-              order: area.order,
-              address: area.address,
-              latitude: area.latitude,
-              longitude: area.longitude,
-            }
-          : null,
-      };
-    }),
-  );
-  const filteredUsers = usersWithDetails
-    .filter((user) => {
-      if (params?.search) {
-        const searchTerm = params.search.toLowerCase();
-        return (
-          user.nickname?.toLowerCase().includes(searchTerm) ||
-          user.account?.identification?.toLowerCase().includes(searchTerm)
-        );
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.nickname) {
-        const nicknameTerm = params.nickname.toLowerCase();
-        return user.nickname?.toLowerCase().includes(nicknameTerm);
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.identification) {
-        const identificationTerm = params.identification.toLowerCase();
-        return user.account?.identification
-          ?.toLowerCase()
-          .includes(identificationTerm);
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.createdAt) {
-        const targetDate = new Date(params.createdAt);
-        const targetDateStr = targetDate.toISOString().split('T')[0];
-        const userDateStr = user.createdAt.toISOString().split('T')[0];
-        return userDateStr === targetDateStr;
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.state) {
-        return user.state === params.state;
-      }
-      return true;
-    });
-
-  const paginatedUsers =
-    params?.page && params?.limit
-      ? filteredUsers.slice(
-          (params.page - 1) * params.limit,
-          params.page * params.limit,
-        )
-      : filteredUsers;
-
-  const totalFilteredCount = usersWithDetails
-    .filter((user) => {
-      if (params?.search) {
-        const searchTerm = params.search.toLowerCase();
-        return (
-          user.nickname?.toLowerCase().includes(searchTerm) ||
-          user.account?.identification?.toLowerCase().includes(searchTerm)
-        );
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.nickname) {
-        const nicknameTerm = params.nickname.toLowerCase();
-        return user.nickname?.toLowerCase().includes(nicknameTerm);
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.identification) {
-        const identificationTerm = params.identification.toLowerCase();
-        return user.account?.identification
-          ?.toLowerCase()
-          .includes(identificationTerm);
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.createdAt) {
-        const targetDate = new Date(params.createdAt);
-        const targetDateStr = targetDate.toISOString().split('T')[0];
-        const userDateStr = user.createdAt.toISOString().split('T')[0];
-        return userDateStr === targetDateStr;
-      }
-      return true;
-    })
-    .filter((user) => {
-      if (params?.state) {
-        return user.state === params.state;
-      }
-      return true;
-    }).length;
-
-  return {
-    users: paginatedUsers,
-    total: totalFilteredCount,
-  };
-}

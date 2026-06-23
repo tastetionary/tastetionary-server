@@ -11,7 +11,6 @@ import {
   deleteUserPreferenceRestaurant,
   validateNickName,
   isRestaurantInUserPreferences,
-  getAllUsers,
   searchAreas,
 } from '@domain/user/service/user.service';
 import { RegisterProfileRequest } from '@domain/user/dto/user.dto';
@@ -178,16 +177,6 @@ describe('user service', () => {
     await expect(validateNickName('특수!문자?')).rejects.toThrowError(
       CallerWrongUsageException,
     );
-  });
-
-  it('getAlUserss', async () => {
-    const user1 = await createProfile(DTO);
-    const user1Id = user1.id;
-    const expectedSize = 1;
-
-    await createAccount({ userId: user1Id, ...DTO.account });
-    const result = await getAllUsers();
-    expect(result.users).toHaveLength(expectedSize);
   });
 
   describe('[private] ', () => {

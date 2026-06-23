@@ -222,7 +222,7 @@ function createExpiredAt(seconds = 180) {
 //   }
 // }
 
-function isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
+function _isGeneralEmailDomain(identification: string, env?: EnvironmentEnum) {
   if (env != EnvironmentEnum.PRODUCTION) {
     return false;
   }
