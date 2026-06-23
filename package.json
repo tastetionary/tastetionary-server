@@ -71,8 +71,7 @@
     "redis": "^4.7.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "ts-mailgun": "^0.5.1",
-    "typescript-transform-paths": "^3.4.6",
+"typescript-transform-paths": "^3.4.6",
     "typia": "^4.2.3",
     "winston": "^3.10.0",
     "winston-daily-rotate-file": "^4.7.1"
@@ -126,13 +125,7 @@
     "@types/request": {
       "form-data": "^2.5.4"
     },
-    "mailgun-js": {
-      "form-data": "^2.5.4"
-    },
-    "@types/mailgun-js": {
-      "form-data": "^2.5.4"
-    },
-    "discord-webhook-node": {
+"discord-webhook-node": {
       "form-data": "^3.0.4"
     },
     "superagent": {
