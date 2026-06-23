@@ -82,17 +82,3 @@ export interface SocialLoginInfo {
   // apple?
   age?: number;
 }
-
-export interface CreateAdminTokenRequest {
-  /**
-   * admin email for login
-   * @type string
-   */
-  identification: string;
-
-  /**
-   * admin password for login
-   * @type string
-   */
-  password: string;
-}

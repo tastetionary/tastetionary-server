@@ -44,7 +44,6 @@ async function getAccessToken(code: string) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
-    console.log(response.data);
     return response.data.access_token;
   } catch (error) {
     console.error(

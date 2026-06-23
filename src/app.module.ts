@@ -8,7 +8,6 @@ import { UserModule } from '@domain/user/user.module';
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { FoodModule } from '@domain/food/food.module';
 import { AuthenticationModule } from '@domain/authentication/authentication.module';
-import { AdminModule } from '@domain/admin/admin.module';
 
 @Module({
   imports: [
@@ -17,7 +16,6 @@ import { AdminModule } from '@domain/admin/admin.module';
     RestaurantModule,
     FoodModule,
     AuthenticationModule,
-    AdminModule,
     ConfigModule.forRoot({
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       cache: true,
