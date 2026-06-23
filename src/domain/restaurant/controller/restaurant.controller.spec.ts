@@ -205,7 +205,6 @@ describe('restaurant controller', () => {
   });
 
   it('/review/recent, should reutrn 200', async () => {
-    const userId = 123;
     const res = await request(app.getHttpServer())
       .get('/v1/restaurant/review/recent')
       .send();

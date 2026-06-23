@@ -46,10 +46,7 @@ import {
 import { findExternalRestaurantById } from '@domain/restaurant/service/restaurant.service';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
-import {
-  searchAccount,
-  createAccount,
-} from '@domain/account/service/account.service';
+import { searchAccount } from '@domain/account/service/account.service';
 
 export async function searchProfile(userId: number) {
   const user = await searchUser(userId);
@@ -86,7 +83,7 @@ const transformRecordToEntity = <T extends AuthenticationRecord>(
   if (!record) {
     return null;
   }
-  const { category, ...data } = record;
+  const { category: _category, ...data } = record;
   return {
     ...data,
   };

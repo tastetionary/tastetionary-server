@@ -308,7 +308,7 @@ export async function getFilteredReviews(param: {
 
   const detailedReviews = await Promise.all(
     paginatedData.map(async (review) => {
-      const { reactions = [], ...record } = review;
+      const { reactions: _reactions = [], ...record } = review;
       const userProfile = await searchProfile(review.userId).catch(() => null);
       const restaurant = await getExternalRestaurantInformationById(
         Number(review.external_restaurant_information_id),

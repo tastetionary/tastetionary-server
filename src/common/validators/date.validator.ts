@@ -12,7 +12,7 @@ export function IsValidDateFormat(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
+        validate(value: any, _args: ValidationArguments) {
           if (typeof value !== 'string') {
             return false;
           }

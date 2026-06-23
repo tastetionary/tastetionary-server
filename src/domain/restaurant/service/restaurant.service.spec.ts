@@ -179,7 +179,6 @@ describe('restaurant service', () => {
     });
 
     it('with no dining area user, should throw error', async () => {
-      const userId = 99;
       const entity = undefined as any;
 
       await expect(

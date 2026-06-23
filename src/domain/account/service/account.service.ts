@@ -40,7 +40,7 @@ export async function getAccount(
       ErrorCodeEnum.ACCOUNT_NOT_FOUND,
     );
   }
-  const { category, ...rest } = data;
+  const { category: _category, ...rest } = data;
   return {
     category: paramCategory,
     ...rest,

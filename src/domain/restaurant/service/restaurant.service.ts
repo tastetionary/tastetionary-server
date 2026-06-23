@@ -495,7 +495,7 @@ export async function reportRestaurantReview(param: {
     );
   }
 
-  const { prices, ...rest } = review;
+  const { prices, ..._rest } = review;
   const priceEnum = prices.map((price) => {
     return Object.values(RestaurantPrice).find(
       (key) => key == price,

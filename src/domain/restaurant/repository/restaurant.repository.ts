@@ -317,7 +317,7 @@ export async function getReviewsByConditions(param: {
   });
 }
 
-function getRestaurantRxnDistinctCnt(
+function _getRestaurantRxnDistinctCnt(
   reactionList: Array<{ userId: number; reactionType: REACTION_TYPE }>,
 ): RestaurantReviewRxnDistinctCnt {
   const map: RestaurantReviewRxnDistinctCnt = Object.values(
