@@ -135,7 +135,9 @@
       "form-data": "^4.0.6"
     },
     "netmask": "^2.0.2",
-    "glob": "^10.5.0",
+    "@nestjs/cli": {
+      "glob": "^10.5.0"
+    },
     "lodash": "^4.18.0",
     "multer": "^2.2.0",
     "picomatch": "^4.0.4",
