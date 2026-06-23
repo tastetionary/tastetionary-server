@@ -1,0 +1,5 @@
+# CVE-2026-12151: undici WebSocket DoS — affects undici bundled inside npm itself
+# (node_modules/npm/node_modules/undici), not our application code.
+# npm has not yet released a patch for their bundled undici as of 2026-06-22.
+# Re-evaluate when npm ships undici >=6.27.0 in its bundle.
+CVE-2026-12151
