@@ -26,4 +26,8 @@ export class RedisService implements OnModuleDestroy {
   async keys(pattern: string): Promise<string[]> {
     return this.redisPubClient.keys(pattern);
   }
+
+  async ping(): Promise<string> {
+    return this.redisPubClient.ping();
+  }
 }
