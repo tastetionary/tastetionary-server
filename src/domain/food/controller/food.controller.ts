@@ -3,8 +3,7 @@ import {
   HttpCode,
   Injectable,
   UseFilters,
-  Get,
-  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
@@ -19,7 +18,7 @@ import {
   getFilterOptions,
   getRecentRecommendations,
 } from '@domain/food/facade/food.facade';
-import { FoodCategory, FoodKeyword } from '@domain/food/food.enum';
+import { RateLimit, RateLimitGuard } from '@common/rate-limit/rate-limit.guard';
 
 @Controller('v1/food')
 @UseFilters(new HttpExceptionFilter())
@@ -29,6 +28,8 @@ export class FoodController {
    * @tag food
    * @summary get food recommentation
    */
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ ttl: 60, limit: 30 })
   @TypedRoute.Post('/recommendation')
   @HttpCode(200)
   async getRecommentation(

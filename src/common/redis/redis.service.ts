@@ -27,6 +27,10 @@ export class RedisService implements OnModuleDestroy {
     return this.redisPubClient.keys(pattern);
   }
 
+  async incr(key: string): Promise<number> {
+    return this.redisPubClient.incr(key);
+  }
+
   async ping(): Promise<string> {
     return this.redisPubClient.ping();
   }
