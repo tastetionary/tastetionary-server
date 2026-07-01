@@ -82,21 +82,38 @@ export interface GetRestaurantInput
    * @type RestaurantCategory
    */
   category: RestaurantCategory[];
+
+  /**
+   * latitude,
+   * example: 37.1234
+   * @type number
+   */
+  latitude: number;
+
+  /**
+   * longitude,
+   * example: 127.1123
+   * @type number
+   */
+  longitude: number;
 }
 
 export interface GetRestaurantsOutput
   extends Omit<ExternalRestaurantInformationRecord, 'id' | 'externalUUID'> {
   id: string;
   externalUUID: string;
-  bookmark: boolean;
   /**
-   * aggregate data from review, if not reviewed, it will be null
-   * @type AggregateReviewDTO
+   * aggregate data from review
+   * @type RecommendationAggregateReviews
    */
-  aggregateReviews: AggregateReviewDTO | null;
-
-  reviews: Array<Omit<RestaurantReview, 'restaurant'>>;
+  aggregateReviews: RecommendationAggregateReviews;
 }
+
+export interface RecommendationAggregateReviews
+  extends Pick<
+    AggregateReviewDTO,
+    'categories' | 'summaries' | 'keywords' | 'prices'
+  > {}
 
 export interface GetNearByRestaurantsOutput
   extends Omit<
@@ -261,47 +278,34 @@ export class RestaurantController {
   /**
    * @tag restaurant
    * @summary get restaurants by condition
-   * @security bearer
    */
-  @UseGuards(AuthGuard, RateLimitGuard)
+  @UseGuards(RateLimitGuard)
   @RateLimit({ ttl: 60, limit: 15 })
   @HttpCode(200)
   @TypedRoute.Post('/recommendation')
   async getRestaurants(
-    @Request() req,
     @TypedBody()
     input: GetRestaurantInput,
   ): Promise<BaseResponseDto<GetRestaurantsOutput>> {
-    const userId = req.user.userId;
     const maxDistanceMeter = 1_000;
 
     const data = await getRecommendations({
-      userId,
+      latitude: input.latitude,
+      longitude: input.longitude,
       maxDistanceMeter: maxDistanceMeter,
       prices: input.prices,
       keywords: input.keywords,
       categories: input.category,
     });
 
-    const reviews = data.reviews.map((d) => {
-      const { id, external_restaurant_information_id, ...rest } = d;
-      return {
-        id: id.toString(),
-        external_restaurant_information_id:
-          external_restaurant_information_id.toString(),
-        ...rest,
-      };
-    });
-
     const { id, externalUUID, ...rest } = data.restaurant;
+    const { categories, summaries, keywords, prices } = data.aggregateReviews;
 
     return new BaseResponseDto({
       id: id.toString(),
       externalUUID: externalUUID.toString(),
-      bookmark: data.bookmark,
       ...rest,
-      aggregateReviews: data.aggregateReviews,
-      reviews: reviews,
+      aggregateReviews: { categories, summaries, keywords, prices },
     });
   }
 

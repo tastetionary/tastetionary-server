@@ -62,35 +62,20 @@ describe('restaurant controller', () => {
   };
 
   it('/recommendation, with empty should return 204', async () => {
-    const userId = 999;
-    const entity = areaEntityFactory({ userId });
-    jest
-      .spyOn(userService, 'searchAreas')
-      .mockReturnValueOnce(Promise.resolve(entity));
-
-    const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(userId, key, {
-      expiresIn: '10h',
-    });
-
     const res = await request(app.getHttpServer())
       .post('/v1/restaurant/recommendation')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         prices: [RestaurantPrice.UNDER_10000],
+        latitude: 37.5665,
+        longitude: 126.978,
       });
 
     assertStatusCode(res, 204);
   });
 
   it('/recommendation, should return 200', async () => {
-    const userId = 123;
-    const entity = areaEntityFactory({ userId });
-    jest
-      .spyOn(userService, 'searchAreas')
-      .mockReturnValueOnce(Promise.resolve(entity));
     jest
       .spyOn(restaurantService, 'getRecommendedRestaurant')
       .mockResolvedValueOnce({
@@ -104,32 +89,28 @@ describe('restaurant controller', () => {
           distance: 10,
         },
         aggregateReviews: {
-          categories: [RestaurantCategory.KOREAN],
-          summaries: [''],
-          opinions: [''],
-          keywords: [''],
+          categories: [RestaurantCategory.ASIAN],
+          summaries: ['summary'],
+          opinions: ['Y'],
+          keywords: ['key'],
           prices: [RestaurantPrice.UNDER_10000],
-          aggregatePrice: { '10': 10 },
-          revisitRatio: 10,
-          totalCount: 10,
-          reviewReactionCnt: { [REACTION_TYPE.L]: 1, [REACTION_TYPE.D]: 0 },
+          aggregatePrice: {},
+          revisitRatio: 100,
+          totalCount: 1,
+          reviewReactionCnt: {} as any,
           userReaction: null,
         },
       });
 
-    const key = configService.getTokenData().accessTokenSecret;
-    const token = createUserToken(userId, key, {
-      expiresIn: '10h',
-    });
-
     const res = await request(app.getHttpServer())
       .post('/v1/restaurant/recommendation')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         excludeIds: [],
         category: [RestaurantCategory.ASIAN],
         keywords: ['key'],
         prices: [RestaurantPrice.UNDER_10000],
+        latitude: 37.5665,
+        longitude: 126.978,
       });
 
     assertStatusCode(res, 200);
