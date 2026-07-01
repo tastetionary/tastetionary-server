@@ -58,6 +58,7 @@ import {
 } from '@domain/restaurant/service/restaurant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { validateImageFile, validateContent } from '@common/util';
+import { RateLimit, RateLimitGuard } from '@common/rate-limit/rate-limit.guard';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -262,7 +263,8 @@ export class RestaurantController {
    * @summary get restaurants by condition
    * @security bearer
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RateLimitGuard)
+  @RateLimit({ ttl: 60, limit: 15 })
   @HttpCode(200)
   @TypedRoute.Post('/recommendation')
   async getRestaurants(
@@ -308,7 +310,8 @@ export class RestaurantController {
    * @summary get nearby reviewed restaurants
    * @security bearer
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RateLimitGuard)
+  @RateLimit({ ttl: 60, limit: 20 })
   @HttpCode(200)
   @TypedRoute.Get('/nearby')
   async getNearByRestaurants(

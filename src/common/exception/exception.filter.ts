@@ -83,6 +83,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return;
     }
 
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+      response.status(status).json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        originMessage: exception.message,
+      });
+      return;
+    }
+
     console.error(exception);
     Sentry.captureException(exception, { extra: request.body });
     response.status(400).json({

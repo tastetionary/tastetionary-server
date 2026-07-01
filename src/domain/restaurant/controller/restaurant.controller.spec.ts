@@ -103,18 +103,6 @@ describe('restaurant controller', () => {
           longitude: 12,
           distance: 10,
         },
-        aggregateReviews: {
-          categories: [RestaurantCategory.KOREAN],
-          summaries: [''],
-          opinions: [''],
-          keywords: [''],
-          prices: [RestaurantPrice.UNDER_10000],
-          aggregatePrice: { '10': 10 },
-          revisitRatio: 10,
-          totalCount: 10,
-          reviewReactionCnt: { [REACTION_TYPE.L]: 1, [REACTION_TYPE.D]: 0 },
-          userReaction: null,
-        },
       });
 
     const key = configService.getTokenData().accessTokenSecret;
