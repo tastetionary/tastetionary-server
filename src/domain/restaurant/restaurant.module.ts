@@ -5,10 +5,18 @@ import { ConfigurationService } from '@domain/configuration/configuration.servic
 import { JwtService } from '@nestjs/jwt';
 import { UserModule } from '@domain/user/user.module';
 import { RedisModule } from '@common/redis/redis.module';
+import { RateLimitGuard } from '@common/rate-limit/rate-limit.guard';
+import { Reflector } from '@nestjs/core';
 
 @Module({
   imports: [UserModule, RedisModule],
   controllers: [RestaurantController],
-  providers: [AuthGuard, ConfigurationService, JwtService],
+  providers: [
+    AuthGuard,
+    ConfigurationService,
+    JwtService,
+    RateLimitGuard,
+    Reflector,
+  ],
 })
 export class RestaurantModule {}
