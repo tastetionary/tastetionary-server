@@ -20,7 +20,6 @@ import { ErrorCodeEnum, ErrorSubCategoryEnum } from '@common/exception/enum';
 import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
 import {
   getPreferenceRestaurant,
-  isRestaurantInUserPreferences,
   searchAreas,
   searchProfile,
 } from '@domain/user/service/user.service';
@@ -48,62 +47,22 @@ interface Recommendation {
 }
 
 export async function getRecommendations(param: {
-  userId: number;
+  latitude: number;
+  longitude: number;
   maxDistanceMeter: number;
   keywords: string[];
   prices: RestaurantPrice[];
   categories: RestaurantCategory[];
 }) {
-  const userAreas = await searchAreas(param.userId);
-  if (!userAreas) {
-    throw new CallerWrongDomainRuleException(
-      ErrorSubCategoryEnum.NO_DATA,
-      'no area',
-      ErrorCodeEnum.MISSING_USER_AREA,
-    );
-  }
-
-  const redisKey = `user:${param.userId}:recommendations`;
-  const recentRecommendations = await getRecentRecommendations(redisKey);
-  const recentIds = recentRecommendations.map((rec) => BigInt(rec.id));
-
-  const excludeRestaurants = await getPreferenceRestaurant(
-    param.userId,
-    PreferenceCategory.EXCLUDED,
-  );
-  const excludeIds = excludeRestaurants.map((restaurant) =>
-    BigInt(restaurant.id),
-  );
-  const excludeRestaurantIds = recentIds.concat(excludeIds);
+  const userAreas = { latitude: param.latitude, longitude: param.longitude };
 
   const res = await getRecommendedRestaurant({
     userAreas,
-    excludeRestaurantIds,
+    excludeRestaurantIds: [],
     ...param,
   });
 
-  await saveNewRecommendation(redisKey, res.restaurant.id.toString());
-  const isBookmarked = await isRestaurantInUserPreferences(
-    param.userId,
-    PreferenceCategory.BOOKMARK,
-    Number(res.restaurant.id),
-  );
-  const isExcluded = await isRestaurantInUserPreferences(
-    param.userId,
-    PreferenceCategory.EXCLUDED,
-    Number(res.restaurant.id),
-  );
-
-  const reviews = (
-    await getRestaurantReviews(res.restaurant.id, param.userId)
-  ).data.slice(0, 3);
-
-  return {
-    ...res,
-    reviews: reviews,
-    bookmark: isBookmarked,
-    exclude: isExcluded,
-  };
+  return { restaurant: res.restaurant, aggregateReviews: res.aggregateReviews };
 }
 
 async function getRecentRecommendations(

@@ -110,7 +110,7 @@ export function aggregateRestaurantReview(
 }
 
 export async function getRecommendedRestaurant(param: {
-  userAreas: AreaEntity;
+  userAreas: { latitude: number; longitude: number };
   maxDistanceMeter: number;
   keywords: string[];
   categories: RestaurantCategory[];
@@ -150,7 +150,7 @@ export async function getRecommendedRestaurant(param: {
 }
 
 async function getRestaurantsByDistance(param: {
-  userAreas: AreaEntity;
+  userAreas: { latitude: number; longitude: number };
   maxDistanceMeter: number;
   excludeRestaurantIds?: bigint[];
 }) {

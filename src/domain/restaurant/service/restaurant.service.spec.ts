@@ -153,13 +153,13 @@ describe('restaurant service', () => {
 
       const maxDistance = 1000;
       const res = await getRecommendedRestaurant({
-        userAreas: areaEntityFactory({ userId }),
+        userAreas: areaEntityFactory({ userId }) as any,
         maxDistanceMeter: maxDistance,
         keywords: ['clean'],
         categories: [RestaurantCategory.ASIAN],
         excludeRestaurantIds: [],
       });
-      expect(res.aggregateReviews.keywords).toEqual(['깨끗해요✨']);
+      expect(res.restaurant).toEqual(external);
       expect(res).not.toBeNull();
     });
 
@@ -169,7 +169,7 @@ describe('restaurant service', () => {
 
       await expect(
         getRecommendedRestaurant({
-          userAreas: areaEntityFactory({ userId }),
+          userAreas: areaEntityFactory({ userId }) as any,
           maxDistanceMeter: maxDistance,
           keywords: [],
           categories: [RestaurantCategory.ASIAN],

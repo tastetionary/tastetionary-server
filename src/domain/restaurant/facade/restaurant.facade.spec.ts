@@ -8,7 +8,10 @@ import {
   getNearByRestaurants,
 } from '@domain/restaurant/facade/restaurant.facade';
 import * as userService from '@domain/user/service/user.service';
-import { CallerWrongDomainRuleException } from '@common/exception/internal.exception';
+import {
+  CallerWrongDomainRuleException,
+  EmptyContentException,
+} from '@common/exception/internal.exception';
 import {
   RestaurantCategory,
   RestaurantPrice,
@@ -23,17 +26,17 @@ jest.mock('@common/redis/redis.operations', () => ({
 
 describe('facade', () => {
   describe('getRecommendations', () => {
-    it('with not area user should throw error', async () => {
-      const userId = 99;
+    it('with no restaurant nearby, should throw error', async () => {
       await expect(
         getRecommendations({
-          userId,
+          latitude: 37.5665,
+          longitude: 126.978,
           maxDistanceMeter: 100,
           keywords: ['clean'],
           prices: [RestaurantPrice.OVER_20000],
           categories: [RestaurantCategory.ASIAN],
         }),
-      ).rejects.toThrowError(CallerWrongDomainRuleException);
+      ).rejects.toThrowError(EmptyContentException);
     });
   });
 });
