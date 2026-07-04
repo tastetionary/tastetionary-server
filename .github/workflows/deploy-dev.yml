@@ -9,7 +9,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js 24.x
         uses: actions/setup-node@v6
@@ -29,7 +29,7 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, codeql]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js 24.x
         uses: actions/setup-node@v6
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, codeql]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js 24.x
         uses: actions/setup-node@v6
@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, test-e2e]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build Docker image
         run: docker build -f docker/Dockerfile -t tastetionary-server:${{ github.sha }} .
@@ -105,7 +105,7 @@ jobs:
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Deploy to Railway
         run: railway up --service=${{ secrets.RAILWAY_SERVICE_ID }}
