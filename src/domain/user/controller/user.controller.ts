@@ -89,29 +89,35 @@ export class UserController {
     description: 'invalid nickname',
     examples: {
       'duplicate nickname': {
-        statusCode: 400,
-        timestamp: new Date().toISOString(),
-        path: '/v1/user/nickname/validation',
-        errorCode: ErrorCodeEnum.DUPLICATE_NIKCNAME,
-        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
-        originMessage: 'duplicate nickname',
+        value: {
+          statusCode: 400,
+          timestamp: new Date().toISOString(),
+          path: '/v1/user/nickname/validation',
+          errorCode: ErrorCodeEnum.DUPLICATE_NIKCNAME,
+          category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+          originMessage: 'duplicate nickname',
+        },
       },
       'invalid nickname': {
-        statusCode: 400,
-        timestamp: new Date().toISOString(),
-        path: '/v1/user/nickname/validation',
-        errorCode: ErrorCodeEnum.INVALID_NICKNAME,
-        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
-        originMessage: 'invalid nickname',
+        value: {
+          statusCode: 400,
+          timestamp: new Date().toISOString(),
+          path: '/v1/user/nickname/validation',
+          errorCode: ErrorCodeEnum.INVALID_NICKNAME,
+          category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+          originMessage: 'invalid nickname',
+        },
       },
       'invalid nickname(range or forbidden characters)': {
-        statusCode: 400,
-        timestamp: new Date().toISOString(),
-        path: '/v1/user/nickname/validation',
-        errorCode: ErrorCodeEnum.INVALID_NICKNAME_FORMAT,
-        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
-        originMessage:
-          'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
+        value: {
+          statusCode: 400,
+          timestamp: new Date().toISOString(),
+          path: '/v1/user/nickname/validation',
+          errorCode: ErrorCodeEnum.INVALID_NICKNAME_FORMAT,
+          category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+          originMessage:
+            'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
+        },
       },
     },
   })
@@ -135,29 +141,35 @@ export class UserController {
     description: 'invalid nickname',
     examples: {
       'duplicate nickname': {
-        statusCode: 400,
-        timestamp: new Date().toISOString(),
-        path: '/v1/user/nickname/validation',
-        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
-        errorCode: ErrorCodeEnum.DUPLICATE_NIKCNAME,
-        originMessage: 'duplicate nickname',
+        value: {
+          statusCode: 400,
+          timestamp: new Date().toISOString(),
+          path: '/v1/user/nickname/validation',
+          category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+          errorCode: ErrorCodeEnum.DUPLICATE_NIKCNAME,
+          originMessage: 'duplicate nickname',
+        },
       },
       'invalid nickname': {
-        statusCode: 400,
-        timestamp: new Date().toISOString(),
-        path: '/v1/user/nickname/validation',
-        errorCode: ErrorCodeEnum.INVALID_NICKNAME,
-        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
-        originMessage: 'invalid nickname',
+        value: {
+          statusCode: 400,
+          timestamp: new Date().toISOString(),
+          path: '/v1/user/nickname/validation',
+          errorCode: ErrorCodeEnum.INVALID_NICKNAME,
+          category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+          originMessage: 'invalid nickname',
+        },
       },
       'invalid nickname(range or forbidden characters)': {
-        statusCode: 400,
-        timestamp: new Date().toISOString(),
-        path: '/v1/user/nickname/validation',
-        errorCode: ErrorCodeEnum.INVALID_NICKNAME_FORMAT,
-        category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
-        originMessage:
-          'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
+        value: {
+          statusCode: 400,
+          timestamp: new Date().toISOString(),
+          path: '/v1/user/nickname/validation',
+          errorCode: ErrorCodeEnum.INVALID_NICKNAME_FORMAT,
+          category: ErrorCategoryEnum.CALLER_WRONG_USAGE_ERROR,
+          originMessage:
+            'only strings containing korean|english characters or numbers with lengths between 3 and 10 are allowed for nickname values',
+        },
       },
     },
   })
