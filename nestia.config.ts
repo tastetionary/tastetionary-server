@@ -7,7 +7,7 @@ const config: INestiaConfig = {
   e2e: 'test',
   swagger: {
     output: 'packages/api/swagger.json',
-    openapi: '3.1',
+    openapi: '3.2',
     security: {
       bearer: {
         type: 'apiKey',
