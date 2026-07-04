@@ -43,7 +43,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.804.0",
     "@aws-sdk/s3-request-presigner": "^3.804.0",
-    "@fxts/core": "^0.21.0",
+    "@fxts/core": "^1.26.0",
     "@nestia/core": "^11.3.4",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
