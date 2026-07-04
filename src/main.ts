@@ -4,14 +4,11 @@ import { AppModule } from '@src/app.module';
 import { winstonLogger } from '@utils/winston.config';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as Sentry from '@sentry/node';
-import { ProfilingIntegration } from '@sentry/profiling-node';
 
 function initSentry(dsn: string, env: string) {
   Sentry.init({
     dsn,
     environment: env,
-    integrations: [new ProfilingIntegration()],
-    profilesSampleRate: 1.0,
   });
 }
 
