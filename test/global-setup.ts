@@ -8,9 +8,7 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 
 declare global {
-  // eslint-disable-next-line no-var
   var __POSTGRES_CONTAINER__: StartedPostgreSqlContainer;
-  // eslint-disable-next-line no-var
   var __REDIS_CONTAINER__: StartedRedisContainer;
 }
 

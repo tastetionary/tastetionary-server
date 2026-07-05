@@ -14,9 +14,9 @@ export async function getRedisClient(): Promise<RedisClientType> {
     await client.connect();
     redisClient = client;
 
-    const singletons: Array<() => Promise<void>> =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ((global as any).__REDIS_SINGLETON_CLOSERS__ ??= []);
+    const singletons: Array<() => Promise<void>> = ((
+      global as any
+    ).__REDIS_SINGLETON_CLOSERS__ ??= []);
     singletons.push(() => client.disconnect());
   }
   return redisClient as RedisClientType;
