@@ -32,6 +32,8 @@ async function bootstrap() {
   const env = config.get<string>('ENV') as string;
   initSentry(sentryDsn, env);
 
+  app.enableShutdownHooks();
+
   app.enableCors({
     origin: [
       'https://tastetionary.vercel.app',
