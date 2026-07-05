@@ -88,6 +88,7 @@ Copy `.env.sample` to `.env`. Required variables:
 ENV=local|dev|test|prod
 DATABASE_URL=postgresql://...
 API_SERVER_PORT=8080
+CORS_ORIGINS=http://localhost:3000,https://tastetionary.com,https://tastetionary.vercel.app
 ACCESS_TOKEN_SECRET / ACCESS_TOKEN_EXPIRED_AT
 REFRESH_TOKEN_SECRET / REFRESH_TOKEN_EXPIRED_AT
 KAKAO_CLIENT_ID / KAKAO_REDIRECT_URI
