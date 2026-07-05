@@ -10,7 +10,7 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "postbuild": "npx nestia swagger",
+    "postbuild": "npx nestia swagger && node -e \"require('fs').copyFileSync('packages/api/swagger.json', 'dist/swagger.json')\"",
     "swagger": "npx nestia swagger",
     "sdk": "rimraf ./src/api/functional && NODE_ENV=development nestia sdk",
     "nestia": "npm run swagger ; npm run sdk",
@@ -69,6 +69,7 @@
     "discord-webhook-node": "^1.1.8",
     "emoji-regex": "^8.0.0",
     "fp-ts": "^2.16.1",
+    "helmet": "^8.2.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.3",
     "nest-winston": "^1.10.2",
