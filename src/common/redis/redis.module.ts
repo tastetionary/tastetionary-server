@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, OnApplicationShutdown } from '@nestjs/common';
 import { RedisService } from './redis.service';
+import { closeRedisClient } from './redis.client';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { FactoryProvider } from '@nestjs/common';
 import { createClient } from 'redis';
@@ -25,4 +26,8 @@ import { createClient } from 'redis';
   ],
   exports: [RedisService],
 })
-export class RedisModule {}
+export class RedisModule implements OnApplicationShutdown {
+  async onApplicationShutdown(): Promise<void> {
+    await closeRedisClient();
+  }
+}
