@@ -20,7 +20,7 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const url = config.get<string>('API_SERVER_URL') as string;
   const port = config.get<number>('API_SERVER_PORT') as number;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+
   const docs = require('../../packages/api/swagger.json');
   docs.servers = [
     {

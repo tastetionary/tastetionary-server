@@ -20,7 +20,6 @@ export class LogInterceptor implements NestInterceptor {
     this.logRequest(context, executionId);
 
     return next.handle().pipe(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catchError((error: any) => {
         this.logResponse(context, executionId, error);
         throw error;

@@ -23,7 +23,6 @@ export interface UserRecord {
 export async function saveUser(param: {
   nickname: string;
   state: UserState;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   property: Record<string, any>;
 }) {
   return prismaClient.users.create({ data: param });
@@ -43,7 +42,6 @@ export async function saveUsers(
   params: {
     nickname: string;
     state: UserState;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     property: Record<string, any>;
   }[],
 ) {
