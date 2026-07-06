@@ -98,7 +98,7 @@
     "@types/uuid": "^11.0.0",
     "cooky-cutter": "^1.5.4",
     "cross-env": "^7.0.3",
-    "eslint": "^9.39.4",
+    "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.7.0",
