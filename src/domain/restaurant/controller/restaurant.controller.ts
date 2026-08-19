@@ -59,6 +59,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { validateImageFile, validateContent } from '@common/util';
 import { RateLimit, RateLimitGuard } from '@common/rate-limit/rate-limit.guard';
+import { incrementRecommendation } from '@common/metrics/metrics.operations';
 
 export interface RegisterRestaurantReviewInput {
   /**
@@ -74,8 +75,10 @@ export interface RegisterRestaurantReviewInput {
   external: ExternalRestaurantInformationDTO;
 }
 
-export interface GetRestaurantInput
-  extends Omit<RestaurantReviewDTO, 'summary' | 'opinion' | 'category'> {
+export interface GetRestaurantInput extends Omit<
+  RestaurantReviewDTO,
+  'summary' | 'opinion' | 'category'
+> {
   /**
    * restaurant category array,
    * example: ["한식"]
@@ -98,8 +101,10 @@ export interface GetRestaurantInput
   longitude: number;
 }
 
-export interface GetRestaurantsOutput
-  extends Omit<ExternalRestaurantInformationRecord, 'id' | 'externalUUID'> {
+export interface GetRestaurantsOutput extends Omit<
+  ExternalRestaurantInformationRecord,
+  'id' | 'externalUUID'
+> {
   id: string;
   externalUUID: string;
   /**
@@ -109,17 +114,15 @@ export interface GetRestaurantsOutput
   aggregateReviews: RecommendationAggregateReviews;
 }
 
-export interface RecommendationAggregateReviews
-  extends Pick<
-    AggregateReviewDTO,
-    'categories' | 'summaries' | 'keywords' | 'prices'
-  > {}
+export interface RecommendationAggregateReviews extends Pick<
+  AggregateReviewDTO,
+  'categories' | 'summaries' | 'keywords' | 'prices'
+> {}
 
-export interface GetNearByRestaurantsOutput
-  extends Omit<
-    ExternalRestaurantInformationRecord,
-    'id' | 'externalUUID' | 'referenceLink' | 'createdAt' | 'updatedAt'
-  > {
+export interface GetNearByRestaurantsOutput extends Omit<
+  ExternalRestaurantInformationRecord,
+  'id' | 'externalUUID' | 'referenceLink' | 'createdAt' | 'updatedAt'
+> {
   restaurantId: string;
 
   category: RestaurantCategory;
@@ -176,15 +179,14 @@ export interface ReviewerSummary {
   reviews: number;
 }
 
-export interface RestaurantReview
-  extends Omit<
-    RestaurantReviewRecord,
-    | 'id'
-    | 'external_restaurant_information_id'
-    | 'userId'
-    | 'category'
-    | 'reactions'
-  > {
+export interface RestaurantReview extends Omit<
+  RestaurantReviewRecord,
+  | 'id'
+  | 'external_restaurant_information_id'
+  | 'userId'
+  | 'category'
+  | 'reactions'
+> {
   id: string;
   external_restaurant_information_id: string;
 
@@ -233,11 +235,10 @@ export interface ReviewsByUser {
   reviews: Array<Omit<RestaurantReview, 'user'>>;
 }
 
-export interface UserReaction
-  extends Omit<
-    RestaurantReviewReactionRecord,
-    'id' | 'createdAt' | 'updatedAt'
-  > {}
+export interface UserReaction extends Omit<
+  RestaurantReviewReactionRecord,
+  'id' | 'createdAt' | 'updatedAt'
+> {}
 
 export interface GetRestaurantReviewOutput {
   /**
@@ -265,11 +266,10 @@ export interface GetReviewsByUserIdOutput {
   reviews: RestaurantReview[];
 }
 
-export interface GetRecentReviewOuptut
-  extends Array<
-    Pick<ExternalRestaurantInformationDTO, 'address' | 'name'> &
-      Pick<RestaurantReviewRecord, 'summary'>
-  > {}
+export interface GetRecentReviewOuptut extends Array<
+  Pick<ExternalRestaurantInformationDTO, 'address' | 'name'> &
+    Pick<RestaurantReviewRecord, 'summary'>
+> {}
 
 @Controller('v1/restaurant')
 @UseFilters(new HttpExceptionFilter())
@@ -297,6 +297,8 @@ export class RestaurantController {
       keywords: input.keywords,
       categories: input.category,
     });
+
+    void incrementRecommendation('restaurant').catch(() => undefined);
 
     const { id, externalUUID, ...rest } = data.restaurant;
     const { categories, summaries, keywords, prices } = data.aggregateReviews;

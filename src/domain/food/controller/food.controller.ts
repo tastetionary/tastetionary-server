@@ -19,6 +19,7 @@ import {
   getRecentRecommendations,
 } from '@domain/food/facade/food.facade';
 import { RateLimit, RateLimitGuard } from '@common/rate-limit/rate-limit.guard';
+import { incrementRecommendation } from '@common/metrics/metrics.operations';
 
 @Controller('v1/food')
 @UseFilters(new HttpExceptionFilter())
@@ -39,6 +40,8 @@ export class FoodController {
       keywords: dto.keywords,
       categories: dto.categories,
     });
+
+    void incrementRecommendation('food').catch(() => undefined);
 
     return new BaseResponseDto({
       id: res.id,
