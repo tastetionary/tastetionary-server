@@ -10,6 +10,7 @@ import { FoodModule } from '@domain/food/food.module';
 import { AuthenticationModule } from '@domain/authentication/authentication.module';
 import { HealthModule } from '@domain/health/health.module';
 import { DatabaseModule } from '@common/database/database.module';
+import { MetricsModule } from '@common/metrics/metrics.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DatabaseModule } from '@common/database/database.module';
     LoggingModule,
     RedisModule,
     DatabaseModule,
+    MetricsModule,
   ],
 })
 export class AppModule {}

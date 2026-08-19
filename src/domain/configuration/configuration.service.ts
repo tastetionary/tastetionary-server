@@ -59,4 +59,8 @@ export class ConfigurationService {
   getRedisConfig() {
     return this.configService.get<string>('REDIS_URL');
   }
+
+  getMetricsToken() {
+    return this.configService.get<string>('METRICS_TOKEN');
+  }
 }
