@@ -3,6 +3,7 @@ import {
   RecommendationSource,
   RestaurantCategory,
   RestaurantPrice,
+  RestaurantSource,
 } from '@domain/restaurant/restaurant.enum';
 import { ExternalRestaurantInformationDTO } from '@domain/restaurant/dto/restaurant.dto';
 import {
@@ -384,6 +385,12 @@ describe('restaurant service', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           name: 'test-name',
+          source: RestaurantSource.KAKAO,
+          source_id: null,
+          category: null,
+          source_category_code: null,
+          synced_at: null,
+          closed_at: null,
         });
 
       const res = await getRecentReviews(count);
