@@ -308,12 +308,11 @@ export async function getNearyByRestaurants(param: {
     targetReviews,
   );
 
-  return restaurants.map((r) => {
+  return restaurants.flatMap((r) => {
     const groupReviews = groupedReview[r.id.toString()];
-    const review = groupReviews.filter(
-      (item) => item.external_restaurant_information_id == r.id,
-    );
-    const category = review[0].category;
+    if (!groupReviews) return [];
+
+    const category = groupReviews[0].category;
     const opinions = groupReviews
       .map((r) => r.opinion)
       .filter((opinion) => opinion !== null) as string[];
@@ -335,7 +334,7 @@ export async function getNearyByRestaurants(param: {
       },
     };
 
-    return data;
+    return [data];
   });
 }
 
