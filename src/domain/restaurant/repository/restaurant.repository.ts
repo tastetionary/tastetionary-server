@@ -5,6 +5,7 @@ import {
   RestaurantPrice,
   RestaurantCategoryIcons,
   RestaurantKeywordEmoji,
+  RestaurantSource,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
@@ -351,14 +352,80 @@ export async function getExternalRestaurantIdsByDistance(param: {
     ST_Distance(location, ST_MakePoint(cast(${
       param.longitude
     } as numeric), cast(${param.latitude} as numeric))) as distance
-  FROM external_restaurant_informations
+  FROM external_restaurant_informations e
   WHERE id NOT IN (${Prisma.join(excludedIds)})
+    AND EXISTS (
+      SELECT 1 FROM restaurant_reviews r
+      WHERE r.external_restaurant_information_id = e.id
+        AND r.deleted_at IS NULL
+    )
     AND st_dwithin(location, ST_MakePoint(cast(${
       param.longitude
     } as numeric), cast(${param.latitude} as numeric)), ${
-    param.maxDistanceMeter
-  })`;
+      param.maxDistanceMeter
+    })`;
   return await prismaClient.$queryRaw(queryRaw);
+}
+
+export interface SbizRestaurantRecord {
+  sourceId: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  referenceLink: string;
+  category: RestaurantCategory;
+  sourceCategoryCode: string;
+}
+
+export async function upsertSbizRestaurants(
+  records: SbizRestaurantRecord[],
+  syncedAt: Date,
+) {
+  if (records.length == 0) return;
+
+  const uniqueRecords = [
+    ...new Map(records.map((record) => [record.sourceId, record])).values(),
+  ];
+  const values = uniqueRecords.map(
+    (record) =>
+      Prisma.sql`(${Prisma.join([
+        RestaurantSource.SBIZ,
+        record.sourceId,
+        record.name,
+        Prisma.sql`st_point(${record.longitude},${record.latitude})`,
+        record.address,
+        record.referenceLink,
+        record.category,
+        record.sourceCategoryCode,
+        syncedAt,
+        syncedAt,
+      ])})`,
+  );
+
+  await prismaClient.$executeRaw`
+    INSERT INTO external_restaurant_informations
+      (source, source_id, name, location, address, reference_link, category, source_category_code, synced_at, updated_at)
+    VALUES ${Prisma.join(values)}
+    ON CONFLICT (source, source_id) DO UPDATE SET
+      name = EXCLUDED.name,
+      location = EXCLUDED.location,
+      address = EXCLUDED.address,
+      reference_link = EXCLUDED.reference_link,
+      category = EXCLUDED.category,
+      source_category_code = EXCLUDED.source_category_code,
+      synced_at = EXCLUDED.synced_at,
+      updated_at = EXCLUDED.updated_at,
+      closed_at = NULL`;
+}
+
+export async function closeUnsyncedSbizRestaurants(syncedAt: Date) {
+  return prismaClient.$executeRaw`
+    UPDATE external_restaurant_informations
+    SET closed_at = ${syncedAt}, updated_at = ${syncedAt}
+    WHERE source = ${RestaurantSource.SBIZ}
+      AND closed_at IS NULL
+      AND synced_at < ${syncedAt}`;
 }
 
 export function getRestaurantOptionsRecord() {

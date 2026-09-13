@@ -17,10 +17,13 @@ import {
   saveReviewReport,
   saveReviewReports,
   updateReviewById,
+  upsertSbizRestaurants,
+  closeUnsyncedSbizRestaurants,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
   RestaurantPrice,
+  RestaurantSource,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
 import prismaClient from '@root/src/common/database/prisma';
@@ -111,7 +114,7 @@ describe('Restaurant repository', () => {
       );
     });
 
-    it('should return restaurants by condition', async () => {
+    it('should return only restaurants with active reviews', async () => {
       const latitude = 37.517331925853;
       const longitude = 127.047377408384;
 
@@ -122,6 +125,52 @@ describe('Restaurant repository', () => {
       });
       const ids = res.map((r) => r.externalUUID);
       expect(ids).toEqual([1000n, 1001n]);
+    });
+  });
+
+  describe('upsertSbizRestaurants / closeUnsyncedSbizRestaurants', () => {
+    const record = (sourceId: string, name: string) => ({
+      sourceId,
+      name,
+      address: '서울특별시 강남구 강남대로 464',
+      latitude: 37.5037083174499,
+      longitude: 127.025322018329,
+      referenceLink: 'https://map.kakao.com/link/map/test,37.5,127.0',
+      category: RestaurantCategory.KOREAN,
+      sourceCategoryCode: 'I20107',
+    });
+    const findSbizRows = () =>
+      prismaClient.externalRestaurantInformations.findMany({
+        where: { source: RestaurantSource.SBIZ },
+        orderBy: { source_id: 'asc' },
+      });
+
+    it('should update existing rows, close missing rows and reopen them when synced again', async () => {
+      const firstSync = new Date('2026-07-01T00:00:00Z');
+      await upsertSbizRestaurants(
+        [record('MA1', 'first'), record('MA2', 'second'), record('MA2', 'dup')],
+        firstSync,
+      );
+      expect((await findSbizRows()).map((r) => r.name)).toEqual([
+        'first',
+        'dup',
+      ]);
+
+      const secondSync = new Date('2026-10-01T00:00:00Z');
+      await upsertSbizRestaurants([record('MA1', 'renamed')], secondSync);
+      const closed = await closeUnsyncedSbizRestaurants(secondSync);
+
+      expect(closed).toBe(1);
+      const [renamed, missing] = await findSbizRows();
+      expect(renamed.name).toBe('renamed');
+      expect(renamed.closed_at).toBeNull();
+      expect(missing.closed_at).toEqual(secondSync);
+
+      const thirdSync = new Date('2027-01-01T00:00:00Z');
+      await upsertSbizRestaurants([record('MA2', 'reopened')], thirdSync);
+      const reopened = (await findSbizRows())[1];
+      expect(reopened.name).toBe('reopened');
+      expect(reopened.closed_at).toBeNull();
     });
   });
 

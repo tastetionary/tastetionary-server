@@ -34,6 +34,11 @@ export enum RestaurantPrice {
   OVER_20000 = '20,000원 이상',
 }
 
+export enum RestaurantSource {
+  KAKAO = 'KAKAO',
+  SBIZ = 'SBIZ',
+}
+
 export enum RecommendationSource {
   REVIEW = 'REVIEW',
   EXTERNAL = 'EXTERNAL',
