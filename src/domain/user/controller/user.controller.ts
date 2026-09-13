@@ -44,18 +44,17 @@ import { ExternalRestaurantInformationRecord } from '@domain/restaurant/reposito
 import { BadRequestExceptionResponse } from '@common/exception/internal.exception';
 import { ErrorCategoryEnum, ErrorCodeEnum } from '@common/exception/enum';
 
-export interface getPreferencesOutput
-  extends Omit<
-    ExternalRestaurantInformationRecord,
-    | 'id'
-    | 'externalUUID'
-    | 'latitude'
-    | 'longitude'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'distance'
-    | 'referenceLink'
-  > {
+export interface getPreferencesOutput extends Omit<
+  ExternalRestaurantInformationRecord,
+  | 'id'
+  | 'externalUUID'
+  | 'latitude'
+  | 'longitude'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'distance'
+  | 'referenceLink'
+> {
   id: string;
   externalUUID: string;
 }
@@ -196,7 +195,7 @@ export class UserController {
       nickname: profile.user.nickname,
       area: profile.area,
       account: {
-        accountEmail: profile.account.identification,
+        accountEmail: profile.account.email ?? profile.account.identification,
       },
     });
   }

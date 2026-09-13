@@ -290,7 +290,10 @@ export async function getFilteredReviews(param: {
           : null,
         user: {
           id: review.userId,
-          identification: userProfile?.account?.identification || 'Unknown',
+          identification:
+            userProfile?.account?.email ??
+            userProfile?.account?.identification ??
+            'Unknown',
           createdAt: userProfile?.account?.createdAt || new Date(),
           nickname: userProfile?.user?.nickname || 'Unknown User',
           reviews: userReviewCount,

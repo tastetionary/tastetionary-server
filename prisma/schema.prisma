@@ -129,6 +129,7 @@ model Accounts {
   userId         Int      @map("user_id")
   category       String   @map("category") @db.VarChar(32)
   identification String   @map("identification") @db.VarChar(256)
+  email          String?  @map("email") @db.VarChar(256)
   requirePassChange Boolean @map("requiredPasswordChange") @default(false)
   password       String   @map("password") @db.VarChar(256)
   createdAt      DateTime @default(now()) @map("created_at")
@@ -137,6 +138,7 @@ model Accounts {
   @@unique([category, identification])
   @@index([userId])
   @@index([category, identification])
+  @@index([category, email])
   @@index([identification, password])
   @@map("accounts")
 }

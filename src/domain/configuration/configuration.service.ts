@@ -37,6 +37,13 @@ export class ConfigurationService {
     };
   }
 
+  getCorsOrigins() {
+    return (this.configService.get<string>('CORS_ORIGINS') ?? '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean);
+  }
+
   getBrevoConfig() {
     return {
       apiKey: this.configService.get('BREVO_API_KEY', ''),
