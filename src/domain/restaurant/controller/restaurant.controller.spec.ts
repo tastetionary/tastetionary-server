@@ -12,6 +12,7 @@ import {
 import { RestaurantModule } from '@domain/restaurant/restaurant.module';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import {
+  RecommendationSource,
   RestaurantCategory,
   RestaurantPrice,
 } from '@domain/restaurant/restaurant.enum';
@@ -88,6 +89,7 @@ describe('restaurant controller', () => {
           longitude: 12,
           distance: 10,
         },
+        source: RecommendationSource.REVIEW,
         aggregateReviews: {
           categories: [RestaurantCategory.ASIAN],
           summaries: ['summary'],
@@ -114,6 +116,45 @@ describe('restaurant controller', () => {
       });
 
     assertStatusCode(res, 200);
+    expect(res.body.data.source).toBe(RecommendationSource.REVIEW);
+    expect(res.body.data.aggregateReviews).toEqual({
+      categories: [RestaurantCategory.ASIAN],
+      summaries: ['summary'],
+      keywords: ['key'],
+      prices: [RestaurantPrice.UNDER_10000],
+    });
+  });
+
+  it('/recommendation, without reviews should return null aggregateReviews', async () => {
+    jest
+      .spyOn(restaurantService, 'getRecommendedRestaurant')
+      .mockResolvedValueOnce({
+        restaurant: {
+          id: 1n,
+          name: 'name',
+          externalUUID: 123n,
+          referenceLink: null,
+          latitude: 12,
+          longitude: 12,
+          distance: 10,
+        },
+        source: RecommendationSource.EXTERNAL,
+        aggregateReviews: null,
+      });
+
+    const res = await request(app.getHttpServer())
+      .post('/v1/restaurant/recommendation')
+      .send({
+        category: [RestaurantCategory.ASIAN],
+        keywords: ['key'],
+        prices: [RestaurantPrice.UNDER_10000],
+        latitude: 37.5665,
+        longitude: 126.978,
+      });
+
+    assertStatusCode(res, 200);
+    expect(res.body.data.source).toBe(RecommendationSource.EXTERNAL);
+    expect(res.body.data.aggregateReviews).toBeNull();
   });
 
   it('/review, not activity user, should return 400', async () => {

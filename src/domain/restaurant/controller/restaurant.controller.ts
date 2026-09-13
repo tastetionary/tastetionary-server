@@ -33,6 +33,7 @@ import {
   RestaurantReviewRxnDistinctCnt,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
+  RecommendationSource,
   RestaurantCategory,
   ReviewReportCategory,
 } from '@domain/restaurant/restaurant.enum';
@@ -106,10 +107,16 @@ export interface GetRestaurantsOutput extends Omit<
   id: string;
   externalUUID: string;
   /**
-   * aggregate data from review
-   * @type RecommendationAggregateReviews
+   * recommendation basis, REVIEW: matched by user reviews, EXTERNAL: from external data without matching reviews
+   * example: "REVIEW"
+   * @type RecommendationSource
    */
-  aggregateReviews: RecommendationAggregateReviews;
+  source: RecommendationSource;
+  /**
+   * aggregate data from review, null when the restaurant has no reviews
+   * @type RecommendationAggregateReviews | null
+   */
+  aggregateReviews: RecommendationAggregateReviews | null;
 }
 
 export interface RecommendationAggregateReviews extends Pick<
@@ -298,13 +305,19 @@ export class RestaurantController {
     void incrementRecommendation('restaurant').catch(() => undefined);
 
     const { id, externalUUID, ...rest } = data.restaurant;
-    const { categories, summaries, keywords, prices } = data.aggregateReviews;
+    const aggregateReviews = data.aggregateReviews;
 
     return new BaseResponseDto({
       id: id.toString(),
       externalUUID: externalUUID.toString(),
       ...rest,
-      aggregateReviews: { categories, summaries, keywords, prices },
+      source: data.source,
+      aggregateReviews: aggregateReviews && {
+        categories: aggregateReviews.categories,
+        summaries: aggregateReviews.summaries,
+        keywords: aggregateReviews.keywords,
+        prices: aggregateReviews.prices,
+      },
     });
   }
 

@@ -30,6 +30,7 @@ import {
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   PriceMapping,
+  RecommendationSource,
   RestaurantCategory,
   RestaurantKeyword,
   RestaurantKeywordEmoji,
@@ -109,6 +110,12 @@ export function aggregateRestaurantReview(
   return { id: randomId, data };
 }
 
+export interface RecommendedRestaurant {
+  restaurant: ExternalRestaurantInformationRecord;
+  source: RecommendationSource;
+  aggregateReviews: AggregateReviewDTO | null;
+}
+
 export async function getRecommendedRestaurant(param: {
   userAreas: { latitude: number; longitude: number };
   maxDistanceMeter: number;
@@ -116,7 +123,7 @@ export async function getRecommendedRestaurant(param: {
   categories: RestaurantCategory[];
   excludeRestaurantIds: bigint[];
   prices?: RestaurantPrice[];
-}) {
+}): Promise<RecommendedRestaurant> {
   const restaurants = await getRestaurantsByDistance({
     ...param,
   });
@@ -145,6 +152,7 @@ export async function getRecommendedRestaurant(param: {
   data.keywords = attachEmoji(data.keywords);
   return {
     restaurant: targetRestaurant,
+    source: RecommendationSource.REVIEW,
     aggregateReviews: data,
   };
 }

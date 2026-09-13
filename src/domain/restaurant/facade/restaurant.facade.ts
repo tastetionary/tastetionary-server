@@ -56,13 +56,11 @@ export async function getRecommendations(param: {
 }) {
   const userAreas = { latitude: param.latitude, longitude: param.longitude };
 
-  const res = await getRecommendedRestaurant({
+  return getRecommendedRestaurant({
     userAreas,
     excludeRestaurantIds: [],
     ...param,
   });
-
-  return { restaurant: res.restaurant, aggregateReviews: res.aggregateReviews };
 }
 
 async function getRecentRecommendations(
