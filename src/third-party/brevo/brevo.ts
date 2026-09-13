@@ -1,8 +1,10 @@
-import * as SibApiV3Sdk from '@sendinblue/client';
+import axios from 'axios';
 import { Logger } from '@nestjs/common';
 import { summarizeHttpError } from '@common/logging/redact';
 
 const logger = new Logger('Brevo');
+
+const BREVO_SEND_EMAIL_URL = 'https://api.brevo.com/v3/smtp/email';
 
 interface BrevoConfig {
   apiKey: string;
@@ -25,27 +27,36 @@ function getDefaultConfig(): BrevoConfig {
 
 export async function sendEmail(content: BrevoContent, config?: BrevoConfig) {
   config = config ?? getDefaultConfig();
-  const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-  apiInstance.setApiKey(0, config.apiKey);
 
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-  sendSmtpEmail.subject = content.subject;
-  sendSmtpEmail.htmlContent = content.htmlContent;
-  sendSmtpEmail.sender = config.sender;
-  sendSmtpEmail.to = content.to;
-
-  return apiInstance.sendTransacEmail(sendSmtpEmail).then(
-    function () {
-      logger.log({ message: 'email sent', subject: content.subject });
-      return true;
-    },
-    function (error) {
-      logger.error({
-        message: 'failed to send email',
+  return axios
+    .post(
+      BREVO_SEND_EMAIL_URL,
+      {
         subject: content.subject,
-        ...summarizeHttpError(error),
-      });
-      return false;
-    },
-  );
+        htmlContent: content.htmlContent,
+        sender: config.sender,
+        to: content.to,
+      },
+      {
+        headers: {
+          'api-key': config.apiKey,
+          'content-type': 'application/json',
+          accept: 'application/json',
+        },
+      },
+    )
+    .then(
+      function () {
+        logger.log({ message: 'email sent', subject: content.subject });
+        return true;
+      },
+      function (error) {
+        logger.error({
+          message: 'failed to send email',
+          subject: content.subject,
+          ...summarizeHttpError(error),
+        });
+        return false;
+      },
+    );
 }
