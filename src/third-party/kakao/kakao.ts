@@ -1,6 +1,9 @@
 import axios from 'axios';
-import { UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { SocialLoginInfo } from '@root/src/domain/account/dto/account.dto';
+import { summarizeHttpError } from '@common/logging/redact';
+
+const logger = new Logger('KakaoOAuth');
 
 export async function getKakaoUserInfo(code: string, redirectUri?: string) {
   const kakaoUserInfoUrl = 'https://kapi.kakao.com/v2/user/me';
@@ -24,10 +27,10 @@ export async function getKakaoUserInfo(code: string, redirectUri?: string) {
 
     return res;
   } catch (error) {
-    console.error(
-      'Error fetching Kakao user info:',
-      error.response ? error.response.data : error.message,
-    );
+    logger.warn({
+      message: 'failed to fetch kakao user info',
+      ...summarizeHttpError(error),
+    });
     throw new UnauthorizedException('Failed to fetch user info from Kakao');
   }
 }
@@ -51,10 +54,10 @@ async function getAccessToken(code: string, redirectUri?: string) {
     });
     return response.data.access_token;
   } catch (error) {
-    console.error(
-      'Error fetching access token:',
-      error.response ? error.response.data : error.message,
-    );
+    logger.warn({
+      message: 'failed to get kakao access token',
+      ...summarizeHttpError(error),
+    });
     throw new UnauthorizedException('Failed to fetch access token from Kakao');
   }
 }

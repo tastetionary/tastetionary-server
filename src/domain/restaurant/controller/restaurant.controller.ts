@@ -2,7 +2,6 @@ import {
   Controller,
   HttpCode,
   Injectable,
-  UseFilters,
   UseGuards,
   Request,
   Param,
@@ -12,7 +11,6 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { PageRequestParams, PageResponseDto } from '@common/dto/pagination.dto';
 import { BaseResponseDto } from '@common/dto/base.dto';
@@ -272,7 +270,6 @@ export interface GetRecentReviewOuptut extends Array<
 > {}
 
 @Controller('v1/restaurant')
-@UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class RestaurantController {
   /**

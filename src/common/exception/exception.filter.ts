@@ -5,6 +5,8 @@ import {
   HttpException,
   BadRequestException,
   UnauthorizedException,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as Sentry from '@sentry/node';
@@ -14,94 +16,156 @@ import {
   EmptyContentException,
 } from '@common/exception/internal.exception';
 import { ErrorCodeEnum } from '@common/exception/enum';
+import { RequestContext } from '@common/logging/request-context';
+import { redactSensitive } from '@common/logging/redact';
+import { EnvironmentEnum } from '@src/env.validation';
+
+type ErrorResponseBody = {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  originMessage: string;
+  category?: string;
+  errorCode?: string;
+  additionalData?: unknown;
+  input?: unknown;
+};
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger('EXCEPTION');
+
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    if (exception instanceof BadRequestException) {
-      response.status(400).json({
-        statusCode: 400,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        additionalData: exception.getResponse(),
-        originMessage: exception.message,
-        input: request.body,
-      });
-      return;
-    }
-
     if (exception instanceof EmptyContentException) {
-      const noContentReason =
-        exception.getResponse()['message'] || 'no content';
-      try {
-        response
-          .status(204)
-          .setHeader('no-content-reason', noContentReason)
-          .send();
-      } catch (e) {
-        console.error(e, `data: ${noContentReason}`);
-        response.status(204).send();
-      }
+      this.sendNoContent(exception, response);
       return;
     }
 
-    if (exception instanceof BaseException) {
-      const status = exception.getStatus();
+    const body = this.createResponseBody(exception, request);
 
-      const detailResponse = {
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        category: exception.category,
-        errorCode: exception.errorCode || ErrorCodeEnum.INTERNAL_SERVER_ERROR,
-        additionalData: exception.loggedData,
-        originMessage: exception.message,
-      };
+    RequestContext.setError({
+      errorName: exception.name,
+      errorMessage: exception.message,
+      errorCode: body.errorCode,
+      errorCause: this.describeCause(exception),
+    });
 
-      if (!(exception instanceof CallerWrongUsageException)) {
-        Sentry.captureException(exception, { extra: detailResponse });
-      }
-
-      // TODO modify detail property on env, when dev, return full response, but prod no
-      response.status(status).json(detailResponse);
-      return;
+    if (this.isServerError(exception, body.statusCode)) {
+      this.report(exception, body, request);
     }
 
-    if (exception instanceof UnauthorizedException) {
-      response.status(401).json({
-        statusCode: 401,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        additionalData: exception.getResponse(),
-        originMessage: exception.message,
-        input: request.body,
-      });
-      return;
-    }
+    response.status(body.statusCode).json(body);
+  }
 
-    if (exception instanceof HttpException) {
-      const status = exception.getStatus();
-      response.status(status).json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        originMessage: exception.message,
-      });
-      return;
-    }
-
-    console.error(exception);
-    Sentry.captureException(exception, { extra: request.body });
-    response.status(400).json({
-      statusCode: 400,
+  private createResponseBody(
+    exception: Error,
+    request: Request,
+  ): ErrorResponseBody {
+    const common = {
       timestamp: new Date().toISOString(),
       path: request.url,
       originMessage: exception.message,
-      input: request.body,
+    };
+
+    if (exception instanceof BaseException) {
+      return {
+        ...common,
+        statusCode: exception.getStatus(),
+        category: exception.category,
+        errorCode: exception.errorCode || ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+        additionalData: exception.loggedData,
+      };
+    }
+
+    if (
+      exception instanceof BadRequestException ||
+      exception instanceof UnauthorizedException
+    ) {
+      return {
+        ...common,
+        statusCode: exception.getStatus(),
+        additionalData: exception.getResponse(),
+        input: this.exposeInput(request),
+      };
+    }
+
+    if (exception instanceof HttpException) {
+      return { ...common, statusCode: exception.getStatus() };
+    }
+
+    return {
+      ...common,
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      input: this.exposeInput(request),
+    };
+  }
+
+  private sendNoContent(exception: EmptyContentException, response: Response) {
+    const noContentReason = exception.getResponse()['message'] || 'no content';
+    try {
+      response
+        .status(204)
+        .setHeader('no-content-reason', noContentReason)
+        .send();
+    } catch (e) {
+      this.logger.warn({
+        message: 'failed to set no-content-reason header',
+        noContentReason,
+        errorMessage: e.message,
+      });
+      response.status(204).send();
+    }
+  }
+
+  private isServerError(exception: Error, statusCode: number) {
+    if (exception instanceof BaseException) {
+      return !(exception instanceof CallerWrongUsageException);
+    }
+    return statusCode >= HttpStatus.INTERNAL_SERVER_ERROR;
+  }
+
+  private report(exception: Error, body: ErrorResponseBody, request: Request) {
+    const context = RequestContext.get();
+    const extra = redactSensitive({ ...body, input: request.body });
+
+    this.logger.error(
+      {
+        message: exception.message,
+        errorName: exception.name,
+        errorCode: body.errorCode,
+        statusCode: body.statusCode,
+        method: request.method,
+        path: request.originalUrl.split('?')[0],
+        additionalData: extra.additionalData,
+      },
+      exception.stack,
+    );
+
+    Sentry.withScope((scope) => {
+      if (context?.userId !== undefined) {
+        scope.setUser({ id: String(context.userId) });
+      }
+      if (context) {
+        scope.setTag('request_id', context.requestId);
+      }
+      scope.setExtras(extra);
+      Sentry.captureException(exception);
     });
+  }
+
+  private describeCause(exception: Error) {
+    const { cause } = exception as { cause?: unknown };
+    return cause instanceof Error ? cause.message : undefined;
+  }
+
+  private exposeInput(request: Request) {
+    if (process.env.ENV === EnvironmentEnum.PRODUCTION) {
+      return undefined;
+    }
+    return redactSensitive(request.body);
   }
 }

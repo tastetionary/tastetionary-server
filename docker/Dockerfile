@@ -27,8 +27,6 @@ COPY --from=builder --chown=node:node /usr/src/app/packages/api/swagger.json ./p
 COPY --from=builder --chown=node:node /usr/src/app/prisma ./prisma
 COPY --chown=node:node package*.json ./
 
-RUN mkdir -p logs && chown node:node logs
-
 USER node
 
 EXPOSE 8080

@@ -1,6 +1,9 @@
 import axios from 'axios';
-import { UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { SocialLoginInfo } from '@domain/account/dto/account.dto';
+import { summarizeHttpError } from '@common/logging/redact';
+
+const logger = new Logger('NaverOAuth');
 
 // https://developers.naver.com/docs/login/profile/profile.md
 export async function getNaverUserInfo(code: string) {
@@ -20,10 +23,10 @@ export async function getNaverUserInfo(code: string) {
 
     return res;
   } catch (error) {
-    console.error(
-      'Error fetching Naver user info:',
-      error.response ? error.response.data : error.message,
-    );
+    logger.warn({
+      message: 'failed to fetch naver user info',
+      ...summarizeHttpError(error),
+    });
     throw new UnauthorizedException('Failed to fetch user info from Naver');
   }
 }
@@ -46,10 +49,10 @@ async function getAccessToken(code: string) {
     });
     return response.data.access_token;
   } catch (error) {
-    console.error(
-      'Error fetching access token:',
-      error.response ? error.response.data : error.message,
-    );
+    logger.warn({
+      message: 'failed to get naver access token',
+      ...summarizeHttpError(error),
+    });
     throw new UnauthorizedException('Failed to fetch access token from Kakao');
   }
 }

@@ -2,13 +2,11 @@ import {
   Controller,
   HttpCode,
   Injectable,
-  UseFilters,
   UseGuards,
   Request,
   Param,
   Query,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import {
   TypedBody,
   TypedRoute,
@@ -60,7 +58,6 @@ export interface getPreferencesOutput extends Omit<
 }
 
 @Controller('v1/user')
-@UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class UserController {
   /**

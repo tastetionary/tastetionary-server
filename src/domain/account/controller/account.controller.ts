@@ -2,11 +2,9 @@ import {
   Controller,
   HttpCode,
   Injectable,
-  UseFilters,
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
@@ -22,9 +20,9 @@ import {
   removeAllToken,
 } from '@domain/account/service/account.service';
 import { resetPassword } from '@domain/account/facade/account.facade';
+import { logUserEvent, UserEvent } from '@common/logging/user-event.logger';
 
 @Controller('v1/account')
-@UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class AccountController {
   /**
@@ -51,6 +49,7 @@ export class AccountController {
   @HttpCode(200)
   async deleteToken(@Request() req): Promise<BaseResponseDto<object>> {
     await removeAllToken(req.user.userId);
+    logUserEvent(UserEvent.LOGOUT, { userId: req.user.userId });
     return new BaseResponseDto({ state: 'success' });
   }
 

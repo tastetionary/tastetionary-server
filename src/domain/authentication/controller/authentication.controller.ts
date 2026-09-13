@@ -2,12 +2,10 @@ import {
   Controller,
   HttpCode,
   Injectable,
-  UseFilters,
   Param,
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
@@ -25,7 +23,6 @@ import {
 import { AuthGuard } from '@common/auth/auth.guard';
 
 @Controller('v1/authentication')
-@UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class AuthenticationController {
   /**

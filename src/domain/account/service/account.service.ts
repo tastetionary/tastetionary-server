@@ -27,6 +27,7 @@ import { createUser } from '@domain/user/service/user.service';
 import { sendEmail } from '@thirdParty/brevo/brevo';
 import * as fs from 'fs';
 import path from 'path';
+import { logUserEvent, UserEvent } from '@common/logging/user-event.logger';
 
 type AccountRecord = NonNullable<Awaited<ReturnType<typeof getIdentification>>>;
 
@@ -139,6 +140,7 @@ export async function changePassword(
     password: newPassword,
     requirePassChange,
   });
+  logUserEvent(UserEvent.PASSWORD_CHANGED, { userId });
 }
 
 export async function updatePassword(param: {
@@ -181,6 +183,10 @@ export async function createToken(param: {
   await saveToken({
     userId: entity.userId,
     ...tokens,
+  });
+  logUserEvent(UserEvent.LOGIN, {
+    userId: entity.userId,
+    provider: param.category,
   });
 
   return {
@@ -263,6 +269,7 @@ async function resolveSocialAccount(
     email,
     password: '',
   });
+  logUserEvent(UserEvent.SIGNUP, { userId: user.id, provider: category });
 
   return getAccount(providerId, category);
 }
@@ -301,6 +308,11 @@ async function checkPassword(entity: AccountEntity, password: string) {
     return;
   }
 
+  logUserEvent(UserEvent.LOGIN_FAILED, {
+    userId: entity.userId,
+    provider: entity.category,
+    reason: ErrorCodeEnum.INVALID_CREDENTIALS,
+  });
   throw new CallerWrongUsageException(
     ErrorSubCategoryEnum.INVALID_INPUT,
     'identification or password is not matched',
