@@ -2,13 +2,11 @@ import {
   Controller,
   HttpCode,
   Injectable,
-  UseFilters,
   UseGuards,
   Request,
   Param,
   Query,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/exception/exception.filter';
 import {
   TypedBody,
   TypedRoute,
@@ -44,24 +42,22 @@ import { ExternalRestaurantInformationRecord } from '@domain/restaurant/reposito
 import { BadRequestExceptionResponse } from '@common/exception/internal.exception';
 import { ErrorCategoryEnum, ErrorCodeEnum } from '@common/exception/enum';
 
-export interface getPreferencesOutput
-  extends Omit<
-    ExternalRestaurantInformationRecord,
-    | 'id'
-    | 'externalUUID'
-    | 'latitude'
-    | 'longitude'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'distance'
-    | 'referenceLink'
-  > {
+export interface getPreferencesOutput extends Omit<
+  ExternalRestaurantInformationRecord,
+  | 'id'
+  | 'externalUUID'
+  | 'latitude'
+  | 'longitude'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'distance'
+  | 'referenceLink'
+> {
   id: string;
   externalUUID: string;
 }
 
 @Controller('v1/user')
-@UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class UserController {
   /**

@@ -1,4 +1,8 @@
 import { Webhook, MessageBuilder } from 'discord-webhook-node';
+import { Logger } from '@nestjs/common';
+import { summarizeHttpError } from '@common/logging/redact';
+
+const logger = new Logger('Discord');
 
 interface DiscordConfig {
   webHookUrl: string;
@@ -26,14 +30,16 @@ export async function sendDiscordMessage(
     .setTitle(content.title)
     .setDescription(content.description);
   return webhook.send(embed).then(
-    function (data) {
-      console.log(
-        'API called successfully. Returned data: ' + JSON.stringify(data),
-      );
+    function () {
+      logger.log({ message: 'discord message sent', title: content.title });
       return true;
     },
     function (error) {
-      console.error(error);
+      logger.error({
+        message: 'failed to send discord message',
+        title: content.title,
+        ...summarizeHttpError(error),
+      });
       return false;
     },
   );

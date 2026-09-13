@@ -1,22 +1,16 @@
+import '@src/instrument';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@src/app.module';
 import { winstonLogger } from '@utils/winston.config';
 import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
-import * as Sentry from '@sentry/node';
 import helmet from 'helmet';
 import { NextFunction, Request, Response } from 'express';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { REQUEST_ID_HEADER } from '@common/logging/request-context.middleware';
 
 const SWAGGER_PATH = 'api';
-
-function initSentry(dsn: string, env: string) {
-  Sentry.init({
-    dsn,
-    environment: env,
-  });
-}
 
 function loadSwaggerDocument(): OpenAPIObject {
   const candidates = [
@@ -59,9 +53,6 @@ async function bootstrap() {
     },
   ];
   SwaggerModule.setup(SWAGGER_PATH, app, docs);
-  const sentryDsn = config.get<string>('SENTRY_DSN') as string;
-  const env = config.get<string>('ENV') as string;
-  initSentry(sentryDsn, env);
 
   app.enableShutdownHooks();
 
@@ -74,6 +65,7 @@ async function bootstrap() {
     origin: corsOrigins,
     methods: 'GET,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: [REQUEST_ID_HEADER],
   });
 
   await app.listen(port);

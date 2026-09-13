@@ -11,6 +11,7 @@ import { findAccessToken } from '@root/src/domain/account/service/account.servic
 import { pipe } from 'fp-ts/lib/function';
 import * as TE from 'fp-ts/TaskEither';
 import { EnvironmentEnum } from '@root/src/env.validation';
+import { RequestContext } from '@common/logging/request-context';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -27,6 +28,7 @@ export class AuthGuard implements CanActivate {
       const [_, token] = request.headers.authorization?.split(' ') ?? [];
       const [__, userId] = token.split(`${this.masterToken}:`);
       request['user'] = { userId: parseInt(userId) };
+      RequestContext.setUserId(request['user'].userId);
       return true;
     }
 
@@ -40,11 +42,12 @@ export class AuthGuard implements CanActivate {
       // so that we can access it in our route handlers
       request['user'] = payload;
     } catch (e) {
-      console.error(e);
       throw new UnauthorizedException(
         'not verified token, maybe expired or invalid or not proper created',
+        { cause: e },
       );
     }
+    RequestContext.setUserId(request['user'].userId);
     return true;
   }
 

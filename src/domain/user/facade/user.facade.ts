@@ -21,6 +21,7 @@ import {
   AuthenticationCategory,
   AuthenticationType,
 } from '@domain/authentication/authentication.enum';
+import { logUserEvent, UserEvent } from '@common/logging/user-event.logger';
 
 export async function getProfile(userId: number) {
   return searchProfile(userId);
@@ -41,6 +42,10 @@ export async function registerProfile(dto: RegisterProfileRequest) {
   const user = await createProfile(dto);
   await createAccount({ userId: user.id, ...dto.account });
   await syncAuthentication(user.id, dto.account.authenticationId);
+  logUserEvent(UserEvent.SIGNUP, {
+    userId: user.id,
+    provider: dto.account.category,
+  });
 
   return user;
 }
@@ -54,4 +59,5 @@ export async function withdrawProfile(
   await removeAllAccount(userId);
   await removeAllToken(userId);
   await removeAllAuth(userId);
+  logUserEvent(UserEvent.WITHDRAWN, { userId, reasons: types });
 }

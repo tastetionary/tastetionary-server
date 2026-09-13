@@ -30,6 +30,7 @@ import {
   updateUserById,
 } from '@domain/user/repository/user.repository';
 import { saveAgreements } from '@domain/user/repository/agreements.repository';
+import { logUserEvent, UserEvent } from '@common/logging/user-event.logger';
 import {
   AuthenticationRecord,
   getAuthenticationsByUserId,
@@ -129,6 +130,10 @@ export async function updateProfile(
   dto: UpdateProfileRequestDto,
 ) {
   await updateUser({ userId, data: dto });
+  logUserEvent(UserEvent.PROFILE_UPDATED, {
+    userId,
+    fields: Object.keys(dto),
+  });
 }
 
 async function createAreas(userId: number, dto: AreaDto) {

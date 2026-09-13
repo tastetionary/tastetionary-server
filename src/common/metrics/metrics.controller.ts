@@ -1,5 +1,4 @@
-import { Controller, Get, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/exception/exception.filter';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { MetricsTokenGuard } from '@common/metrics/metrics.guard';
 import {
   METRIC_RETENTION_DAYS,
@@ -20,7 +19,6 @@ function parseDays(days?: string): number {
 }
 
 @Controller('metrics')
-@UseFilters(new HttpExceptionFilter())
 @UseGuards(MetricsTokenGuard)
 export class MetricsController {
   /**

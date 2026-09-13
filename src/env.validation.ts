@@ -1,5 +1,11 @@
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, validateSync, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  validateSync,
+  IsNumber,
+  IsString,
+  IsOptional,
+} from 'class-validator';
 
 export enum EnvironmentEnum {
   LOCAL = 'local',
@@ -17,6 +23,10 @@ class EnvironmentVariables {
 
   @IsString()
   CORS_ORIGINS: string;
+
+  @IsOptional()
+  @IsString()
+  SENTRY_DSN?: string;
 }
 
 export function validate(config: Record<string, unknown>) {

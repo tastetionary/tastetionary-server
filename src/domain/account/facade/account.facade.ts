@@ -20,6 +20,7 @@ import {
   ErrorSubCategoryEnum,
 } from '@root/src/common/exception/enum';
 import { SHA256 } from 'crypto-js';
+import { logUserEvent, UserEvent } from '@common/logging/user-event.logger';
 
 export async function resetPassword(historyId: number, code: string) {
   const auth = await findValidAuth(historyId, code);
@@ -55,6 +56,7 @@ export async function resetPassword(historyId: number, code: string) {
     AuthenticationCategory.PASSWORD,
     AuthenticationType.EMAIL,
   );
+  logUserEvent(UserEvent.PASSWORD_RESET, { userId: account.userId });
 }
 
 function generatePassword(length: number): string {

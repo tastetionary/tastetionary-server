@@ -1,9 +1,11 @@
-import { Module, OnApplicationShutdown } from '@nestjs/common';
+import { Logger, Module, OnApplicationShutdown } from '@nestjs/common';
 import { RedisService } from './redis.service';
 import { closeRedisClient } from './redis.client';
 import { ConfigurationService } from '@domain/configuration/configuration.service';
 import { FactoryProvider } from '@nestjs/common';
 import { createClient } from 'redis';
+
+const logger = new Logger('Redis');
 
 @Module({
   providers: [
@@ -15,7 +17,10 @@ import { createClient } from 'redis';
           url: configurationService.getRedisConfig(),
         });
         client.on('error', (err) => {
-          console.error('[Redis] client error:', err);
+          logger.error(
+            { message: 'redis client error', errorMessage: err.message },
+            err.stack,
+          );
         });
         await client.connect();
         return client;

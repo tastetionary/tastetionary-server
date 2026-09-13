@@ -1,11 +1,4 @@
-import {
-  Controller,
-  HttpCode,
-  Injectable,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/exception/exception.filter';
+import { Controller, HttpCode, Injectable, UseGuards } from '@nestjs/common';
 import { TypedBody, TypedRoute } from '@nestia/core';
 import { BaseResponseDto } from '@common/dto/base.dto';
 import {
@@ -22,7 +15,6 @@ import { RateLimit, RateLimitGuard } from '@common/rate-limit/rate-limit.guard';
 import { incrementRecommendation } from '@common/metrics/metrics.operations';
 
 @Controller('v1/food')
-@UseFilters(new HttpExceptionFilter())
 @Injectable()
 export class FoodController {
   /**

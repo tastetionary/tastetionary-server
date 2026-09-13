@@ -1,4 +1,8 @@
 import * as SibApiV3Sdk from '@sendinblue/client';
+import { Logger } from '@nestjs/common';
+import { summarizeHttpError } from '@common/logging/redact';
+
+const logger = new Logger('Brevo');
 
 interface BrevoConfig {
   apiKey: string;
@@ -31,14 +35,16 @@ export async function sendEmail(content: BrevoContent, config?: BrevoConfig) {
   sendSmtpEmail.to = content.to;
 
   return apiInstance.sendTransacEmail(sendSmtpEmail).then(
-    function (data) {
-      console.log(
-        'API called successfully. Returned data: ' + JSON.stringify(data),
-      );
+    function () {
+      logger.log({ message: 'email sent', subject: content.subject });
       return true;
     },
     function (error) {
-      console.error(error);
+      logger.error({
+        message: 'failed to send email',
+        subject: content.subject,
+        ...summarizeHttpError(error),
+      });
       return false;
     },
   );

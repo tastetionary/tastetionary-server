@@ -1,6 +1,9 @@
 import axios from 'axios';
-import { UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { SocialLoginInfo } from '@root/src/domain/account/dto/account.dto';
+import { summarizeHttpError } from '@common/logging/redact';
+
+const logger = new Logger('GoogleOAuth');
 
 export async function getGoogleUserInfo(code: string) {
   const accessToken = await getAccessToken(code);
@@ -20,10 +23,10 @@ export async function getGoogleUserInfo(code: string) {
 
     return res;
   } catch (error) {
-    console.error(
-      'Error fetching Google user info:',
-      error.response ? error.response.data : error.message,
-    );
+    logger.warn({
+      message: 'failed to fetch google user info',
+      ...summarizeHttpError(error),
+    });
     throw new UnauthorizedException('Failed to fetch user info from Google');
   }
 }
@@ -41,7 +44,10 @@ async function getAccessToken(code: string) {
 
     return response.data.access_token;
   } catch (error) {
-    console.error(error);
+    logger.warn({
+      message: 'failed to get google access token',
+      ...summarizeHttpError(error),
+    });
     throw new UnauthorizedException(
       'Failed to get access token from google: ' + error,
     );
