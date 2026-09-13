@@ -72,6 +72,10 @@ export class AuthGuard implements CanActivate {
   }
 
   private isMasterToken(request: Request) {
+    if (process.env.ENV !== EnvironmentEnum.LOCAL) {
+      return false;
+    }
+
     const [_, token] = request.headers.authorization?.split(' ') ?? [];
     if (!token) return false;
 
