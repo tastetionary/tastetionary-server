@@ -334,9 +334,14 @@ describe('restaurant controller', () => {
         user: { id: 123, reviews: 0, nickname: 'test' },
       });
 
+    const key = configService.getTokenData().accessTokenSecret;
+    const token = createUserToken(userId, key, {
+      expiresIn: '10h',
+    });
+
     const res = await request(app.getHttpServer())
       .get(`/v1/restaurant/reviewer/${userId}/review`)
-      .set('Authorization', 'Bearer master-tastionary');
+      .set('Authorization', `Bearer ${token}`);
 
     assertStatusCode(res, 200);
   });

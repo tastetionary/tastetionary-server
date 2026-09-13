@@ -61,11 +61,14 @@ export function accountEntityFactory(param: {
   userId?: number;
   identification?: string;
   password?: string;
+  email?: string | null;
 }) {
+  const identification = param.identification || `${random()}@ide.com`;
   return define<AccountEntity>({
     id: random(),
     userId: param.userId || random(),
-    identification: param.identification || `${random()}@ide.com`,
+    identification,
+    email: param.email !== undefined ? param.email : identification,
     password: param.password || 'password',
     category: AccountCategory.EMAIL,
     requirePassChange: false,
@@ -86,11 +89,11 @@ export function areaEntityFactory(param: {
 }) {
   const location = param.location ?? seoulLatLon;
   return define<AreaEntity>({
-        id: random(),
-        userId: param.userId ?? random(),
-        order: 1,
-        address: `factory_${location.address}`,
-        latitude: location.lat,
-        longitude: location.lon,
+    id: random(),
+    userId: param.userId ?? random(),
+    order: 1,
+    address: `factory_${location.address}`,
+    latitude: location.lat,
+    longitude: location.lon,
   })();
 }
