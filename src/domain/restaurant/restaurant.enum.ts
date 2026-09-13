@@ -34,6 +34,11 @@ export enum RestaurantPrice {
   OVER_20000 = '20,000원 이상',
 }
 
+export enum RecommendationSource {
+  REVIEW = 'REVIEW',
+  EXTERNAL = 'EXTERNAL',
+}
+
 export const PriceMapping: Record<RestaurantPrice, number> = {
   [RestaurantPrice.UNDER_10000]: 7500,
   [RestaurantPrice.UNDER_13000]: 11500,

@@ -1,5 +1,6 @@
 import { truncateTables } from '@root/jest.setup';
 import {
+  RecommendationSource,
   RestaurantCategory,
   RestaurantPrice,
 } from '@domain/restaurant/restaurant.enum';
@@ -161,7 +162,8 @@ describe('restaurant service', () => {
         excludeRestaurantIds: [],
       });
       expect(res.restaurant).toEqual(external);
-      expect(res).not.toBeNull();
+      expect(res.source).toBe(RecommendationSource.REVIEW);
+      expect(res.aggregateReviews).not.toBeNull();
     });
 
     it('with not restaurant within distance, should return null', async () => {
