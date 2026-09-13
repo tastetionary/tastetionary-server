@@ -26,6 +26,7 @@ export async function saveAccount(param: {
   category: AccountCategory;
   identification: string;
   password: string;
+  email?: string | null;
 }) {
   await saveAccounts([param]);
 }
@@ -36,6 +37,7 @@ export async function saveAccounts(
     category: AccountCategory;
     identification: string;
     password: string;
+    email?: string | null;
   }[],
 ) {
   return prismaClient.accounts.createMany({ data: params });
@@ -45,6 +47,10 @@ export async function getIdentification(
   identification: string,
   category: AccountCategory,
 ) {
+  if (!identification) {
+    return null;
+  }
+
   return prismaClient.accounts.findFirst({
     where: { identification, category },
   });
@@ -71,6 +77,19 @@ export async function updateAccountById(
     identification: string;
     password: string;
     requirePassChange: boolean;
+  },
+) {
+  return prismaClient.accounts.update({
+    where: { id },
+    data: param,
+  });
+}
+
+export async function updateAccountIdentity(
+  id: number,
+  param: {
+    identification: string;
+    email?: string | null;
   },
 ) {
   return prismaClient.accounts.update({

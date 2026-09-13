@@ -5,8 +5,8 @@ import { summarizeHttpError } from '@common/logging/redact';
 
 const logger = new Logger('GoogleOAuth');
 
-export async function getGoogleUserInfo(code: string) {
-  const accessToken = await getAccessToken(code);
+export async function getGoogleUserInfo(code: string, redirectUri?: string) {
+  const accessToken = await getAccessToken(code, redirectUri);
   const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
 
   try {
@@ -18,7 +18,8 @@ export async function getGoogleUserInfo(code: string) {
 
     const res: SocialLoginInfo = {
       email: userInfoResponse.data.email,
-      id: userInfoResponse.data.sub,
+      emailVerified: userInfoResponse.data.email_verified === true,
+      id: String(userInfoResponse.data.sub),
     };
 
     return res;
@@ -31,14 +32,14 @@ export async function getGoogleUserInfo(code: string) {
   }
 }
 
-async function getAccessToken(code: string) {
+async function getAccessToken(code: string, redirectUri?: string) {
   try {
     const googleTokenUrl = 'https://oauth2.googleapis.com/token';
     const response = await axios.post(googleTokenUrl, {
       code,
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      redirect_uri: redirectUri ?? process.env.GOOGLE_REDIRECT_URI,
       grant_type: 'authorization_code',
     });
 
@@ -48,8 +49,6 @@ async function getAccessToken(code: string) {
       message: 'failed to get google access token',
       ...summarizeHttpError(error),
     });
-    throw new UnauthorizedException(
-      'Failed to get access token from google: ' + error,
-    );
+    throw new UnauthorizedException('Failed to get access token from google');
   }
 }

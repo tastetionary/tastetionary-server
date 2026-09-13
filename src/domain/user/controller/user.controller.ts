@@ -192,7 +192,7 @@ export class UserController {
       nickname: profile.user.nickname,
       area: profile.area,
       account: {
-        accountEmail: profile.account.identification,
+        accountEmail: profile.account.email ?? profile.account.identification,
       },
     });
   }

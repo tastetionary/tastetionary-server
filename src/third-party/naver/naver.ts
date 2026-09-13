@@ -18,7 +18,7 @@ export async function getNaverUserInfo(code: string) {
 
     const res: SocialLoginInfo = {
       email: userInfoResponse.data.response.email,
-      id: userInfoResponse.data.response.id,
+      id: String(userInfoResponse.data.response.id),
     };
 
     return res;

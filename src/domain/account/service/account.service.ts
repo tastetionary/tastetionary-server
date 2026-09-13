@@ -10,6 +10,7 @@ import {
   getToken,
   saveAccount,
   updateAccountById,
+  updateAccountIdentity,
 } from '@domain/account/repository/account.repository';
 import {
   deleteTokensByUserId,
@@ -28,6 +29,19 @@ import * as fs from 'fs';
 import path from 'path';
 import { logUserEvent, UserEvent } from '@common/logging/user-event.logger';
 
+type AccountRecord = NonNullable<Awaited<ReturnType<typeof getIdentification>>>;
+
+function toAccountEntity(
+  record: AccountRecord,
+  paramCategory: AccountCategory,
+) {
+  const { category: _category, ...rest } = record;
+  return {
+    category: paramCategory,
+    ...rest,
+  };
+}
+
 export type AccountEntity = Awaited<ReturnType<typeof getAccount>>;
 export async function getAccount(
   identification: string,
@@ -41,11 +55,7 @@ export async function getAccount(
       ErrorCodeEnum.ACCOUNT_NOT_FOUND,
     );
   }
-  const { category: _category, ...rest } = data;
-  return {
-    category: paramCategory,
-    ...rest,
-  };
+  return toAccountEntity(data, paramCategory);
 }
 
 export async function findAccount(
@@ -82,6 +92,7 @@ export async function createAccount(param: {
   identification: string;
   password: string;
   category: AccountCategory;
+  email?: string | null;
 }) {
   const accountEntity = await findAccount(param.identification, param.category);
   if (accountEntity) {
@@ -97,8 +108,16 @@ export async function createAccount(param: {
     userId: param.userId,
     category: param.category,
     identification: param.identification,
+    email: param.email ?? resolveDefaultEmail(param),
     password,
   });
+}
+
+function resolveDefaultEmail(param: {
+  identification: string;
+  category: AccountCategory;
+}) {
+  return param.category === AccountCategory.EMAIL ? param.identification : null;
 }
 
 export async function changePassword(
@@ -149,53 +168,17 @@ export async function createToken(param: {
   category: AccountCategory;
   password?: string;
   code?: string;
+  redirectUri?: string;
 }) {
-  let userInfo;
-  if (param.category === AccountCategory.EMAIL) {
-    if (!param.identification || !param.password) {
-      throw new CallerWrongUsageException(
-        ErrorSubCategoryEnum.INVALID_INPUT,
-        'Identification and password are required for EMAIL login.',
-        ErrorCodeEnum.MISSING_REQUIRED_FIELD,
-      );
-    }
-  } else {
-    if (!param.code) {
-      throw new CallerWrongUsageException(
-        ErrorSubCategoryEnum.INVALID_INPUT,
-        'Authorization code is required for social login.',
-        ErrorCodeEnum.MISSING_REQUIRED_FIELD,
-      );
-    }
-    userInfo = await getUserInfo(param.category, param.code);
-  }
-
-  const identification =
+  const entity =
     param.category === AccountCategory.EMAIL
-      ? param.identification
-      : userInfo.email;
-  const identificationRecord = await getIdentification(
-    identification,
-    param.category,
-  );
-  if (param.category !== AccountCategory.EMAIL && !identificationRecord) {
-    const user = await createUser();
-    await createAccount({
-      userId: user.id,
-      identification: identification,
-      category: param.category,
-      password: '',
-    });
-    logUserEvent(UserEvent.SIGNUP, {
-      userId: user.id,
-      provider: param.category,
-    });
-  }
+      ? await resolveEmailAccount(param.identification, param.password)
+      : await resolveSocialAccount(
+          param.category,
+          param.code,
+          param.redirectUri,
+        );
 
-  const entity = await getAccount(identification, param.category);
-  if (param.category === AccountCategory.EMAIL) {
-    await checkPassword(entity, param.password!);
-  }
   const tokens = makeTokens({ userId: entity.userId });
   await saveToken({
     userId: entity.userId,
@@ -210,6 +193,113 @@ export async function createToken(param: {
     ...tokens,
     requirePassChange: entity.requirePassChange,
   };
+}
+
+async function resolveEmailAccount(identification?: string, password?: string) {
+  if (!identification || !password) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'Identification and password are required for EMAIL login.',
+      ErrorCodeEnum.MISSING_REQUIRED_FIELD,
+    );
+  }
+
+  const entity = await getAccount(identification, AccountCategory.EMAIL);
+  await checkPassword(entity, password);
+
+  return entity;
+}
+
+async function resolveSocialAccount(
+  category: AccountCategory,
+  code?: string,
+  redirectUri?: string,
+) {
+  if (!code) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'Authorization code is required for social login.',
+      ErrorCodeEnum.MISSING_REQUIRED_FIELD,
+    );
+  }
+
+  assertAllowedRedirectUri(redirectUri);
+
+  const userInfo = await getUserInfo(category, code, redirectUri);
+  const providerId = userInfo?.id;
+  if (!providerId) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'social provider did not return a user id',
+      ErrorCodeEnum.MISSING_REQUIRED_FIELD,
+    );
+  }
+
+  const email = userInfo.email ?? null;
+
+  const matched = await getIdentification(providerId, category);
+  if (matched) {
+    if (email && matched.email !== email) {
+      const updated = await updateAccountIdentity(matched.id, {
+        identification: providerId,
+        email,
+      });
+      return toAccountEntity(updated, category);
+    }
+    return toAccountEntity(matched, category);
+  }
+
+  const legacy =
+    email && userInfo.emailVerified
+      ? await getIdentification(email, category)
+      : null;
+  if (legacy) {
+    const migrated = await updateAccountIdentity(legacy.id, {
+      identification: providerId,
+      email,
+    });
+    return toAccountEntity(migrated, category);
+  }
+
+  const user = await createUser();
+  await createAccount({
+    userId: user.id,
+    identification: providerId,
+    category,
+    email,
+    password: '',
+  });
+  logUserEvent(UserEvent.SIGNUP, { userId: user.id, provider: category });
+
+  return getAccount(providerId, category);
+}
+
+function assertAllowedRedirectUri(redirectUri?: string) {
+  if (!redirectUri) {
+    return;
+  }
+
+  const origin = toOrigin(redirectUri);
+  const allowedOrigins = new ConfigurationService(
+    new ConfigService(),
+  ).getCorsOrigins();
+  if (origin && allowedOrigins.includes(origin)) {
+    return;
+  }
+
+  throw new CallerWrongUsageException(
+    ErrorSubCategoryEnum.INVALID_INPUT,
+    'redirect uri is not allowed',
+    ErrorCodeEnum.INVALID_VALUE,
+  );
+}
+
+function toOrigin(url: string) {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
 }
 
 async function checkPassword(entity: AccountEntity, password: string) {
@@ -244,7 +334,7 @@ function makeTokens(payload: { userId: number }) {
   const refreshToken = jwt.sign(
     payload,
     cfgService.getTokenData().refreshTokenSecret,
-    { expiresIn: `${refreshTokenExpiredAt}` },
+    { expiresIn: `${refreshTokenExpiredAt}s` },
   );
 
   return {
@@ -269,12 +359,16 @@ export function findAccessToken(accessToken: string) {
   return pipe(accessToken, getToken);
 }
 
-async function getUserInfo(category: AccountCategory, code: string) {
+async function getUserInfo(
+  category: AccountCategory,
+  code: string,
+  redirectUri?: string,
+) {
   switch (category) {
     case AccountCategory.KAKAO:
-      return await getKakaoUserInfo(code);
+      return await getKakaoUserInfo(code, redirectUri);
     case AccountCategory.GOOGLE:
-      return await getGoogleUserInfo(code);
+      return await getGoogleUserInfo(code, redirectUri);
     case AccountCategory.NAVER:
       return await getNaverUserInfo(code);
     default:

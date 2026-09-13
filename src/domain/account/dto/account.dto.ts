@@ -61,6 +61,8 @@ export interface CreateTokenRequest {
    * @type string
    */
   code?: string;
+
+  redirectUri?: string;
 }
 
 export interface TokenDTO {
@@ -73,7 +75,8 @@ export interface TokenDTO {
 
 export interface SocialLoginInfo {
   id: string;
-  email: string;
+  email?: string;
+  emailVerified?: boolean;
   gender?: string;
   // TODO:
   // kakao: age_range: 20~29
