@@ -16,6 +16,7 @@ import {
   _private,
   getRecentReviews,
   updateReview,
+  getNearyByRestaurants,
 } from '@domain/restaurant/service/restaurant.service';
 import { EmptyContentException } from '@common/exception/internal.exception';
 import prismaClient from '@root/src/common/database/prisma';
@@ -190,6 +191,36 @@ describe('restaurant service', () => {
           excludeRestaurantIds: [],
         }),
       ).rejects.toThrowError(EmptyContentException);
+    });
+  });
+
+  describe('getNearyByRestaurants', () => {
+    it('should skip restaurants without active reviews', async () => {
+      const userId = 999;
+      const reviewed = externalRestaurantInformationRecordFactory({});
+      const unreviewed = externalRestaurantInformationRecordFactory({});
+      jest
+        .spyOn(repo, 'getExternalRestaurantIdsByDistance')
+        .mockResolvedValueOnce([reviewed, unreviewed]);
+      const review = restaurantReviewRecordFactory({
+        id: reviewed.id,
+        userId,
+        opinion: 'Y',
+      });
+      jest
+        .spyOn(repo, 'getReviewsByConditions')
+        .mockResolvedValueOnce([review]);
+
+      const res = await getNearyByRestaurants({
+        userAreas: areaEntityFactory({ userId }),
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+        maxDistanceMeter: 1000,
+      });
+
+      expect(res).toHaveLength(1);
+      expect(res[0].id).toBe(reviewed.id);
+      expect(res[0].aggregateReviews.totalCount).toBe(1);
     });
   });
 
