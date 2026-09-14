@@ -8,6 +8,7 @@ import {
   ExternalRestaurantInformationRecord,
   getExternalRestaurantIdsByDistance,
   getExternalRestaurantInformation,
+  getRandomSbizRestaurantByDistance,
   getRestaurantOptionsRecord,
   getReviewById,
   getReviewsByConditions,
@@ -124,25 +125,66 @@ export async function getRecommendedRestaurant(param: {
   excludeRestaurantIds: bigint[];
   prices?: RestaurantPrice[];
 }): Promise<RecommendedRestaurant> {
-  const restaurants = await getRestaurantsByDistance({
-    ...param,
-  });
-  if (restaurants.length == 0) {
+  if (!param.userAreas) {
     throw new EmptyContentException('식사 지역 내 식당이 존재하지 않음');
   }
 
-  const ids = restaurants.map((r) => r.id);
-  const targetReviews = await getReviewsByConditions({
-    restaurantIds: ids,
-    keywords: detachEmoji(param.keywords),
-    categories: param.categories,
-    prices: param.prices,
+  const categories = withoutAllOption(param.categories, RestaurantCategory.ALL);
+  const keywords = withoutAllOption(
+    detachEmoji(param.keywords),
+    RestaurantKeyword.ALL,
+  );
+
+  const reviewed = await recommendByReviews({
+    ...param,
+    categories,
+    keywords,
   });
-  if (targetReviews.length == 0) {
+  if (reviewed) return reviewed;
+
+  const restaurant = await getRandomSbizRestaurantByDistance({
+    latitude: param.userAreas.latitude,
+    longitude: param.userAreas.longitude,
+    maxDistanceMeter: param.maxDistanceMeter,
+    categories,
+    excludedIds: param.excludeRestaurantIds,
+  });
+  if (!restaurant) {
     throw new EmptyContentException(
       '검색 조건에 부합 되는 식당이 존재 하지 않음',
     );
   }
+
+  return {
+    restaurant,
+    source: RecommendationSource.EXTERNAL,
+    aggregateReviews: null,
+  };
+}
+
+async function recommendByReviews(param: {
+  userAreas: { latitude: number; longitude: number };
+  maxDistanceMeter: number;
+  keywords?: string[];
+  categories?: RestaurantCategory[];
+  excludeRestaurantIds: bigint[];
+  prices?: RestaurantPrice[];
+}): Promise<RecommendedRestaurant | null> {
+  const restaurants = await getExternalRestaurantIdsByDistance({
+    latitude: param.userAreas.latitude,
+    longitude: param.userAreas.longitude,
+    maxDistanceMeter: param.maxDistanceMeter,
+    excludedIds: param.excludeRestaurantIds,
+  });
+  if (restaurants.length == 0) return null;
+
+  const targetReviews = await getReviewsByConditions({
+    restaurantIds: restaurants.map((r) => r.id),
+    keywords: param.keywords,
+    categories: param.categories,
+    prices: param.prices,
+  });
+  if (targetReviews.length == 0) return null;
 
   const { id, data } = aggregateRestaurantReview(targetReviews);
   const targetRestaurant = restaurants.find(
@@ -157,19 +199,8 @@ export async function getRecommendedRestaurant(param: {
   };
 }
 
-async function getRestaurantsByDistance(param: {
-  userAreas: { latitude: number; longitude: number };
-  maxDistanceMeter: number;
-  excludeRestaurantIds?: bigint[];
-}) {
-  if (!param.userAreas) return [];
-
-  return await getExternalRestaurantIdsByDistance({
-    latitude: param.userAreas?.latitude,
-    longitude: param.userAreas?.longitude,
-    maxDistanceMeter: param.maxDistanceMeter,
-    excludedIds: param.excludeRestaurantIds,
-  });
+function withoutAllOption<T extends string>(values: T[], all: T) {
+  return values.length == 0 || values.includes(all) ? undefined : values;
 }
 
 export async function createReview(param: {
