@@ -122,11 +122,22 @@ export interface GetRestaurantsOutput extends Omit<
    * @type RecommendationAggregateReviews | null
    */
   aggregateReviews: RecommendationAggregateReviews | null;
+  /**
+   * latest reviews of the restaurant, empty when the restaurant has no reviews
+   * @type Array<Omit<RestaurantReview, 'restaurant'>>
+   */
+  reviews: Array<Omit<RestaurantReview, 'restaurant'>>;
 }
 
 export interface RecommendationAggregateReviews extends Pick<
   AggregateReviewDTO,
-  'categories' | 'summaries' | 'keywords' | 'prices'
+  | 'categories'
+  | 'summaries'
+  | 'keywords'
+  | 'prices'
+  | 'totalCount'
+  | 'revisitRatio'
+  | 'aggregatePrice'
 > {}
 
 export interface GetNearByRestaurantsOutput extends Omit<
@@ -322,7 +333,16 @@ export class RestaurantController {
         summaries: aggregateReviews.summaries,
         keywords: aggregateReviews.keywords,
         prices: aggregateReviews.prices,
+        totalCount: aggregateReviews.totalCount,
+        revisitRatio: aggregateReviews.revisitRatio,
+        aggregatePrice: aggregateReviews.aggregatePrice,
       },
+      reviews: data.reviews.map((review) => ({
+        ...review,
+        id: review.id.toString(),
+        external_restaurant_information_id:
+          review.external_restaurant_information_id.toString(),
+      })),
     });
   }
 

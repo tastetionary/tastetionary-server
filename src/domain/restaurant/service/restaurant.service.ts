@@ -620,7 +620,7 @@ function aggregatePrice(prices: RestaurantPrice[]) {
   });
 
   const sum = prices.reduce((sum, price) => sum + PriceMapping[price], 0);
-  const avg = sum / prices.length;
+  const avg = prices.length > 0 ? sum / prices.length : 0;
   const roundAvg = Math.round(avg / 1000) * 1000;
   data['avg'] = roundAvg;
 

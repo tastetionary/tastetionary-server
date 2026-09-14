@@ -19,6 +19,7 @@ import {
 import * as restaurantService from '@domain/restaurant/service/restaurant.service';
 import * as userService from '@domain/user/service/user.service';
 import { areaEntityFactory } from '@root/test/factory/user.factory';
+import { restaurantReviewRecordFactory } from '@root/test/factory/restaurant.factory';
 
 describe('restaurant controller', () => {
   let app: INestApplication;
@@ -96,12 +97,30 @@ describe('restaurant controller', () => {
           opinions: ['Y'],
           keywords: ['key'],
           prices: [RestaurantPrice.UNDER_10000],
-          aggregatePrice: {},
+          aggregatePrice: { [RestaurantPrice.UNDER_10000]: 1, avg: 8000 },
           revisitRatio: 100,
           totalCount: 1,
           reviewReactionCnt: {} as any,
           userReaction: null,
         },
+      });
+    const { reactions: _reactions, ...review } = restaurantReviewRecordFactory({
+      id: 1n,
+      userId: 7,
+    });
+    const reviewsSpy = jest
+      .spyOn(restaurantService, 'getRestaurantReviews')
+      .mockResolvedValueOnce({
+        keywordReviews: { total: 1, revisitRatio: 100, keywordCounts: [] },
+        data: [
+          {
+            user: { id: 7, nickname: 'nickname', reviews: 1 },
+            ...review,
+            reviewReactionCnt: { L: 1, D: 0 },
+            userReaction: null,
+          },
+        ],
+        totalCount: 1,
       });
 
     const res = await request(app.getHttpServer())
@@ -116,12 +135,24 @@ describe('restaurant controller', () => {
       });
 
     assertStatusCode(res, 200);
+    expect(reviewsSpy).toHaveBeenCalledWith(1n, undefined, 1, 10);
     expect(res.body.data.source).toBe(RecommendationSource.REVIEW);
     expect(res.body.data.aggregateReviews).toEqual({
       categories: [RestaurantCategory.ASIAN],
       summaries: ['summary'],
       keywords: ['key'],
       prices: [RestaurantPrice.UNDER_10000],
+      totalCount: 1,
+      revisitRatio: 100,
+      aggregatePrice: { [RestaurantPrice.UNDER_10000]: 1, avg: 8000 },
+    });
+    expect(res.body.data.reviews).toHaveLength(1);
+    expect(res.body.data.reviews[0]).toMatchObject({
+      id: review.id.toString(),
+      external_restaurant_information_id: '1',
+      user: { id: 7, nickname: 'nickname', reviews: 1 },
+      reviewReactionCnt: { L: 1, D: 0 },
+      userReaction: null,
     });
   });
 
@@ -141,6 +172,7 @@ describe('restaurant controller', () => {
         source: RecommendationSource.EXTERNAL,
         aggregateReviews: null,
       });
+    const reviewsSpy = jest.spyOn(restaurantService, 'getRestaurantReviews');
 
     const res = await request(app.getHttpServer())
       .post('/v1/restaurant/recommendation')
@@ -156,6 +188,8 @@ describe('restaurant controller', () => {
     expect(res.body.data.source).toBe(RecommendationSource.EXTERNAL);
     expect(res.body.data.externalUUID).toBeNull();
     expect(res.body.data.aggregateReviews).toBeNull();
+    expect(res.body.data.reviews).toEqual([]);
+    expect(reviewsSpy).not.toHaveBeenCalled();
   });
 
   it('/review, not activity user, should return 400', async () => {

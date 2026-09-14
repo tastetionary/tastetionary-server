@@ -28,6 +28,7 @@ import {
   RestaurantReviewDTO,
 } from '@domain/restaurant/dto/restaurant.dto';
 import {
+  RecommendationSource,
   RestaurantCategory,
   RestaurantPrice,
   ReviewReportCategory,
@@ -46,6 +47,8 @@ interface Recommendation {
   expiredAt: number;
 }
 
+const RECOMMENDATION_REVIEW_LIMIT = 10;
+
 export async function getRecommendations(param: {
   latitude: number;
   longitude: number;
@@ -56,11 +59,25 @@ export async function getRecommendations(param: {
 }) {
   const userAreas = { latitude: param.latitude, longitude: param.longitude };
 
-  return getRecommendedRestaurant({
+  const recommendation = await getRecommendedRestaurant({
     userAreas,
     excludeRestaurantIds: [],
     ...param,
   });
+
+  const reviews =
+    recommendation.source == RecommendationSource.REVIEW
+      ? (
+          await getRestaurantReviews(
+            recommendation.restaurant.id,
+            undefined,
+            1,
+            RECOMMENDATION_REVIEW_LIMIT,
+          )
+        ).data
+      : [];
+
+  return { ...recommendation, reviews };
 }
 
 async function getRecentRecommendations(
