@@ -142,6 +142,10 @@ describe('restaurant service', () => {
         avg: 10000,
       });
     });
+
+    it('aggregatePrice, without prices should return zero average', () => {
+      expect(_private.aggregatePrice([]).avg).toBe(0);
+    });
   });
 
   describe('getRecommendedRestaurant', () => {
