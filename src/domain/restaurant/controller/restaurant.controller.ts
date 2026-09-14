@@ -105,7 +105,12 @@ export interface GetRestaurantsOutput extends Omit<
   'id' | 'externalUUID'
 > {
   id: string;
-  externalUUID: string;
+  /**
+   * kakao place id, null when the restaurant comes from public data and is not linked yet
+   * example: "9391929"
+   * @type string | null
+   */
+  externalUUID: string | null;
   /**
    * recommendation basis, REVIEW: matched by user reviews, EXTERNAL: from external data without matching reviews
    * example: "REVIEW"
@@ -309,7 +314,7 @@ export class RestaurantController {
 
     return new BaseResponseDto({
       id: id.toString(),
-      externalUUID: externalUUID.toString(),
+      externalUUID: externalUUID?.toString() ?? null,
       ...rest,
       source: data.source,
       aggregateReviews: aggregateReviews && {

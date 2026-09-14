@@ -167,6 +167,71 @@ describe('restaurant service', () => {
       expect(res.aggregateReviews).not.toBeNull();
     });
 
+    it('without matching reviews, should fall back to sbiz restaurant', async () => {
+      const userId = 999;
+      const reviewed = externalRestaurantInformationRecordFactory({});
+      const sbiz = {
+        ...externalRestaurantInformationRecordFactory({}),
+        externalUUID: null,
+      };
+      jest
+        .spyOn(repo, 'getExternalRestaurantIdsByDistance')
+        .mockResolvedValueOnce([reviewed]);
+      jest.spyOn(repo, 'getReviewsByConditions').mockResolvedValueOnce([]);
+      const sbizSpy = jest
+        .spyOn(repo, 'getRandomSbizRestaurantByDistance')
+        .mockResolvedValueOnce(sbiz);
+
+      const res = await getRecommendedRestaurant({
+        userAreas: areaEntityFactory({ userId }) as any,
+        maxDistanceMeter: 1000,
+        keywords: ['clean'],
+        categories: [RestaurantCategory.KOREAN],
+        excludeRestaurantIds: [],
+      });
+
+      expect(res).toEqual({
+        restaurant: sbiz,
+        source: RecommendationSource.EXTERNAL,
+        aggregateReviews: null,
+      });
+      expect(sbizSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ categories: [RestaurantCategory.KOREAN] }),
+      );
+    });
+
+    it('with all option, should not filter by category and keyword', async () => {
+      const userId = 999;
+      jest
+        .spyOn(repo, 'getExternalRestaurantIdsByDistance')
+        .mockResolvedValueOnce([
+          externalRestaurantInformationRecordFactory({}),
+        ]);
+      const reviewSpy = jest
+        .spyOn(repo, 'getReviewsByConditions')
+        .mockResolvedValueOnce([]);
+      const sbizSpy = jest
+        .spyOn(repo, 'getRandomSbizRestaurantByDistance')
+        .mockResolvedValueOnce(null);
+
+      await expect(
+        getRecommendedRestaurant({
+          userAreas: areaEntityFactory({ userId }) as any,
+          maxDistanceMeter: 1000,
+          keywords: ['전체'],
+          categories: [RestaurantCategory.ALL],
+          excludeRestaurantIds: [],
+        }),
+      ).rejects.toThrow(EmptyContentException);
+
+      expect(reviewSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ categories: undefined, keywords: undefined }),
+      );
+      expect(sbizSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ categories: undefined }),
+      );
+    });
+
     it('with not restaurant within distance, should return null', async () => {
       const userId = 1000;
       const maxDistance = 1000;

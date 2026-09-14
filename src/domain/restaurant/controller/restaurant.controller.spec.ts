@@ -125,14 +125,14 @@ describe('restaurant controller', () => {
     });
   });
 
-  it('/recommendation, without reviews should return null aggregateReviews', async () => {
+  it('/recommendation, from sbiz should return null externalUUID and aggregateReviews', async () => {
     jest
       .spyOn(restaurantService, 'getRecommendedRestaurant')
       .mockResolvedValueOnce({
         restaurant: {
           id: 1n,
           name: 'name',
-          externalUUID: 123n,
+          externalUUID: null,
           referenceLink: null,
           latitude: 12,
           longitude: 12,
@@ -154,6 +154,7 @@ describe('restaurant controller', () => {
 
     assertStatusCode(res, 200);
     expect(res.body.data.source).toBe(RecommendationSource.EXTERNAL);
+    expect(res.body.data.externalUUID).toBeNull();
     expect(res.body.data.aggregateReviews).toBeNull();
   });
 

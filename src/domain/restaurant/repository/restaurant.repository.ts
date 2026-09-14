@@ -48,7 +48,7 @@ export type RestaurantReviewReactionSummaryRecord = Pick<
 export interface ExternalRestaurantInformationRecord {
   id: bigint;
   name: string;
-  externalUUID: bigint;
+  externalUUID: bigint | null;
   referenceLink: string | null;
   latitude: number;
   longitude: number;
@@ -365,6 +365,45 @@ export async function getExternalRestaurantIdsByDistance(param: {
       param.maxDistanceMeter
     })`;
   return await prismaClient.$queryRaw(queryRaw);
+}
+
+export async function getRandomSbizRestaurantByDistance(param: {
+  latitude: number;
+  longitude: number;
+  maxDistanceMeter: number;
+  categories?: RestaurantCategory[];
+  excludedIds?: bigint[];
+}): Promise<ExternalRestaurantInformationRecord | null> {
+  const point = Prisma.sql`ST_MakePoint(cast(${param.longitude} as numeric), cast(${param.latitude} as numeric))`;
+  const excludedIds =
+    param.excludedIds && param.excludedIds.length > 0
+      ? param.excludedIds
+      : [0n];
+  const categoryCondition =
+    param.categories && param.categories.length > 0
+      ? Prisma.sql`AND category IN (${Prisma.join(param.categories)})`
+      : Prisma.empty;
+
+  const rows: ExternalRestaurantInformationRecord[] =
+    await prismaClient.$queryRaw`
+    SELECT id,
+      name,
+      external_uuid as "externalUUID",
+      reference_link as "referenceLink",
+      address,
+      ST_Y(location::geometry) as latitude,
+      ST_X(location::geometry) as longitude,
+      ST_Distance(location, ${point}) as distance
+    FROM external_restaurant_informations
+    WHERE source = ${RestaurantSource.SBIZ}
+      AND closed_at IS NULL
+      AND id NOT IN (${Prisma.join(excludedIds)})
+      ${categoryCondition}
+      AND st_dwithin(location, ${point}, ${param.maxDistanceMeter})
+    ORDER BY random()
+    LIMIT 1`;
+
+  return rows[0] ?? null;
 }
 
 export interface SbizRestaurantRecord {

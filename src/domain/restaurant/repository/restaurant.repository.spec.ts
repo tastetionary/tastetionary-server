@@ -19,6 +19,7 @@ import {
   updateReviewById,
   upsertSbizRestaurants,
   closeUnsyncedSbizRestaurants,
+  getRandomSbizRestaurantByDistance,
 } from '@domain/restaurant/repository/restaurant.repository';
 import {
   RestaurantCategory,
@@ -171,6 +172,82 @@ describe('Restaurant repository', () => {
       const reopened = (await findSbizRows())[1];
       expect(reopened.name).toBe('reopened');
       expect(reopened.closed_at).toBeNull();
+    });
+  });
+
+  describe('getRandomSbizRestaurantByDistance', () => {
+    const origin = { latitude: 37.5037083174499, longitude: 127.025322018329 };
+    const record = (
+      sourceId: string,
+      category: RestaurantCategory,
+      location = origin,
+    ) => ({
+      sourceId,
+      name: sourceId,
+      address: 'address',
+      latitude: location.latitude,
+      longitude: location.longitude,
+      referenceLink: 'https://map.kakao.com/link/map/test,37.5,127.0',
+      category,
+      sourceCategoryCode: 'I20107',
+    });
+
+    beforeEach(async () => {
+      await upsertSbizRestaurants(
+        [record('KOREAN_CLOSED', RestaurantCategory.KOREAN)],
+        new Date('2026-07-01T00:00:00Z'),
+      );
+      const syncedAt = new Date('2026-10-01T00:00:00Z');
+      await upsertSbizRestaurants(
+        [
+          record('KOREAN_NEAR', RestaurantCategory.KOREAN),
+          record('CHINESE_NEAR', RestaurantCategory.CHINESE),
+          record('KOREAN_FAR', RestaurantCategory.KOREAN, {
+            latitude: 37.6,
+            longitude: 127.1,
+          }),
+        ],
+        syncedAt,
+      );
+      await closeUnsyncedSbizRestaurants(syncedAt);
+      await saveExternalRestaurantInformation({
+        externalUUID: 1n,
+        name: 'KAKAO_NEAR',
+        location: origin,
+        referenceLink: 'https://place.map.kakao.com/1',
+      });
+    });
+
+    it('should return open sbiz restaurant within distance matching category', async () => {
+      const res = await getRandomSbizRestaurantByDistance({
+        ...origin,
+        maxDistanceMeter: 1000,
+        categories: [RestaurantCategory.KOREAN],
+      });
+
+      expect(res?.name).toBe('KOREAN_NEAR');
+      expect(res?.externalUUID).toBeNull();
+      expect(res?.address).toBe('address');
+    });
+
+    it('should not return excluded or non-sbiz restaurants', async () => {
+      const [korean, chinese] = await Promise.all(
+        [RestaurantCategory.KOREAN, RestaurantCategory.CHINESE].map(
+          (category) =>
+            getRandomSbizRestaurantByDistance({
+              ...origin,
+              maxDistanceMeter: 1000,
+              categories: [category],
+            }),
+        ),
+      );
+
+      const res = await getRandomSbizRestaurantByDistance({
+        ...origin,
+        maxDistanceMeter: 1000,
+        excludedIds: [korean!.id, chinese!.id],
+      });
+      expect(res).toBeNull();
     });
   });
 
