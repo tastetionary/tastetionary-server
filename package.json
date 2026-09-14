@@ -82,7 +82,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@nestia/e2e": "^11.3.4",
-    "@nestia/sdk": "^11.3.4",
+    "@nestia/sdk": "^13.0.2",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
