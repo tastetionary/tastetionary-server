@@ -112,7 +112,7 @@
     "testcontainers": "^12.1.0",
     "ts-jest": "^29.4.11",
     "ts-loader": "^9.4.3",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "ts-patch": "^3.3.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6",
