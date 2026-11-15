@@ -24,6 +24,7 @@ import prismaClient from '@common/database/prisma';
 import { getProfile } from '@domain/user/facade/user.facade';
 import { CallerWrongUsageException } from '@common/exception/internal.exception';
 import { createAccount } from '@domain/account/service/account.service';
+import { ErrorCodeEnum } from '@common/exception/enum';
 
 describe('user service', () => {
   beforeEach(async () => {
@@ -159,6 +160,29 @@ describe('user service', () => {
     await expect(validateNickName(DTO.nickname!)).rejects.toThrowError(
       CallerWrongUsageException,
     );
+  });
+
+  it('should throw invalid nickname error when the value contains a banned word', async () => {
+    await truncateTables(prismaClient, ['banned_words']);
+    await prismaClient.bannedWords.create({ data: { word: 'banned' } });
+
+    const error = await validateNickName('banned1').catch((e) => e);
+    await truncateTables(prismaClient, ['banned_words']);
+
+    expect(error).toBeInstanceOf(CallerWrongUsageException);
+    expect(error.errorCode).toEqual(ErrorCodeEnum.INVALID_NICKNAME);
+  });
+
+  it('should not report invalid nickname when the banned word check fails', async () => {
+    const spy = jest
+      .spyOn(prismaClient, '$queryRaw')
+      .mockRejectedValue(new Error('query failed'));
+
+    const error = await validateNickName('nickname').catch((e) => e);
+    spy.mockRestore();
+
+    expect(error).not.toBeInstanceOf(CallerWrongUsageException);
+    expect(error.message).toEqual('failed to check banned words');
   });
 
   it('should throw caller wrong usage exception nickname when the value length < 3', async () => {
