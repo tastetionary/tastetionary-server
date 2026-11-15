@@ -260,27 +260,20 @@ export async function validateNickName(nickname: string) {
     );
   }
 
-  await pipe(
-    nickname,
-    checkNickNameValidity,
-    TE.chain((isValid) => {
-      if (!isValid) {
-        throw new CallerWrongUsageException(
-          ErrorSubCategoryEnum.INVALID_INPUT,
-          'invalid nickname',
-          ErrorCodeEnum.INVALID_NICKNAME,
-        );
-      }
-      return TE.right(true);
-    }),
-    TE.mapError(() => {
-      throw new CallerWrongUsageException(
-        ErrorSubCategoryEnum.INVALID_INPUT,
-        'invalid nickname',
-        ErrorCodeEnum.INVALID_NICKNAME,
-      );
+  const isValid = await pipe(
+    checkNickNameValidity(nickname),
+    TE.getOrElse<Error, boolean>((error) => {
+      throw error;
     }),
   )();
+
+  if (!isValid) {
+    throw new CallerWrongUsageException(
+      ErrorSubCategoryEnum.INVALID_INPUT,
+      'invalid nickname',
+      ErrorCodeEnum.INVALID_NICKNAME,
+    );
+  }
 
   const duplicate = await validateNickNameDuplication(nickname);
   if (duplicate) {

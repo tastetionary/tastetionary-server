@@ -13,7 +13,6 @@ import {
 } from '@domain/user/repository/user.repository';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
-import { error } from 'console';
 
 describe('user repository', () => {
   beforeEach(async () => {
@@ -67,56 +66,56 @@ describe('user repository', () => {
     expect(res.length).toEqual(data.length);
   });
 
-  it('should return false if there is banned word', async () => {
-    prismaClient.bannedWords.findMany = jest
-      .fn()
-      .mockResolvedValue([{ word: 'banned' }]);
-    const res = await pipe(
-      checkNickNameValidity('banned nickname'),
-      TE.match(
-        (error) => {
-          console.log(error);
+  describe('checkNickNameValidity', () => {
+    const check = (nickname: string) =>
+      pipe(
+        checkNickNameValidity(nickname),
+        TE.getOrElse<Error, boolean>((error) => {
           throw error;
-        },
-        (success: boolean) => success,
-      ),
-    )();
-    expect(res).toBe(false);
-  });
+        }),
+      )();
 
-  it('should return false if word has similiarity', async () => {
-    prismaClient.bannedWords.findMany = jest.fn().mockResolvedValue([]);
-    prismaClient.$queryRaw = jest
-      .fn()
-      .mockResolvedValue(['similar banned word']);
-    const res = await pipe(
-      checkNickNameValidity('invalid nickname'),
-      TE.match(
-        (error) => {
-          console.log(error);
-          throw error;
-        },
-        (success: boolean) => success,
-      ),
-    )();
-    expect(res).toBe(false);
-  });
+    beforeEach(async () => {
+      await truncateTables(prismaClient, ['banned_words']);
+      await prismaClient.bannedWords.createMany({
+        data: [{ word: 'banned' }, { word: '금칙어' }],
+      });
+    });
 
-  it('should return true if there is no banned word', async () => {
-    prismaClient.bannedWords.findMany = jest.fn().mockResolvedValue([]);
-    prismaClient.$queryRaw = jest.fn().mockResolvedValue([]);
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
 
-    const res = await pipe(
-      checkNickNameValidity('valid nickname'),
-      TE.match(
-        (error) => {
-          console.log(error);
-          throw error;
-        },
-        (success: boolean) => success,
-      ),
-    )();
+    it('should return false if nickname contains a banned word', async () => {
+      expect(await check('myBANNEDnick')).toBe(false);
+      expect(await check('맛있는금칙어')).toBe(false);
+    });
 
-    expect(res).toBe(true);
+    it('should return false if nickname is similar to a banned word', async () => {
+      expect(await check('bannned')).toBe(false);
+    });
+
+    it('should return true if nickname is only a part of a banned word', async () => {
+      expect(await check('nne')).toBe(true);
+    });
+
+    it('should return true if there is no banned word', async () => {
+      expect(await check('맛있는고양이')).toBe(true);
+      expect(await check('nickname')).toBe(true);
+    });
+
+    it('should return left with cause if the query fails', async () => {
+      const cause = new Error('function similarity(text, text) does not exist');
+      jest.spyOn(prismaClient, '$queryRaw').mockRejectedValue(cause);
+
+      const res = await checkNickNameValidity('nickname')();
+
+      expect(res).toEqualLeft(
+        expect.objectContaining({
+          message: 'failed to check banned words',
+          cause,
+        }),
+      );
+    });
   });
 });

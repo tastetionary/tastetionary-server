@@ -6,10 +6,7 @@ import {
 import { Prisma, Users } from '@prisma/client';
 import prismaClient from '@root/src/common/database/prisma';
 import * as nicknameSource from '@domain/user/resource/nickname.json';
-import { ErrorContents } from '@common/exception/internal.exception';
 import * as TE from 'fp-ts/TaskEither';
-import { pipe } from 'fp-ts/lib/function';
-import { ErrorSubCategoryEnum } from '@root/src/common/exception/enum';
 
 export interface UserRecord {
   id: number;
@@ -133,42 +130,22 @@ export function getNicknamePartRecord(): nicknamePartsRecord {
 
 export function checkNickNameValidity(
   nickname: string,
-): TE.TaskEither<ErrorContents, boolean> {
-  return pipe(
-    TE.tryCatch(
-      async () => {
-        const bannedWords = await prismaClient.bannedWords.findMany({
-          where: {
-            word: {
-              contains: nickname,
-              mode: 'insensitive',
-            },
-          },
-        });
+): TE.TaskEither<Error, boolean> {
+  return TE.tryCatch(
+    async () => {
+      const matches = await prismaClient.$queryRaw<{ word: string }[]>`
+        SELECT word FROM banned_words
+        WHERE word <> ''
+          AND (
+            position(lower(word) in lower(${nickname})) > 0
+            OR similarity(${nickname}, word) > 0.3
+          )
+        LIMIT 1
+      `;
 
-        if (bannedWords.length > 0) {
-          return false;
-        }
-
-        const similarMatch: string[] = await prismaClient.$queryRaw`
-          SELECT * FROM banned_words
-          WHERE similarity(${nickname}, word) > 0.3
-        `;
-
-        if (similarMatch.length > 0) {
-          return false;
-        }
-
-        return true;
-      },
-      () => ({
-        subCategory: ErrorSubCategoryEnum.INVALID_INPUT,
-        message: 'failed to check banned words',
-      }),
-    ),
-    TE.mapLeft(() => ({
-      subCategory: ErrorSubCategoryEnum.INVALID_INPUT,
-      message: 'failed to check banned words',
-    })),
+      return matches.length === 0;
+    },
+    (cause) =>
+      Object.assign(new Error('failed to check banned words'), { cause }),
   );
 }
